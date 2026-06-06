@@ -61,16 +61,18 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                 onClick={() => setActive(i)}
                 className="group relative block w-full overflow-hidden border border-white/8 bg-graphite-800"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={g.image_url}
-                  alt={g.caption || 'BMW coding work'}
-                  loading="lazy"
-                  className="w-full transition-transform duration-700 group-hover:scale-[1.04]"
-                />
+                <div className="aspect-[4/3] w-full overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={g.image_url}
+                    alt={g.caption || 'BMW coding work'}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                </div>
                 <span className="m-stripe absolute left-0 top-0 h-full w-1 opacity-0 transition-opacity group-hover:opacity-100" />
                 {g.caption && (
-                  <span className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-graphite-900/90 to-transparent p-4 text-left font-mono text-xs uppercase tracking-wider text-muted opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-graphite-900/90 to-transparent p-4 text-left font-mono text-xs uppercase tracking-wider text-muted opacity-100 sm:translate-y-2 sm:opacity-0 sm:transition-all sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
                     {g.caption}
                   </span>
                 )}

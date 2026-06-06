@@ -27,13 +27,13 @@ export function Services({ catalog }: { catalog: CategoryWithServices[] }) {
             <div key={cat.id} className="grid grid-cols-12 gap-x-8 gap-y-6">
               {/* Sticky category header (left rail) */}
               <div className="col-span-12 md:col-span-4">
-                <div className="md:sticky md:top-28">
-                  <span className="font-display text-6xl text-graphite-500">
-                    {String(ci + 1).padStart(2, '0')}
-                  </span>
-                  <h3 className="mt-1 font-display text-3xl leading-none tracking-wide text-ink">
-                    {cat.name}
-                  </h3>
+                    <div className="md:sticky md:top-28">
+                      <span className="font-display text-4xl md:text-6xl text-graphite-500">
+                        {String(ci + 1).padStart(2, '0')}
+                      </span>
+                      <h3 className="mt-1 font-display text-2xl md:text-3xl leading-none tracking-wide text-ink">
+                        {cat.name}
+                      </h3>
                   <div className="m-stripe mt-4 h-[2px] w-16" />
                 </div>
               </div>
@@ -57,7 +57,7 @@ export function Services({ catalog }: { catalog: CategoryWithServices[] }) {
                         </p>
                       </div>
                       <div className="col-span-12 text-left sm:col-span-4 sm:text-right">
-                        <span className="font-mono text-base text-bmw transition-colors group-hover:text-ink">
+                        <span className="font-mono text-sm sm:text-base text-bmw transition-colors group-hover:text-ink">
                           {s.price_label}
                         </span>
                       </div>
