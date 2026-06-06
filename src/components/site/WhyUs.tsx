@@ -16,7 +16,7 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
           {/* Left: statement */}
           <div className="col-span-12 lg:col-span-7">
             <div className="mb-4 flex items-center gap-3">
-              <span className="label">04 / The specialist</span>
+              <span className="label max-w-[140px] break-words">04 / The specialist</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
             <h2 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
