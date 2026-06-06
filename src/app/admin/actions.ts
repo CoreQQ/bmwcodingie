@@ -1,0 +1,241 @@
+'use server';
+
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import { getSupabaseAdmin, GALLERY_BUCKET } from '@/lib/supabase';
+import { ADMIN_COOKIE, checkPassword, sessionToken } from '@/lib/auth';
+
+function refreshSite() {
+  revalidatePath('/');
+}
+
+// ─────────────────────────── Auth ───────────────────────────
+
+export async function login(formData: FormData) {
+  const password = String(formData.get('password') ?? '');
+  if (!checkPassword(password)) {
+    redirect('/admin/login?error=1');
+  }
+  const token = await sessionToken();
+  cookies().set(ADMIN_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 14, // 14 days
+  });
+  redirect('/admin');
+}
+
+export async function logout() {
+  cookies().delete(ADMIN_COOKIE);
+  redirect('/admin/login');
+}
+
+// ─────────────────────────── Services ───────────────────────────
+
+export async function createService(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('services').insert({
+    title: String(formData.get('title') ?? '').trim(),
+    description: String(formData.get('description') ?? '').trim(),
+    price_label: String(formData.get('price_label') ?? 'On request').trim(),
+    category_id: numOrNull(formData.get('category_id')),
+    mobile_available: formData.get('mobile_available') === 'on',
+    visible: true,
+    sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
+  revalidatePath('/admin/services');
+  refreshSite();
+}
+
+export async function updateService(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const id = Number(formData.get('id'));
+  await sb
+    .from('services')
+    .update({
+      title: String(formData.get('title') ?? '').trim(),
+      description: String(formData.get('description') ?? '').trim(),
+      price_label: String(formData.get('price_label') ?? 'On request').trim(),
+      category_id: numOrNull(formData.get('category_id')),
+      mobile_available: formData.get('mobile_available') === 'on',
+      visible: formData.get('visible') === 'on',
+      sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+    })
+    .eq('id', id);
+  revalidatePath('/admin/services');
+  refreshSite();
+}
+
+export async function deleteService(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('services').delete().eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/services');
+  refreshSite();
+}
+
+// ─────────────────────────── Categories ───────────────────────────
+
+export async function createCategory(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const name = String(formData.get('name') ?? '').trim();
+  await sb.from('categories').insert({
+    name,
+    slug: slugify(String(formData.get('slug') ?? name)),
+    sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
+  revalidatePath('/admin/categories');
+  refreshSite();
+}
+
+export async function updateCategory(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb
+    .from('categories')
+    .update({
+      name: String(formData.get('name') ?? '').trim(),
+      sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+    })
+    .eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/categories');
+  refreshSite();
+}
+
+export async function deleteCategory(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('categories').delete().eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/categories');
+  refreshSite();
+}
+
+// ─────────────────────────── Gallery ───────────────────────────
+
+export async function uploadGalleryImage(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const file = formData.get('file') as File | null;
+  if (!file || file.size === 0) return;
+
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+  const { error: upErr } = await sb.storage
+    .from(GALLERY_BUCKET)
+    .upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
+  if (upErr) {
+    console.error('[gallery] upload failed:', upErr.message);
+    return;
+  }
+
+  const { data } = sb.storage.from(GALLERY_BUCKET).getPublicUrl(path);
+
+  await sb.from('gallery').insert({
+    image_url: data.publicUrl,
+    caption: String(formData.get('caption') ?? '').trim(),
+    visible: true,
+    sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
+
+  revalidatePath('/admin/gallery');
+  refreshSite();
+}
+
+export async function updateGalleryItem(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb
+    .from('gallery')
+    .update({
+      caption: String(formData.get('caption') ?? '').trim(),
+      sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+      visible: formData.get('visible') === 'on',
+    })
+    .eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/gallery');
+  refreshSite();
+}
+
+export async function deleteGalleryItem(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const id = Number(formData.get('id'));
+  const url = String(formData.get('image_url') ?? '');
+
+  // Best-effort: remove the file from storage too.
+  const marker = `/${GALLERY_BUCKET}/`;
+  const idx = url.indexOf(marker);
+  if (idx !== -1) {
+    const objectPath = url.slice(idx + marker.length);
+    await sb.storage.from(GALLERY_BUCKET).remove([objectPath]);
+  }
+
+  await sb.from('gallery').delete().eq('id', id);
+  revalidatePath('/admin/gallery');
+  refreshSite();
+}
+
+// ─────────────────────────── Settings / content ───────────────────────────
+
+export async function updateSettings(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb
+    .from('site_settings')
+    .update({
+      hero_title: String(formData.get('hero_title') ?? '').trim(),
+      hero_subtitle: String(formData.get('hero_subtitle') ?? '').trim(),
+      about_text: String(formData.get('about_text') ?? '').trim(),
+      service_area: String(formData.get('service_area') ?? '').trim(),
+      phone: String(formData.get('phone') ?? '').trim(),
+      whatsapp: String(formData.get('whatsapp') ?? '').trim(),
+      telegram: String(formData.get('telegram') ?? '').trim(),
+      instagram: String(formData.get('instagram') ?? '').trim(),
+      email: String(formData.get('email') ?? '').trim(),
+    })
+    .eq('id', 1);
+  revalidatePath('/admin/content');
+  refreshSite();
+}
+
+// ─────────────────────────── Bookings ───────────────────────────
+
+export async function toggleBookingHandled(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb
+    .from('bookings')
+    .update({ handled: formData.get('handled') === 'true' })
+    .eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/bookings');
+}
+
+export async function deleteBooking(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('bookings').delete().eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/bookings');
+}
+
+// ─────────────────────────── helpers ───────────────────────────
+
+function numOrNull(v: FormDataEntryValue | null): number | null {
+  const n = Number(v);
+  return v === null || v === '' || Number.isNaN(n) ? null : n;
+}
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40) || `cat-${Date.now()}`;
+}

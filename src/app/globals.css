@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bmw: #1c69d4;
+  --m-blue: #0066b1;
+  --m-purple: #5c2d91;
+  --m-red: #e2001a;
+  --graphite: #0a0b0d;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
+body {
+  background-color: var(--graphite);
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Selection */
+::selection {
+  background: var(--bmw);
+  color: #fff;
+}
+
+/* Slim scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0b0d;
+}
+::-webkit-scrollbar-thumb {
+  background: #272c33;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4048;
+}
+
+@layer components {
+  /* ---- The BMW M three-colour stripe ---- */
+  .m-stripe {
+    background: linear-gradient(
+      90deg,
+      var(--m-blue) 0 33.33%,
+      var(--m-purple) 33.33% 66.66%,
+      var(--m-red) 66.66% 100%
+    );
+  }
+  /* Vertical variant */
+  .m-stripe-v {
+    background: linear-gradient(
+      180deg,
+      var(--m-blue) 0 33.33%,
+      var(--m-purple) 33.33% 66.66%,
+      var(--m-red) 66.66% 100%
+    );
+  }
+
+  /* Monospace ticker label used across sections */
+  .label {
+    @apply font-mono text-[11px] uppercase tracking-ticker text-faint;
+  }
+
+  /* Blueprint grid background texture */
+  .blueprint {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Subtle film grain overlay */
+  .grain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-bmw px-6 py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_28px_-6px_rgba(28,105,212,0.7)];
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-300 hover:border-ink/60;
+  }
+}
+
+/* ---- Scroll reveal ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+}
+.reveal.is-in {
+  animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
