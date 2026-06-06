@@ -21,8 +21,6 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 64px;
-  min-width: 100%;
-  overflow-x: hidden;
 }
 
 @media (min-width: 768px) {
@@ -36,8 +34,6 @@ body {
   color: #fff;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  min-width: 100%;
-  overflow-x: hidden;
 }
 
 /* Selection */
