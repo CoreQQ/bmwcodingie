@@ -12,7 +12,7 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
   return (
     <section id="about" className="relative border-t border-white/5 py-20 md:py-28">
       <div className="mx-auto max-w-edge px-5 md:px-8">
-        <div className="grid grid-cols-12 gap-x-10 gap-y-14">
+        <div className="grid grid-cols-12 gap-x-4 md:gap-x-10 gap-y-14">
           {/* Left: statement */}
           <div className="col-span-12 lg:col-span-7">
             <div className="mb-4 flex items-center gap-3">
@@ -25,7 +25,7 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
             </h2>
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted">{settings.about_text}</p>
 
-            <div className="mt-10 grid grid-cols-3 gap-px bg-white/8">
+            <div className="mt-10 grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-3">
               <Stat n="F·G·U" label="Generations" />
               <Stat n="100%" label="Mobile callout" />
               <Stat n="On site" label="See it work first" />

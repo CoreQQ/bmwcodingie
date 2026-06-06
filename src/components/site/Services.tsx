@@ -24,7 +24,7 @@ export function Services({ catalog }: { catalog: CategoryWithServices[] }) {
 
         <div className="space-y-16 md:space-y-24">
           {catalog.map((cat, ci) => (
-            <div key={cat.id} className="grid grid-cols-12 gap-x-8 gap-y-6">
+            <div key={cat.id} className="grid grid-cols-12 gap-x-4 md:gap-x-8 gap-y-6">
               {/* Sticky category header (left rail) */}
               <div className="col-span-12 md:col-span-4">
                     <div className="md:sticky md:top-28">

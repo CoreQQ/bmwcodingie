@@ -55,7 +55,7 @@ export function Contact({
           <span className="m-stripe h-[2px] w-10" />
         </div>
 
-        <div className="grid grid-cols-12 gap-x-10 gap-y-12">
+        <div className="grid grid-cols-12 gap-x-4 md:gap-x-10 gap-y-12">
           {/* Left: pitch + direct contact */}
           <div className="col-span-12 lg:col-span-5">
             <h2 className="font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.9]">

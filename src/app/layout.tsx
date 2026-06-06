@@ -36,6 +36,10 @@ export const metadata: Metadata = {
     'E-Sys coding',
     'Japan to EU BMW conversion',
   ],
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+  },
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
@@ -90,9 +94,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" className={`${bebas.variable} ${manrope.variable}`}>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
       <body className="font-sans antialiased">
         <script
           type="application/ld+json"
