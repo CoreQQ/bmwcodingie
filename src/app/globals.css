@@ -13,6 +13,10 @@
 * {
   -webkit-tap-highlight-color: transparent;
 }
+/* Use border-box globally to prevent borders/padding from increasing element size */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 html {
   scroll-behavior: smooth;
