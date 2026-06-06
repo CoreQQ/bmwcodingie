@@ -67,7 +67,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
                 <SpecRow k="Format" v="Mobile — I come to you" />
                 <SpecRow k="Coverage" v="Dublin + surrounding counties" />
                 <SpecRow k="Tooling" v="ISTA · E-Sys · BimmerCode" />
-                <SpecRow k="Platforms" v="F · G · U-series" />
+                <SpecRow k="Platforms" v="F · G · E-series" />
                 <SpecRow k="Payment" v="On completion, on site" />
               </div>
               <div className="flex items-center gap-2 border-t border-white/10 px-5 py-4 text-sm text-muted">
