@@ -26,7 +26,7 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted">{settings.about_text}</p>
 
             <div className="mt-10 grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-3">
-              <Stat n="F·G·U" label="Generations" />
+              <Stat n="F·G·I" label="Generations" />
               <Stat n="100%" label="Mobile callout" />
               <Stat n="On site" label="See it work first" />
             </div>
