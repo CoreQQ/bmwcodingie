@@ -5,7 +5,7 @@ const TOOLING = ['ISTA / Rheingold', 'E-Sys + PSdZData', 'BimmerCode', 'FA / VO 
 const PLATFORMS = [
   { gen: 'F-series', detail: 'F2x · F3x · F1x · F8x — NBT / NBT Evo' },
   { gen: 'G-series', detail: 'G2x · G3x · G0x — MGU iDrive 7/8' },
-  { gen: 'E-series', detail: 'Latest E-platform — assessed per car' },
+  { gen: 'I-series', detail: 'Latest I-platform — assessed per car' },
 ];
 
 export function WhyUs({ settings }: { settings: SiteSettings }) {

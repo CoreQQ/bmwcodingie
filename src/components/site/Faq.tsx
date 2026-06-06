@@ -10,7 +10,7 @@ const FAQS = [
   },
   {
     q: 'Which BMW models do you cover?',
-    a: 'F, G and E-series across NBT, NBT Evo and MGU (iDrive 6/7/8) head units. Send me your model, year and VIN-derived build and I will confirm exactly what is possible on your car.',
+    a: 'F, G and I-series across NBT, NBT Evo and MGU (iDrive 6/7/8) head units. Send me your model, year and VIN-derived build and I will confirm exactly what is possible on your car.',
   },
   {
     q: 'Do I need to drive anywhere?',

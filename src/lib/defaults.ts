@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   hero_subtitle:
     'I come to you. Dealer-level coding, diagnostics and retrofits performed at your home or workplace anywhere in Dublin and the surrounding counties.',
   about_text:
-    'Independent BMW coding specialist working out of Dublin. ISTA/Rheingold, E-Sys and BimmerCode across F, G and E-series — done at your door, paid on completion.',
+    'Independent BMW coding specialist working out of Dublin. ISTA/Rheingold, E-Sys and BimmerCode across F, G and I-series — done at your door, paid on completion.',
   service_area:
     'Dublin city and county, plus Kildare, Wicklow and Meath. Same-day callouts when the calendar allows.',
   phone: '+353 00 000 0000',
