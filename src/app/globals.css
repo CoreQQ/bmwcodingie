@@ -81,6 +81,8 @@ body {
   /* Monospace ticker label used across sections */
   .label {
     @apply font-mono text-[11px] uppercase tracking-ticker text-faint;
+    max-width: 100%;
+    @apply whitespace-normal break-words;
   }
 
   /* Blueprint grid background texture */
