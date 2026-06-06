@@ -32,7 +32,7 @@ export function Header() {
             : 'bg-transparent'
         }`}
       >
-        <div className="mx-auto flex max-w-edge items-center justify-between px-5 py-4 md:px-8">
+        <div className="mx-auto flex max-w-edge items-center justify-between px-4 py-3 md:px-8 md:py-4">
           {/* Wordmark */}
           <a href="#top" className="group flex items-center gap-3">
             <span className="m-stripe-v h-7 w-1.5" aria-hidden="true" />

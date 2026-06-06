@@ -16,7 +16,13 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 88px;
+  scroll-padding-top: 64px;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 88px;
+  }
 }
 
 body {
@@ -92,10 +98,10 @@ body {
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-bmw px-6 py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_28px_-6px_rgba(28,105,212,0.7)];
+    @apply inline-flex items-center justify-center gap-2 bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_28px_-6px_rgba(28,105,212,0.7)];
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-300 hover:border-ink/60;
+    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-300 hover:border-ink/60;
   }
 }
 

@@ -23,7 +23,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-graphite-900 to-transparent" />
       </div>
 
-      <div className="mx-auto max-w-edge px-5 pb-20 pt-36 md:px-8 md:pb-28 md:pt-44">
+      <div className="mx-auto max-w-edge px-5 pb-16 pt-20 sm:pt-28 md:px-8 md:pb-28 md:pt-44">
         <div className="grid grid-cols-12 gap-y-12 md:gap-x-10">
           {/* Headline block */}
           <div className="col-span-12 lg:col-span-8">
@@ -32,7 +32,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
               <span className="label text-muted">Independent BMW Specialist · Est. Dublin</span>
             </div>
 
-            <h1 className="font-display text-[clamp(3rem,11vw,8.5rem)] leading-[0.86] tracking-tight">
+            <h1 className="font-display text-[clamp(2.2rem,10vw,6.5rem)] leading-[0.86] tracking-tight">
               <span className="block">BMW CODING</span>
               <span className="block text-bmw">&amp; RETROFITS</span>
               <span className="block text-muted">MOBILE · DUBLIN</span>
@@ -53,7 +53,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
 
             <a
               href="#services"
-              className="mt-14 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-faint transition-colors hover:text-ink"
+              className="mt-8 sm:mt-14 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-faint transition-colors hover:text-ink"
             >
               <ArrowDown size={14} className="animate-bounce" /> Scroll
             </a>
