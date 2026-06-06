@@ -78,14 +78,14 @@ export function Contact({
                 <span className="ml-auto text-sm text-muted">{settings.whatsapp}</span>
               </a>
               <a
-                href={`https://t.me/${tg}`}
+                href={`https://instagram.com/${ig}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 border border-white/10 p-4 transition-colors hover:border-bmw"
               >
-                <Send size={20} className="text-bmw" />
-                <span className="font-mono text-sm uppercase tracking-wider text-ink">Telegram</span>
-                <span className="ml-auto text-sm text-muted">@{tg}</span>
+                <Instagram size={20} className="text-bmw" />
+                <span className="font-mono text-sm uppercase tracking-wider text-ink">Instagram</span>
+                <span className="ml-auto text-sm text-muted">@{ig}</span>
               </a>
               <a
                 href={`tel:${settings.phone.replace(/\s+/g, '')}`}
