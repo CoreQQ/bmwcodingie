@@ -40,7 +40,7 @@ export function Header() {
               <span className="block font-display text-2xl tracking-wide text-ink">
                 BMW CODING
               </span>
-              <span className="label block leading-none text-faint">Dublin · Mobile</span>
+              <span className="label block leading-none text-faint">Dublin · Ireland</span>
             </span>
           </a>
 

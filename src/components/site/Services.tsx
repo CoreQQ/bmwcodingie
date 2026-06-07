@@ -13,12 +13,12 @@ export function Services({ catalog }: { catalog: CategoryWithServices[] }) {
               <span className="m-stripe h-[2px] w-10" />
             </div>
             <h2 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
-              WHAT I CODE
+              WHAT WE CODE
             </h2>
           </div>
           <p className="col-span-12 text-muted md:col-span-4 md:text-right">
-            Fixed prices where I can give them, honest “on request” where the car decides. Every
-            job is mobile unless the hardware says otherwise.
+            Fixed prices where we can give them, honest “on request” where the car decides. Most
+            jobs can be done in person or remotely — hardware retrofits are in-person only.
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export function Services({ catalog }: { catalog: CategoryWithServices[] }) {
                           <h4 className="text-lg font-semibold text-ink">{s.title}</h4>
                           {s.mobile_available && (
                             <span className="inline-flex items-center gap-1 border border-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-faint">
-                              <Check size={10} className="text-bmw" /> Mobile
+                              <Check size={10} className="text-bmw" /> Remote OK
                             </span>
                           )}
                         </div>
@@ -71,7 +71,7 @@ export function Services({ catalog }: { catalog: CategoryWithServices[] }) {
 
         <p className="mt-14 max-w-xl text-sm text-faint">
           Don’t see your exact request? Hidden features and bespoke coding are part of the job —
-          message me the car and what you want, and I’ll tell you straight whether it’s possible.
+          message us the car and what you want, and we’ll tell you straight whether it’s possible.
         </p>
       </div>
     </section>

@@ -21,11 +21,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bmwcoding.ie';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'BMW Coding IE — Mobile BMW Coding, Diagnostics & Retrofits in Dublin',
+    default: 'BMW Coding IE — BMW Coding, Diagnostics & Retrofits in Dublin',
     template: '%s · BMW Coding IE',
   },
   description:
-    'Mobile BMW coding, ISTA diagnostics and retrofits across Dublin. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. I come to you.',
+    'BMW coding, ISTA diagnostics and retrofits across Dublin — in person or remotely over ENET. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. F and G series.',
   keywords: [
     'BMW coding Dublin',
     'BMW diagnostics Dublin',
@@ -46,15 +46,15 @@ export const metadata: Metadata = {
     locale: 'en_IE',
     url: SITE_URL,
     siteName: 'BMW Coding IE',
-    title: 'BMW Coding IE — Mobile BMW Coding & Retrofits in Dublin',
+    title: 'BMW Coding IE — BMW Coding & Retrofits in Dublin',
     description:
-      'Dealer-level BMW coding, diagnostics and retrofits at your door across Dublin and the surrounding counties.',
+      'Dealer-level BMW coding, diagnostics and retrofits across Dublin — in person or remotely over ENET. F and G series.',
     images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'BMW Coding IE' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BMW Coding IE — Mobile BMW Coding & Retrofits in Dublin',
-    description: 'Mobile BMW coding, diagnostics and retrofits across Dublin.',
+    title: 'BMW Coding IE — BMW Coding & Retrofits in Dublin',
+    description: 'BMW coding, diagnostics and retrofits across Dublin — in person or remote.',
     images: ['/og.jpg'],
   },
   robots: { index: true, follow: true },
@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     '@type': 'AutoRepair',
     name: 'BMW Coding IE',
     description:
-      'Mobile BMW coding, diagnostics and retrofit specialist serving Dublin and surrounding counties.',
+      'BMW coding, diagnostics and retrofit team serving Dublin and surrounding counties — in person or remotely over ENET.',
     url: SITE_URL,
     telephone: settings.phone,
     email: settings.email,

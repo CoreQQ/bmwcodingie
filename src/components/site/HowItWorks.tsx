@@ -4,21 +4,21 @@ const STEPS = [
   {
     n: '01',
     title: 'Send the details',
-    body: 'Message the model, year and what you want — CarPlay, ambient light, a fault to chase. I confirm if it’s codable.',
+    body: 'Message the model, year and what you want — CarPlay, ambient light, a fault to chase. We confirm if it’s codable.',
   },
   {
     n: '02',
-    title: 'Pick a time & place',
-    body: 'Home, work or a car park — wherever the car sits. We lock in a slot, often same day.',
+    title: 'In person or remote',
+    body: 'Choose what suits you: we come to the car around Dublin, or you connect remotely — for that you need a laptop and an ENET cable.',
   },
   {
     n: '03',
-    title: 'I come to you',
-    body: 'I arrive with the laptop and tooling, plug in, code or diagnose on the spot and show you it working.',
+    title: 'We get you coded',
+    body: 'In person we arrive with the tooling and plug in; remotely we connect over ENET. Either way we code or diagnose and show it working.',
   },
   {
     n: '04',
-    title: 'Done — pay on site',
+    title: 'Done — pay on completion',
     body: 'You see the result before you pay. Card or cash on completion. No dealer trip, no waiting room.',
   },
 ];

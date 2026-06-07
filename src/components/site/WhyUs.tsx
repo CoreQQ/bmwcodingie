@@ -5,7 +5,6 @@ const TOOLING = ['ISTA / Rheingold', 'E-Sys + PSdZData', 'BimmerCode', 'FA / VO 
 const PLATFORMS = [
   { gen: 'F-series', detail: 'F2x · F3x · F1x · F8x — NBT / NBT Evo' },
   { gen: 'G-series', detail: 'G2x · G3x · G0x — MGU iDrive 7/8' },
-  { gen: 'I-series', detail: 'Latest I-platform — assessed per car' },
 ];
 
 export function WhyUs({ settings }: { settings: SiteSettings }) {
@@ -16,19 +15,19 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
           {/* Left: statement */}
           <div className="col-span-12 lg:col-span-7">
             <div className="mb-4 flex items-center gap-3">
-              <span className="label max-w-[140px] break-words">04 / The specialist</span>
+              <span className="label max-w-[140px] break-words">04 / The team</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
             <h2 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
-              ONE PERSON. <br />
+              A REAL TEAM. <br />
               <span className="text-bmw">THE RIGHT TOOLS.</span>
             </h2>
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted">{settings.about_text}</p>
 
             <div className="mt-10 grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-3">
-              <Stat n="F·G·I" label="Generations" />
-              <Stat n="100%" label="Mobile callout" />
-              <Stat n="On site" label="See it work first" />
+              <Stat n="F·G" label="Generations" />
+              <Stat n="2 ways" label="In-person or remote" />
+              <Stat n="Live" label="See it work first" />
             </div>
           </div>
 

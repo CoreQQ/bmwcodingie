@@ -59,11 +59,11 @@ export function Contact({
           {/* Left: pitch + direct contact */}
           <div className="col-span-12 lg:col-span-5">
             <h2 className="font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.9]">
-              BOOK A <br /> CALLOUT
+              BOOK <br /> A SLOT
             </h2>
             <p className="mt-6 max-w-md text-muted">
-              Tell me the car and what you need. I’ll reply with whether it’s codable, a price and
-              the soonest slot. Prefer to chat? Message me directly.
+              Tell us the car and what you need. We’ll reply with whether it’s codable, a price and
+              the soonest slot. Prefer to chat? Message us directly.
             </p>
 
             <div className="mt-9 space-y-3">
@@ -156,14 +156,14 @@ export function Contact({
                     value={form.message}
                     onChange={update('message')}
                     rows={3}
-                    placeholder="Tell me what you’re after…"
+                    placeholder="Tell us what you’re after…"
                     className={`${inputCls} resize-none`}
                   />
                 </Field>
 
                 {status === 'sent' ? (
                   <div className="border border-bmw/40 bg-bmw/10 p-4 text-sm text-ink">
-                    Got it — I’ll be in touch shortly. For anything urgent, message me on WhatsApp.
+                    Got it — we’ll be in touch shortly. For anything urgent, message us on WhatsApp.
                   </div>
                 ) : (
                   <button
@@ -171,12 +171,12 @@ export function Contact({
                     disabled={status === 'sending'}
                     className="btn-primary w-full disabled:opacity-60"
                   >
-                    {status === 'sending' ? 'Sending…' : 'Request a callout'}
+                    {status === 'sending' ? 'Sending…' : 'Send request'}
                   </button>
                 )}
                 {status === 'error' && (
                   <p className="text-sm text-m-red">
-                    Please add at least your name and a contact number — or message me on WhatsApp.
+                    Please add at least your name and a contact number — or message us on WhatsApp.
                   </p>
                 )}
 

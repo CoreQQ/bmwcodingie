@@ -6,27 +6,27 @@ import { Plus } from 'lucide-react';
 const FAQS = [
   {
     q: 'Will coding affect my BMW warranty?',
-    a: 'Coding changes software parameters that already exist in your car — it is reversible and I can return any setting to factory before a dealer visit. I will always tell you up front if a specific request is likely to be flagged.',
+    a: 'Coding changes software parameters that already exist in your car — it is reversible and we can return any setting to factory before a dealer visit. We will always tell you up front if a specific request is likely to be flagged.',
   },
   {
     q: 'Which BMW models do you cover?',
-    a: 'F, G and I-series across NBT, NBT Evo and MGU (iDrive 6/7/8) head units. Send me your model, year and VIN-derived build and I will confirm exactly what is possible on your car.',
+    a: 'F and G series across NBT, NBT Evo and MGU (iDrive 6/7/8) head units. Send us your model, year and VIN-derived build and we will confirm exactly what is possible on your car.',
   },
   {
     q: 'Do I need to drive anywhere?',
-    a: 'No — that is the whole point. I come to your home, workplace or wherever the car is parked across Dublin and the surrounding counties. Most coding jobs are done in under an hour at your door.',
+    a: 'Usually not. For in-person work we come to your home, workplace or wherever the car is parked across Dublin and the surrounding counties. We also offer remote coding — you stay where you are and connect a laptop with an ENET cable to the car while we work.',
   },
   {
     q: 'How do I pay?',
-    a: 'On completion, once you have seen the feature working. Card or cash on site. Prices for diagnostics and conversions are confirmed before I start so there are no surprises.',
+    a: 'On completion, once you have seen the feature working. Card or cash. Prices for diagnostics and conversions are confirmed before we start so there are no surprises.',
   },
   {
     q: 'Can you retrofit hardware, not just code?',
-    a: 'Yes — ambient lighting, cruise control and similar retrofits that need wiring or modules can be scoped. Some need parts ordered first, so message me early and I will quote the full job.',
+    a: 'Yes — ambient lighting, cruise control and similar retrofits that need wiring or modules can be scoped. These are in-person jobs and some need parts ordered first, so message us early and we will quote the full job.',
   },
   {
     q: 'My import is Japanese spec — can you convert it?',
-    a: 'Japan→EU conversions are a regular job: region change, FSC, ETC mirror handling and TCB considerations. Send the details and I will tell you what your specific car needs.',
+    a: 'Japan→EU conversions are a regular job: region change, FSC, ETC mirror handling and TCB considerations. Send the details and we will tell you what your specific car needs.',
   },
 ];
 

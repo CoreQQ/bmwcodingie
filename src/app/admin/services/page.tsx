@@ -41,7 +41,7 @@ export default async function ServicesAdmin() {
           </Field>
           <label className="flex items-center gap-2 text-sm text-muted">
             <input type="checkbox" name="mobile_available" defaultChecked className="accent-bmw" />
-            Mobile callout available
+            Remote available
           </label>
           <div className="flex items-end">
             <button type="submit" className={aBtn}>
@@ -125,7 +125,7 @@ function ServiceEditor({ service, categories }: { service: Service; categories: 
           </label>
           <label className="flex items-center gap-2 text-sm text-muted">
             <input type="checkbox" name="mobile_available" defaultChecked={service.mobile_available} className="accent-bmw" />
-            Mobile available
+            Remote available
           </label>
         </div>
         <div className="flex justify-end gap-2 md:col-span-4">

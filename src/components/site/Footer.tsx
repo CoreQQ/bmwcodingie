@@ -17,8 +17,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
               <span className="font-display text-3xl tracking-wide text-ink">BMW CODING IE</span>
             </div>
             <p className="mt-4 max-w-sm text-sm text-muted">
-              Independent, mobile BMW coding, diagnostics and retrofits across Dublin and the
-              surrounding counties. I come to you.
+              Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in
+              person or remotely over ENET.
             </p>
             <div className="mt-5 flex gap-3">
               <a

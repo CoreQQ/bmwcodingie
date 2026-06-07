@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
         <QuickLink href="/admin/services" title="Edit services & prices" desc="Add, reorder, hide or re-price coding services." />
         <QuickLink href="/admin/gallery" title="Upload work photos" desc="Add before/after and iDrive screens to the gallery." />
         <QuickLink href="/admin/content" title="Hero, about & contacts" desc="Edit headline, blurbs and your phone / WhatsApp / Telegram." />
-        <QuickLink href="/admin/bookings" title="Review enquiries" desc="See callout requests from the contact form." />
+        <QuickLink href="/admin/bookings" title="Review enquiries" desc="See booking requests from the contact form." />
       </div>
     </AdminShell>
   );

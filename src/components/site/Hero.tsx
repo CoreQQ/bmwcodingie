@@ -29,13 +29,13 @@ export function Hero({ settings }: { settings: SiteSettings }) {
           <div className="col-span-12 lg:col-span-8">
             <div className="mb-7 flex items-center gap-3 reveal is-in">
               <span className="m-stripe h-[3px] w-12" />
-              <span className="label text-muted">Independent BMW Specialist · Est. Dublin</span>
+              <span className="label text-muted">Independent BMW Coding Team · Est. Dublin</span>
             </div>
 
             <h1 className="font-display text-[clamp(2.2rem,10vw,6.5rem)] leading-[0.86] tracking-tight">
               <span className="block">BMW CODING</span>
               <span className="block text-bmw">&amp; RETROFITS</span>
-              <span className="block text-muted">MOBILE · DUBLIN</span>
+              <span className="block text-muted">IN-PERSON · REMOTE</span>
             </h1>
 
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
@@ -64,11 +64,11 @@ export function Hero({ settings }: { settings: SiteSettings }) {
             <div className="border border-white/10 bg-graphite-800/60 backdrop-blur-sm">
               <div className="m-stripe h-1 w-full" />
               <div className="space-y-0 divide-y divide-white/5">
-                <SpecRow k="Format" v="Mobile — I come to you" />
+                <SpecRow k="Format" v="In-person or remote" />
                 <SpecRow k="Coverage" v="Dublin + surrounding counties" />
                 <SpecRow k="Tooling" v="ISTA · E-Sys · BimmerCode" />
-                <SpecRow k="Platforms" v="F · G · I-series" />
-                <SpecRow k="Payment" v="On completion, on site" />
+                <SpecRow k="Platforms" v="F · G series" />
+                <SpecRow k="Payment" v="On completion" />
               </div>
               <div className="flex items-center gap-2 border-t border-white/10 px-5 py-4 text-sm text-muted">
                 <MapPin size={15} className="text-bmw" />
