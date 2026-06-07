@@ -1,6 +1,7 @@
 import { Instagram, Send, MessageCircle } from 'lucide-react';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
+import { Logo } from './Logo';
 
 export function Footer({ settings }: { settings: SiteSettings }) {
   const year = new Date().getFullYear();
@@ -12,10 +13,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="grid grid-cols-12 gap-y-10 pb-14">
           <div className="col-span-12 md:col-span-5">
-            <div className="flex items-center gap-3">
-              <span className="m-stripe-v h-8 w-1.5" />
-              <span className="font-display text-3xl tracking-wide text-ink">BMW CODING IE</span>
-            </div>
+            <Logo markClass="h-11 w-11" textClass="text-3xl" />
             <p className="mt-4 max-w-sm text-sm text-muted">
               Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in
               person or remotely over ENET.

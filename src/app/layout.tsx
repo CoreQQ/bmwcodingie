@@ -21,7 +21,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bmwcoding.ie';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'BMW Coding IE — BMW Coding, Diagnostics & Retrofits in Dublin',
+    default: 'BMW Coding IE',
     template: '%s · BMW Coding IE',
   },
   description:

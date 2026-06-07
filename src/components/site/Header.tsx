@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Logo } from './Logo';
 
 const NAV = [
   { href: '#services', label: 'Services' },
@@ -34,14 +35,8 @@ export function Header() {
       >
         <div className="mx-auto flex max-w-edge items-center justify-between px-4 py-3 md:px-8 md:py-4">
           {/* Wordmark */}
-          <a href="#top" className="group flex items-center gap-3">
-            <span className="m-stripe-v h-7 w-1.5" aria-hidden="true" />
-            <span className="leading-none">
-              <span className="block font-display text-2xl tracking-wide text-ink">
-                BMW CODING
-              </span>
-              <span className="label block leading-none text-faint">Dublin · Ireland</span>
-            </span>
+          <a href="#top" className="group inline-flex items-center">
+            <Logo subtitle="Dublin · Ireland" markClass="h-9 w-9" textClass="text-2xl" />
           </a>
 
           {/* Desktop nav */}
