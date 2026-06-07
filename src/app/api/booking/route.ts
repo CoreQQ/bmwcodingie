@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { notifyTelegram } from '@/lib/telegram';
 
 export const runtime = 'nodejs';
 
@@ -21,21 +22,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Name and contact required' }, { status: 400 });
   }
 
+  const lead = { name, contact, bmw_model, service, message };
   const sb = getSupabaseAdmin();
+
+  // No DB configured yet — accept the lead so the form still works in preview,
+  // and still ping Telegram so the enquiry isn't lost.
   if (!sb) {
-    // No DB configured yet — accept the lead so the form still works in preview.
     console.warn('[booking] Supabase not configured; lead not persisted:', { name, contact });
+    await notifyTelegram({ ...lead, persisted: false });
     return NextResponse.json({ ok: true, persisted: false });
   }
 
-  const { error } = await sb
-    .from('bookings')
-    .insert({ name, contact, bmw_model, service, message });
+  const { error } = await sb.from('bookings').insert(lead);
 
   if (error) {
     console.error('[booking] insert failed:', error.message);
+    // Notify anyway so the lead reaches you even if the DB write failed.
+    await notifyTelegram({ ...lead, persisted: false });
     return NextResponse.json({ ok: false, error: 'Could not save' }, { status: 500 });
   }
 
+  // Saved — notify. Telegram failure never affects the visitor's success response.
+  await notifyTelegram({ ...lead, persisted: true });
   return NextResponse.json({ ok: true, persisted: true });
 }

@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import { Bebas_Neue, Manrope } from 'next/font/google';
 import './globals.css';
 import { getSettings } from '@/lib/data';
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const bebas = Bebas_Neue({
   weight: '400',
