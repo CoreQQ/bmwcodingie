@@ -4,89 +4,86 @@
 -- ============================================================
 
 -- ---------- Tables ----------
-
 create table if not exists categories (
-  id          bigint generated always as identity primary key,
-  slug        text unique not null,
-  name        text not null,
-  sort_order  int  not null default 0,
-  created_at  timestamptz not null default now()
+  id bigint generated always as identity primary key,
+  slug text unique not null,
+  name text not null,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
 );
 
 create table if not exists services (
-  id               bigint generated always as identity primary key,
-  category_id      bigint references categories(id) on delete set null,
-  title            text not null,
-  description      text not null default '',
-  price_label      text not null default 'On request',
+  id bigint generated always as identity primary key,
+  category_id bigint references categories(id) on delete set null,
+  title text not null,
+  description text not null default '',
+  price_label text not null default 'On request',
   mobile_available boolean not null default true,
-  visible          boolean not null default true,
-  sort_order       int not null default 0,
-  created_at       timestamptz not null default now()
+  visible boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
 );
 
 create table if not exists gallery (
-  id          bigint generated always as identity primary key,
-  image_url   text not null,
-  caption     text not null default '',
-  visible     boolean not null default true,
-  sort_order  int not null default 0,
-  created_at  timestamptz not null default now()
+  id bigint generated always as identity primary key,
+  image_url text not null,
+  caption text not null default '',
+  visible boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
 );
 
 create table if not exists bookings (
-  id          bigint generated always as identity primary key,
-  name        text not null,
-  contact     text not null,
-  bmw_model   text not null default '',
-  service     text not null default '',
-  message     text not null default '',
-  handled     boolean not null default false,
-  created_at  timestamptz not null default now()
+  id bigint generated always as identity primary key,
+  name text not null,
+  contact text not null,
+  bmw_model text not null default '',
+  service text not null default '',
+  message text not null default '',
+  handled boolean not null default false,
+  created_at timestamptz not null default now()
 );
 
 -- Single-row settings table (id is always 1).
 create table if not exists site_settings (
-  id            int primary key default 1,
-  hero_title    text not null default 'BMW Coding & Retrofits — Mobile Service Across Dublin',
-  hero_subtitle text not null default 'I come to you. Dealer-level coding, diagnostics and retrofits performed at your home or workplace anywhere in Dublin and the surrounding counties.',
-  about_text    text not null default 'Independent BMW coding specialist working out of Dublin. ISTA/Rheingold, E-Sys and BimmerCode across F, G and U-series — done at your door, paid on completion.',
-  service_area  text not null default 'Dublin city and county, plus Kildare, Wicklow and Meath. Same-day callouts when the calendar allows.',
-  phone         text not null default '+353 00 000 0000',
-  whatsapp      text not null default '+353000000000',
-  telegram      text not null default 'bmwcoding_ie',
-  instagram     text not null default 'bmwcoding.ie',
-  email         text not null default 'hello@bmwcoding.ie',
+  id int primary key default 1,
+  hero_title text not null default 'BMW Coding & Retrofits — In-Person & Remote, Dublin',
+  hero_subtitle text not null default 'Dealer-level BMW coding, diagnostics and retrofits. Done in person across Dublin, or remotely if you have a laptop and an ENET cable.',
+  about_text text not null default 'Independent BMW coding team based in Dublin. ISTA/Rheingold, E-Sys and BimmerCode across F and G series — done in person or remotely over ENET, paid on completion.',
+  service_area text not null default 'In person across Dublin, Kildare, Wicklow and Meath. Remote coding available anywhere — you just need a laptop and an ENET cable.',
+  phone text not null default '+353 00 000 0000',
+  whatsapp text not null default '+353000000000',
+  telegram text not null default 'bmwcoding_ie',
+  instagram text not null default 'bmwcoding.ie',
+  email text not null default 'hello@bmwcoding.ie',
   constraint single_row check (id = 1)
 );
 
 -- ---------- Row Level Security ----------
 -- Public site reads with the ANON key; admin writes use the
 -- SERVICE ROLE key which bypasses RLS entirely.
-
-alter table categories    enable row level security;
-alter table services      enable row level security;
-alter table gallery       enable row level security;
+alter table categories enable row level security;
+alter table services enable row level security;
+alter table gallery enable row level security;
 alter table site_settings enable row level security;
-alter table bookings      enable row level security;
+alter table bookings enable row level security;
 
 -- Public can read catalog + settings.
-create policy "public read categories"    on categories    for select using (true);
-create policy "public read services"       on services       for select using (true);
-create policy "public read gallery"        on gallery        for select using (true);
-create policy "public read site_settings"  on site_settings  for select using (true);
+create policy "public read categories" on categories for select using (true);
+create policy "public read services" on services for select using (true);
+create policy "public read gallery" on gallery for select using (true);
+create policy "public read site_settings" on site_settings for select using (true);
 
 -- Public (anon) can INSERT a booking from the contact form, but not read them.
 create policy "public insert bookings" on bookings for insert with check (true);
 
 -- ---------- Seed ----------
-
 insert into site_settings (id) values (1) on conflict (id) do nothing;
 
 insert into categories (slug, name, sort_order) values
   ('multimedia', 'Multimedia & Comfort', 1),
-  ('lighting',   'Light & Appearance',   2),
-  ('assist',     'Assistants & Convenience', 3),
+  ('lighting', 'Light & Appearance', 2),
+  ('assist', 'Assistants & Convenience', 3),
   ('conversion', 'Conversions & Diagnostics', 4)
 on conflict (slug) do nothing;
 
@@ -113,7 +110,7 @@ from (values
   -- Conversions & Diagnostics
   ('conversion', 'Japan → EU conversion', 'Region change, FSC, ETC mirror and TCB hardware considerations for JDM imports.', 'from €150', 1),
   ('conversion', 'Full ISTA diagnostics', 'Complete fault scan, read and clear codes, written summary of findings.', 'from €80', 2),
-  ('conversion', 'Hidden features & custom coding', 'Bespoke coding to your spec — tell me what you want, I will scope it.', 'On request', 3)
+  ('conversion', 'Hidden features & custom coding', 'Bespoke coding to your spec — tell us what you want, we will scope it.', 'On request', 3)
 ) as v(cat_slug, title, description, price_label, sort_order)
 join categories c on c.slug = v.cat_slug
 on conflict do nothing;
