@@ -23,7 +23,7 @@ export function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       {/* top hairline M-stripe */}
-      <div className="m-stripe h-[3px] w-full" aria-hidden="true" />
+      <div className="m-stripe m-stripe-anim h-[3px] w-full" aria-hidden="true" />
 
       <div
         className={`transition-all duration-300 ${
@@ -50,7 +50,7 @@ export function Header() {
               <a
                 key={n.href}
                 href={n.href}
-                className="font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-ink"
+                className="nav-link font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-ink"
               >
                 {n.label}
               </a>

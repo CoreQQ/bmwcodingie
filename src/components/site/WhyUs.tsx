@@ -25,9 +25,9 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted">{settings.about_text}</p>
 
             <div className="mt-10 grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-3">
-              <Stat n="F·G" label="Generations" />
-              <Stat n="2 ways" label="In-person or remote" />
-              <Stat n="Live" label="See it work first" />
+              <Stat n="F·G" label="Generations" accent="text-m-blue" />
+              <Stat n="2 ways" label="In-person or remote" accent="text-m-purple" />
+              <Stat n="Live" label="See it work first" accent="text-m-red" />
             </div>
           </div>
 
@@ -65,10 +65,10 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
   );
 }
 
-function Stat({ n, label }: { n: string; label: string }) {
+function Stat({ n, label, accent = 'text-ink' }: { n: string; label: string; accent?: string }) {
   return (
     <div className="bg-graphite-900 p-5">
-      <div className="font-display text-4xl leading-none text-ink">{n}</div>
+      <div className={`font-display text-4xl leading-none ${accent}`}>{n}</div>
       <div className="label mt-2">{label}</div>
     </div>
   );

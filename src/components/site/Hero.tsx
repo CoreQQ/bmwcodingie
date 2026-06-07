@@ -9,13 +9,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
           Drop a real photo at /public/hero.jpg to override the gradient. */}
       <div className="absolute inset-0 -z-10">
         <div className="blueprint absolute inset-0 opacity-60" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(120% 80% at 78% 0%, rgba(28,105,212,0.22) 0%, rgba(10,11,13,0) 55%), radial-gradient(80% 60% at 0% 100%, rgba(92,45,145,0.14) 0%, rgba(10,11,13,0) 60%)',
-          }}
-        />
+        <div className="absolute inset-0 hero-glow" />
         <div
           className="absolute inset-0 bg-[url('/hero.jpg')] bg-cover bg-center opacity-0 [background-blend-mode:overlay]"
           style={{ opacity: 'var(--hero-photo, 0)' }}
@@ -33,16 +27,34 @@ export function Hero({ settings }: { settings: SiteSettings }) {
             </div>
 
             <h1 className="font-display text-[clamp(2.2rem,10vw,6.5rem)] leading-[0.86] tracking-tight">
-              <span className="block">BMW CODING</span>
-              <span className="block text-bmw">&amp; RETROFITS</span>
-              <span className="block text-muted">IN-PERSON · REMOTE</span>
+              <span className="block animate-fade-up opacity-0" style={{ animationDelay: '0.05s' }}>
+                BMW CODING
+              </span>
+              <span
+                className="block animate-fade-up opacity-0"
+                style={{ animationDelay: '0.13s' }}
+              >
+                <span className="text-m-gradient">&amp; RETROFITS</span>
+              </span>
+              <span
+                className="block text-muted animate-fade-up opacity-0"
+                style={{ animationDelay: '0.21s' }}
+              >
+                IN-PERSON · REMOTE
+              </span>
             </h1>
 
-            <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
+            <p
+              className="mt-8 max-w-xl text-lg leading-relaxed text-muted animate-fade-up opacity-0"
+              style={{ animationDelay: '0.3s' }}
+            >
               {settings.hero_subtitle}
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-4">
+            <div
+              className="mt-10 flex flex-wrap items-center gap-4 animate-fade-up opacity-0"
+              style={{ animationDelay: '0.38s' }}
+            >
               <a href="#contact" className="btn-primary">
                 Book now
               </a>
@@ -62,7 +74,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
           {/* Spec readout card — offset right */}
           <div className="col-span-12 lg:col-span-4 lg:pt-24">
             <div className="border border-white/10 bg-graphite-800/60 backdrop-blur-sm">
-              <div className="m-stripe h-1 w-full" />
+              <div className="m-stripe m-stripe-anim h-1 w-full" />
               <div className="space-y-0 divide-y divide-white/5">
                 <SpecRow k="Format" v="In-person or remote" />
                 <SpecRow k="Coverage" v="Dublin + surrounding counties" />

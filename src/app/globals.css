@@ -3,9 +3,13 @@
 @tailwind utilities;
 
 :root {
+  /* Primary clickable accent (M blue family) */
   --bmw: #1c69d4;
-  --m-blue: #0066b1;
-  --m-purple: #5c2d91;
+  --bmw-dark: #1454ae;
+  /* BMW M motorsport tricolour */
+  --m-blue: #1786d4;
+  --m-blue-deep: #0a5cc0;
+  --m-purple: #6a2cc0;
   --m-red: #e2001a;
   --graphite: #0a0b0d;
 }
@@ -36,9 +40,9 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Selection */
+/* Selection — M blue */
 ::selection {
-  background: var(--bmw);
+  background: var(--m-blue);
   color: #fff;
 }
 
@@ -78,9 +82,54 @@ body {
     );
   }
 
+  /* Animated stripe: a light sheen sweeps along the tricolour.
+     Apply together with .m-stripe, e.g. class="m-stripe m-stripe-anim". */
+  .m-stripe-anim {
+    position: relative;
+    overflow: hidden;
+  }
+  .m-stripe-anim::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.55),
+      transparent
+    );
+    animation: sheen 4.5s ease-in-out infinite;
+  }
+
   /* Monospace ticker label used across sections */
   .label {
     @apply font-mono text-[11px] uppercase tracking-ticker text-faint;
+  }
+
+  /* Animated tricolour gradient text — use on a key headline word */
+  .text-m-gradient {
+    background-image: linear-gradient(
+      90deg,
+      var(--m-blue),
+      var(--m-purple) 52%,
+      var(--m-red)
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: gradient-pan 7s ease infinite;
+  }
+
+  /* Animated tricolour glow for the hero backdrop */
+  .hero-glow {
+    background:
+      radial-gradient(58% 50% at 80% 0%, rgba(23, 134, 212, 0.22) 0%, rgba(10, 11, 13, 0) 60%),
+      radial-gradient(46% 42% at 92% 8%, rgba(106, 44, 192, 0.16) 0%, rgba(10, 11, 13, 0) 60%),
+      radial-gradient(44% 40% at 2% 100%, rgba(226, 0, 26, 0.13) 0%, rgba(10, 11, 13, 0) 62%);
+    animation: glow-drift 14s ease-in-out infinite alternate;
   }
 
   /* Blueprint grid background texture */
@@ -102,10 +151,46 @@ body {
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_28px_-6px_rgba(28,105,212,0.7)];
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_30px_-6px_rgba(23,134,212,0.75)];
   }
+  /* Sheen that sweeps across the primary button on hover */
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 45%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-160%) skewX(-20deg);
+    transition: transform 0.6s ease;
+  }
+  .btn-primary:hover::after {
+    transform: translateX(320%) skewX(-20deg);
+  }
+
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-300 hover:border-ink/60;
+    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-300 hover:border-m-blue/70 hover:text-ink;
+  }
+
+  /* Nav link with an M-blue underline that grows on hover */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 1.5px;
+    width: 100%;
+    background: var(--m-blue);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-link:hover::after {
+    transform: scaleX(1);
   }
 }
 
@@ -123,12 +208,35 @@ body {
     transform: translateY(0);
   }
 }
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes glow-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
+  100% { transform: translate3d(-2%, 1%, 0) scale(1.07); opacity: 1; }
+}
+@keyframes sheen {
+  0% { transform: translateX(-120%); }
+  60%, 100% { transform: translateX(260%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal.is-in {
     opacity: 1;
     transform: none;
     animation: none;
+  }
+  .text-m-gradient,
+  .hero-glow,
+  .m-stripe-anim::after,
+  .btn-primary::after,
+  [class*='animate-'] {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
   html {
     scroll-behavior: auto;

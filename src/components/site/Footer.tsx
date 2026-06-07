@@ -95,7 +95,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
           </span>
         </div>
       </div>
-      <div className="m-stripe h-1 w-full" />
+      <div className="m-stripe m-stripe-anim h-1 w-full" />
     </footer>
   );
 }
