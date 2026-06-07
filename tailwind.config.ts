@@ -17,11 +17,10 @@ const config: Config = {
         ink: '#FFFFFF',
         muted: '#A1A6AD',
         faint: '#6B7178',
-        // BMW M motorsport tricolour — now the core accent identity
+        // BMW M motorsport tricolour — light blue · dark blue · red
         m: {
-          blue: '#1786D4',
-          'blue-deep': '#0A5CC0',
-          purple: '#6A2CC0',
+          blue: '#2E9BE6',
+          'dark-blue': '#0A4FB0',
           red: '#E2001A',
         },
         // Primary clickable accent (sits within the M blue family)

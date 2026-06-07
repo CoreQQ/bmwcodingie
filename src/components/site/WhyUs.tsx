@@ -26,7 +26,7 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
 
             <div className="mt-10 grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-3">
               <Stat n="F·G" label="Generations" accent="text-m-blue" />
-              <Stat n="2 ways" label="In-person or remote" accent="text-m-purple" />
+              <Stat n="2 ways" label="In-person or remote" accent="text-m-dark-blue" />
               <Stat n="Live" label="See it work first" accent="text-m-red" />
             </div>
           </div>
