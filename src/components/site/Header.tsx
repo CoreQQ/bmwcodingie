@@ -36,7 +36,7 @@ export function Header() {
         <div className="mx-auto flex max-w-edge items-center justify-between px-4 py-3 md:px-8 md:py-4">
           {/* Wordmark */}
           <a href="#top" className="group inline-flex items-center">
-            <Logo className="h-9 w-auto md:h-10" />
+            <Logo className="h-16 w-auto md:h-20" />
           </a>
 
           {/* Desktop nav */}

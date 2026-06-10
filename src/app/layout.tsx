@@ -24,11 +24,6 @@ export const metadata: Metadata = {
     default: 'BMW Coding IE',
     template: '%s · BMW Coding IE',
   },
-  icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
-  },
   description:
     'BMW coding, ISTA diagnostics and retrofits across Dublin — in person or remotely over ENET. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. F and G series.',
   keywords: [
