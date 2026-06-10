@@ -13,7 +13,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="grid grid-cols-12 gap-y-10 pb-14">
           <div className="col-span-12 md:col-span-5">
-            <Logo markClass="h-11 w-11" textClass="text-3xl" />
+            <Logo className="h-12 w-auto" />
             <p className="mt-4 max-w-sm text-sm text-muted">
               Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in
               person or remotely over ENET.
