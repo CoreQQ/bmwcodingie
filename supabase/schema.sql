@@ -84,7 +84,8 @@ insert into categories (slug, name, sort_order) values
   ('multimedia', 'Multimedia & Comfort', 1),
   ('lighting', 'Light & Appearance', 2),
   ('assist', 'Assistants & Convenience', 3),
-  ('conversion', 'Conversions & Diagnostics', 4)
+  ('conversion', 'Conversions & Diagnostics', 4),
+  ('tuning', 'Performance & Tuning', 5)
 on conflict (slug) do nothing;
 
 -- Helper inserts keyed by category slug.
@@ -114,3 +115,13 @@ from (values
 ) as v(cat_slug, title, description, price_label, sort_order)
 join categories c on c.slug = v.cat_slug
 on conflict do nothing;
+
+-- Performance & Tuning: in-person ECU remap (mobile_available = false).
+insert into services (category_id, title, description, price_label, mobile_available, sort_order)
+select c.id,
+       'Stage 1 / Stage 2 remap',
+       'ECU remap for more power and torque — Stage 1 on the standard car, Stage 2 with supporting hardware. Built for your exact engine and spec, flashed in person.',
+       'On request', false, 1
+from categories c
+where c.slug = 'tuning'
+  and not exists (select 1 from services s where s.title = 'Stage 1 / Stage 2 remap');

@@ -67,6 +67,15 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
       svc(16, 4, 'Hidden features & custom coding', 'Bespoke coding to your spec — tell us what you want, we will scope it.', 'On request'),
     ],
   },
+  {
+    id: 5,
+    slug: 'tuning',
+    name: 'Performance & Tuning',
+    sort_order: 5,
+    services: [
+      svc(17, 5, 'Stage 1 / Stage 2 remap', 'ECU remap for more power and torque — Stage 1 on the standard car, Stage 2 with supporting hardware. Built for your exact engine and spec, flashed in person.', 'On request', false),
+    ],
+  },
 ];
 
 function svc(
@@ -75,6 +84,7 @@ function svc(
   title: string,
   description: string,
   price_label: string,
+  mobile_available = true,
 ) {
   return {
     id,
@@ -82,7 +92,7 @@ function svc(
     title,
     description,
     price_label,
-    mobile_available: true,
+    mobile_available,
     visible: true,
     sort_order: id,
   };
