@@ -45,20 +45,36 @@ body {
   color: #fff;
 }
 
-/* Slim scrollbar */
+/* Custom scrollbar — BMW M tricolour thumb (Chromium / Safari) */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 ::-webkit-scrollbar-track {
   background: #0a0b0d;
 }
 ::-webkit-scrollbar-thumb {
-  background: #272c33;
-  border-radius: 0;
+  background: linear-gradient(
+    180deg,
+    var(--m-blue) 0%,
+    var(--m-dark-blue) 50%,
+    var(--m-red) 100%
+  );
+  /* The border is the track colour, so the thumb reads as a slim inset pill */
+  border: 3px solid #0a0b0d;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a4048;
+  background: linear-gradient(180deg, var(--m-blue) 0%, var(--m-red) 100%);
+  border-width: 2px;
+}
+::-webkit-scrollbar-corner {
+  background: #0a0b0d;
+}
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--m-blue) #0a0b0d;
 }
 
 @layer components {
@@ -99,6 +115,21 @@ body {
       transparent
     );
     animation: sheen 4.5s ease-in-out infinite;
+  }
+
+  /* Scroll progress fill — tricolour anchored to viewport width so it
+     reveals blue → red as you reach the bottom (no squishing). */
+  .scroll-progress-fill {
+    height: 100%;
+    background-image: linear-gradient(
+      90deg,
+      var(--m-blue),
+      var(--m-dark-blue) 55%,
+      var(--m-red)
+    );
+    background-size: 100vw 100%;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 12px -2px rgba(23, 134, 212, 0.6);
   }
 
   /* Monospace ticker label used across sections */
@@ -221,6 +252,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .preloader {
+    display: none !important;
+  }
   .reveal,
   .reveal.is-in {
     opacity: 1;

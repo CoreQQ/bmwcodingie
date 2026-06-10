@@ -1,4 +1,6 @@
 import { Header } from '@/components/site/Header';
+import { Preloader } from '@/components/site/Preloader';
+import { ScrollProgress } from '@/components/site/ScrollProgress';
 import { Hero } from '@/components/site/Hero';
 import { Services } from '@/components/site/Services';
 import { HowItWorks } from '@/components/site/HowItWorks';
@@ -23,6 +25,8 @@ export default async function HomePage() {
 
   return (
     <div className="grain relative min-h-screen">
+      <Preloader />
+      <ScrollProgress />
       <Header />
       <main>
         <Hero settings={settings} />
