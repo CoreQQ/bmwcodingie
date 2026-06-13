@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Bebas_Neue, Manrope } from 'next/font/google';
 import './globals.css';
 import { getSettings } from '@/lib/data';
@@ -18,6 +18,11 @@ const manrope = Manrope({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bmwcoding.ie';
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -36,10 +41,6 @@ export const metadata: Metadata = {
     'E-Sys coding',
     'Japan to EU BMW conversion',
   ],
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-  },
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
@@ -97,8 +98,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="font-sans antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e'),
+          }}
         />
+        <noscript>
+          <style>{`.reveal{opacity:1!important;transform:none!important;animation:none!important}`}</style>
+        </noscript>
         {children}
       </body>
     </html>

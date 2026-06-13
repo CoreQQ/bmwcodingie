@@ -13,6 +13,7 @@ export function Contact({
   serviceOptions: string[];
 }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
   const [form, setForm] = useState({
     name: '',
     contact: '',
@@ -24,9 +25,11 @@ export function Contact({
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  async function submit() {
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
     if (!form.name.trim() || !form.contact.trim()) {
       setStatus('error');
+      setErrorMsg('Please add at least your name and a contact number.');
       return;
     }
     setStatus('sending');
@@ -41,6 +44,7 @@ export function Contact({
       setForm({ name: '', contact: '', bmw_model: '', service: '', message: '' });
     } catch {
       setStatus('error');
+      setErrorMsg('Something went wrong — please try again or message us on WhatsApp.');
     }
   }
 
@@ -107,13 +111,15 @@ export function Contact({
           <div className="col-span-12 lg:col-span-7">
             <div className="border border-white/10 bg-graphite-800/50">
               <div className="m-stripe h-1 w-full" />
-              <div className="space-y-5 p-6 md:p-8">
+              <form onSubmit={submit} className="space-y-5 p-6 md:p-8">
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label="Name *">
                     <input
                       value={form.name}
                       onChange={update('name')}
                       placeholder="Your name"
+                      required
+                      aria-required="true"
                       className={inputCls}
                     />
                   </Field>
@@ -122,6 +128,8 @@ export function Contact({
                       value={form.contact}
                       onChange={update('contact')}
                       placeholder="+353 …"
+                      required
+                      aria-required="true"
                       className={inputCls}
                     />
                   </Field>
@@ -162,12 +170,12 @@ export function Contact({
                 </Field>
 
                 {status === 'sent' ? (
-                  <div className="border border-bmw/40 bg-bmw/10 p-4 text-sm text-ink">
+                  <div role="alert" className="border border-bmw/40 bg-bmw/10 p-4 text-sm text-ink">
                     Got it — we’ll be in touch shortly. For anything urgent, message us on WhatsApp.
                   </div>
                 ) : (
                   <button
-                    onClick={submit}
+                    type="submit"
                     disabled={status === 'sending'}
                     className="btn-primary w-full disabled:opacity-60"
                   >
@@ -175,9 +183,7 @@ export function Contact({
                   </button>
                 )}
                 {status === 'error' && (
-                  <p className="text-sm text-m-red">
-                    Please add at least your name and a contact number — or message us on WhatsApp.
-                  </p>
+                  <p role="alert" className="text-sm text-m-red">{errorMsg}</p>
                 )}
 
                 <div className="flex items-center gap-4 pt-1 text-faint">
@@ -196,7 +202,7 @@ export function Contact({
                     <Mail size={14} /> {settings.email}
                   </a>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>

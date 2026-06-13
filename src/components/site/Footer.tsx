@@ -62,7 +62,11 @@ export function Footer({ settings }: { settings: SiteSettings }) {
                   {settings.email}
                 </a>
               </li>
-              <li>WhatsApp {settings.whatsapp}</li>
+              <li>
+                <a href={waLink(settings.whatsapp)} target="_blank" rel="noopener noreferrer" className="hover:text-ink">
+                  WhatsApp {settings.whatsapp}
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -79,8 +83,9 @@ export function Footer({ settings }: { settings: SiteSettings }) {
             <h4 className="label mb-4">Navigate</h4>
             <ul className="space-y-2 text-sm text-muted">
               <li><a href="#services" className="hover:text-ink">Services</a></li>
-              <li><a href="#work" className="hover:text-ink">Work</a></li>
               <li><a href="#process" className="hover:text-ink">How it works</a></li>
+              <li><a href="#work" className="hover:text-ink">Work</a></li>
+              <li><a href="#about" className="hover:text-ink">About</a></li>
               <li><a href="#contact" className="hover:text-ink">Book</a></li>
             </ul>
           </div>
