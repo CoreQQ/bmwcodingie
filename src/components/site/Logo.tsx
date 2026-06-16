@@ -8,6 +8,7 @@ export function Logo({ className = 'h-9 w-auto' }: { className?: string }) {
     <img
       src="/logo.png"
       alt="BMW Coding IE"
+      fetchPriority="high"
       className={`${className} select-none object-contain transition-transform duration-300 group-hover:scale-105`}
     />
   );

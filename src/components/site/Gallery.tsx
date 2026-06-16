@@ -96,6 +96,11 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
             <X size={28} />
           </button>
           {items.length > 1 && (
+            <span className="absolute left-1/2 top-5 -translate-x-1/2 font-mono text-xs uppercase tracking-widest text-faint">
+              {active + 1} / {items.length}
+            </span>
+          )}
+          {items.length > 1 && (
             <>
               <button
                 onClick={(e) => {

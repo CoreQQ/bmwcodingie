@@ -9,6 +9,7 @@ import { WhyUs } from '@/components/site/WhyUs';
 import { Faq } from '@/components/site/Faq';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
+import { ChatWidget } from '@/components/site/ChatWidget';
 import { getCatalog, getGallery, getSettings } from '@/lib/data';
 
 // Always render fresh so admin edits appear immediately.
@@ -38,6 +39,7 @@ export default async function HomePage() {
         <Contact settings={settings} serviceOptions={serviceOptions} />
       </main>
       <Footer settings={settings} />
+      <ChatWidget />
     </div>
   );
 }

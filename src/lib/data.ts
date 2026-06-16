@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { getSupabase } from './supabase';
 import { DEFAULT_CATALOG, DEFAULT_SETTINGS } from './defaults';
 import type {
@@ -10,8 +11,10 @@ import type {
 
 // All reads degrade gracefully: if Supabase is not configured or a query
 // fails, the site falls back to the bundled defaults so it never looks broken.
+// cache() deduplicates calls within the same request (e.g. layout + page both
+// calling getSettings no longer results in two Supabase round-trips).
 
-export async function getCatalog(): Promise<CategoryWithServices[]> {
+export const getCatalog = cache(async (): Promise<CategoryWithServices[]> => {
   const sb = getSupabase();
   if (!sb) return DEFAULT_CATALOG;
 
@@ -41,9 +44,9 @@ export async function getCatalog(): Promise<CategoryWithServices[]> {
   } catch {
     return DEFAULT_CATALOG;
   }
-}
+});
 
-export async function getGallery(): Promise<GalleryItem[]> {
+export const getGallery = cache(async (): Promise<GalleryItem[]> => {
   const sb = getSupabase();
   if (!sb) return [];
 
@@ -58,9 +61,9 @@ export async function getGallery(): Promise<GalleryItem[]> {
   } catch {
     return [];
   }
-}
+});
 
-export async function getSettings(): Promise<SiteSettings> {
+export const getSettings = cache(async (): Promise<SiteSettings> => {
   const sb = getSupabase();
   if (!sb) return DEFAULT_SETTINGS;
 
@@ -75,11 +78,12 @@ export async function getSettings(): Promise<SiteSettings> {
   } catch {
     return DEFAULT_SETTINGS;
   }
-}
+});
 
-/** Build a clean wa.me link from a stored number. */
+/** Build a clean wa.me link from a stored number. Returns '#' if number is empty. */
 export function waLink(whatsapp: string, text?: string): string {
   const digits = whatsapp.replace(/[^\d]/g, '');
+  if (!digits) return '#';
   const q = text ? `?text=${encodeURIComponent(text)}` : '';
   return `https://wa.me/${digits}${q}`;
 }
