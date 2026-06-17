@@ -3,6 +3,7 @@ import { Bebas_Neue, Manrope } from 'next/font/google';
 import './globals.css';
 import { getSettings } from '@/lib/data';
 import { MetaPixel } from '@/components/site/MetaPixel';
+import { GoogleAdsTag } from '@/components/site/GoogleAdsTag';
 
 const bebas = Bebas_Neue({
   weight: '400',
@@ -98,6 +99,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className={`${bebas.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
         <MetaPixel />
+        <GoogleAdsTag />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
