@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Phone, MessageCircle, Send, Instagram, Mail, MapPin } from 'lucide-react';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
+import { trackMetaEvent } from './MetaPixel';
 
 export function Contact({
   settings,
@@ -41,6 +42,7 @@ export function Contact({
       });
       if (!res.ok) throw new Error('failed');
       setStatus('sent');
+      trackMetaEvent('Lead', { content_name: form.service || 'General enquiry' });
       setForm({ name: '', contact: '', bmw_model: '', service: '', message: '' });
     } catch {
       setStatus('error');
