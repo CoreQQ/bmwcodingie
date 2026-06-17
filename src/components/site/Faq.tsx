@@ -33,8 +33,24 @@ const FAQS = [
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+
   return (
     <section className="relative border-t border-white/5 py-20 md:py-28">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e'),
+        }}
+      />
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="grid grid-cols-12 gap-x-4 md:gap-x-10 gap-y-10">
           <div className="col-span-12 md:col-span-4">
