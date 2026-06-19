@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Bebas_Neue, Manrope } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { getSettings } from '@/lib/data';
 import { MetaPixel } from '@/components/site/MetaPixel';
@@ -114,6 +116,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {children}
         <VisitorPing />
         <CookieConsent />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
