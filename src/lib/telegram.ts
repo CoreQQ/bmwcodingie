@@ -70,17 +70,25 @@ export type VisitorPing = {
   referrer?: string;
   device: 'mobile' | 'desktop';
   ip?: string;
+  browser?: string;
+  os?: string;
+  location?: string;
+  language?: string;
+  isReturning?: boolean;
 };
 
 /** Sends a lightweight "someone's on the site" notification. */
 export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
   const lines = [
-    "👀 <b>New visitor on the site</b>",
+    `${v.isReturning ? '🔁 <b>Returning visitor</b>' : '👀 <b>New visitor on the site</b>'}`,
     '━━━━━━━━━━━━━━━━━━━',
     `📍 <b>Page:</b> ${esc(v.path)}`,
     `🔗 <b>Source:</b> ${esc(v.referrer || 'Direct / unknown')}`,
-    `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}`,
-    `🌐 <b>IP:</b> <code>${esc(v.ip || 'unknown')}</code>`,
+    `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}${v.os ? ` (${esc(v.os)})` : ''}`,
   ];
+  if (v.browser) lines.push(`🧭 <b>Browser:</b> ${esc(v.browser)}`);
+  if (v.location) lines.push(`📌 <b>Location:</b> ${esc(v.location)}`);
+  if (v.language) lines.push(`🗣 <b>Language:</b> ${esc(v.language)}`);
+  lines.push(`🌐 <b>IP:</b> <code>${esc(v.ip || 'unknown')}</code>`);
   return sendTelegramMessage(lines.join('\n'));
 }
