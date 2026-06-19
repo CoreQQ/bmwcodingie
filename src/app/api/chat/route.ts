@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
@@ -39,6 +40,10 @@ How to respond:
 - Be warm and professional — not salesy`;
 
 export async function POST(req: Request) {
+  if (isRateLimited(`chat:${clientIp(req)}`, 15, 5 * 60 * 1000)) {
+    return new Response('Too many requests — please slow down a little.', { status: 429 });
+  }
+
   let body: { messages?: Array<{ role: string; content: string }> };
   try {
     body = await req.json();
