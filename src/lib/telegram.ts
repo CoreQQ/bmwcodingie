@@ -18,28 +18,11 @@ export type Lead = {
   persisted?: boolean;
 };
 
-/**
- * Sends a new-enquiry notification to the owner's Telegram chat.
- * Never throws — returns false on any failure so the calling route
- * can still respond to the visitor normally.
- */
-export async function notifyTelegram(lead: Lead): Promise<boolean> {
+/** Shared sender — never throws, returns false on any failure. */
+async function sendTelegramMessage(text: string): Promise<boolean> {
   if (!telegramConfigured) {
     console.warn('[telegram] TG_TOKEN / TG_CHAT_ID not set — skipping notification');
     return false;
-  }
-
-  const lines = [
-    '🚗 <b>New BMW Coding IE enquiry</b>',
-    '',
-    `<b>Name:</b> ${esc(lead.name)}`,
-    `<b>Contact:</b> ${esc(lead.contact)}`,
-  ];
-  if (lead.bmw_model) lines.push(`<b>BMW:</b> ${esc(lead.bmw_model)}`);
-  if (lead.service) lines.push(`<b>Service:</b> ${esc(lead.service)}`);
-  if (lead.message) lines.push(`<b>Message:</b> ${esc(lead.message)}`);
-  if (lead.persisted === false) {
-    lines.push('', '⚠️ <i>Not saved to the database — follow up manually.</i>');
   }
 
   try {
@@ -48,7 +31,7 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: TG_CHAT_ID,
-        text: lines.join('\n'),
+        text,
         parse_mode: 'HTML',
         disable_web_page_preview: true,
       }),
@@ -63,4 +46,39 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
     console.error('[telegram] request error:', e);
     return false;
   }
+}
+
+/** Sends a new-enquiry notification to the owner's Telegram chat. */
+export async function notifyTelegram(lead: Lead): Promise<boolean> {
+  const lines = [
+    '🚗 <b>New BMW Coding IE enquiry</b>',
+    '',
+    `<b>Name:</b> ${esc(lead.name)}`,
+    `<b>Contact:</b> ${esc(lead.contact)}`,
+  ];
+  if (lead.bmw_model) lines.push(`<b>BMW:</b> ${esc(lead.bmw_model)}`);
+  if (lead.service) lines.push(`<b>Service:</b> ${esc(lead.service)}`);
+  if (lead.message) lines.push(`<b>Message:</b> ${esc(lead.message)}`);
+  if (lead.persisted === false) {
+    lines.push('', '⚠️ <i>Not saved to the database — follow up manually.</i>');
+  }
+  return sendTelegramMessage(lines.join('\n'));
+}
+
+export type VisitorPing = {
+  path: string;
+  referrer?: string;
+  device: 'mobile' | 'desktop';
+};
+
+/** Sends a lightweight "someone's on the site" notification. */
+export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
+  const lines = [
+    "👀 <b>Someone's browsing the site</b>",
+    '',
+    `<b>Page:</b> ${esc(v.path)}`,
+    `<b>From:</b> ${esc(v.referrer || 'Direct / unknown')}`,
+    `<b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}`,
+  ];
+  return sendTelegramMessage(lines.join('\n'));
 }

@@ -1,7 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import { Bebas_Neue, Manrope } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { getSettings } from '@/lib/data';
+import { MetaPixel } from '@/components/site/MetaPixel';
+import { GoogleAdsTag } from '@/components/site/GoogleAdsTag';
+import { CookieConsent } from '@/components/site/CookieConsent';
+import { VisitorPing } from '@/components/site/VisitorPing';
 
 const bebas = Bebas_Neue({
   weight: '400',
@@ -96,6 +102,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${bebas.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
+        <MetaPixel />
+        <GoogleAdsTag />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -106,6 +114,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <style>{`.reveal{opacity:1!important;transform:none!important;animation:none!important}`}</style>
         </noscript>
         {children}
+        <VisitorPing />
+        <CookieConsent />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
