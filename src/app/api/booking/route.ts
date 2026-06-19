@@ -1,10 +1,18 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { notifyTelegram } from '@/lib/telegram';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
+  if (isRateLimited(`booking:${clientIp(req)}`, 5, 10 * 60 * 1000)) {
+    return NextResponse.json(
+      { ok: false, error: 'Too many requests — please try again shortly.' },
+      { status: 429 },
+    );
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();

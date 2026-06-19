@@ -3,7 +3,7 @@ import { Bebas_Neue, Manrope } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
-import { getSettings } from '@/lib/data';
+import { getCatalog, getSettings } from '@/lib/data';
 import { MetaPixel } from '@/components/site/MetaPixel';
 import { GoogleAdsTag } from '@/components/site/GoogleAdsTag';
 import { CookieConsent } from '@/components/site/CookieConsent';
@@ -32,15 +32,17 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'BMW Coding IE',
-    template: '%s · BMW Coding IE',
+    default: 'BMW Coding Dublin | Coding, Diagnostics & Retrofits — BMW Coding IE',
+    template: '%s | BMW Coding Dublin',
   },
   description:
-    'BMW coding, ISTA diagnostics and retrofits across Dublin — in person or remotely over ENET. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. F and G series.',
+    'BMW coding Dublin — ISTA diagnostics, coding and retrofits, in person or remotely over ENET. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. F and G series.',
   keywords: [
     'BMW coding Dublin',
+    'BMW coding dublin ireland',
     'BMW diagnostics Dublin',
     'mobile BMW coding Ireland',
+    'BMW retrofit Dublin',
     'CarPlay activation BMW',
     'ambient lighting retrofit BMW',
     'ISTA Rheingold',
@@ -52,30 +54,32 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IE',
     url: SITE_URL,
-    siteName: 'BMW Coding IE',
-    title: 'BMW Coding IE — BMW Coding & Retrofits in Dublin',
+    siteName: 'BMW Coding Dublin',
+    title: 'BMW Coding Dublin — Coding, Diagnostics & Retrofits | BMW Coding IE',
     description:
-      'Dealer-level BMW coding, diagnostics and retrofits across Dublin — in person or remotely over ENET. F and G series.',
-    images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'BMW Coding IE' }],
+      'Dealer-level BMW coding Dublin — diagnostics and retrofits, in person or remotely over ENET. F and G series.',
+    images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'BMW Coding Dublin — BMW Coding IE' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BMW Coding IE — BMW Coding & Retrofits in Dublin',
-    description: 'BMW coding, diagnostics and retrofits across Dublin — in person or remote.',
+    title: 'BMW Coding Dublin — Coding, Diagnostics & Retrofits',
+    description: 'BMW coding Dublin — diagnostics and retrofits, in person or remote.',
     images: ['/og.jpg'],
   },
   robots: { index: true, follow: true },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const settings = await getSettings();
+  const [settings, catalog] = await Promise.all([getSettings(), getCatalog()]);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'AutoRepair',
-    name: 'BMW Coding IE',
+    name: 'BMW Coding Dublin — BMW Coding IE',
+    alternateName: 'BMW Coding IE',
     description:
-      'BMW coding, diagnostics and retrofit team serving Dublin and surrounding counties — in person or remotely over ENET.',
+      'BMW coding Dublin — diagnostics and retrofit team serving Dublin and surrounding counties, in person or remotely over ENET.',
+    slogan: 'Dealer-level BMW coding, diagnostics and retrofits in Dublin',
     url: SITE_URL,
     telephone: settings.phone,
     email: settings.email,
@@ -94,6 +98,30 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       addressCountry: 'IE',
     },
     geo: { '@type': 'GeoCoordinates', latitude: 53.3498, longitude: -6.2603 },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '09:00',
+        closes: '19:00',
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Saturday'],
+        opens: '10:00',
+        closes: '16:00',
+      },
+    ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'BMW coding & retrofit services',
+      itemListElement: catalog.flatMap((cat) =>
+        cat.services.map((s) => ({
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: s.title, areaServed: 'Dublin' },
+        })),
+      ),
+    },
     sameAs: settings.instagram
       ? [`https://instagram.com/${settings.instagram.replace(/^@/, '')}`]
       : [],

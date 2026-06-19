@@ -40,7 +40,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
                 className="block text-muted animate-fade-up opacity-0"
                 style={{ animationDelay: '0.21s' }}
               >
-                IN-PERSON · REMOTE
+                DUBLIN · IN-PERSON &amp; REMOTE
               </span>
             </h1>
 
