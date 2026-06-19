@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Phone, MessageCircle, Send, Instagram, Mail, MapPin } from 'lucide-react';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
@@ -26,6 +26,17 @@ export function Contact({
 
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  // Lets the quote builder hand off its selection without prop drilling —
+  // both sections are mounted on the same page at the same time.
+  useEffect(() => {
+    function onQuoteApply(e: Event) {
+      const detail = (e as CustomEvent<{ service: string; message: string }>).detail;
+      setForm((f) => ({ ...f, service: detail.service, message: detail.message }));
+    }
+    window.addEventListener('quote:apply', onQuoteApply);
+    return () => window.removeEventListener('quote:apply', onQuoteApply);
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -59,7 +70,7 @@ export function Contact({
     <section id="contact" className="relative border-t border-white/5 py-20 md:py-28">
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="mb-12 flex items-center gap-3">
-          <span className="label">06 / Book</span>
+          <span className="label">07 / Book</span>
           <span className="m-stripe h-[2px] w-10" />
         </div>
 
@@ -151,6 +162,13 @@ export function Contact({
                   <Field label="Service needed">
                     <select value={form.service} onChange={update('service')} className={inputCls}>
                       <option value="">Select…</option>
+                      {form.service &&
+                        !serviceOptions.includes(form.service) &&
+                        form.service !== 'Other / not sure' && (
+                          <option value={form.service} className="bg-graphite-800">
+                            {form.service}
+                          </option>
+                        )}
                       {serviceOptions.map((s) => (
                         <option key={s} value={s} className="bg-graphite-800">
                           {s}
