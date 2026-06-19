@@ -52,13 +52,13 @@ async function sendTelegramMessage(text: string): Promise<boolean> {
 export async function notifyTelegram(lead: Lead): Promise<boolean> {
   const lines = [
     '🚗 <b>New BMW Coding IE enquiry</b>',
-    '',
-    `<b>Name:</b> ${esc(lead.name)}`,
-    `<b>Contact:</b> ${esc(lead.contact)}`,
+    '━━━━━━━━━━━━━━━━━━━',
+    `👤 <b>Name:</b> ${esc(lead.name)}`,
+    `☎️ <b>Contact:</b> ${esc(lead.contact)}`,
   ];
-  if (lead.bmw_model) lines.push(`<b>BMW:</b> ${esc(lead.bmw_model)}`);
-  if (lead.service) lines.push(`<b>Service:</b> ${esc(lead.service)}`);
-  if (lead.message) lines.push(`<b>Message:</b> ${esc(lead.message)}`);
+  if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
+  if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
+  if (lead.message) lines.push(`💬 <b>Message:</b> ${esc(lead.message)}`);
   if (lead.persisted === false) {
     lines.push('', '⚠️ <i>Not saved to the database — follow up manually.</i>');
   }
@@ -69,16 +69,18 @@ export type VisitorPing = {
   path: string;
   referrer?: string;
   device: 'mobile' | 'desktop';
+  ip?: string;
 };
 
 /** Sends a lightweight "someone's on the site" notification. */
 export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
   const lines = [
-    "👀 <b>Someone's browsing the site</b>",
-    '',
-    `<b>Page:</b> ${esc(v.path)}`,
-    `<b>From:</b> ${esc(v.referrer || 'Direct / unknown')}`,
-    `<b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}`,
+    "👀 <b>New visitor on the site</b>",
+    '━━━━━━━━━━━━━━━━━━━',
+    `📍 <b>Page:</b> ${esc(v.path)}`,
+    `🔗 <b>Source:</b> ${esc(v.referrer || 'Direct / unknown')}`,
+    `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}`,
+    `🌐 <b>IP:</b> <code>${esc(v.ip || 'unknown')}</code>`,
   ];
   return sendTelegramMessage(lines.join('\n'));
 }

@@ -27,6 +27,6 @@ export async function POST(req: Request) {
   }
   lastNotified.set(ip, Date.now());
 
-  await notifyVisitor({ path, referrer, device });
+  await notifyVisitor({ path, referrer, device, ip });
   return NextResponse.json({ ok: true });
 }
