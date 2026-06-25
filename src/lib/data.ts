@@ -2,9 +2,11 @@ import { cache } from 'react';
 import { getSupabase } from './supabase';
 import { DEFAULT_CATALOG, DEFAULT_SETTINGS } from './defaults';
 import type {
+  CarModel,
   Category,
   CategoryWithServices,
   GalleryItem,
+  ModelCompatibility,
   Service,
   SiteSettings,
 } from './types';
@@ -77,6 +79,32 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
     return { ...DEFAULT_SETTINGS, ...(data as Partial<SiteSettings>) };
   } catch {
     return DEFAULT_SETTINGS;
+  }
+});
+
+export const getCarModels = cache(async (): Promise<CarModel[]> => {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  try {
+    const { data, error } = await sb.from('car_models').select('*').order('sort_order');
+    if (error || !data) return [];
+    return data as CarModel[];
+  } catch {
+    return [];
+  }
+});
+
+export const getCompatibility = cache(async (): Promise<ModelCompatibility[]> => {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  try {
+    const { data, error } = await sb.from('model_compatibility').select('*');
+    if (error || !data) return [];
+    return data as ModelCompatibility[];
+  } catch {
+    return [];
   }
 });
 

@@ -48,3 +48,22 @@ export type SiteSettings = {
 };
 
 export type CategoryWithServices = Category & { services: Service[] };
+
+export type CarModel = {
+  id: number;
+  chassis_code: string;
+  label: string;
+  year_from: number;
+  year_to: number | null;
+  sort_order: number;
+};
+
+export type CompatibilityStatus = 'yes' | 'no' | 'on_request';
+
+export type ModelCompatibility = {
+  id: number;
+  model_id: number;
+  service_id: number;
+  status: CompatibilityStatus;
+  note: string;
+};

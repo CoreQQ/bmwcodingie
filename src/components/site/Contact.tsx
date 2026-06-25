@@ -38,6 +38,25 @@ export function Contact({
     return () => window.removeEventListener('quote:apply', onQuoteApply);
   }, []);
 
+  // The /models page hands off its selection via sessionStorage since it's a
+  // separate page navigation, not a same-page event.
+  useEffect(() => {
+    const raw = sessionStorage.getItem('bmw_quote_handoff');
+    if (!raw) return;
+    sessionStorage.removeItem('bmw_quote_handoff');
+    try {
+      const detail = JSON.parse(raw) as { bmw_model?: string; service?: string; message?: string };
+      setForm((f) => ({
+        ...f,
+        bmw_model: detail.bmw_model ?? f.bmw_model,
+        service: detail.service ?? f.service,
+        message: detail.message ?? f.message,
+      }));
+    } catch {
+      // ignore malformed handoff data
+    }
+  }, []);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name.trim() || !form.contact.trim()) {

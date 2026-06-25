@@ -1,5 +1,13 @@
 import { getSupabaseAdmin } from './supabase';
-import type { Booking, Category, GalleryItem, Service, SiteSettings } from './types';
+import type {
+  Booking,
+  CarModel,
+  Category,
+  GalleryItem,
+  ModelCompatibility,
+  Service,
+  SiteSettings,
+} from './types';
 import { DEFAULT_SETTINGS } from './defaults';
 
 export async function adminGetCategories(): Promise<Category[]> {
@@ -42,4 +50,18 @@ export async function adminGetSettings(): Promise<SiteSettings> {
   if (!sb) return DEFAULT_SETTINGS;
   const { data } = await sb.from('site_settings').select('*').eq('id', 1).single();
   return { ...DEFAULT_SETTINGS, ...(data as Partial<SiteSettings> | null) };
+}
+
+export async function adminGetCarModels(): Promise<CarModel[]> {
+  const sb = getSupabaseAdmin();
+  if (!sb) return [];
+  const { data } = await sb.from('car_models').select('*').order('sort_order');
+  return (data ?? []) as CarModel[];
+}
+
+export async function adminGetCompatibility(): Promise<ModelCompatibility[]> {
+  const sb = getSupabaseAdmin();
+  if (!sb) return [];
+  const { data } = await sb.from('model_compatibility').select('*');
+  return (data ?? []) as ModelCompatibility[];
 }

@@ -205,6 +205,72 @@ export async function updateSettings(formData: FormData) {
   refreshSite();
 }
 
+// ─────────────────────────── Car models ───────────────────────────
+
+export async function createCarModel(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('car_models').insert({
+    chassis_code: String(formData.get('chassis_code') ?? '').trim().toUpperCase(),
+    label: String(formData.get('label') ?? '').trim(),
+    year_from: Number(formData.get('year_from') ?? 0) || 0,
+    year_to: numOrNull(formData.get('year_to')),
+    sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
+  revalidatePath('/admin/models');
+  refreshSite();
+}
+
+export async function updateCarModel(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb
+    .from('car_models')
+    .update({
+      chassis_code: String(formData.get('chassis_code') ?? '').trim().toUpperCase(),
+      label: String(formData.get('label') ?? '').trim(),
+      year_from: Number(formData.get('year_from') ?? 0) || 0,
+      year_to: numOrNull(formData.get('year_to')),
+      sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+    })
+    .eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/models');
+  refreshSite();
+}
+
+export async function deleteCarModel(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('car_models').delete().eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/models');
+  refreshSite();
+}
+
+export async function saveCompatibility(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const modelId = Number(formData.get('model_id'));
+
+  const rows: { model_id: number; service_id: number; status: string; note: string }[] = [];
+  for (const [key, value] of formData.entries()) {
+    const m = key.match(/^status_(\d+)$/);
+    if (!m) continue;
+    const serviceId = Number(m[1]);
+    rows.push({
+      model_id: modelId,
+      service_id: serviceId,
+      status: String(value),
+      note: String(formData.get(`note_${serviceId}`) ?? '').trim(),
+    });
+  }
+
+  if (rows.length > 0) {
+    await sb.from('model_compatibility').upsert(rows, { onConflict: 'model_id,service_id' });
+  }
+  revalidatePath(`/admin/models/${modelId}`);
+  refreshSite();
+}
+
 // ─────────────────────────── Bookings ───────────────────────────
 
 export async function toggleBookingHandled(formData: FormData) {

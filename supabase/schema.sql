@@ -59,6 +59,26 @@ create table if not exists site_settings (
   constraint single_row check (id = 1)
 );
 
+create table if not exists car_models (
+  id bigint generated always as identity primary key,
+  chassis_code text not null unique,
+  label text not null,
+  year_from int not null,
+  year_to int,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists model_compatibility (
+  id bigint generated always as identity primary key,
+  model_id bigint not null references car_models(id) on delete cascade,
+  service_id bigint not null references services(id) on delete cascade,
+  status text not null default 'on_request' check (status in ('yes', 'no', 'on_request')),
+  note text not null default '',
+  created_at timestamptz not null default now(),
+  unique (model_id, service_id)
+);
+
 -- ---------- Row Level Security ----------
 -- Public site reads with the ANON key; admin writes use the
 -- SERVICE ROLE key which bypasses RLS entirely.
@@ -67,12 +87,16 @@ alter table services enable row level security;
 alter table gallery enable row level security;
 alter table site_settings enable row level security;
 alter table bookings enable row level security;
+alter table car_models enable row level security;
+alter table model_compatibility enable row level security;
 
 -- Public can read catalog + settings.
 create policy "public read categories" on categories for select using (true);
 create policy "public read services" on services for select using (true);
 create policy "public read gallery" on gallery for select using (true);
 create policy "public read site_settings" on site_settings for select using (true);
+create policy "public read car_models" on car_models for select using (true);
+create policy "public read model_compatibility" on model_compatibility for select using (true);
 
 -- Public (anon) can INSERT a booking from the contact form, but not read them.
 create policy "public insert bookings" on bookings for insert with check (true);
@@ -125,3 +149,18 @@ select c.id,
 from categories c
 where c.slug = 'tuning'
   and not exists (select 1 from services s where s.title = 'Stage 1 / Stage 2 remap');
+
+-- Common F/G-series chassis as a starting point — review and correct exact
+-- per-model/service compatibility in Admin → Models, nothing here is assumed.
+insert into car_models (chassis_code, label, year_from, year_to, sort_order) values
+  ('F20', '1 Series (F20/F21)', 2011, 2019, 1),
+  ('F30', '3 Series (F30/F31/F34)', 2012, 2019, 2),
+  ('F10', '5 Series (F10/F11)', 2010, 2017, 3),
+  ('F48', 'X1 (F48)', 2015, 2022, 4),
+  ('F15', 'X5 (F15)', 2013, 2018, 5),
+  ('G20', '3 Series (G20/G21)', 2019, null, 6),
+  ('G30', '5 Series (G30/G31)', 2017, null, 7),
+  ('G01', 'X3 (G01)', 2017, null, 8),
+  ('G05', 'X5 (G05)', 2018, null, 9),
+  ('E90', '3 Series (E90/E91/E92/E93)', 2005, 2013, 10)
+on conflict (chassis_code) do nothing;
