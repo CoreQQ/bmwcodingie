@@ -1,3 +1,5 @@
+import { translateToRussian } from './translate';
+
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT_ID = process.env.TG_CHAT_ID;
 
@@ -58,7 +60,11 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
   ];
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
-  if (lead.message) lines.push(`💬 <b>Message:</b> ${esc(lead.message)}`);
+  if (lead.message) {
+    lines.push(`💬 <b>Message:</b> ${esc(lead.message)}`);
+    const translated = await translateToRussian(lead.message);
+    if (translated) lines.push(`🇷🇺 <i>${esc(translated)}</i>`);
+  }
   if (lead.persisted === false) {
     lines.push('', '⚠️ <i>Not saved to the database — follow up manually.</i>');
   }
