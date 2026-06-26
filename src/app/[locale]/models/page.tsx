@@ -45,7 +45,7 @@ export default async function ModelsPage() {
               <span className="label text-muted">{t('eyebrow')}</span>
             </div>
             <h1 className="font-display text-[clamp(2.2rem,8vw,5rem)] leading-[0.9]">
-              {t('heading1')} <span className="text-m-gradient">{t('headingHighlight')}</span> {t('heading2')}
+              {t('heading1')} <span className="text-bmw">{t('headingHighlight')}</span> {t('heading2')}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{t('intro')}</p>
           </div>

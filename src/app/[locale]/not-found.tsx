@@ -18,7 +18,7 @@ export default async function NotFound() {
         </div>
 
         <h1 className="font-display text-[clamp(3.5rem,18vw,11rem)] leading-[0.82] tracking-tight">
-          <span className="block text-m-gradient">404</span>
+          <span className="block text-bmw">404</span>
         </h1>
 
         <p className="mt-4 max-w-xl font-mono text-sm uppercase tracking-wider text-faint">
@@ -36,8 +36,8 @@ export default async function NotFound() {
           </Link>
         </div>
 
-        <div className="mt-14 max-w-md border border-white/10 bg-graphite-800/60 backdrop-blur-sm">
-          <div className="m-stripe m-stripe-anim h-1 w-full" />
+        <div className="mt-14 max-w-md border border-white/10 bg-graphite-800">
+          <div className="m-stripe h-1 w-full" />
           <div className="divide-y divide-white/5">
             <SpecRow k={t('specStatus')} v={t('specStatusValue')} />
             <SpecRow k={t('specModule')} v={t('specModuleValue')} />

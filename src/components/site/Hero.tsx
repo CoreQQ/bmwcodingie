@@ -36,7 +36,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
                 className="block animate-fade-up opacity-0"
                 style={{ animationDelay: '0.13s' }}
               >
-                <span className="text-m-gradient">{t('headline2')}</span>
+                <span className="text-bmw">{t('headline2')}</span>
               </span>
               <span
                 className="block text-muted animate-fade-up opacity-0"
@@ -75,8 +75,8 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
 
           {/* Spec readout card — offset right */}
           <div className="col-span-12 lg:col-span-4 lg:pt-24">
-            <div className="border border-white/10 bg-graphite-800/60 backdrop-blur-sm">
-              <div className="m-stripe m-stripe-anim h-1 w-full" />
+            <div className="border border-white/10 bg-graphite-800">
+              <div className="m-stripe h-1 w-full" />
               <div className="space-y-0 divide-y divide-white/5">
                 <SpecRow k={t('specFormat')} v={t('specFormatValue')} />
                 <SpecRow k={t('specCoverage')} v={t('specCoverageValue')} />

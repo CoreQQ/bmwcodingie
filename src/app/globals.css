@@ -97,26 +97,6 @@ html {
     );
   }
 
-  /* Animated stripe: a light sheen sweeps along the tricolour.
-     Apply together with .m-stripe, e.g. class="m-stripe m-stripe-anim". */
-  .m-stripe-anim {
-    position: relative;
-    overflow: hidden;
-  }
-  .m-stripe-anim::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    width: 40%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.55),
-      transparent
-    );
-    animation: sheen 4.5s ease-in-out infinite;
-  }
-
   /* Scroll progress fill — tricolour anchored to viewport width so it
      reveals blue → red as you reach the bottom (no squishing). */
   .scroll-progress-fill {
@@ -137,29 +117,9 @@ html {
     @apply font-mono text-[11px] uppercase tracking-ticker text-faint;
   }
 
-  /* Animated tricolour gradient text — use on a key headline word */
-  .text-m-gradient {
-    background-image: linear-gradient(
-      90deg,
-      var(--m-blue),
-      var(--m-dark-blue) 52%,
-      var(--m-red)
-    );
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: gradient-pan 7s ease infinite;
-  }
-
-  /* Animated tricolour glow for the hero backdrop */
+  /* Faint, static vignette behind hero-type sections — no motion, no bloom */
   .hero-glow {
-    background:
-      radial-gradient(58% 50% at 80% 0%, rgba(23, 134, 212, 0.22) 0%, rgba(10, 11, 13, 0) 60%),
-      radial-gradient(46% 42% at 92% 8%, rgba(10, 79, 176, 0.18) 0%, rgba(10, 11, 13, 0) 60%),
-      radial-gradient(44% 40% at 2% 100%, rgba(226, 0, 26, 0.13) 0%, rgba(10, 11, 13, 0) 62%);
-    animation: glow-drift 14s ease-in-out infinite alternate;
+    background: radial-gradient(120% 60% at 85% 0%, rgba(23, 134, 212, 0.08) 0%, rgba(10, 11, 13, 0) 60%);
   }
 
   /* Blueprint grid background texture */
@@ -238,19 +198,6 @@ html {
     transform: translateY(0);
   }
 }
-@keyframes gradient-pan {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-@keyframes glow-drift {
-  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
-  100% { transform: translate3d(-2%, 1%, 0) scale(1.07); opacity: 1; }
-}
-@keyframes sheen {
-  0% { transform: translateX(-120%); }
-  60%, 100% { transform: translateX(260%); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .preloader {
     display: none !important;
@@ -261,9 +208,6 @@ html {
     transform: none;
     animation: none;
   }
-  .text-m-gradient,
-  .hero-glow,
-  .m-stripe-anim::after,
   .btn-primary::after,
   [class*='animate-'] {
     animation: none !important;

@@ -53,7 +53,7 @@ export function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       {/* top hairline M-stripe */}
-      <div className="m-stripe m-stripe-anim h-[3px] w-full" aria-hidden="true" />
+      <div className="m-stripe h-[3px] w-full" aria-hidden="true" />
 
       <div
         className={`transition-all duration-300 ${
