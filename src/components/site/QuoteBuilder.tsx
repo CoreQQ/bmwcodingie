@@ -59,8 +59,8 @@ export function QuoteBuilder({ catalog }: { catalog: CategoryWithServices[] }) {
             </h2>
             <p className="mt-6 max-w-md text-muted">{t('intro')}</p>
 
-            <div className="mt-9 border border-white/10 bg-graphite-800/50">
-              <div className="m-stripe m-stripe-anim h-1 w-full" />
+            <div className="mt-9 border border-white/10 bg-graphite-800">
+              <div className="m-stripe h-1 w-full" />
               <div className="p-6">
                 <p className="label">{t('estimatedTotal')}</p>
                 <p className="mt-2 font-display text-5xl text-bmw">

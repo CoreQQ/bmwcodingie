@@ -123,7 +123,7 @@ export function ChatWidget() {
           style={{ height: 'min(520px, calc(100vh - 120px))' }}
         >
           {/* Header */}
-          <div className="m-stripe-anim flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-bmw" />
               <span className="font-mono text-xs uppercase tracking-wider text-ink">
