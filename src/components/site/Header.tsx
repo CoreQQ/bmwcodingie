@@ -115,13 +115,11 @@ export function Header() {
                 {n.label}
               </NavItem>
             ))}
-            <div className="py-4">
-              <LanguageSwitcher />
-            </div>
+            <LanguageSwitcher mobile />
             <a
               href="#contact"
               onClick={() => setOpen(false)}
-              className="btn-primary mt-1 w-full"
+              className="btn-primary mt-5 w-full"
             >
               {t('bookNow')}
             </a>
