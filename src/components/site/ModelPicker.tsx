@@ -2,14 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { Check, X, HelpCircle, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { CarModel, CategoryWithServices, ModelCompatibility, SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
-
-const STATUS_META = {
-  yes: { label: 'Available', icon: Check, cls: 'border-bmw/40 bg-bmw/10 text-bmw' },
-  no: { label: 'Not available', icon: X, cls: 'border-m-red/40 bg-m-red/10 text-m-red' },
-  on_request: { label: 'On request', icon: HelpCircle, cls: 'border-white/15 bg-white/5 text-muted' },
-} as const;
 
 export function ModelPicker({
   models,
@@ -22,6 +17,12 @@ export function ModelPicker({
   compatibility: ModelCompatibility[];
   settings: SiteSettings;
 }) {
+  const t = useTranslations('ModelPicker');
+  const STATUS_META = {
+    yes: { label: t('available'), icon: Check, cls: 'border-bmw/40 bg-bmw/10 text-bmw' },
+    no: { label: t('notAvailable'), icon: X, cls: 'border-m-red/40 bg-m-red/10 text-m-red' },
+    on_request: { label: t('onRequest'), icon: HelpCircle, cls: 'border-white/15 bg-white/5 text-muted' },
+  } as const;
   const [selectedId, setSelectedId] = useState<number | ''>('');
 
   const selectedModel = models.find((m) => m.id === selectedId) ?? null;
@@ -66,17 +67,14 @@ export function ModelPicker({
     return (
       <section className="border-t border-white/5 py-16 md:py-24">
         <div className="mx-auto max-w-edge px-5 md:px-8">
-          <p className="max-w-lg text-muted">
-            We&apos;re still building out the model list. Message us your exact chassis code and
-            year on WhatsApp and we&apos;ll tell you straight away what&apos;s possible.
-          </p>
+          <p className="max-w-lg text-muted">{t('emptyMessage')}</p>
           <a
             href={waLink(settings.whatsapp, 'Hi — I have a BMW and want to know what coding is possible.')}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary mt-6 inline-flex"
           >
-            Ask on WhatsApp
+            {t('emptyCta')}
           </a>
         </div>
       </section>
@@ -88,13 +86,13 @@ export function ModelPicker({
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="max-w-md">
           <label className="block">
-            <span className="label mb-2 block">Your BMW</span>
+            <span className="label mb-2 block">{t('yourBmw')}</span>
             <select
               value={selectedId}
               onChange={(e) => setSelectedId(e.target.value ? Number(e.target.value) : '')}
               className="w-full border border-white/10 bg-graphite-900 px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-bmw"
             >
-              <option value="">Select chassis code &amp; year…</option>
+              <option value="">{t('selectPlaceholder')}</option>
               {models.map((m) => (
                 <option key={m.id} value={m.id} className="bg-graphite-800">
                   {m.chassis_code} — {m.label} ({m.year_from}–{m.year_to ?? 'present'})
@@ -106,14 +104,14 @@ export function ModelPicker({
 
         {!selectedModel ? (
           <p className="mt-10 text-sm text-faint">
-            Don&apos;t see your exact chassis listed?{' '}
+            {t('notListed')}{' '}
             <a
               href={waLink(settings.whatsapp, 'Hi — I have a BMW and want to know what coding is possible.')}
               target="_blank"
               rel="noopener noreferrer"
               className="text-bmw underline-offset-2 hover:underline"
             >
-              Ask us on WhatsApp
+              {t('askWhatsapp')}
             </a>
             .
           </p>
@@ -121,12 +119,12 @@ export function ModelPicker({
           <div className="mt-12">
             <div className="mb-10 flex flex-wrap items-end justify-between gap-6 border border-white/10 bg-graphite-800/50 p-6">
               <div>
-                <p className="label">Showing results for</p>
+                <p className="label">{t('showingResultsFor')}</p>
                 <p className="mt-1 font-display text-3xl text-ink">{selectedModel.chassis_code}</p>
                 <p className="text-sm text-muted">{selectedModel.label}</p>
               </div>
               <button onClick={requestQuote} className="btn-primary inline-flex items-center gap-2">
-                <Sparkles size={16} /> Get a quote for this model
+                <Sparkles size={16} /> {t('getQuote')}
               </button>
             </div>
 

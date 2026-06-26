@@ -2,8 +2,9 @@ import { Trash2, Plus, Save } from 'lucide-react';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { PageHeading, Card, Field, aInput, aBtn, aBtnGhost, aBtnDanger } from '@/components/admin/ui';
 import { ConfirmButton } from '@/components/admin/ConfirmButton';
+import { TranslationEditor } from '@/components/admin/TranslationEditor';
 import { adminGetServices, adminGetCategories } from '@/lib/admin-data';
-import { createService, updateService, deleteService } from '../actions';
+import { createService, updateService, deleteService, updateServiceTranslation } from '../actions';
 import type { Category, Service } from '@/lib/types';
 
 export default async function ServicesAdmin() {
@@ -134,6 +135,17 @@ function ServiceEditor({ service, categories }: { service: Service; categories: 
           </button>
         </div>
       </form>
+
+      <TranslationEditor
+        id={service.id}
+        translations={service.translations}
+        action={updateServiceTranslation}
+        fields={[
+          { name: 'title', label: 'Title' },
+          { name: 'price_label', label: 'Price label' },
+          { name: 'description', label: 'Description', multiline: true },
+        ]}
+      />
 
       <form action={deleteService} className="mt-2 flex justify-end border-t border-white/5 pt-2">
         <input type="hidden" name="id" value={service.id} />

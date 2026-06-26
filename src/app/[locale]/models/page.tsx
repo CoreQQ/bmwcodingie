@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
 import { ModelPicker } from '@/components/site/ModelPicker';
@@ -6,14 +7,22 @@ import { getCarModels, getCatalog, getCompatibility, getSettings } from '@/lib/d
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Check your BMW model',
-  description:
-    'Pick your exact BMW chassis code and year to see which coding, diagnostics and retrofit options are available for your car in Dublin.',
-  alternates: { canonical: '/models' },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'ModelsPage' });
+  return {
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    alternates: { canonical: '/models' },
+  };
+}
 
 export default async function ModelsPage() {
+  const t = await getTranslations('ModelsPage');
   const [models, catalog, compatibility, settings] = await Promise.all([
     getCarModels(),
     getCatalog(),
@@ -33,15 +42,12 @@ export default async function ModelsPage() {
           <div className="mx-auto max-w-edge px-5 md:px-8">
             <div className="mb-5 flex items-center gap-3">
               <span className="m-stripe h-[3px] w-12" />
-              <span className="label text-muted">Check your exact model</span>
+              <span className="label text-muted">{t('eyebrow')}</span>
             </div>
             <h1 className="font-display text-[clamp(2.2rem,8vw,5rem)] leading-[0.9]">
-              WHAT CAN <span className="text-m-gradient">YOUR BMW</span> DO?
+              {t('heading1')} <span className="text-m-gradient">{t('headingHighlight')}</span> {t('heading2')}
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-              Pick your chassis code and year — we&apos;ll show you exactly what&apos;s available,
-              what isn&apos;t, and what we need to confirm in person.
-            </p>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{t('intro')}</p>
           </div>
         </section>
 

@@ -16,6 +16,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   telegram: 'bmwcoding_ie',
   instagram: 'bmwcoding.ie',
   email: 'hello@bmwcoding.ie',
+  translations: {},
 };
 
 export const DEFAULT_CATALOG: CategoryWithServices[] = [
@@ -24,6 +25,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     slug: 'multimedia',
     name: 'Multimedia & Comfort',
     sort_order: 1,
+    translations: {},
     services: [
       svc(1, 1, 'Apple CarPlay activation', 'Wired or full wireless CarPlay enabled on NBT, NBT Evo and MGU head units.', 'from €120'),
       svc(2, 1, 'Android Auto activation', 'Enabled where supported — iDrive 7 (MGU) only; iDrive 6 / NBT Evo assessed per car.', 'from €120'),
@@ -37,6 +39,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     slug: 'lighting',
     name: 'Light & Appearance',
     sort_order: 2,
+    translations: {},
     services: [
       svc(6, 2, 'Ambient lighting retrofit', 'OEM contour lighting retrofit or coding for existing harnesses on F/G platforms.', 'On request'),
       svc(7, 2, 'Welcome / Coming Home', 'Welcome light animation, Coming Home timing and carpet lighting.', 'from €50'),
@@ -49,6 +52,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     slug: 'assist',
     name: 'Assistants & Convenience',
     sort_order: 3,
+    translations: {},
     services: [
       svc(10, 3, 'Cruise control retrofit / activation', 'Hardware retrofit or coding activation, including SZL and steering module setup.', 'On request'),
       svc(11, 3, 'Comfort Access & folding mirrors', 'Keyless comfort access tweaks and auto mirror folding on lock.', 'from €50'),
@@ -61,6 +65,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     slug: 'conversion',
     name: 'Conversions & Diagnostics',
     sort_order: 4,
+    translations: {},
     services: [
       svc(14, 4, 'Japan → EU conversion', 'Region change, FSC, ETC mirror and TCB hardware considerations for JDM imports.', 'from €150'),
       svc(15, 4, 'Full ISTA diagnostics', 'Complete fault scan, read and clear codes, written summary of findings.', 'from €80'),
@@ -72,6 +77,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     slug: 'tuning',
     name: 'Performance & Tuning',
     sort_order: 5,
+    translations: {},
     services: [
       svc(17, 5, 'Stage 1 / Stage 2 remap', 'ECU remap for more power and torque — Stage 1 on the standard car, Stage 2 with supporting hardware. Built for your exact engine and spec, flashed in person.', 'On request', false),
     ],
@@ -95,5 +101,6 @@ function svc(
     mobile_available,
     visible: true,
     sort_order: id,
+    translations: {},
   };
 }

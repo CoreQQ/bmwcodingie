@@ -2,14 +2,10 @@
 
 import { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
-
-const FIELDS = [
-  { label: 'IBAN', value: 'IE53AIBK93334153254033' },
-  { label: 'BIC', value: 'AIBKIE2D' },
-  { label: 'Recipient', value: 'Oleksandr Rudenko' },
-];
+import { useTranslations } from 'next-intl';
 
 function CopyField({ label, value }: { label: string; value: string }) {
+  const t = useTranslations('Payment');
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -26,7 +22,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
       </div>
       <button
         onClick={copy}
-        aria-label={`Copy ${label}`}
+        aria-label={t('copyAria', { label })}
         className="ml-6 flex h-9 w-9 shrink-0 items-center justify-center border border-white/10 text-muted transition-colors hover:border-bmw hover:text-bmw"
       >
         {copied ? <Check size={16} className="text-bmw" /> : <Copy size={16} />}
@@ -36,19 +32,24 @@ function CopyField({ label, value }: { label: string; value: string }) {
 }
 
 export default function PaymentPage() {
+  const t = useTranslations('Payment');
+  const FIELDS = [
+    { label: t('ibanLabel'), value: 'IE53AIBK93334153254033' },
+    { label: t('bicLabel'), value: 'AIBKIE2D' },
+    { label: t('recipientLabel'), value: 'Oleksandr Rudenko' },
+  ];
+
   return (
     <div className="grain relative min-h-screen">
       <div className="mx-auto max-w-lg px-5 py-20 md:py-32">
         <div className="mb-2 flex items-center gap-3">
-          <span className="label">BMW Coding IE</span>
+          <span className="label">{t('eyebrow')}</span>
           <span className="m-stripe h-[2px] w-8" />
         </div>
         <h1 className="font-display text-[clamp(2.5rem,8vw,4rem)] leading-[0.9]">
-          PAYMENT<br />DETAILS
+          {t('heading1')}<br />{t('heading2')}
         </h1>
-        <p className="mt-4 text-sm text-muted">
-          Bank transfer — tap any field to copy.
-        </p>
+        <p className="mt-4 text-sm text-muted">{t('subtitle')}</p>
 
         <div className="mt-10 space-y-3">
           {FIELDS.map((f) => (
@@ -56,9 +57,7 @@ export default function PaymentPage() {
           ))}
         </div>
 
-        <p className="mt-8 text-xs text-faint">
-          Please include your name or booking reference in the payment description.
-        </p>
+        <p className="mt-8 text-xs text-faint">{t('footnote')}</p>
       </div>
     </div>
   );

@@ -1,13 +1,15 @@
+import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { Reveal } from './Reveal';
 
 const TOOLING = ['ISTA / Rheingold', 'E-Sys + PSdZData', 'BimmerCode', 'FA / VO coding', 'ENET / OBD'];
-const PLATFORMS = [
-  { gen: 'F-series', detail: 'F2x · F3x · F1x · F8x — NBT / NBT Evo' },
-  { gen: 'G-series', detail: 'G2x · G3x · G0x — MGU iDrive 7/8' },
-];
 
-export function WhyUs({ settings }: { settings: SiteSettings }) {
+export async function WhyUs({ settings }: { settings: SiteSettings }) {
+  const t = await getTranslations('WhyUs');
+  const PLATFORMS = [
+    { gen: 'F-series', detail: t('platformFSeriesDetail') },
+    { gen: 'G-series', detail: t('platformGSeriesDetail') },
+  ];
   return (
     <section id="about" className="relative border-t border-white/5 py-20 md:py-28">
       <div className="mx-auto max-w-edge px-5 md:px-8">
@@ -15,19 +17,19 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
           {/* Left: statement */}
           <div className="col-span-12 lg:col-span-7">
             <div className="mb-4 flex items-center gap-3">
-              <span className="label max-w-[140px] break-words">04 / The team</span>
+              <span className="label max-w-[140px] break-words">{t('eyebrow')}</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
             <h2 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
-              A REAL TEAM. <br />
-              <span className="text-bmw">THE RIGHT TOOLS.</span>
+              {t('heading1')} <br />
+              <span className="text-bmw">{t('heading2')}</span>
             </h2>
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted">{settings.about_text}</p>
 
             <div className="mt-10 grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-3">
-              <Stat n="F·G" label="Generations" accent="text-m-blue" />
-              <Stat n="2 ways" label="In-person or remote" accent="text-m-dark-blue" />
-              <Stat n="Live" label="See it work first" accent="text-m-red" />
+              <Stat n="F·G" label={t('statGenerations')} accent="text-m-blue" />
+              <Stat n="2 ways" label={t('statFormat')} accent="text-m-dark-blue" />
+              <Stat n="Live" label={t('statLive')} accent="text-m-red" />
             </div>
           </div>
 
@@ -35,19 +37,19 @@ export function WhyUs({ settings }: { settings: SiteSettings }) {
           <div className="col-span-12 lg:col-span-5 lg:pt-16">
             <Reveal>
               <div className="border border-white/10 bg-graphite-800/50 p-7">
-                <h3 className="label mb-5">Equipment</h3>
+                <h3 className="label mb-5">{t('equipment')}</h3>
                 <div className="flex flex-wrap gap-2">
-                  {TOOLING.map((t) => (
+                  {TOOLING.map((tool) => (
                     <span
-                      key={t}
+                      key={tool}
                       className="border border-white/10 px-3 py-1.5 font-mono text-xs text-muted"
                     >
-                      {t}
+                      {tool}
                     </span>
                   ))}
                 </div>
 
-                <h3 className="label mb-4 mt-8">Supported platforms</h3>
+                <h3 className="label mb-4 mt-8">{t('supportedPlatforms')}</h3>
                 <ul className="divide-y divide-white/5">
                   {PLATFORMS.map((p) => (
                     <li key={p.gen} className="flex items-baseline justify-between gap-4 py-3">

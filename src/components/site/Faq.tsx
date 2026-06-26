@@ -2,35 +2,14 @@
 
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-
-const FAQS = [
-  {
-    q: 'Will coding affect my BMW warranty?',
-    a: 'Coding changes software parameters that already exist in your car — it is reversible and we can return any setting to factory before a dealer visit. We will always tell you up front if a specific request is likely to be flagged.',
-  },
-  {
-    q: 'Which BMW models do you cover?',
-    a: 'F and G series across NBT, NBT Evo and MGU (iDrive 6/7/8) head units. Send us your model, year and VIN-derived build and we will confirm exactly what is possible on your car.',
-  },
-  {
-    q: 'Do I need to drive anywhere?',
-    a: 'Usually not. For in-person work we come to your home, workplace or wherever the car is parked across Dublin and the surrounding counties. We also offer remote coding — you stay where you are and connect a laptop with an ENET cable to the car while we work.',
-  },
-  {
-    q: 'How do I pay?',
-    a: 'On completion, once you have seen the feature working. Card or cash. Prices for diagnostics and conversions are confirmed before we start so there are no surprises.',
-  },
-  {
-    q: 'Can you retrofit hardware, not just code?',
-    a: 'Yes — ambient lighting, cruise control and similar retrofits that need wiring or modules can be scoped. These are in-person jobs and some need parts ordered first, so message us early and we will quote the full job.',
-  },
-  {
-    q: 'My import is Japanese spec — can you convert it?',
-    a: 'Japan→EU conversions are a regular job: region change, FSC, ETC mirror handling and TCB considerations. Send the details and we will tell you what your specific car needs.',
-  },
-];
+import { useTranslations } from 'next-intl';
 
 export function Faq() {
+  const t = useTranslations('Faq');
+  const FAQS = [1, 2, 3, 4, 5, 6].map((i) => ({
+    q: t(`q${i}` as Parameters<typeof t>[0]),
+    a: t(`a${i}` as Parameters<typeof t>[0]),
+  }));
   const [open, setOpen] = useState<number | null>(0);
 
   const jsonLd = {
@@ -55,11 +34,11 @@ export function Faq() {
         <div className="grid grid-cols-12 gap-x-4 md:gap-x-10 gap-y-10">
           <div className="col-span-12 md:col-span-4">
             <div className="mb-4 flex items-center gap-3">
-              <span className="label">05 / FAQ</span>
+              <span className="label">{t('eyebrow')}</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
             <h2 className="font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.9]">
-              QUESTIONS, <br /> ANSWERED
+              {t('heading1')} <br /> {t('heading2')}
             </h2>
           </div>
 

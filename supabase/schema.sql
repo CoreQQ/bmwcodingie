@@ -9,6 +9,7 @@ create table if not exists categories (
   slug text unique not null,
   name text not null,
   sort_order int not null default 0,
+  translations jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 
@@ -21,6 +22,7 @@ create table if not exists services (
   mobile_available boolean not null default true,
   visible boolean not null default true,
   sort_order int not null default 0,
+  translations jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 
@@ -56,6 +58,7 @@ create table if not exists site_settings (
   telegram text not null default 'bmwcoding_ie',
   instagram text not null default 'bmwcoding.ie',
   email text not null default 'hello@bmwcoding.ie',
+  translations jsonb not null default '{}'::jsonb,
   constraint single_row check (id = 1)
 );
 
@@ -78,6 +81,12 @@ create table if not exists model_compatibility (
   created_at timestamptz not null default now(),
   unique (model_id, service_id)
 );
+
+-- Migration: add per-locale translation overrides to tables that predate
+-- multi-language support. Safe to re-run.
+alter table categories add column if not exists translations jsonb not null default '{}'::jsonb;
+alter table services add column if not exists translations jsonb not null default '{}'::jsonb;
+alter table site_settings add column if not exists translations jsonb not null default '{}'::jsonb;
 
 -- ---------- Row Level Security ----------
 -- Public site reads with the ANON key; admin writes use the

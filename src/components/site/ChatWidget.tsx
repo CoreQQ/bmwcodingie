@@ -2,17 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MessageCircle, X, Send, ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
-const GREETING: Message = {
-  role: 'assistant',
-  content: "Hi! I'm the BMW Coding IE assistant. Ask me about our services, pricing, or whether your car is codable — I'm happy to help.",
-};
-
 export function ChatWidget() {
+  const t = useTranslations('ChatWidget');
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([GREETING]);
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', content: t('greeting') },
+  ]);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -87,7 +86,7 @@ export function ChatWidget() {
           const updated = [...m];
           updated[placeholderIdx] = {
             role: 'assistant',
-            content: 'Sorry, something went wrong. Please try again or message us on WhatsApp.',
+            content: t('errorMessage'),
           };
           return updated;
         });
@@ -110,7 +109,7 @@ export function ChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label={open ? 'Close chat' : 'Chat with us'}
+        aria-label={open ? t('closeChat') : t('chatWithUs')}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center border border-bmw bg-graphite-900 text-bmw shadow-lg transition-all hover:bg-bmw hover:text-white"
         style={{ borderRadius: 0 }}
       >
@@ -128,13 +127,13 @@ export function ChatWidget() {
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-bmw" />
               <span className="font-mono text-xs uppercase tracking-wider text-ink">
-                BMW Coding IE · Assistant
+                {t('assistantLabel')}
               </span>
             </div>
             <button
               onClick={() => setOpen(false)}
               className="text-faint transition-colors hover:text-ink"
-              aria-label="Close"
+              aria-label={t('close')}
             >
               <ChevronDown size={18} />
             </button>
@@ -174,7 +173,7 @@ export function ChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Ask about services, pricing…"
+              placeholder={t('placeholder')}
               rows={1}
               disabled={streaming}
               className="flex-1 resize-none border border-white/10 bg-graphite-800 px-3 py-2 text-sm text-ink placeholder:text-faint outline-none focus:border-bmw disabled:opacity-50 transition-colors"
@@ -183,7 +182,7 @@ export function ChatWidget() {
             <button
               onClick={send}
               disabled={!input.trim() || streaming}
-              aria-label="Send"
+              aria-label={t('send')}
               className="flex h-9 w-9 shrink-0 items-center justify-center border border-bmw text-bmw transition-colors hover:bg-bmw hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Send size={15} />

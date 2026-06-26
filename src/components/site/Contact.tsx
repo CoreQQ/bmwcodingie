@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Phone, MessageCircle, Send, Instagram, Mail, MapPin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { trackMetaEvent } from './MetaPixel';
@@ -14,6 +15,7 @@ export function Contact({
   settings: SiteSettings;
   serviceOptions: string[];
 }) {
+  const t = useTranslations('Contact');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [form, setForm] = useState({
@@ -61,7 +63,7 @@ export function Contact({
     e.preventDefault();
     if (!form.name.trim() || !form.contact.trim()) {
       setStatus('error');
-      setErrorMsg('Please add at least your name and a contact number.');
+      setErrorMsg(t('validationError'));
       return;
     }
     setStatus('sending');
@@ -78,7 +80,7 @@ export function Contact({
       setForm({ name: '', contact: '', bmw_model: '', service: '', message: '' });
     } catch {
       setStatus('error');
-      setErrorMsg('Something went wrong — please try again or message us on WhatsApp.');
+      setErrorMsg(t('submitError'));
     }
   }
 
@@ -89,7 +91,7 @@ export function Contact({
     <section id="contact" className="relative border-t border-white/5 py-20 md:py-28">
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="mb-12 flex items-center gap-3">
-          <span className="label">07 / Book</span>
+          <span className="label">{t('eyebrow')}</span>
           <span className="m-stripe h-[2px] w-10" />
         </div>
 
@@ -97,12 +99,9 @@ export function Contact({
           {/* Left: pitch + direct contact */}
           <div className="col-span-12 lg:col-span-5">
             <h2 className="font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.9]">
-              BOOK <br /> A SLOT
+              {t('heading1')} <br /> {t('heading2')}
             </h2>
-            <p className="mt-6 max-w-md text-muted">
-              Tell us the car and what you need. We’ll reply with whether it’s codable, a price and
-              the soonest slot. Prefer to chat? Message us directly.
-            </p>
+            <p className="mt-6 max-w-md text-muted">{t('intro')}</p>
 
             <div className="mt-9 space-y-3">
               <a
@@ -112,7 +111,7 @@ export function Contact({
                 className="flex items-center gap-4 border border-white/10 p-4 transition-colors hover:border-bmw"
               >
                 <MessageCircle size={20} className="text-bmw" />
-                <span className="font-mono text-sm uppercase tracking-wider text-ink">WhatsApp</span>
+                <span className="font-mono text-sm uppercase tracking-wider text-ink">{t('whatsapp')}</span>
                 <span className="ml-auto text-sm text-muted">{settings.whatsapp}</span>
               </a>
               <a
@@ -122,7 +121,7 @@ export function Contact({
                 className="flex items-center gap-4 border border-white/10 p-4 transition-colors hover:border-bmw"
               >
                 <Instagram size={20} className="text-bmw" />
-                <span className="font-mono text-sm uppercase tracking-wider text-ink">Instagram</span>
+                <span className="font-mono text-sm uppercase tracking-wider text-ink">{t('instagram')}</span>
                 <span className="ml-auto text-sm text-muted">@{ig}</span>
               </a>
               <a
@@ -130,7 +129,7 @@ export function Contact({
                 className="flex items-center gap-4 border border-white/10 p-4 transition-colors hover:border-bmw"
               >
                 <Phone size={20} className="text-bmw" />
-                <span className="font-mono text-sm uppercase tracking-wider text-ink">Call</span>
+                <span className="font-mono text-sm uppercase tracking-wider text-ink">{t('call')}</span>
                 <span className="ml-auto text-sm text-muted">{settings.phone}</span>
               </a>
             </div>
@@ -147,21 +146,21 @@ export function Contact({
               <div className="m-stripe h-1 w-full" />
               <form onSubmit={submit} className="space-y-5 p-6 md:p-8">
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Name *">
+                  <Field label={t('nameLabel')}>
                     <input
                       value={form.name}
                       onChange={update('name')}
-                      placeholder="Your name"
+                      placeholder={t('namePlaceholder')}
                       required
                       aria-required="true"
                       className={inputCls}
                     />
                   </Field>
-                  <Field label="Phone / WhatsApp *">
+                  <Field label={t('contactLabel')}>
                     <input
                       value={form.contact}
                       onChange={update('contact')}
-                      placeholder="+353 …"
+                      placeholder={t('contactPlaceholder')}
                       required
                       aria-required="true"
                       className={inputCls}
@@ -170,17 +169,17 @@ export function Contact({
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="BMW model & year">
+                  <Field label={t('modelLabel')}>
                     <input
                       value={form.bmw_model}
                       onChange={update('bmw_model')}
-                      placeholder="e.g. G30 530e, 2019"
+                      placeholder={t('modelPlaceholder')}
                       className={inputCls}
                     />
                   </Field>
-                  <Field label="Service needed">
+                  <Field label={t('serviceLabel')}>
                     <select value={form.service} onChange={update('service')} className={inputCls}>
-                      <option value="">Select…</option>
+                      <option value="">{t('serviceSelectPlaceholder')}</option>
                       {form.service &&
                         !serviceOptions.includes(form.service) &&
                         form.service !== 'Other / not sure' && (
@@ -194,25 +193,25 @@ export function Contact({
                         </option>
                       ))}
                       <option value="Other / not sure" className="bg-graphite-800">
-                        Other / not sure
+                        {t('serviceOther')}
                       </option>
                     </select>
                   </Field>
                 </div>
 
-                <Field label="Anything else">
+                <Field label={t('messageLabel')}>
                   <textarea
                     value={form.message}
                     onChange={update('message')}
                     rows={3}
-                    placeholder="Tell us what you’re after…"
+                    placeholder={t('messagePlaceholder')}
                     className={`${inputCls} resize-none`}
                   />
                 </Field>
 
                 {status === 'sent' ? (
                   <div role="alert" className="border border-bmw/40 bg-bmw/10 p-4 text-sm text-ink">
-                    Got it — we’ll be in touch shortly. For anything urgent, message us on WhatsApp.
+                    {t('sentMessage')}
                   </div>
                 ) : (
                   <button
@@ -220,7 +219,7 @@ export function Contact({
                     disabled={status === 'sending'}
                     className="btn-primary w-full disabled:opacity-60"
                   >
-                    {status === 'sending' ? 'Sending…' : 'Send request'}
+                    {status === 'sending' ? t('sendingButton') : t('sendButton')}
                   </button>
                 )}
                 {status === 'error' && (
