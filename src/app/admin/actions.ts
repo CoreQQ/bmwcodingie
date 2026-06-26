@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin, GALLERY_BUCKET } from '@/lib/supabase';
 import { ADMIN_COOKIE, checkPassword, sessionToken } from '@/lib/auth';
 
@@ -79,6 +80,21 @@ export async function deleteService(formData: FormData) {
   refreshSite();
 }
 
+export async function updateServiceTranslation(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const id = Number(formData.get('id'));
+  const locale = String(formData.get('locale') ?? '').trim();
+  if (!locale) return;
+  await mergeTranslation(sb, 'services', id, locale, {
+    title: String(formData.get('title') ?? '').trim(),
+    description: String(formData.get('description') ?? '').trim(),
+    price_label: String(formData.get('price_label') ?? '').trim(),
+  });
+  revalidatePath('/admin/services');
+  refreshSite();
+}
+
 // ─────────────────────────── Categories ───────────────────────────
 
 export async function createCategory(formData: FormData) {
@@ -112,6 +128,19 @@ export async function deleteCategory(formData: FormData) {
   const sb = getSupabaseAdmin();
   if (!sb) return;
   await sb.from('categories').delete().eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/categories');
+  refreshSite();
+}
+
+export async function updateCategoryTranslation(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const id = Number(formData.get('id'));
+  const locale = String(formData.get('locale') ?? '').trim();
+  if (!locale) return;
+  await mergeTranslation(sb, 'categories', id, locale, {
+    name: String(formData.get('name') ?? '').trim(),
+  });
   revalidatePath('/admin/categories');
   refreshSite();
 }
@@ -205,6 +234,86 @@ export async function updateSettings(formData: FormData) {
   refreshSite();
 }
 
+export async function updateSettingsTranslation(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const locale = String(formData.get('locale') ?? '').trim();
+  if (!locale) return;
+  await mergeTranslation(sb, 'site_settings', 1, locale, {
+    hero_subtitle: String(formData.get('hero_subtitle') ?? '').trim(),
+    about_text: String(formData.get('about_text') ?? '').trim(),
+    service_area: String(formData.get('service_area') ?? '').trim(),
+  });
+  revalidatePath('/admin/content');
+  refreshSite();
+}
+
+// ─────────────────────────── Car models ───────────────────────────
+
+export async function createCarModel(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('car_models').insert({
+    chassis_code: String(formData.get('chassis_code') ?? '').trim().toUpperCase(),
+    label: String(formData.get('label') ?? '').trim(),
+    year_from: Number(formData.get('year_from') ?? 0) || 0,
+    year_to: numOrNull(formData.get('year_to')),
+    sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
+  revalidatePath('/admin/models');
+  refreshSite();
+}
+
+export async function updateCarModel(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb
+    .from('car_models')
+    .update({
+      chassis_code: String(formData.get('chassis_code') ?? '').trim().toUpperCase(),
+      label: String(formData.get('label') ?? '').trim(),
+      year_from: Number(formData.get('year_from') ?? 0) || 0,
+      year_to: numOrNull(formData.get('year_to')),
+      sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+    })
+    .eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/models');
+  refreshSite();
+}
+
+export async function deleteCarModel(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('car_models').delete().eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/models');
+  refreshSite();
+}
+
+export async function saveCompatibility(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const modelId = Number(formData.get('model_id'));
+
+  const rows: { model_id: number; service_id: number; status: string; note: string }[] = [];
+  for (const [key, value] of formData.entries()) {
+    const m = key.match(/^status_(\d+)$/);
+    if (!m) continue;
+    const serviceId = Number(m[1]);
+    rows.push({
+      model_id: modelId,
+      service_id: serviceId,
+      status: String(value),
+      note: String(formData.get(`note_${serviceId}`) ?? '').trim(),
+    });
+  }
+
+  if (rows.length > 0) {
+    await sb.from('model_compatibility').upsert(rows, { onConflict: 'model_id,service_id' });
+  }
+  revalidatePath(`/admin/models/${modelId}`);
+  refreshSite();
+}
+
 // ─────────────────────────── Bookings ───────────────────────────
 
 export async function toggleBookingHandled(formData: FormData) {
@@ -225,6 +334,22 @@ export async function deleteBooking(formData: FormData) {
 }
 
 // ─────────────────────────── helpers ───────────────────────────
+
+/** Read-merge-write one locale's fields into a row's `translations` jsonb column. */
+async function mergeTranslation(
+  sb: SupabaseClient,
+  table: string,
+  id: number,
+  locale: string,
+  fields: Record<string, string>,
+) {
+  const { data } = await sb.from(table).select('translations').eq('id', id).single();
+  const translations = (data?.translations as Record<string, Record<string, string>>) ?? {};
+  await sb
+    .from(table)
+    .update({ translations: { ...translations, [locale]: { ...translations[locale], ...fields } } })
+    .eq('id', id);
+}
 
 function numOrNull(v: FormDataEntryValue | null): number | null {
   const n = Number(v);

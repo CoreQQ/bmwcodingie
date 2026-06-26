@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Bebas_Neue, Manrope } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { getLocale, getTranslations } from 'next-intl/server';
 import './globals.css';
 import { getCatalog, getSettings } from '@/lib/data';
 import { MetaPixel } from '@/components/site/MetaPixel';
@@ -70,7 +71,12 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [settings, catalog] = await Promise.all([getSettings(), getCatalog()]);
+  const [settings, catalog, locale, tCookie] = await Promise.all([
+    getSettings(),
+    getCatalog(),
+    getLocale(),
+    getTranslations('CookieConsent'),
+  ]);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -128,7 +134,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   };
 
   return (
-    <html lang="en" className={`${bebas.variable} ${manrope.variable}`}>
+    <html lang={locale} className={`${bebas.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
         <MetaPixel />
         <GoogleAdsTag />
@@ -143,7 +149,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </noscript>
         {children}
         <VisitorPing />
-        <CookieConsent />
+        <CookieConsent
+          text={tCookie('text')}
+          necessaryOnly={tCookie('necessaryOnly')}
+          acceptAll={tCookie('acceptAll')}
+        />
         <Analytics />
         <SpeedInsights />
       </body>

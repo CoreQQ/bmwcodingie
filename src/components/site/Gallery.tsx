@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { GalleryItem } from '@/lib/types';
 
 export function Gallery({ items }: { items: GalleryItem[] }) {
+  const t = useTranslations('Gallery');
   const [active, setActive] = useState<number | null>(null);
 
   const close = useCallback(() => setActive(null), []);
@@ -38,17 +40,14 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
         <div className="mb-12 grid grid-cols-12 items-end gap-6">
           <div className="col-span-12 md:col-span-8">
             <div className="mb-4 flex items-center gap-3">
-              <span className="label">03 / Work</span>
+              <span className="label">{t('eyebrow')}</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
             <h2 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
-              REAL CARS, REAL SCREENS
+              {t('heading')}
             </h2>
           </div>
-          <p className="col-span-12 text-muted md:col-span-4 md:text-right">
-            Before / after, iDrive screens and work in progress — straight from jobs around
-            Dublin.
-          </p>
+          <p className="col-span-12 text-muted md:col-span-4 md:text-right">{t('intro')}</p>
         </div>
 
         {items.length === 0 ? (
@@ -65,7 +64,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={g.image_url}
-                    alt={g.caption || 'BMW coding work'}
+                    alt={g.caption || t('altFallback')}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                   />
@@ -91,7 +90,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
           <button
             onClick={close}
             className="absolute right-5 top-5 text-muted transition-colors hover:text-ink"
-            aria-label="Close"
+            aria-label={t('close')}
           >
             <X size={28} />
           </button>
@@ -108,7 +107,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   prev();
                 }}
                 className="absolute left-3 text-muted transition-colors hover:text-ink md:left-8"
-                aria-label="Previous"
+                aria-label={t('previous')}
               >
                 <ChevronLeft size={36} />
               </button>
@@ -118,7 +117,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   next();
                 }}
                 className="absolute right-3 text-muted transition-colors hover:text-ink md:right-8"
-                aria-label="Next"
+                aria-label={t('next')}
               >
                 <ChevronRight size={36} />
               </button>
@@ -128,7 +127,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={items[active].image_url}
-              alt={items[active].caption || 'BMW coding work'}
+              alt={items[active].caption || t('altFallback')}
               className="max-h-[80vh] w-auto border border-white/10"
             />
             {items[active].caption && (
@@ -144,18 +143,19 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
 }
 
 function EmptyState() {
+  const t = useTranslations('Gallery');
   return (
     <div className="relative grid grid-cols-1 gap-px overflow-hidden border border-white/8 bg-white/8 sm:grid-cols-3">
       {[0, 1, 2].map((i) => (
         <div key={i} className="blueprint flex aspect-[4/3] items-center justify-center bg-graphite-800">
           <span className="font-mono text-[11px] uppercase tracking-ticker text-faint">
-            Work · {String(i + 1).padStart(2, '0')}
+            {t('emptyWork', { n: String(i + 1).padStart(2, '0') })}
           </span>
         </div>
       ))}
       <div className="absolute inset-0 flex items-center justify-center">
         <p className="bg-graphite-900/80 px-4 py-2 text-sm text-muted backdrop-blur">
-          Photos from recent jobs are being added.
+          {t('emptyCaption')}
         </p>
       </div>
     </div>

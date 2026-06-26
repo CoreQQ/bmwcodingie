@@ -1,38 +1,23 @@
+import { getTranslations } from 'next-intl/server';
 import { Reveal } from './Reveal';
 
-const STEPS = [
-  {
-    n: '01',
-    title: 'Send the details',
-    body: 'Message the model, year and what you want — CarPlay, ambient light, a fault to chase. We confirm if it’s codable.',
-  },
-  {
-    n: '02',
-    title: 'In person or remote',
-    body: 'Choose what suits you: we come to the car around Dublin, or you connect remotely — for that you need a laptop and an ENET cable.',
-  },
-  {
-    n: '03',
-    title: 'We get you coded',
-    body: 'In person we arrive with the tooling and plug in; remotely we connect over ENET. Either way we code or diagnose and show it working.',
-  },
-  {
-    n: '04',
-    title: 'Done — pay on completion',
-    body: 'You see the result before you pay. Card or cash on completion. No dealer trip, no waiting room.',
-  },
-];
-
-export function HowItWorks() {
+export async function HowItWorks() {
+  const t = await getTranslations('HowItWorks');
+  const STEPS = [
+    { n: '01', title: t('step1Title'), body: t('step1Body') },
+    { n: '02', title: t('step2Title'), body: t('step2Body') },
+    { n: '03', title: t('step3Title'), body: t('step3Body') },
+    { n: '04', title: t('step4Title'), body: t('step4Body') },
+  ];
   return (
     <section id="process" className="relative border-t border-white/5 py-20 md:py-28">
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="mb-14 flex items-center gap-3">
-          <span className="label">02 / Process</span>
+          <span className="label">{t('eyebrow')}</span>
           <span className="m-stripe h-[2px] w-10" />
         </div>
         <h2 className="mb-16 max-w-3xl font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
-          FOUR STEPS, NO DEALER QUEUE
+          {t('heading')}
         </h2>
 
         <div className="grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-2 lg:grid-cols-4">

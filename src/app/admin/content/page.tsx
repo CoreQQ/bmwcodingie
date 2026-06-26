@@ -1,8 +1,9 @@
 import { Save } from 'lucide-react';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { PageHeading, Card, Field, aInput, aBtn } from '@/components/admin/ui';
+import { TranslationEditor } from '@/components/admin/TranslationEditor';
 import { adminGetSettings } from '@/lib/admin-data';
-import { updateSettings } from '../actions';
+import { updateSettings, updateSettingsTranslation } from '../actions';
 
 export default async function ContentAdmin() {
   const s = await adminGetSettings();
@@ -64,6 +65,22 @@ export default async function ContentAdmin() {
           </button>
         </div>
       </form>
+
+      <Card className="mt-8 p-5">
+        <p className="mb-4 text-sm text-muted">
+          Per-language overrides for the hero subtitle, about text and service area.
+        </p>
+        <TranslationEditor
+          id={1}
+          translations={s.translations}
+          action={updateSettingsTranslation}
+          fields={[
+            { name: 'hero_subtitle', label: 'Hero subtitle', multiline: true },
+            { name: 'about_text', label: 'About text', multiline: true },
+            { name: 'service_area', label: 'Service area', multiline: true },
+          ]}
+        />
+      </Card>
     </AdminShell>
   );
 }

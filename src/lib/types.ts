@@ -1,8 +1,13 @@
+export type CategoryTranslation = { name?: string };
+export type ServiceTranslation = { title?: string; description?: string; price_label?: string };
+export type SiteSettingsTranslation = { hero_subtitle?: string; about_text?: string; service_area?: string };
+
 export type Category = {
   id: number;
   slug: string;
   name: string;
   sort_order: number;
+  translations: Record<string, CategoryTranslation>;
 };
 
 export type Service = {
@@ -14,6 +19,7 @@ export type Service = {
   mobile_available: boolean;
   visible: boolean;
   sort_order: number;
+  translations: Record<string, ServiceTranslation>;
 };
 
 export type GalleryItem = {
@@ -45,6 +51,26 @@ export type SiteSettings = {
   telegram: string;
   instagram: string;
   email: string;
+  translations: Record<string, SiteSettingsTranslation>;
 };
 
 export type CategoryWithServices = Category & { services: Service[] };
+
+export type CarModel = {
+  id: number;
+  chassis_code: string;
+  label: string;
+  year_from: number;
+  year_to: number | null;
+  sort_order: number;
+};
+
+export type CompatibilityStatus = 'yes' | 'no' | 'on_request';
+
+export type ModelCompatibility = {
+  id: number;
+  model_id: number;
+  service_id: number;
+  status: CompatibilityStatus;
+  note: string;
+};

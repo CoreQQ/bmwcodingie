@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { CategoryWithServices } from '@/lib/types';
 
 function parsePrice(label: string): number | null {
@@ -10,6 +11,7 @@ function parsePrice(label: string): number | null {
 }
 
 export function QuoteBuilder({ catalog }: { catalog: CategoryWithServices[] }) {
+  const t = useTranslations('QuoteBuilder');
   const allServices = useMemo(() => catalog.flatMap((c) => c.services), [catalog]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
 
@@ -46,37 +48,33 @@ export function QuoteBuilder({ catalog }: { catalog: CategoryWithServices[] }) {
     <section id="quote" className="relative border-t border-white/5 py-20 md:py-28">
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="mb-12 flex items-center gap-3">
-          <span className="label">06 / Build your quote</span>
+          <span className="label">{t('eyebrow')}</span>
           <span className="m-stripe h-[2px] w-10" />
         </div>
 
         <div className="grid grid-cols-12 gap-x-4 md:gap-x-10 gap-y-10">
           <div className="col-span-12 lg:col-span-5">
             <h2 className="font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.9]">
-              PICK WHAT <br /> YOU WANT
+              {t('heading1')} <br /> {t('heading2')}
             </h2>
-            <p className="mt-6 max-w-md text-muted">
-              Tick everything you&apos;re interested in — we&apos;ll total the fixed prices live.
-              Anything priced &quot;on request&quot; gets flagged so we can confirm it with you
-              directly.
-            </p>
+            <p className="mt-6 max-w-md text-muted">{t('intro')}</p>
 
             <div className="mt-9 border border-white/10 bg-graphite-800/50">
               <div className="m-stripe m-stripe-anim h-1 w-full" />
               <div className="p-6">
-                <p className="label">Estimated total</p>
+                <p className="label">{t('estimatedTotal')}</p>
                 <p className="mt-2 font-display text-5xl text-bmw">
                   {chosen.length === 0 ? '€0' : `from €${total}`}
                 </p>
                 {hasCustom && (
-                  <p className="mt-2 text-xs text-faint">+ items priced on request</p>
+                  <p className="mt-2 text-xs text-faint">{t('customNote')}</p>
                 )}
                 <button
                   onClick={sendToBooking}
                   disabled={chosen.length === 0}
                   className="btn-primary mt-6 inline-flex w-full items-center justify-center gap-2 disabled:opacity-40"
                 >
-                  <Sparkles size={16} /> Send to booking form
+                  <Sparkles size={16} /> {t('sendToBooking')}
                 </button>
               </div>
             </div>

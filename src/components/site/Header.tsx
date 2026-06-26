@@ -1,16 +1,45 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Logo } from './Logo';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
-const NAV = [
-  { href: '#services', label: 'Services' },
-  { href: '#process', label: 'How it works' },
-  { href: '#work', label: 'Work' },
-  { href: '#contact', label: 'Contact' },
-];
+function NavItem({
+  href,
+  className,
+  onClick,
+  children,
+}: {
+  href: string;
+  className: string;
+  onClick?: () => void;
+  children: React.ReactNode;
+}) {
+  if (href.startsWith('#')) {
+    return (
+      <a href={href} className={className} onClick={onClick}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className} onClick={onClick}>
+      {children}
+    </Link>
+  );
+}
 
 export function Header() {
+  const t = useTranslations('Header');
+  const NAV = [
+    { href: '#services', label: t('navServices') },
+    { href: '#process', label: t('navHowItWorks') },
+    { href: '#work', label: t('navWork') },
+    { href: '/models', label: t('navCheckModel') },
+    { href: '#contact', label: t('navContact') },
+  ];
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -42,16 +71,17 @@ export function Header() {
           {/* Desktop nav */}
           <nav className="hidden items-center gap-9 md:flex">
             {NAV.map((n) => (
-              <a
+              <NavItem
                 key={n.href}
                 href={n.href}
                 className="nav-link font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-ink"
               >
                 {n.label}
-              </a>
+              </NavItem>
             ))}
+            <LanguageSwitcher />
             <a href="#contact" className="btn-primary">
-              Book now
+              {t('bookNow')}
             </a>
           </nav>
 
@@ -76,21 +106,24 @@ export function Header() {
         {open && (
           <nav className="border-t border-white/5 bg-graphite-900/95 px-5 pb-6 pt-2 backdrop-blur-xl md:hidden">
             {NAV.map((n) => (
-              <a
+              <NavItem
                 key={n.href}
                 href={n.href}
                 onClick={() => setOpen(false)}
                 className="block border-b border-white/5 py-4 font-mono text-sm uppercase tracking-widest text-muted"
               >
                 {n.label}
-              </a>
+              </NavItem>
             ))}
+            <div className="py-4">
+              <LanguageSwitcher />
+            </div>
             <a
               href="#contact"
               onClick={() => setOpen(false)}
-              className="btn-primary mt-5 w-full"
+              className="btn-primary mt-1 w-full"
             >
-              Book now
+              {t('bookNow')}
             </a>
           </nav>
         )}

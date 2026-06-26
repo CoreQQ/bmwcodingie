@@ -2,8 +2,9 @@ import { Trash2, Plus, Save } from 'lucide-react';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { PageHeading, Card, Field, aInput, aBtn, aBtnGhost, aBtnDanger } from '@/components/admin/ui';
 import { ConfirmButton } from '@/components/admin/ConfirmButton';
+import { TranslationEditor } from '@/components/admin/TranslationEditor';
 import { adminGetCategories, adminGetServices } from '@/lib/admin-data';
-import { createCategory, updateCategory, deleteCategory } from '../actions';
+import { createCategory, updateCategory, deleteCategory, updateCategoryTranslation } from '../actions';
 
 export default async function CategoriesAdmin() {
   const [categories, services] = await Promise.all([
@@ -64,6 +65,12 @@ export default async function CategoriesAdmin() {
                 </button>
               </div>
             </form>
+            <TranslationEditor
+              id={c.id}
+              translations={c.translations}
+              action={updateCategoryTranslation}
+              fields={[{ name: 'name', label: 'Name' }]}
+            />
             <form action={deleteCategory} className="mt-2 flex justify-end border-t border-white/5 pt-2">
               <input type="hidden" name="id" value={c.id} />
               <ConfirmButton

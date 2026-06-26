@@ -1,9 +1,11 @@
 import { Instagram, Send, MessageCircle } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { Logo } from './Logo';
 
-export function Footer({ settings }: { settings: SiteSettings }) {
+export async function Footer({ settings }: { settings: SiteSettings }) {
+  const t = await getTranslations('Footer');
   const year = new Date().getFullYear();
   const tg = settings.telegram.replace(/^@/, '');
   const ig = settings.instagram.replace(/^@/, '');
@@ -14,10 +16,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         <div className="grid grid-cols-12 gap-y-10 pb-14">
           <div className="col-span-12 md:col-span-5">
             <Logo className="h-24 w-auto" />
-            <p className="mt-4 max-w-sm text-sm text-muted">
-              Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in
-              person or remotely over ENET.
-            </p>
+            <p className="mt-4 max-w-sm text-sm text-muted">{t('pitch')}</p>
             <div className="mt-5 flex gap-3">
               <a
                 href={`https://instagram.com/${ig}`}
@@ -50,7 +49,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
           </div>
 
           <div className="col-span-6 md:col-span-3">
-            <h4 className="label mb-4">Contact</h4>
+            <h4 className="label mb-4">{t('contactHeading')}</h4>
             <ul className="space-y-2 text-sm text-muted">
               <li>
                 <a href={`tel:${settings.phone.replace(/\s+/g, '')}`} className="hover:text-ink">
@@ -64,38 +63,36 @@ export function Footer({ settings }: { settings: SiteSettings }) {
               </li>
               <li>
                 <a href={waLink(settings.whatsapp)} target="_blank" rel="noopener noreferrer" className="hover:text-ink">
-                  WhatsApp {settings.whatsapp}
+                  {t('whatsappLine', { number: settings.whatsapp })}
                 </a>
               </li>
             </ul>
           </div>
 
           <div className="col-span-6 md:col-span-2">
-            <h4 className="label mb-4">Hours</h4>
+            <h4 className="label mb-4">{t('hoursHeading')}</h4>
             <ul className="space-y-2 text-sm text-muted">
-              <li>Mon–Fri · 09:00–19:00</li>
-              <li>Sat · 10:00–16:00</li>
-              <li>Sun · By appointment</li>
+              <li>{t('hours1')}</li>
+              <li>{t('hours2')}</li>
+              <li>{t('hours3')}</li>
             </ul>
           </div>
 
           <div className="col-span-12 md:col-span-2">
-            <h4 className="label mb-4">Navigate</h4>
+            <h4 className="label mb-4">{t('navigateHeading')}</h4>
             <ul className="space-y-2 text-sm text-muted">
-              <li><a href="#services" className="hover:text-ink">Services</a></li>
-              <li><a href="#process" className="hover:text-ink">How it works</a></li>
-              <li><a href="#work" className="hover:text-ink">Work</a></li>
-              <li><a href="#about" className="hover:text-ink">About</a></li>
-              <li><a href="#contact" className="hover:text-ink">Book</a></li>
+              <li><a href="#services" className="hover:text-ink">{t('navServices')}</a></li>
+              <li><a href="#process" className="hover:text-ink">{t('navHowItWorks')}</a></li>
+              <li><a href="#work" className="hover:text-ink">{t('navWork')}</a></li>
+              <li><a href="#about" className="hover:text-ink">{t('navAbout')}</a></li>
+              <li><a href="#contact" className="hover:text-ink">{t('navBook')}</a></li>
             </ul>
           </div>
         </div>
 
         <div className="flex flex-col items-start justify-between gap-3 border-t border-white/8 py-6 text-xs text-faint md:flex-row md:items-center">
-          <span>© {year} BMW Coding IE · Dublin, Ireland</span>
-          <span className="font-mono">
-            Not affiliated with or endorsed by BMW AG. BMW is a trademark of its owner.
-          </span>
+          <span>{t('copyright', { year })}</span>
+          <span className="font-mono">{t('trademark')}</span>
         </div>
       </div>
       <div className="m-stripe m-stripe-anim h-1 w-full" />

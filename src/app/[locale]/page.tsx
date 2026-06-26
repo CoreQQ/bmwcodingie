@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { Header } from '@/components/site/Header';
 import { Preloader } from '@/components/site/Preloader';
 import { ScrollProgress } from '@/components/site/ScrollProgress';
@@ -15,6 +17,16 @@ import { getCatalog, getGallery, getSettings } from '@/lib/data';
 
 // Always render fresh so admin edits appear immediately.
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'HomeMetadata' });
+  return { title: t('title'), description: t('description') };
+}
 
 export default async function HomePage() {
   const [catalog, gallery, settings] = await Promise.all([

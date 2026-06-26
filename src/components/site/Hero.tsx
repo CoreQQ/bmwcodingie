@@ -1,8 +1,10 @@
 import { ArrowDown, MapPin } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 
-export function Hero({ settings }: { settings: SiteSettings }) {
+export async function Hero({ settings }: { settings: SiteSettings }) {
+  const t = await getTranslations('Hero');
   return (
     <section id="top" className="relative overflow-hidden">
       {/* Background: blueprint grid + atmospheric blue glow.
@@ -23,24 +25,24 @@ export function Hero({ settings }: { settings: SiteSettings }) {
           <div className="col-span-12 lg:col-span-8">
             <div className="mb-7 flex items-center gap-3 reveal is-in">
               <span className="m-stripe h-[3px] w-12" />
-              <span className="label text-muted">Independent BMW Coding Team · Est. Dublin</span>
+              <span className="label text-muted">{t('eyebrow')}</span>
             </div>
 
             <h1 className="font-display text-[clamp(2.2rem,10vw,6.5rem)] leading-[0.86] tracking-tight">
               <span className="block animate-fade-up opacity-0" style={{ animationDelay: '0.05s' }}>
-                BMW CODING
+                {t('headline1')}
               </span>
               <span
                 className="block animate-fade-up opacity-0"
                 style={{ animationDelay: '0.13s' }}
               >
-                <span className="text-m-gradient">&amp; RETROFITS</span>
+                <span className="text-m-gradient">{t('headline2')}</span>
               </span>
               <span
                 className="block text-muted animate-fade-up opacity-0"
                 style={{ animationDelay: '0.21s' }}
               >
-                DUBLIN · IN-PERSON &amp; REMOTE
+                {t('headline3')}
               </span>
             </h1>
 
@@ -56,10 +58,10 @@ export function Hero({ settings }: { settings: SiteSettings }) {
               style={{ animationDelay: '0.38s' }}
             >
               <a href="#contact" className="btn-primary">
-                Book now
+                {t('bookNow')}
               </a>
               <a href="#services" className="btn-ghost">
-                View coding services
+                {t('viewServices')}
               </a>
             </div>
 
@@ -67,7 +69,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
               href="#services"
               className="mt-8 sm:mt-14 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-faint transition-colors hover:text-ink"
             >
-              <ArrowDown size={14} className="animate-bounce" /> Scroll
+              <ArrowDown size={14} className="animate-bounce" /> {t('scroll')}
             </a>
           </div>
 
@@ -76,11 +78,11 @@ export function Hero({ settings }: { settings: SiteSettings }) {
             <div className="border border-white/10 bg-graphite-800/60 backdrop-blur-sm">
               <div className="m-stripe m-stripe-anim h-1 w-full" />
               <div className="space-y-0 divide-y divide-white/5">
-                <SpecRow k="Format" v="In-person or remote" />
-                <SpecRow k="Coverage" v="Dublin + surrounding counties" />
-                <SpecRow k="Tooling" v="ISTA · E-Sys · BimmerCode" />
-                <SpecRow k="Platforms" v="F · G series" />
-                <SpecRow k="Payment" v="On completion" />
+                <SpecRow k={t('specFormat')} v={t('specFormatValue')} />
+                <SpecRow k={t('specCoverage')} v={t('specCoverageValue')} />
+                <SpecRow k={t('specTooling')} v={t('specToolingValue')} />
+                <SpecRow k={t('specPlatforms')} v={t('specPlatformsValue')} />
+                <SpecRow k={t('specPayment')} v={t('specPaymentValue')} />
               </div>
               <div className="flex items-center gap-2 border-t border-white/10 px-5 py-4 text-sm text-muted">
                 <MapPin size={15} className="text-bmw" />
@@ -94,7 +96,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
               rel="noopener noreferrer"
               className="mt-3 block border border-white/10 px-5 py-3 text-center font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:border-bmw hover:text-ink"
             >
-              WhatsApp a quick question →
+              {t('whatsappCta')}
             </a>
           </div>
         </div>
