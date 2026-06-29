@@ -36,7 +36,7 @@ async function upcomingBookings(sb: SupabaseClient): Promise<BookingRow[]> {
   const today = new Date().toISOString().slice(0, 10);
   const { data } = await sb
     .from('bookings')
-    .select('id, name, contact, slot_date, slot_time, status')
+    .select('id, name, contact, slot_date, slot_time, status, bmw_model, service, message')
     .not('slot_date', 'is', null)
     .gte('slot_date', today)
     .in('status', ['pending', 'confirmed']);

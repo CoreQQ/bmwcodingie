@@ -210,6 +210,9 @@ export type BookingRow = {
   slot_date: string | null;
   slot_time: string;
   status: string;
+  bmw_model?: string;
+  service?: string;
+  message?: string;
 };
 
 function dayLabel(date: string): string {
@@ -268,6 +271,9 @@ export function buildBookingsDay(date: string, rows: BookingRow[]): { text: stri
   for (const r of list) {
     const icon = STATUS_ICON[r.status] ?? '⏳';
     lines.push(`${icon} <b>${esc(r.slot_time)}</b> · ${esc(r.name)} · ${esc(r.contact)}`);
+    if (r.bmw_model) lines.push(`   🚙 ${esc(r.bmw_model)}`);
+    if (r.service) lines.push(`   🔧 ${esc(r.service)}`);
+    if (r.message) lines.push(`   💬 ${esc(r.message)}`);
   }
 
   return {
