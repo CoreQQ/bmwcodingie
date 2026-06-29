@@ -11,10 +11,10 @@
   "Hero": {
     "eyebrow": "Independent BMW Coding Team · Est. Dublin",
     "headline1": "BMW CODING",
-    "headline2": "& RETROFITS",
-    "headline3": "DUBLIN · IN-PERSON & REMOTE",
-    "bookNow": "Book now",
-    "viewServices": "View coding services",
+    "headline2": "DUBLIN & IRELAND",
+    "headline3": "DIAGNOSTICS & RETROFITS",
+    "bookNow": "Book BMW Coding",
+    "viewServices": "View Services",
     "scroll": "Scroll",
     "specFormat": "Format",
     "specFormatValue": "In-person or remote",
@@ -205,7 +205,7 @@
     "metaDescription": "Pick your exact BMW chassis code and year to see which coding, diagnostics and retrofit options are available for your car in Dublin."
   },
   "HomeMetadata": {
-    "title": "BMW Coding Dublin & Ireland | Coding, Diagnostics & Retrofits",
-    "description": "BMW coding in Dublin and across Ireland — ISTA diagnostics, coding and retrofits. In person around Dublin, or remotely anywhere in Ireland (Cork, Waterford and beyond) over ENET. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. F and G series."
+    "title": "BMW Coding Dublin & Ireland | CarPlay, Diagnostics & Retrofits",
+    "description": "BMW coding, diagnostics and retrofits in Dublin and across Ireland. Apple CarPlay, Android Auto, ISTA diagnostics, Japan to EU conversion, map updates and remote coding."
   }
 }

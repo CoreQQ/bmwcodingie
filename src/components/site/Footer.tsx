@@ -2,6 +2,8 @@ import { Instagram, Send, MessageCircle } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
+import { Link } from '@/i18n/navigation';
+import { SERVICE_NAV } from '@/lib/servicePages';
 import { Logo } from './Logo';
 
 export async function Footer({ settings }: { settings: SiteSettings }) {
@@ -88,6 +90,20 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
               <li><a href="#contact" className="hover:text-ink">{t('navBook')}</a></li>
             </ul>
           </div>
+        </div>
+
+        {/* SEO internal links to dedicated service pages */}
+        <div className="border-t border-white/8 py-8">
+          <h3 className="label mb-4">BMW Coding Services</h3>
+          <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted sm:grid-cols-3 lg:grid-cols-4">
+            {SERVICE_NAV.map((s) => (
+              <li key={s.slug}>
+                <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="flex flex-col items-start justify-between gap-3 border-t border-white/8 py-6 text-xs text-faint md:flex-row md:items-center">

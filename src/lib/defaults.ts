@@ -6,7 +6,7 @@ import type { CategoryWithServices, SiteSettings } from './types';
 export const DEFAULT_SETTINGS: SiteSettings = {
   hero_title: 'BMW Coding & Retrofits — In-Person & Remote, Dublin',
   hero_subtitle:
-    'Dealer-level BMW coding, diagnostics and retrofits. Done in person across Dublin, or remotely if you have a laptop and an ENET cable.',
+    'Independent BMW coding, diagnostics and retrofit service based in Dublin. In-person coding across Dublin, Kildare, Wicklow and Meath, with remote BMW coding available across Ireland where supported.',
   about_text:
     'Independent BMW coding team based in Dublin. ISTA/Rheingold, E-Sys and BimmerCode across F and G series — done in person or remotely over ENET, paid on completion.',
   service_area:

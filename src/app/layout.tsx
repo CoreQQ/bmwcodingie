@@ -23,7 +23,7 @@ const manrope = Manrope({
   display: 'swap',
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bmwcoding.ie';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -62,9 +62,9 @@ export const metadata: Metadata = {
     locale: 'en_IE',
     url: SITE_URL,
     siteName: 'BMW Coding',
-    title: 'BMW Coding — Coding, Diagnostics & Retrofits in Dublin & across Ireland',
+    title: 'BMW Coding IE — Coding, Diagnostics & Retrofits in Dublin',
     description:
-      'Dealer-level BMW coding — diagnostics and retrofits, in person around Dublin or remotely anywhere in Ireland over ENET. F and G series.',
+      'Independent BMW coding team in Dublin. In-person and remote BMW coding, CarPlay activation, diagnostics, retrofits and Japan import conversions.',
     images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'BMW Coding Dublin — BMW Coding IE' }],
   },
   twitter: {
