@@ -187,6 +187,110 @@ export async function editBookingMessage(
   });
 }
 
+// ─── /bookings browser (command + date drill-down) ───
+
+/** True when the chat is the configured owner chat — gates the /bookings command. */
+export function isOwner(chatId: number | string): boolean {
+  return Boolean(TG_CHAT_ID) && String(chatId) === String(TG_CHAT_ID);
+}
+
+const STATUS_ICON: Record<string, string> = { confirmed: '✅', pending: '⏳', declined: '❌' };
+
+export type BookingRow = {
+  id: number;
+  name: string;
+  contact: string;
+  slot_date: string | null;
+  slot_time: string;
+  status: string;
+};
+
+function dayLabel(date: string): string {
+  const d = new Date(`${date}T00:00:00`);
+  return Number.isNaN(d.getTime())
+    ? date
+    : d.toLocaleDateString('en-IE', { weekday: 'short', day: '2-digit', month: 'short' });
+}
+
+/** Top-level /bookings view: totals + one button per upcoming date with counts. */
+export function buildBookingsMenu(rows: BookingRow[]): { text: string; keyboard: InlineKeyboard } {
+  const active = rows.filter(
+    (r) => r.slot_date && (r.status === 'pending' || r.status === 'confirmed'),
+  );
+  const confirmed = active.filter((r) => r.status === 'confirmed').length;
+  const pending = active.filter((r) => r.status === 'pending').length;
+
+  const byDate = new Map<string, BookingRow[]>();
+  for (const r of active) {
+    const k = r.slot_date as string;
+    const arr = byDate.get(k);
+    if (arr) arr.push(r);
+    else byDate.set(k, [r]);
+  }
+  const dates = [...byDate.keys()].sort();
+
+  const text = [
+    '📋 <b>Upcoming bookings</b>',
+    '━━━━━━━━━━━━━━━━━━━',
+    `✅ ${confirmed} confirmed · ⏳ ${pending} pending`,
+    dates.length ? 'Pick a date:' : 'No upcoming bookings yet.',
+  ].join('\n');
+
+  const keyboard: InlineKeyboard = {
+    inline_keyboard: dates.slice(0, 30).map((d) => {
+      const list = byDate.get(d)!;
+      const c = list.filter((x) => x.status === 'confirmed').length;
+      const p = list.filter((x) => x.status === 'pending').length;
+      return [{ text: `${dayLabel(d)} · ✅${c} ⏳${p}`, callback_data: `bkday:${d}` }];
+    }),
+  };
+  return { text, keyboard };
+}
+
+/** Drill-down for one date: each slot with customer + status, plus a back button. */
+export function buildBookingsDay(date: string, rows: BookingRow[]): { text: string; keyboard: InlineKeyboard } {
+  const list = rows
+    .filter((r) => r.slot_date === date && (r.status === 'pending' || r.status === 'confirmed'))
+    .sort((a, b) => a.slot_time.localeCompare(b.slot_time));
+
+  const lines = [
+    `📅 <b>${esc(dayLabel(date))}</b> — ${list.length} booking${list.length === 1 ? '' : 's'}`,
+    '━━━━━━━━━━━━━━━━━━━',
+  ];
+  if (!list.length) lines.push('No bookings for this day.');
+  for (const r of list) {
+    const icon = STATUS_ICON[r.status] ?? '⏳';
+    lines.push(`${icon} <b>${esc(r.slot_time)}</b> · ${esc(r.name)} · ${esc(r.contact)}`);
+  }
+
+  return {
+    text: lines.join('\n'),
+    keyboard: { inline_keyboard: [[{ text: '← Back to dates', callback_data: 'bklist' }]] },
+  };
+}
+
+/** Send a fresh message to the owner chat (used by the /bookings command). */
+export async function sendOwnerMessage(text: string, keyboard?: InlineKeyboard): Promise<boolean> {
+  return sendTelegramMessage(text, keyboard);
+}
+
+/** Replace a message in place (used by the date drill-down / back navigation). */
+export async function editMessage(
+  chatId: number | string,
+  messageId: number,
+  text: string,
+  keyboard: InlineKeyboard,
+): Promise<void> {
+  await tgCall('editMessageText', {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
+    reply_markup: keyboard,
+  });
+}
+
 export type VisitorPing = {
   path: string;
   referrer?: string;
