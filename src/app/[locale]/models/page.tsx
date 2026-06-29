@@ -5,7 +5,9 @@ import { Footer } from '@/components/site/Footer';
 import { ModelPicker } from '@/components/site/ModelPicker';
 import { getCarModels, getCatalog, getCompatibility, getSettings } from '@/lib/data';
 
-export const dynamic = 'force-dynamic';
+// Cached for fast TTFB; admin edits revalidate on demand, with a 10-minute
+// fallback so model/compatibility changes never stay stale for long.
+export const revalidate = 600;
 
 export async function generateMetadata({
   params,

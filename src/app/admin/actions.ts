@@ -8,7 +8,9 @@ import { getSupabaseAdmin, GALLERY_BUCKET } from '@/lib/supabase';
 import { ADMIN_COOKIE, checkPassword, sessionToken } from '@/lib/auth';
 
 function refreshSite() {
-  revalidatePath('/');
+  // 'layout' cascades the revalidation to every route under the root layout,
+  // which covers all localized homepages (/, /ru, /uk, …) and /models.
+  revalidatePath('/', 'layout');
 }
 
 // ─────────────────────────── Auth ───────────────────────────
