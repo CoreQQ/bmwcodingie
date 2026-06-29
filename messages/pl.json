@@ -119,7 +119,11 @@
     "sendButton": "Wyślij zapytanie",
     "sendingButton": "Wysyłanie…",
     "validationError": "Podaj przynajmniej imię i numer kontaktowy.",
-    "submitError": "Coś poszło nie tak — spróbuj ponownie lub napisz do nas na WhatsApp."
+    "submitError": "Coś poszło nie tak — spróbuj ponownie lub napisz do nas na WhatsApp.",
+    "slotHeading": "Wybierz termin",
+    "slotOptional": "opcjonalnie",
+    "slotTimePrompt": "Wybierz godzinę",
+    "slotNote": "Termin to prośba — potwierdzimy go wiadomością, zanim stanie się ostateczny."
   },
   "Footer": {
     "pitch": "Niezależne kodowanie, diagnostyka i retrofity BMW na terenie Dublina i całej Irlandii — na miejscu lub zdalnie przez ENET.",

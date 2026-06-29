@@ -119,7 +119,11 @@
     "sendButton": "Trimite cererea",
     "sendingButton": "Se trimite…",
     "validationError": "Te rugăm să completezi cel puțin numele și un număr de contact.",
-    "submitError": "Ceva nu a funcționat — te rugăm să încerci din nou sau să ne scrii pe WhatsApp."
+    "submitError": "Ceva nu a funcționat — te rugăm să încerci din nou sau să ne scrii pe WhatsApp.",
+    "slotHeading": "Alege un interval",
+    "slotOptional": "opțional",
+    "slotTimePrompt": "Alege o oră",
+    "slotNote": "Intervalul este o cerere — îl confirmăm printr-un mesaj înainte să devină definitiv."
   },
   "Footer": {
     "pitch": "Coding, diagnostic și retrofit BMW independent, în Dublin și în toată Irlanda — la fața locului sau la distanță prin ENET.",

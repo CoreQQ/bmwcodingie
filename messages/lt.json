@@ -119,7 +119,11 @@
     "sendButton": "Siųsti užklausą",
     "sendingButton": "Siunčiama…",
     "validationError": "Įveskite bent vardą ir kontaktinį numerį.",
-    "submitError": "Kažkas nutiko ne taip — pabandykite dar kartą arba rašykite mums per WhatsApp."
+    "submitError": "Kažkas nutiko ne taip — pabandykite dar kartą arba rašykite mums per WhatsApp.",
+    "slotHeading": "Pasirinkite laiką",
+    "slotOptional": "neprivaloma",
+    "slotTimePrompt": "Pasirinkite valandą",
+    "slotNote": "Laikas yra užklausa — patvirtinsime jį žinute, kol jis taps galutinis."
   },
   "Footer": {
     "pitch": "Nepriklausomas BMW kodavimas, diagnostika ir retrofitai visame Dubline ir Airijoje — gyvai arba nuotoliniu būdu per ENET.",
