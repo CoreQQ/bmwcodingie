@@ -119,7 +119,11 @@
     "sendButton": "Send request",
     "sendingButton": "Sending…",
     "validationError": "Please add at least your name and a contact number.",
-    "submitError": "Something went wrong — please try again or message us on WhatsApp."
+    "submitError": "Something went wrong — please try again or message us on WhatsApp.",
+    "slotHeading": "Pick a slot",
+    "slotOptional": "optional",
+    "slotTimePrompt": "Pick a time",
+    "slotNote": "Slots are requests — we'll confirm by message before they're final."
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",
@@ -200,7 +204,7 @@
     "metaDescription": "Pick your exact BMW chassis code and year to see which coding, diagnostics and retrofit options are available for your car in Dublin."
   },
   "HomeMetadata": {
-    "title": "BMW Coding Dublin | Coding, Diagnostics & Retrofits — BMW Coding IE",
-    "description": "BMW coding Dublin — ISTA diagnostics, coding and retrofits, in person or remotely over ENET. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. F and G series."
+    "title": "BMW Coding Dublin & Ireland | Coding, Diagnostics & Retrofits",
+    "description": "BMW coding in Dublin and across Ireland — ISTA diagnostics, coding and retrofits. In person around Dublin, or remotely anywhere in Ireland (Cork, Waterford and beyond) over ENET. CarPlay, Android Auto, ambient lighting, cruise control, Japan→EU conversions. F and G series."
   }
 }

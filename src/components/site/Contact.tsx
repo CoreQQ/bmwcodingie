@@ -7,6 +7,7 @@ import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { trackMetaEvent } from './MetaPixel';
 import { trackGoogleConversion } from './GoogleAdsTag';
+import { SlotPicker } from './SlotPicker';
 
 export function Contact({
   settings,
@@ -24,6 +25,8 @@ export function Contact({
     bmw_model: '',
     service: '',
     message: '',
+    slot_date: '',
+    slot_time: '',
   });
 
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -77,7 +80,7 @@ export function Contact({
       setStatus('sent');
       trackMetaEvent('Lead', { content_name: form.service || 'General enquiry' });
       trackGoogleConversion();
-      setForm({ name: '', contact: '', bmw_model: '', service: '', message: '' });
+      setForm({ name: '', contact: '', bmw_model: '', service: '', message: '', slot_date: '', slot_time: '' });
     } catch {
       setStatus('error');
       setErrorMsg(t('submitError'));
@@ -208,6 +211,11 @@ export function Contact({
                     className={`${inputCls} resize-none`}
                   />
                 </Field>
+
+                <SlotPicker
+                  value={{ date: form.slot_date, time: form.slot_time }}
+                  onChange={(v) => setForm((f) => ({ ...f, slot_date: v.date, slot_time: v.time }))}
+                />
 
                 {status === 'sent' ? (
                   <div role="alert" className="border border-bmw/40 bg-bmw/10 p-4 text-sm text-ink">

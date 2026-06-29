@@ -30,6 +30,8 @@ export type GalleryItem = {
   sort_order: number;
 };
 
+export type BookingStatus = 'pending' | 'confirmed' | 'declined';
+
 export type Booking = {
   id: number;
   name: string;
@@ -37,6 +39,9 @@ export type Booking = {
   bmw_model: string;
   service: string;
   message: string;
+  slot_date: string | null;
+  slot_time: string;
+  status: BookingStatus;
   handled: boolean;
   created_at: string;
 };

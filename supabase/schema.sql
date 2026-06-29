@@ -88,6 +88,13 @@ alter table categories add column if not exists translations jsonb not null defa
 alter table services add column if not exists translations jsonb not null default '{}'::jsonb;
 alter table site_settings add column if not exists translations jsonb not null default '{}'::jsonb;
 
+-- Migration: add requested booking slot + confirmation status. The slot is a
+-- customer-proposed preference; status moves pending -> confirmed/declined when
+-- the owner taps a button on the Telegram notification. Safe to re-run.
+alter table bookings add column if not exists slot_date date;
+alter table bookings add column if not exists slot_time text not null default '';
+alter table bookings add column if not exists status text not null default 'pending';
+
 -- ---------- Row Level Security ----------
 -- Public site reads with the ANON key; admin writes use the
 -- SERVICE ROLE key which bypasses RLS entirely.

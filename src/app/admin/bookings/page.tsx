@@ -18,6 +18,21 @@ function fmtDate(iso: string): string {
   });
 }
 
+function fmtSlot(date: string | null, time: string): string {
+  if (!date) return '';
+  const d = new Date(`${date}T00:00:00`);
+  const day = Number.isNaN(d.getTime())
+    ? date
+    : d.toLocaleDateString('en-IE', { weekday: 'short', day: '2-digit', month: 'short' });
+  return time ? `${day} · ${time}` : day;
+}
+
+const STATUS_BADGE: Record<string, string> = {
+  pending: 'bg-amber-500/15 text-amber-400',
+  confirmed: 'bg-emerald-500/15 text-emerald-400',
+  declined: 'bg-red-500/15 text-red-400',
+};
+
 export default async function BookingsAdmin() {
   const bookings = await adminGetBookings();
   const newCount = bookings.filter((b) => !b.handled).length;
@@ -61,6 +76,15 @@ function BookingRow({ booking: b }: { booking: Booking }) {
             {!b.handled && (
               <span className="rounded bg-bmw/15 px-2 py-0.5 text-xs uppercase tracking-wide text-bmw">New</span>
             )}
+            {b.slot_date && (
+              <span
+                className={`rounded px-2 py-0.5 text-xs uppercase tracking-wide ${
+                  STATUS_BADGE[b.status] ?? STATUS_BADGE.pending
+                }`}
+              >
+                {b.status}
+              </span>
+            )}
           </div>
           {b.contact && (
             <a
@@ -75,6 +99,12 @@ function BookingRow({ booking: b }: { booking: Booking }) {
       </div>
 
       <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+        {b.slot_date && (
+          <div>
+            <dt className="text-xs uppercase tracking-wide text-faint">Requested slot</dt>
+            <dd className="text-ink">{fmtSlot(b.slot_date, b.slot_time)}</dd>
+          </div>
+        )}
         {b.bmw_model && (
           <div>
             <dt className="text-xs uppercase tracking-wide text-faint">BMW model</dt>
