@@ -43,6 +43,13 @@ export function SlotPicker({
   const t = useTranslations('Contact');
   const locale = useLocale();
 
+  // The date list depends on "today", which differs between the statically
+  // prerendered HTML (server timezone) and the visitor's browser. Rendering it
+  // only after mount keeps server and first client render identical, avoiding a
+  // hydration mismatch that would otherwise crash the page near date boundaries.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // Slots already taken (confirmed bookings), as a set of "date|time" keys.
   const [taken, setTaken] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -84,6 +91,11 @@ export function SlotPicker({
         <span className="text-[11px] text-faint">· {t('slotOptional')}</span>
       </div>
 
+      {!mounted ? (
+        // Placeholder that matches the server render until the client mounts.
+        <div className="mt-3 h-[62px] w-full animate-pulse rounded bg-white/5" aria-hidden="true" />
+      ) : (
+        <>
       {/* Date chips */}
       <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {days.map((d) => {
@@ -148,6 +160,8 @@ export function SlotPicker({
             })}
           </div>
         </div>
+      )}
+        </>
       )}
 
       <p className="mt-3 text-[11px] leading-relaxed text-faint">{t('slotNote')}</p>
