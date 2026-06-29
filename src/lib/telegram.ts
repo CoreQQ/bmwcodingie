@@ -276,10 +276,12 @@ export function buildBookingsDay(date: string, rows: BookingRow[]): { text: stri
     if (r.message) lines.push(`   💬 ${esc(r.message)}`);
   }
 
-  return {
-    text: lines.join('\n'),
-    keyboard: { inline_keyboard: [[{ text: '← Back to dates', callback_data: 'bklist' }]] },
-  };
+  const buttons: InlineButton[][] = list.map((r) => [
+    { text: `🗑 Free ${r.slot_time}`, callback_data: `bkfree:${r.id}` },
+  ]);
+  buttons.push([{ text: '← Back to dates', callback_data: 'bklist' }]);
+
+  return { text: lines.join('\n'), keyboard: { inline_keyboard: buttons } };
 }
 
 /** Send a fresh message to the owner chat (used by the /bookings command). */
