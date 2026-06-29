@@ -30,7 +30,7 @@ export type GalleryItem = {
   sort_order: number;
 };
 
-export type BookingStatus = 'pending' | 'confirmed' | 'declined';
+export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'cancelled';
 
 export type Booking = {
   id: number;

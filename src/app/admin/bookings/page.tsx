@@ -31,6 +31,7 @@ const STATUS_BADGE: Record<string, string> = {
   pending: 'bg-amber-500/15 text-amber-400',
   confirmed: 'bg-emerald-500/15 text-emerald-400',
   declined: 'bg-red-500/15 text-red-400',
+  cancelled: 'bg-white/10 text-muted',
 };
 
 export default async function BookingsAdmin() {

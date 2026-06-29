@@ -134,6 +134,23 @@ export async function POST(req: Request) {
     return ok();
   }
 
+  // Free a slot: marks it cancelled (frees availability) but keeps the
+  // customer record. Re-renders the day so the slot drops off the list.
+  const free = /^bkfree:(\d+)$/.exec(cq.data);
+  if (free) {
+    const id = Number(free[1]);
+    const { data: row } = await sb.from('bookings').select('slot_date').eq('id', id).single();
+    await sb.from('bookings').update({ status: 'cancelled' }).eq('id', id);
+    await answerCallback(cq.id, 'Slot freed ✓');
+    const date = (row?.slot_date as string | null) ?? null;
+    if (date) {
+      const rows = await upcomingBookings(sb);
+      const { text, keyboard } = buildBookingsDay(date, rows);
+      await editMessage(chatId, messageId, text, keyboard);
+    }
+    return ok();
+  }
+
   // Confirm / decline a specific booking.
   const m = /^bk:(confirm|decline):(\d+)$/.exec(cq.data);
   if (!m) {
