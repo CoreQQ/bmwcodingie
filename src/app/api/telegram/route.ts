@@ -12,6 +12,12 @@ import {
   type BookingRow,
   type Lead,
 } from '@/lib/telegram';
+import {
+  cancelInvoice,
+  startInvoice,
+  tryHandleInvoiceCallback,
+  tryHandleInvoiceText,
+} from '@/lib/invoiceFlow';
 import type { Booking } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -59,17 +65,32 @@ export async function POST(req: Request) {
 
   const sb = getSupabaseAdmin();
 
-  // ── /bookings command ──────────────────────────────────────────
+  // ── Owner messages: commands + invoice wizard input ────────────
   const msg = update.message;
-  if (msg?.text && /^\/bookings(@\w+)?\b/.test(msg.text.trim())) {
+  if (msg?.text) {
+    const text = msg.text.trim();
     if (!isOwner(msg.chat.id)) return ok();
     if (!sb) {
       await sendOwnerMessage('Database not configured.');
       return ok();
     }
-    const rows = await upcomingBookings(sb);
-    const { text, keyboard } = buildBookingsMenu(rows);
-    await sendOwnerMessage(text, keyboard);
+
+    if (/^\/invoice(@\w+)?\b/.test(text)) {
+      await startInvoice(sb, msg.chat.id);
+      return ok();
+    }
+    if (text === '✖️ Cancel' || /^\/cancel(@\w+)?\b/.test(text)) {
+      await cancelInvoice(sb, msg.chat.id);
+      return ok();
+    }
+    if (/^\/bookings(@\w+)?\b/.test(text)) {
+      const rows = await upcomingBookings(sb);
+      const { text: out, keyboard } = buildBookingsMenu(rows);
+      await sendOwnerMessage(out, keyboard);
+      return ok();
+    }
+    // Otherwise, feed it to an active invoice draft (if any).
+    if (await tryHandleInvoiceText(sb, msg.chat.id, text)) return ok();
     return ok();
   }
 
@@ -87,6 +108,12 @@ export async function POST(req: Request) {
 
   const chatId = cq.message.chat.id;
   const messageId = cq.message.message_id;
+
+  // Invoice wizard price-choice callbacks.
+  if (cq.data.startsWith('inv:')) {
+    await tryHandleInvoiceCallback(sb, chatId, messageId, cq.data, (t) => answerCallback(cq.id, t));
+    return ok();
+  }
 
   // Back to the date list.
   if (cq.data === 'bklist') {
@@ -130,6 +157,7 @@ export async function POST(req: Request) {
     contact: booking.contact,
     bmw_model: booking.bmw_model,
     service: booking.service,
+    message: booking.message,
     slot_date: booking.slot_date,
     slot_time: booking.slot_time,
   };

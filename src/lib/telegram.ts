@@ -127,17 +127,24 @@ export function bookingLines(lead: Lead): string[] {
   if (slot) lines.push(`🕒 <b>Requested slot:</b> ${esc(slot)}`);
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
+  if (lead.message) lines.push(`💬 <b>Description:</b> ${esc(lead.message)}`);
+  return lines;
+}
+
+/** bookingLines plus a Russian translation of the customer's message. Shared by the
+ *  initial notification and the post-confirm/decline edit so details are never lost. */
+async function bookingDetailLines(lead: Lead): Promise<string[]> {
+  const lines = bookingLines(lead);
+  if (lead.message) {
+    const translated = await translateToRussian(lead.message);
+    if (translated) lines.push(`🇷🇺 <i>${esc(translated)}</i>`);
+  }
   return lines;
 }
 
 /** Sends a new-enquiry / booking-request notification to the owner's Telegram chat. */
 export async function notifyTelegram(lead: Lead): Promise<boolean> {
-  const lines = bookingLines(lead);
-  if (lead.message) {
-    lines.push(`💬 <b>Message:</b> ${esc(lead.message)}`);
-    const translated = await translateToRussian(lead.message);
-    if (translated) lines.push(`🇷🇺 <i>${esc(translated)}</i>`);
-  }
+  const lines = await bookingDetailLines(lead);
   if (lead.persisted === false) {
     lines.push('', '⚠️ <i>Not saved to the database — follow up manually.</i>');
   }
@@ -172,7 +179,7 @@ export async function editBookingMessage(
     outcome === 'confirmed'
       ? '✅ <b>CONFIRMED</b>'
       : '❌ <b>DECLINED — slot taken</b>';
-  const text = [...bookingLines(lead), '', stamp].join('\n');
+  const text = [...(await bookingDetailLines(lead)), '', stamp].join('\n');
   const button: InlineButton =
     outcome === 'confirmed'
       ? { text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(lead.name, slot) } }
@@ -272,6 +279,50 @@ export function buildBookingsDay(date: string, rows: BookingRow[]): { text: stri
 /** Send a fresh message to the owner chat (used by the /bookings command). */
 export async function sendOwnerMessage(text: string, keyboard?: InlineKeyboard): Promise<boolean> {
   return sendTelegramMessage(text, keyboard);
+}
+
+/** Send a message to the owner chat with any reply_markup (inline keyboard,
+ *  reply keyboard, or { remove_keyboard: true }). */
+export async function sendOwnerWithMarkup(text: string, replyMarkup?: object): Promise<boolean> {
+  if (!telegramConfigured) {
+    console.warn('[telegram] not configured — skipping message');
+    return false;
+  }
+  const ok = await tgCall('sendMessage', {
+    chat_id: TG_CHAT_ID,
+    text,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
+    ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+  });
+  return ok !== null;
+}
+
+/** Upload a generated PDF (or any bytes) to the owner chat. */
+export async function sendOwnerDocument(
+  bytes: Uint8Array,
+  filename: string,
+  caption?: string,
+): Promise<boolean> {
+  if (!TG_TOKEN || !TG_CHAT_ID) {
+    console.warn('[telegram] not configured — skipping document');
+    return false;
+  }
+  try {
+    const form = new FormData();
+    form.append('chat_id', String(TG_CHAT_ID));
+    if (caption) form.append('caption', caption);
+    form.append('document', new Blob([bytes as unknown as BlobPart], { type: 'application/pdf' }), filename);
+    const res = await fetch(`${API}/sendDocument`, { method: 'POST', body: form });
+    if (!res.ok) {
+      console.error('[telegram] sendDocument failed:', res.status, await res.text().catch(() => ''));
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('[telegram] sendDocument error:', e);
+    return false;
+  }
 }
 
 /** Replace a message in place (used by the date drill-down / back navigation). */

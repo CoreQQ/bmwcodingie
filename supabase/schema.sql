@@ -95,6 +95,18 @@ alter table bookings add column if not exists slot_date date;
 alter table bookings add column if not exists slot_time text not null default '';
 alter table bookings add column if not exists status text not null default 'pending';
 
+-- One in-progress invoice draft per Telegram chat, driven by the bot's
+-- /invoice wizard. Server-role access only (RLS on, no public policies).
+create table if not exists invoice_drafts (
+  chat_id bigint primary key,
+  step text not null default '',
+  client text not null default '',
+  pending_service text not null default '',
+  items jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table invoice_drafts enable row level security;
+
 -- ---------- Row Level Security ----------
 -- Public site reads with the ANON key; admin writes use the
 -- SERVICE ROLE key which bypasses RLS entirely.
