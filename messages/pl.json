@@ -123,7 +123,8 @@
     "slotHeading": "Wybierz termin",
     "slotOptional": "opcjonalnie",
     "slotTimePrompt": "Wybierz godzinę",
-    "slotNote": "Termin to prośba — potwierdzimy go wiadomością, zanim stanie się ostateczny."
+    "slotNote": "Termin to prośba — potwierdzimy go wiadomością, zanim stanie się ostateczny.",
+    "slotTaken": "Zajęte"
   },
   "Footer": {
     "pitch": "Niezależne kodowanie, diagnostyka i retrofity BMW na terenie Dublina i całej Irlandii — na miejscu lub zdalnie przez ENET.",

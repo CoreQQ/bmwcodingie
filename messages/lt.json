@@ -123,7 +123,8 @@
     "slotHeading": "Pasirinkite laiką",
     "slotOptional": "neprivaloma",
     "slotTimePrompt": "Pasirinkite valandą",
-    "slotNote": "Laikas yra užklausa — patvirtinsime jį žinute, kol jis taps galutinis."
+    "slotNote": "Laikas yra užklausa — patvirtinsime jį žinute, kol jis taps galutinis.",
+    "slotTaken": "Užimta"
   },
   "Footer": {
     "pitch": "Nepriklausomas BMW kodavimas, diagnostika ir retrofitai visame Dubline ir Airijoje — gyvai arba nuotoliniu būdu per ENET.",

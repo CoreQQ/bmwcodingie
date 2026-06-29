@@ -123,7 +123,8 @@
     "slotHeading": "Pick a slot",
     "slotOptional": "optional",
     "slotTimePrompt": "Pick a time",
-    "slotNote": "Slots are requests — we'll confirm by message before they're final."
+    "slotNote": "Slots are requests — we'll confirm by message before they're final.",
+    "slotTaken": "Booked"
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",
