@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -43,6 +43,23 @@ export function SlotPicker({
   const t = useTranslations('Contact');
   const locale = useLocale();
 
+  // Slots already taken (confirmed bookings), as a set of "date|time" keys.
+  const [taken, setTaken] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/slots')
+      .then((r) => r.json())
+      .then((d: { taken?: { date: string; time: string }[] }) => {
+        if (alive && Array.isArray(d.taken)) {
+          setTaken(new Set(d.taken.map((s) => `${s.date}|${s.time}`)));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   // Next ~2 weeks of bookable days (skip Sundays — by arrangement only).
   const days = useMemo(() => {
     const out: Date[] = [];
@@ -72,20 +89,27 @@ export function SlotPicker({
         {days.map((d) => {
           const key = ymd(d);
           const active = value.date === key;
+          // Dim a day whose every window is already taken.
+          const dayWindows = windowsFor(d.getDay());
+          const full = dayWindows.length > 0 && dayWindows.every((w) => taken.has(`${key}|${w}`));
           return (
             <button
               key={key}
               type="button"
               onClick={() => onChange({ date: key, time: '' })}
               aria-pressed={active}
-              className={`flex shrink-0 flex-col items-center gap-0.5 border px-3 py-2 transition-colors ${
-                active ? 'border-bmw bg-bmw/10 text-ink' : 'border-white/10 text-muted hover:border-white/25'
+              className={`relative flex shrink-0 flex-col items-center gap-0.5 border px-3 py-2 transition-colors ${
+                active
+                  ? 'border-bmw bg-bmw/10 text-ink'
+                  : `border-white/10 hover:border-white/25 ${full ? 'text-faint opacity-50' : 'text-muted'}`
               }`}
             >
               <span className="font-mono text-[10px] uppercase tracking-wider">
                 {d.toLocaleDateString(locale, { weekday: 'short' })}
               </span>
-              <span className="text-base leading-none text-ink">{d.getDate()}</span>
+              <span className={`text-base leading-none ${full && !active ? 'text-faint' : 'text-ink'}`}>
+                {d.getDate()}
+              </span>
               <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
                 {d.toLocaleDateString(locale, { month: 'short' })}
               </span>
@@ -101,17 +125,24 @@ export function SlotPicker({
           <div className="flex flex-wrap gap-2">
             {times.map((w) => {
               const active = value.time === w;
+              const isTaken = taken.has(`${value.date}|${w}`);
               return (
                 <button
                   key={w}
                   type="button"
+                  disabled={isTaken}
                   onClick={() => onChange({ date: value.date, time: w })}
                   aria-pressed={active}
-                  className={`border px-3 py-2 font-mono text-xs transition-colors ${
-                    active ? 'border-bmw bg-bmw/10 text-ink' : 'border-white/10 text-muted hover:border-white/25'
+                  className={`flex items-center gap-2 border px-3 py-2 font-mono text-xs transition-colors ${
+                    isTaken
+                      ? 'cursor-not-allowed border-white/5 text-faint line-through opacity-50'
+                      : active
+                        ? 'border-bmw bg-bmw/10 text-ink'
+                        : 'border-white/10 text-muted hover:border-white/25'
                   }`}
                 >
                   {w}
+                  {isTaken && <span className="no-underline">· {t('slotTaken')}</span>}
                 </button>
               );
             })}
