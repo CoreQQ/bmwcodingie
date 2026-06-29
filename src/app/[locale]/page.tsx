@@ -15,8 +15,10 @@ import { Footer } from '@/components/site/Footer';
 import { ChatWidget } from '@/components/site/ChatWidget';
 import { getCatalog, getGallery, getSettings } from '@/lib/data';
 
-// Always render fresh so admin edits appear immediately.
-export const dynamic = 'force-dynamic';
+// Serve cached HTML for fast TTFB/LCP. Admin edits revalidate the site
+// on demand (see refreshSite in admin/actions.ts); this is the safety
+// fallback so content is never stale for more than 10 minutes.
+export const revalidate = 600;
 
 export async function generateMetadata({
   params,

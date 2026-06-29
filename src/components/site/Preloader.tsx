@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { Logo } from './Logo';
 
-const FILL_DURATION = 900;
-const PAUSE_AFTER_FILL = 150;
-const SLIDE_DURATION = 750;
+const FILL_DURATION = 600;
+const PAUSE_AFTER_FILL = 100;
+const SLIDE_DURATION = 600;
+const SESSION_KEY = 'bmw_preloaded';
 
 export function Preloader() {
   const [filled, setFilled] = useState(false);
@@ -18,6 +19,14 @@ export function Preloader() {
       setHidden(true);
       return;
     }
+
+    // Only play once per browser session — returning to the home page or
+    // navigating back shouldn't replay the intro (and shouldn't block).
+    if (sessionStorage.getItem(SESSION_KEY)) {
+      setHidden(true);
+      return;
+    }
+    sessionStorage.setItem(SESSION_KEY, '1');
 
     document.body.style.overflow = 'hidden';
 
