@@ -207,5 +207,25 @@
   "HomeMetadata": {
     "title": "BMW Coding Dublin | Кодування, діагностика та retrofit — BMW Coding IE",
     "description": "Кодування BMW у Дубліні — діагностика ISTA, кодування та retrofit, особисто або віддалено через ENET. CarPlay, Android Auto, ambient-підсвітка, круїз-контроль, конверсії Japan→EU. Серії F і G."
+  },
+  "VinDecoder": {
+    "eyebrow": "VIN-декодер",
+    "heading": "Визначте ваш BMW за VIN",
+    "intro": "Введіть 17-значний VIN — ми визначимо вашу модель BMW і покажемо, що на ній можна закодувати.",
+    "placeholder": "напр. WBA8E9G50GNT...",
+    "button": "Визначити",
+    "decoding": "Визначаємо…",
+    "invalid": "Схоже, це некоректний 17-значний VIN. Перевірте та спробуйте ще раз.",
+    "notBmw": "Цей VIN — не BMW, а ми кодуємо лише BMW. Перевірте номер?",
+    "error": "Не вдалося визначити VIN зараз. Спробуйте ще раз або надішліть його нам у WhatsApp.",
+    "resultTitle": "Ваш BMW",
+    "model": "Модель",
+    "series": "Серія",
+    "year": "Рік",
+    "body": "Кузов",
+    "engine": "Двигун",
+    "ctaOptions": "Що можна закодувати",
+    "ctaWhatsApp": "Запитати про кодинг",
+    "waText": "Вітаю — VIN мого BMW:"
   }
 }

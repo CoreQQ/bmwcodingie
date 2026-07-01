@@ -207,5 +207,25 @@
   "HomeMetadata": {
     "title": "BMW kodavimas Dubline | Kodavimas, diagnostika ir retrofitai — BMW Coding IE",
     "description": "BMW kodavimas Dubline — ISTA diagnostika, kodavimas ir retrofitai, gyvai arba nuotoliniu būdu per ENET. CarPlay, Android Auto, foninis apšvietimas, greičio palaikymo sistema, konversijos iš Japonijos į ES. F ir G serijos."
+  },
+  "VinDecoder": {
+    "eyebrow": "VIN dekoderis",
+    "heading": "Atpažinkite savo BMW pagal VIN",
+    "intro": "Įveskite 17 ženklų VIN — nustatysime jūsų BMW modelį ir parodysime, ką galima jame užkoduoti.",
+    "placeholder": "pvz. WBA8E9G50GNT...",
+    "button": "Dekoduoti VIN",
+    "decoding": "Dekoduojama…",
+    "invalid": "Tai neatrodo kaip taisyklingas 17 ženklų VIN. Patikrinkite ir bandykite dar kartą.",
+    "notBmw": "Šis VIN — ne BMW, o mes koduojame tik BMW. Patikrinkite numerį?",
+    "error": "Nepavyko dabar dekoduoti VIN. Bandykite dar kartą arba atsiųskite jį mums per WhatsApp.",
+    "resultTitle": "Jūsų BMW",
+    "model": "Modelis",
+    "series": "Serija",
+    "year": "Metai",
+    "body": "Kėbulas",
+    "engine": "Variklis",
+    "ctaOptions": "Kodavimo galimybės",
+    "ctaWhatsApp": "Klausti apie kodavimą",
+    "waText": "Sveiki — mano BMW VIN:"
   }
 }
