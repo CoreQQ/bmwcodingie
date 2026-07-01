@@ -1,5 +1,6 @@
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import { buildVehicleReportPdf, type ReportSection } from '@/lib/vehicleReport';
+import { estimateHeadUnit } from '@/lib/headUnit';
 
 export const runtime = 'nodejs';
 
@@ -74,6 +75,14 @@ export async function GET(req: Request) {
     arr.push([label, v]);
     bySection.set(section, arr);
   }
+  // Add the estimated head unit to the Vehicle section.
+  const headUnit = estimateHeadUnit(val('ModelYear'), val('Series') || val('Model'));
+  if (headUnit) {
+    const veh = bySection.get('Vehicle') ?? [];
+    veh.push(['Likely head unit (est.)', headUnit]);
+    bySection.set('Vehicle', veh);
+  }
+
   const sections: ReportSection[] = [...bySection.entries()].map(([title, rows]) => ({ title, rows }));
 
   const title = [val('Make') || 'BMW', val('Model'), val('Series'), val('ModelYear')]

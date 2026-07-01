@@ -227,6 +227,8 @@
     "ctaOptions": "Zobacz opcje kodowania",
     "ctaWhatsApp": "Zapytaj o kodowanie",
     "waText": "Cześć — numer VIN mojego BMW to",
-    "download": "Pobierz informacje o pojeździe"
+    "download": "Pobierz informacje o pojeździe",
+    "headUnit": "Prawdopodobna jednostka iDrive",
+    "headUnitNote": "Szacunek na podstawie modelu i roku — dokładna jednostka zależy od opcji fabrycznych, potwierdzana na aucie."
   }
 }

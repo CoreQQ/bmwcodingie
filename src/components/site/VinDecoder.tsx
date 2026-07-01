@@ -13,6 +13,7 @@ type Decoded = {
   year?: string;
   body?: string;
   engine?: string;
+  headUnit?: string;
   error?: string;
 };
 
@@ -128,6 +129,15 @@ export function VinDecoder({ whatsapp }: { whatsapp: string }) {
                 {[result.series, result.year, result.body].filter(Boolean).join(' · ')}
               </p>
             )}
+
+            {result.headUnit && (
+              <div className="mt-4 border border-white/10 bg-graphite-900 p-4">
+                <p className="font-mono text-[11px] uppercase tracking-wider text-faint">{t('headUnit')}</p>
+                <p className="mt-1 text-lg font-semibold text-bmw">{result.headUnit}</p>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-faint">{t('headUnitNote')}</p>
+              </div>
+            )}
+
             <dl className="mt-4 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
               {rows
                 .filter(([, v]) => v)

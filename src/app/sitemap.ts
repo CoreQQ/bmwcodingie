@@ -5,6 +5,7 @@ import { ALL_SERVICE_SLUGS } from '@/lib/servicePages';
 const PATHS = [
   { path: '', priority: 1 },
   { path: '/models', priority: 0.8 },
+  { path: '/bmw-coding-list', priority: 0.8 },
   ...ALL_SERVICE_SLUGS.map((slug) => ({ path: `/${slug}`, priority: 0.9 })),
 ];
 

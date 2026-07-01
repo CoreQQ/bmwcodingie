@@ -227,6 +227,8 @@
     "ctaOptions": "See coding options",
     "ctaWhatsApp": "Ask what's codable",
     "waText": "Hi — my BMW VIN is",
-    "download": "Download vehicle info"
+    "download": "Download vehicle info",
+    "headUnit": "Likely head unit",
+    "headUnitNote": "Estimated from model & year — the exact unit depends on factory options, confirmed on the car."
   }
 }
