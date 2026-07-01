@@ -9,7 +9,6 @@ import { HowItWorks } from '@/components/site/HowItWorks';
 import { Gallery } from '@/components/site/Gallery';
 import { WhyUs } from '@/components/site/WhyUs';
 import { Faq } from '@/components/site/Faq';
-import { QuoteBuilder } from '@/components/site/QuoteBuilder';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
 import { ChatWidget } from '@/components/site/ChatWidget';
@@ -58,7 +57,6 @@ export default async function HomePage({
         <Gallery items={gallery} />
         <WhyUs settings={settings} />
         <Faq />
-        <QuoteBuilder catalog={catalog} />
         <Contact settings={settings} serviceOptions={serviceOptions} />
       </main>
       <Footer settings={settings} />
