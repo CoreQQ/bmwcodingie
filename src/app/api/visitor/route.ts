@@ -11,19 +11,25 @@ const COOLDOWN_MS = 10 * 60 * 1000;
 
 const PRIVATE_IP = /^(127\.|10\.|192\.168\.|::1$|unknown$)/;
 
-/** Best-effort city/country lookup. Returns undefined on any failure or private IP. */
-async function geolocate(ip: string): Promise<string | undefined> {
-  if (PRIVATE_IP.test(ip)) return undefined;
+type Geo = { country?: string; city?: string; isp?: string };
+
+/** Best-effort country/city/ISP lookup. Returns {} on any failure or private IP. */
+async function geolocate(ip: string): Promise<Geo> {
+  if (PRIVATE_IP.test(ip)) return {};
   try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`, {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,city,isp`, {
       signal: AbortSignal.timeout(2000),
     });
-    if (!res.ok) return undefined;
+    if (!res.ok) return {};
     const data = await res.json();
-    if (data.status !== 'success') return undefined;
-    return [data.city, data.country].filter(Boolean).join(', ') || undefined;
+    if (data.status !== 'success') return {};
+    return {
+      country: data.country || undefined,
+      city: data.city || undefined,
+      isp: data.isp || undefined,
+    };
   } catch {
-    return undefined;
+    return {};
   }
 }
 
@@ -49,8 +55,8 @@ export async function POST(req: Request) {
 
   const { browser, os } = parseUserAgent(req.headers.get('user-agent') || '');
   const language = req.headers.get('accept-language')?.split(',')[0]?.trim();
-  const location = await geolocate(ip);
+  const { country, city, isp } = await geolocate(ip);
 
-  await notifyVisitor({ path, referrer, device, ip, browser, os, location, language, isReturning });
+  await notifyVisitor({ path, referrer, device, ip, browser, os, country, city, isp, language, isReturning });
   return NextResponse.json({ ok: true });
 }

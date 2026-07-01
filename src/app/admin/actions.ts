@@ -1,11 +1,18 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin, GALLERY_BUCKET } from '@/lib/supabase';
 import { ADMIN_COOKIE, checkPassword, sessionToken } from '@/lib/auth';
+import { notifyEvent } from '@/lib/telegram';
+
+/** Best-effort client IP from the request headers (server action context). */
+function requestIp(): string {
+  const h = headers();
+  return h.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+}
 
 function refreshSite() {
   // 'layout' cascades the revalidation to every route under the root layout,
@@ -18,6 +25,12 @@ function refreshSite() {
 export async function login(formData: FormData) {
   const password = String(formData.get('password') ?? '');
   if (!checkPassword(password)) {
+    await notifyEvent({
+      emoji: '⚠️',
+      title: 'Failed admin login attempt',
+      rows: [['IP', requestIp()]],
+      note: 'Wrong password entered on /admin/login.',
+    });
     redirect('/admin/login?error=1');
   }
   const token = await sessionToken();
@@ -28,6 +41,7 @@ export async function login(formData: FormData) {
     path: '/',
     maxAge: 60 * 60 * 24 * 14, // 14 days
   });
+  await notifyEvent({ emoji: '🔐', title: 'Admin signed in', rows: [['IP', requestIp()]] });
   redirect('/admin');
 }
 
@@ -168,11 +182,22 @@ export async function uploadGalleryImage(formData: FormData) {
 
   const { data } = sb.storage.from(GALLERY_BUCKET).getPublicUrl(path);
 
+  const caption = String(formData.get('caption') ?? '').trim();
   await sb.from('gallery').insert({
     image_url: data.publicUrl,
-    caption: String(formData.get('caption') ?? '').trim(),
+    caption,
     visible: true,
     sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
+
+  await notifyEvent({
+    emoji: '🖼',
+    title: 'New gallery image uploaded',
+    rows: [
+      ['File', file.name || path],
+      ['Size', `${Math.round(file.size / 1024)} KB`],
+      ['Caption', caption || '—'],
+    ],
   });
 
   revalidatePath('/admin/gallery');

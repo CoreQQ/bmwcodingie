@@ -350,6 +350,22 @@ export async function editMessage(
   });
 }
 
+/** Current date+time in Dublin, e.g. "01 Jul 2026, 09:18". */
+function dublinTime(): string {
+  try {
+    return new Date().toLocaleString('en-IE', {
+      timeZone: 'Europe/Dublin',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return new Date().toISOString();
+  }
+}
+
 export type VisitorPing = {
   path: string;
   referrer?: string;
@@ -357,23 +373,47 @@ export type VisitorPing = {
   ip?: string;
   browser?: string;
   os?: string;
-  location?: string;
+  country?: string;
+  city?: string;
+  isp?: string;
   language?: string;
   isReturning?: boolean;
 };
 
-/** Sends a lightweight "someone's on the site" notification. */
+/** Sends a "someone's on the site" notification with full visit details. */
 export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
   const lines = [
-    `${v.isReturning ? '🔁 <b>Returning visitor</b>' : '👀 <b>New visitor on the site</b>'}`,
+    v.isReturning ? '🔁 <b>Returning visitor</b>' : '👀 <b>New visitor on the site</b>',
     '━━━━━━━━━━━━━━━━━━━',
-    `📍 <b>Page:</b> ${esc(v.path)}`,
+    `🕒 <b>Time:</b> ${esc(dublinTime())}`,
+    `📄 <b>Page:</b> ${esc(v.path)}`,
     `🔗 <b>Source:</b> ${esc(v.referrer || 'Direct / unknown')}`,
-    `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}${v.os ? ` (${esc(v.os)})` : ''}`,
+    `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}${v.os ? ` · ${esc(v.os)}` : ''}`,
   ];
   if (v.browser) lines.push(`🧭 <b>Browser:</b> ${esc(v.browser)}`);
-  if (v.location) lines.push(`📌 <b>Location:</b> ${esc(v.location)}`);
   if (v.language) lines.push(`🗣 <b>Language:</b> ${esc(v.language)}`);
+  if (v.country) lines.push(`🌍 <b>Country:</b> ${esc(v.country)}`);
+  if (v.city) lines.push(`🏙 <b>City:</b> ${esc(v.city)}`);
+  if (v.isp) lines.push(`🏢 <b>Provider:</b> ${esc(v.isp)}`);
   lines.push(`🌐 <b>IP:</b> <code>${esc(v.ip || 'unknown')}</code>`);
+  return sendTelegramMessage(lines.join('\n'));
+}
+
+/** Generic event notification (admin login, server error, file upload, …). */
+export async function notifyEvent(opts: {
+  emoji: string;
+  title: string;
+  rows?: [string, string][];
+  note?: string;
+}): Promise<boolean> {
+  const lines = [
+    `${opts.emoji} <b>${esc(opts.title)}</b>`,
+    '━━━━━━━━━━━━━━━━━━━',
+    `🕒 <b>Time:</b> ${esc(dublinTime())}`,
+  ];
+  for (const [k, val] of opts.rows ?? []) {
+    if (val) lines.push(`<b>${esc(k)}:</b> ${esc(val)}`);
+  }
+  if (opts.note) lines.push('', `<i>${esc(opts.note)}</i>`);
   return sendTelegramMessage(lines.join('\n'));
 }
