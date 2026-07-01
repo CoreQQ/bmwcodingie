@@ -207,5 +207,25 @@
   "HomeMetadata": {
     "title": "Kodowanie BMW Dublin | Kodowanie, Diagnostyka i Retrofity — BMW Coding IE",
     "description": "Kodowanie BMW Dublin — diagnostyka ISTA, kodowanie i retrofity, na miejscu lub zdalnie przez ENET. CarPlay, Android Auto, oświetlenie ambientowe, tempomat, konwersje Japonia→UE. Seria F i G."
+  },
+  "VinDecoder": {
+    "eyebrow": "Dekoder VIN",
+    "heading": "Rozpoznaj swoje BMW po VIN",
+    "intro": "Wpisz 17-znakowy numer VIN — rozpoznamy Twój model BMW i pokażemy, co można w nim zakodować.",
+    "placeholder": "np. WBA8E9G50GNT...",
+    "button": "Dekoduj VIN",
+    "decoding": "Dekodowanie…",
+    "invalid": "To nie wygląda na prawidłowy 17-znakowy VIN. Sprawdź i spróbuj ponownie.",
+    "notBmw": "Ten VIN to nie BMW — kodujemy tylko BMW. Sprawdź numer?",
+    "error": "Nie udało się teraz odczytać VIN. Spróbuj ponownie lub wyślij go do nas na WhatsApp.",
+    "resultTitle": "Twoje BMW",
+    "model": "Model",
+    "series": "Seria",
+    "year": "Rok",
+    "body": "Nadwozie",
+    "engine": "Silnik",
+    "ctaOptions": "Zobacz opcje kodowania",
+    "ctaWhatsApp": "Zapytaj o kodowanie",
+    "waText": "Cześć — numer VIN mojego BMW to"
   }
 }
