@@ -8,11 +8,12 @@ import { Services } from '@/components/site/Services';
 import { HowItWorks } from '@/components/site/HowItWorks';
 import { Gallery } from '@/components/site/Gallery';
 import { WhyUs } from '@/components/site/WhyUs';
+import { Reviews } from '@/components/site/Reviews';
 import { Faq } from '@/components/site/Faq';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
 import { ChatWidget } from '@/components/site/ChatWidget';
-import { getCatalog, getGallery, getSettings } from '@/lib/data';
+import { getCatalog, getGallery, getReviews, getSettings } from '@/lib/data';
 
 // Serve cached HTML for fast TTFB/LCP. Admin edits revalidate the site
 // on demand (see refreshSite in admin/actions.ts); this is the safety
@@ -37,9 +38,10 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [catalog, gallery, settings] = await Promise.all([
+  const [catalog, gallery, reviews, settings] = await Promise.all([
     getCatalog(),
     getGallery(),
+    getReviews(),
     getSettings(),
   ]);
 
@@ -56,6 +58,7 @@ export default async function HomePage({
         <HowItWorks />
         <Gallery items={gallery} />
         <WhyUs settings={settings} />
+        <Reviews reviews={reviews} />
         <Faq />
         <Contact settings={settings} serviceOptions={serviceOptions} />
       </main>

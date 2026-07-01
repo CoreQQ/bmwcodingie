@@ -107,6 +107,20 @@ create table if not exists invoice_drafts (
 );
 alter table invoice_drafts enable row level security;
 
+-- Customer reviews shown on the site (owner-managed in the admin panel).
+create table if not exists reviews (
+  id bigint generated always as identity primary key,
+  author text not null,
+  car text not null default '',
+  rating int not null default 5,
+  body text not null default '',
+  visible boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table reviews enable row level security;
+create policy "public read reviews" on reviews for select using (true);
+
 -- ---------- Row Level Security ----------
 -- Public site reads with the ANON key; admin writes use the
 -- SERVICE ROLE key which bypasses RLS entirely.

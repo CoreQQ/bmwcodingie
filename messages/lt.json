@@ -131,9 +131,9 @@
     "contactHeading": "Kontaktai",
     "hoursHeading": "Darbo laikas",
     "navigateHeading": "Naršyti",
-    "hours1": "Pir–Pen · 09:00–19:00",
-    "hours2": "Šeš · 10:00–16:00",
-    "hours3": "Sek · Susitarus iš anksto",
+    "hours1": "Pir–Pen · 19:00–23:00",
+    "hours2": "Šeš ir Sek · 11:00–23:00",
+    "hours3": "Vakaro ir savaitgalio laikai",
     "navServices": "Paslaugos",
     "navHowItWorks": "Kaip tai vyksta",
     "navWork": "Darbai",
@@ -230,5 +230,10 @@
     "download": "Atsisiųsti automobilio informaciją",
     "headUnit": "Tikėtina „iDrive“ sistema",
     "headUnitNote": "Įvertinta pagal modelį ir metus — tiksli sistema priklauso nuo gamyklinių opcijų, patvirtinama automobilyje."
+  },
+  "Reviews": {
+    "eyebrow": "Atsiliepimai",
+    "heading": "KĄ SAKO KLIENTAI",
+    "count": "{n} patvirtintų atsiliepimų"
   }
 }

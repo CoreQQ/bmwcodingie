@@ -343,6 +343,51 @@ export async function saveCompatibility(formData: FormData) {
 
 // ─────────────────────────── Bookings ───────────────────────────
 
+// ─────────────────────────── Reviews ───────────────────────────
+
+export async function createReview(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const rating = Math.max(1, Math.min(5, Number(formData.get('rating') ?? 5) || 5));
+  await sb.from('reviews').insert({
+    author: String(formData.get('author') ?? '').trim(),
+    car: String(formData.get('car') ?? '').trim(),
+    rating,
+    body: String(formData.get('body') ?? '').trim(),
+    visible: true,
+    sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
+  revalidatePath('/admin/reviews');
+  refreshSite();
+}
+
+export async function updateReview(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const rating = Math.max(1, Math.min(5, Number(formData.get('rating') ?? 5) || 5));
+  await sb
+    .from('reviews')
+    .update({
+      author: String(formData.get('author') ?? '').trim(),
+      car: String(formData.get('car') ?? '').trim(),
+      rating,
+      body: String(formData.get('body') ?? '').trim(),
+      visible: formData.get('visible') === 'on' || formData.get('visible') === 'true',
+      sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+    })
+    .eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/reviews');
+  refreshSite();
+}
+
+export async function deleteReview(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  await sb.from('reviews').delete().eq('id', Number(formData.get('id')));
+  revalidatePath('/admin/reviews');
+  refreshSite();
+}
+
 export async function toggleBookingHandled(formData: FormData) {
   const sb = getSupabaseAdmin();
   if (!sb) return;

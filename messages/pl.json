@@ -131,9 +131,9 @@
     "contactHeading": "Kontakt",
     "hoursHeading": "Godziny otwarcia",
     "navigateHeading": "Nawigacja",
-    "hours1": "Pon–Pt · 09:00–19:00",
-    "hours2": "Sob · 10:00–16:00",
-    "hours3": "Niedz · Po umówieniu",
+    "hours1": "Pon–Pt · 19:00–23:00",
+    "hours2": "Sob i Niedz · 11:00–23:00",
+    "hours3": "Wieczory i weekendy",
     "navServices": "Usługi",
     "navHowItWorks": "Jak to działa",
     "navWork": "Realizacje",
@@ -230,5 +230,10 @@
     "download": "Pobierz informacje o pojeździe",
     "headUnit": "Prawdopodobna jednostka iDrive",
     "headUnitNote": "Szacunek na podstawie modelu i roku — dokładna jednostka zależy od opcji fabrycznych, potwierdzana na aucie."
+  },
+  "Reviews": {
+    "eyebrow": "Opinie",
+    "heading": "CO MÓWIĄ KIEROWCY",
+    "count": "{n} zweryfikowanych opinii"
   }
 }
