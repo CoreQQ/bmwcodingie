@@ -3,7 +3,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
 import { ModelPicker } from '@/components/site/ModelPicker';
-import { VinDecoder } from '@/components/site/VinDecoder';
 import { getCarModels, getCatalog, getCompatibility, getSettings } from '@/lib/data';
 
 // Cached for fast TTFB; admin edits revalidate on demand, with a 10-minute
@@ -57,16 +56,10 @@ export default async function ModelsPage({
               {t('heading1')} <span className="text-bmw">{t('headingHighlight')}</span> {t('heading2')}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{t('intro')}</p>
-
-            <div className="mt-10 max-w-3xl">
-              <VinDecoder whatsapp={settings.whatsapp} />
-            </div>
           </div>
         </section>
 
-        <div id="model-check">
-          <ModelPicker models={models} catalog={catalog} compatibility={compatibility} settings={settings} />
-        </div>
+        <ModelPicker models={models} catalog={catalog} compatibility={compatibility} settings={settings} />
       </main>
       <Footer settings={settings} />
     </div>
