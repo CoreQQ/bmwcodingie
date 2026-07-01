@@ -184,6 +184,43 @@ html {
   }
 }
 
+/* ---- Preloader logo reveal ----
+   Two bars in the background colour cover the logo, then retract (width 100%→0)
+   to "unwrap" it — after which the overlay collapses. */
+.preloader-logo {
+  position: relative;
+  display: inline-block;
+}
+.preloader-logo::before,
+.preloader-logo::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  background: #0a0b0d;
+}
+.preloader-logo::before {
+  top: 0;
+  height: 52%;
+}
+.preloader-logo::after {
+  bottom: 0;
+  height: 52%;
+}
+.preloader-logo.is-anim::before,
+.preloader-logo.is-anim::after {
+  animation: preloader-unwrap 0.9s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+@keyframes preloader-unwrap {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
+
 /* ---- Scroll reveal ---- */
 .reveal {
   opacity: 0;

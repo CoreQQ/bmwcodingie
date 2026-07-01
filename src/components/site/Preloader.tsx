@@ -3,25 +3,22 @@
 import { useEffect, useState } from 'react';
 import { Logo } from './Logo';
 
-const FILL_DURATION = 600;
-const PAUSE_AFTER_FILL = 100;
-const SLIDE_DURATION = 600;
+const REVEAL_MS = 900;
+const HOLD_MS = 250;
+const COLLAPSE_MS = 500;
 const SESSION_KEY = 'bmw_preloaded';
 
 export function Preloader() {
-  const [filled, setFilled] = useState(false);
-  const [slideUp, setSlideUp] = useState(false);
+  const [anim, setAnim] = useState(false);
+  const [collapse, setCollapse] = useState(false);
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    // Honour reduced-motion: skip the loader entirely.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setHidden(true);
       return;
     }
-
-    // Only play once per browser session — returning to the home page or
-    // navigating back shouldn't replay the intro (and shouldn't block).
+    // Only play once per browser session.
     if (sessionStorage.getItem(SESSION_KEY)) {
       setHidden(true);
       return;
@@ -29,20 +26,16 @@ export function Preloader() {
     sessionStorage.setItem(SESSION_KEY, '1');
 
     document.body.style.overflow = 'hidden';
-
-    const raf = requestAnimationFrame(() => setFilled(true));
-    const slideTimer = window.setTimeout(() => {
-      setSlideUp(true);
+    const raf = requestAnimationFrame(() => setAnim(true)); // start the logo unwrap
+    const collapseTimer = window.setTimeout(() => {
+      setCollapse(true); // collapse the overlay
       document.body.style.overflow = '';
-    }, FILL_DURATION + PAUSE_AFTER_FILL);
-    const hideTimer = window.setTimeout(
-      () => setHidden(true),
-      FILL_DURATION + PAUSE_AFTER_FILL + SLIDE_DURATION,
-    );
+    }, REVEAL_MS + HOLD_MS);
+    const hideTimer = window.setTimeout(() => setHidden(true), REVEAL_MS + HOLD_MS + COLLAPSE_MS);
 
     return () => {
       cancelAnimationFrame(raf);
-      window.clearTimeout(slideTimer);
+      window.clearTimeout(collapseTimer);
       window.clearTimeout(hideTimer);
       document.body.style.overflow = '';
     };
@@ -53,18 +46,12 @@ export function Preloader() {
   return (
     <div
       aria-hidden="true"
-      className={`preloader fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-graphite-900 transition-transform duration-[750ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
-        slideUp ? '-translate-y-full' : 'translate-y-0'
+      className={`preloader fixed inset-x-0 top-0 z-[100] flex items-center justify-center overflow-hidden bg-graphite-900 transition-[height] duration-[500ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+        collapse ? 'h-0' : 'h-[100dvh]'
       }`}
     >
-      <div className="relative flex flex-col items-center gap-7">
-        <Logo className="h-14 w-auto" />
-        <div className="h-[3px] w-[min(60vw,280px)] overflow-hidden bg-graphite-600">
-          <div
-            className="m-stripe h-full transition-[width] duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
-            style={{ width: filled ? '100%' : '0%' }}
-          />
-        </div>
+      <div className={`preloader-logo ${anim ? 'is-anim' : ''}`}>
+        <Logo className="h-16 w-auto md:h-24" />
       </div>
 
       {/* If JS is disabled, never trap the visitor behind the overlay. */}

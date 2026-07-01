@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
+import { estimateHeadUnit } from '@/lib/headUnit';
 
 export const runtime = 'nodejs';
 
@@ -33,17 +34,20 @@ export async function GET(req: Request) {
       return s && s !== '0' ? s : '';
     };
     const displacement = clean(r.DisplacementL);
+    const series = clean(r.Series) || clean(r.Series2);
+    const year = clean(r.ModelYear);
 
     return NextResponse.json({
       ok: true,
       isBmw,
       make,
       model: clean(r.Model),
-      series: clean(r.Series) || clean(r.Series2),
-      year: clean(r.ModelYear),
+      series,
+      year,
       body: clean(r.BodyClass),
       fuel: clean(r.FuelTypePrimary),
       engine: displacement ? `${displacement}L${r.FuelTypePrimary ? ` ${clean(r.FuelTypePrimary)}` : ''}` : '',
+      headUnit: isBmw ? estimateHeadUnit(year, series || clean(r.Model)) : '',
     });
   } catch {
     return NextResponse.json({ ok: false, error: 'lookup_failed' });

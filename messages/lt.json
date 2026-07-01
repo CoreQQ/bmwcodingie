@@ -227,6 +227,8 @@
     "ctaOptions": "Kodavimo galimybės",
     "ctaWhatsApp": "Klausti apie kodavimą",
     "waText": "Sveiki — mano BMW VIN:",
-    "download": "Atsisiųsti automobilio informaciją"
+    "download": "Atsisiųsti automobilio informaciją",
+    "headUnit": "Tikėtina „iDrive“ sistema",
+    "headUnitNote": "Įvertinta pagal modelį ir metus — tiksli sistema priklauso nuo gamyklinių opcijų, patvirtinama automobilyje."
   }
 }
