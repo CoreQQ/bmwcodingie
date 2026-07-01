@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { setRequestLocale } from 'next-intl/server';
 import { ServiceLanding } from '@/components/site/ServiceLanding';
 import { serviceMetadata } from '@/lib/servicePages';
 
@@ -11,6 +12,8 @@ export function generateMetadata(): Metadata {
   return serviceMetadata(SLUG);
 }
 
-export default function Page() {
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <ServiceLanding slug={SLUG} />;
 }
