@@ -226,6 +226,7 @@
     "engine": "Variklis",
     "ctaOptions": "Kodavimo galimybės",
     "ctaWhatsApp": "Klausti apie kodavimą",
-    "waText": "Sveiki — mano BMW VIN:"
+    "waText": "Sveiki — mano BMW VIN:",
+    "download": "Atsisiųsti automobilio informaciją"
   }
 }

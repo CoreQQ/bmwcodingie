@@ -226,6 +226,7 @@
     "engine": "Engine",
     "ctaOptions": "See coding options",
     "ctaWhatsApp": "Ask what's codable",
-    "waText": "Hi — my BMW VIN is"
+    "waText": "Hi — my BMW VIN is",
+    "download": "Download vehicle info"
   }
 }
