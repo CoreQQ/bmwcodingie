@@ -226,6 +226,7 @@
     "engine": "Motor",
     "ctaOptions": "Opțiuni de codare",
     "ctaWhatsApp": "Întreabă ce se poate coda",
-    "waText": "Bună — VIN-ul BMW-ului meu este"
+    "waText": "Bună — VIN-ul BMW-ului meu este",
+    "download": "Descarcă informațiile vehiculului"
   }
 }

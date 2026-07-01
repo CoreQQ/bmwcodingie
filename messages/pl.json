@@ -226,6 +226,7 @@
     "engine": "Silnik",
     "ctaOptions": "Zobacz opcje kodowania",
     "ctaWhatsApp": "Zapytaj o kodowanie",
-    "waText": "Cześć — numer VIN mojego BMW to"
+    "waText": "Cześć — numer VIN mojego BMW to",
+    "download": "Pobierz informacje o pojeździe"
   }
 }

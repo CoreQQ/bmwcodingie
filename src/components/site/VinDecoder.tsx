@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ScanLine, Loader2, Check, AlertTriangle, ArrowRight, MessageCircle } from 'lucide-react';
+import { ScanLine, Loader2, Check, AlertTriangle, ArrowRight, MessageCircle, Download } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 type Decoded = {
@@ -120,7 +120,15 @@ export function VinDecoder({ whatsapp }: { whatsapp: string }) {
               <Check size={16} />
               <span className="label text-bmw">{t('resultTitle')}</span>
             </div>
-            <dl className="grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
+            <p className="font-display text-[clamp(1.5rem,4vw,2.2rem)] leading-none text-ink">
+              {`${result.make || 'BMW'} ${result.model || ''}`.trim()}
+            </p>
+            {[result.series, result.year, result.body].filter(Boolean).length > 0 && (
+              <p className="mt-1.5 font-mono text-xs uppercase tracking-wider text-muted">
+                {[result.series, result.year, result.body].filter(Boolean).join(' · ')}
+              </p>
+            )}
+            <dl className="mt-4 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
               {rows
                 .filter(([, v]) => v)
                 .map(([k, v]) => (
@@ -139,6 +147,12 @@ export function VinDecoder({ whatsapp }: { whatsapp: string }) {
                 }
               >
                 {t('ctaOptions')} <ArrowRight size={15} />
+              </a>
+              <a
+                href={`/api/vin/report?vin=${cleaned}`}
+                className="btn-ghost inline-flex items-center gap-2"
+              >
+                <Download size={15} /> {t('download')}
               </a>
               <a
                 href={waLink(whatsapp, waText)}
