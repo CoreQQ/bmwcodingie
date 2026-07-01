@@ -131,9 +131,9 @@
     "contactHeading": "Contact",
     "hoursHeading": "Program",
     "navigateHeading": "Navigare",
-    "hours1": "Luni–Vineri · 09:00–19:00",
-    "hours2": "Sâmbătă · 10:00–16:00",
-    "hours3": "Duminică · Doar cu programare",
+    "hours1": "Lun–Vin · 19:00–23:00",
+    "hours2": "Sâm & Dum · 11:00–23:00",
+    "hours3": "Seri și weekend",
     "navServices": "Servicii",
     "navHowItWorks": "Cum funcționează",
     "navWork": "Lucrări",
@@ -230,5 +230,10 @@
     "download": "Descarcă informațiile vehiculului",
     "headUnit": "Unitate iDrive probabilă",
     "headUnitNote": "Estimare după model și an — unitatea exactă depinde de opțiunile din fabrică, confirmată pe mașină."
+  },
+  "Reviews": {
+    "eyebrow": "Recenzii",
+    "heading": "CE SPUN CLIENȚII",
+    "count": "{n} recenzii verificate"
   }
 }

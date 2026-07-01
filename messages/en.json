@@ -131,9 +131,9 @@
     "contactHeading": "Contact",
     "hoursHeading": "Hours",
     "navigateHeading": "Navigate",
-    "hours1": "Mon–Fri · 09:00–19:00",
-    "hours2": "Sat · 10:00–16:00",
-    "hours3": "Sun · By appointment",
+    "hours1": "Mon–Fri · 19:00–23:00",
+    "hours2": "Sat & Sun · 11:00–23:00",
+    "hours3": "Evening & weekend slots",
     "navServices": "Services",
     "navHowItWorks": "How it works",
     "navWork": "Work",
@@ -230,5 +230,10 @@
     "download": "Download vehicle info",
     "headUnit": "Likely head unit",
     "headUnitNote": "Estimated from model & year — the exact unit depends on factory options, confirmed on the car."
+  },
+  "Reviews": {
+    "eyebrow": "Reviews",
+    "heading": "WHAT DRIVERS SAY",
+    "count": "{n} verified reviews"
   }
 }

@@ -4,16 +4,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-// Working hours mirror the opening hours in the site's structured data:
-// Mon–Fri 09:00–19:00, Sat 10:00–16:00, Sun by arrangement (no fixed slots).
+// Booking availability: weekdays 19:00–23:00 (evenings), weekends 11:00–23:00.
+// Mirror this in the structured data and footer hours if it changes.
 const HOURS: Record<number, [number, number] | null> = {
-  0: null,
-  1: [9, 19],
-  2: [9, 19],
-  3: [9, 19],
-  4: [9, 19],
-  5: [9, 19],
-  6: [10, 16],
+  0: [11, 23], // Sun
+  1: [19, 23], // Mon
+  2: [19, 23], // Tue
+  3: [19, 23], // Wed
+  4: [19, 23], // Thu
+  5: [19, 23], // Fri
+  6: [11, 23], // Sat
 };
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -67,7 +67,7 @@ export function SlotPicker({
     };
   }, []);
 
-  // Next ~2 weeks of bookable days (skip Sundays — by arrangement only).
+  // Next ~2 weeks of bookable days (every day has evening/weekend slots).
   const days = useMemo(() => {
     const out: Date[] = [];
     const start = new Date();

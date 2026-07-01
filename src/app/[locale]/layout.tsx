@@ -2,7 +2,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { getCatalog, getSettings } from '@/lib/data';
+import { getCatalog, getReviews, getSettings } from '@/lib/data';
 import { CookieConsent } from '@/components/site/CookieConsent';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
@@ -28,15 +28,37 @@ export default async function LocaleLayout({
   // instead of request headers, so the pages can be prerendered and cached.
   setRequestLocale(locale);
 
-  const [settings, catalog, tCookie] = await Promise.all([
+  const [settings, catalog, reviews, tCookie] = await Promise.all([
     getSettings(),
     getCatalog(),
+    getReviews(),
     getTranslations('CookieConsent'),
   ]);
 
   const sameAs = settings.instagram
     ? [`https://instagram.com/${settings.instagram.replace(/^@/, '')}`]
     : [];
+
+  // Only emit rating data when there are real reviews — never fabricate it.
+  const ratingData =
+    reviews.length > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: (
+              reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length
+            ).toFixed(1),
+            reviewCount: reviews.length,
+            bestRating: 5,
+          },
+          review: reviews.slice(0, 8).map((r) => ({
+            '@type': 'Review',
+            author: { '@type': 'Person', name: r.author },
+            reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
+            reviewBody: r.body,
+          })),
+        }
+      : {};
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -85,14 +107,14 @@ export default async function LocaleLayout({
           {
             '@type': 'OpeningHoursSpecification',
             dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-            opens: '09:00',
-            closes: '19:00',
+            opens: '19:00',
+            closes: '23:00',
           },
           {
             '@type': 'OpeningHoursSpecification',
-            dayOfWeek: ['Saturday'],
-            opens: '10:00',
-            closes: '16:00',
+            dayOfWeek: ['Saturday', 'Sunday'],
+            opens: '11:00',
+            closes: '23:00',
           },
         ],
         hasOfferCatalog: {
@@ -106,6 +128,7 @@ export default async function LocaleLayout({
           ),
         },
         sameAs,
+        ...ratingData,
       },
     ],
   };

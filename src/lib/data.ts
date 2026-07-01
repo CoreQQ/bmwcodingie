@@ -8,6 +8,7 @@ import type {
   CategoryWithServices,
   GalleryItem,
   ModelCompatibility,
+  Review,
   Service,
   SiteSettings,
 } from './types';
@@ -79,6 +80,23 @@ export const getGallery = cache(async (): Promise<GalleryItem[]> => {
       .order('sort_order', { ascending: true });
     if (error || !data) return [];
     return data as GalleryItem[];
+  } catch {
+    return [];
+  }
+});
+
+export const getReviews = cache(async (): Promise<Review[]> => {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  try {
+    const { data, error } = await sb
+      .from('reviews')
+      .select('*')
+      .eq('visible', true)
+      .order('sort_order', { ascending: true });
+    if (error || !data) return [];
+    return data as Review[];
   } catch {
     return [];
   }

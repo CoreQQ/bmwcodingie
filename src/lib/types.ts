@@ -22,6 +22,17 @@ export type Service = {
   translations: Record<string, ServiceTranslation>;
 };
 
+export type Review = {
+  id: number;
+  author: string;
+  car: string;
+  rating: number;
+  body: string;
+  visible: boolean;
+  sort_order: number;
+  created_at: string;
+};
+
 export type GalleryItem = {
   id: number;
   image_url: string;

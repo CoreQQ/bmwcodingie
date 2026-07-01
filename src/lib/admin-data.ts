@@ -5,6 +5,7 @@ import type {
   Category,
   GalleryItem,
   ModelCompatibility,
+  Review,
   Service,
   SiteSettings,
 } from './types';
@@ -43,6 +44,16 @@ export async function adminGetBookings(): Promise<Booking[]> {
     .select('*')
     .order('created_at', { ascending: false });
   return (data ?? []) as Booking[];
+}
+
+export async function adminGetReviews(): Promise<Review[]> {
+  const sb = getSupabaseAdmin();
+  if (!sb) return [];
+  const { data } = await sb
+    .from('reviews')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  return (data ?? []) as Review[];
 }
 
 export async function adminGetSettings(): Promise<SiteSettings> {

@@ -12,6 +12,7 @@ import {
   LogOut,
   ExternalLink,
   Car,
+  Star,
 } from 'lucide-react';
 import { logout } from '@/app/admin/actions';
 
@@ -21,6 +22,7 @@ const LINKS = [
   { href: '/admin/categories', label: 'Categories', icon: FolderTree },
   { href: '/admin/models', label: 'Models', icon: Car },
   { href: '/admin/gallery', label: 'Gallery', icon: Images },
+  { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/content', label: 'Content & Contacts', icon: FileText },
   { href: '/admin/bookings', label: 'Bookings', icon: Inbox },
 ];
