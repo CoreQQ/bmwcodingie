@@ -102,29 +102,37 @@ export function Header() {
           </button>
         </div>
 
-        {/* Mobile drawer */}
-        {open && (
-          <nav className="border-t border-white/5 bg-graphite-900/95 px-5 pb-6 pt-2 backdrop-blur-xl md:hidden">
-            {NAV.map((n) => (
-              <NavItem
-                key={n.href}
-                href={n.href}
-                onClick={() => setOpen(false)}
-                className="block border-b border-white/5 py-4 font-mono text-sm uppercase tracking-widest text-muted"
-              >
-                {n.label}
-              </NavItem>
-            ))}
-            <LanguageSwitcher mobile />
-            <a
-              href="#contact"
-              onClick={() => setOpen(false)}
-              className="btn-primary mt-5 w-full"
+        {/* Mobile drawer — grid-rows trick animates open/close smoothly */}
+        <div
+          className="grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden"
+          style={{ gridTemplateRows: open ? '1fr' : '0fr' }}
+        >
+          <div className="overflow-hidden">
+            <nav
+              className={`border-t border-white/5 bg-graphite-900/95 px-5 pb-6 pt-2 backdrop-blur-xl transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0'}`}
+              aria-hidden={!open}
             >
-              {t('bookNow')}
-            </a>
-          </nav>
-        )}
+              {NAV.map((n) => (
+                <NavItem
+                  key={n.href}
+                  href={n.href}
+                  onClick={() => setOpen(false)}
+                  className="block border-b border-white/5 py-4 font-mono text-sm uppercase tracking-widest text-muted"
+                >
+                  {n.label}
+                </NavItem>
+              ))}
+              <LanguageSwitcher mobile />
+              <a
+                href="#contact"
+                onClick={() => setOpen(false)}
+                className="btn-primary mt-5 w-full"
+              >
+                {t('bookNow')}
+              </a>
+            </nav>
+          </div>
+        </div>
       </div>
     </header>
   );

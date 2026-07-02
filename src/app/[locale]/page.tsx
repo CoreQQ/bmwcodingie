@@ -12,7 +12,7 @@ import { Reviews } from '@/components/site/Reviews';
 import { Faq } from '@/components/site/Faq';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
-import { ChatWidget } from '@/components/site/ChatWidget';
+import { ChatWidgetLazy as ChatWidget } from '@/components/site/ChatWidgetLazy';
 import { getCatalog, getGallery, getReviews, getSettings } from '@/lib/data';
 
 // Serve cached HTML for fast TTFB/LCP. Admin edits revalidate the site

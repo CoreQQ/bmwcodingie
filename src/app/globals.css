@@ -45,6 +45,18 @@ body {
   color: #fff;
 }
 
+/* Keyboard focus — a crisp M-blue ring, only for :focus-visible so mouse
+   clicks stay clean. */
+:focus-visible {
+  outline: 2px solid var(--bmw);
+  outline-offset: 2px;
+}
+
+/* Balanced line wrapping for large display headings */
+.text-balance {
+  text-wrap: balance;
+}
+
 /* Custom scrollbar — BMW M tricolour thumb (Chromium / Safari) */
 ::-webkit-scrollbar {
   width: 12px;

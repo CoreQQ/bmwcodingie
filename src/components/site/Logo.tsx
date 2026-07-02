@@ -9,6 +9,8 @@ export function Logo({ className = 'h-9 w-auto' }: { className?: string }) {
       src="/logo.png"
       alt="BMW Coding — BMW coding, diagnostics & retrofits in Dublin and across Ireland"
       fetchPriority="high"
+      width={384}
+      height={384}
       className={`${className} select-none object-contain transition-transform duration-300 group-hover:scale-105`}
     />
   );

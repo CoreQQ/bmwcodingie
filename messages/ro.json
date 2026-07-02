@@ -87,15 +87,6 @@
     "q6": "Maşina mea este import din Japonia — o puteți converti?",
     "a6": "Conversiile Japonia→UE sunt o lucrare obișnuită pentru noi: schimbarea regiunii, FSC, gestionarea oglinzilor pentru ETC și aspectele legate de TCB. Trimite-ne detaliile și îți spunem exact de ce are nevoie maşina ta."
   },
-  "QuoteBuilder": {
-    "eyebrow": "06 / Construiește-ți oferta",
-    "heading1": "ALEGE CE",
-    "heading2": "ÎȚI DOREȘTI",
-    "intro": "Bifează tot ce te interesează — calculăm totalul prețurilor fixe pe loc. Tot ce este marcat „la cerere” este semnalat ca să-l confirmăm direct cu tine.",
-    "estimatedTotal": "Total estimat",
-    "customNote": "+ produse cu preț la cerere",
-    "sendToBooking": "Trimite la formularul de programare"
-  },
   "Contact": {
     "eyebrow": "07 / Programare",
     "heading1": "PROGRAMEAZĂ",
@@ -207,29 +198,6 @@
   "HomeMetadata": {
     "title": "BMW Coding Dublin | Coding, Diagnostic și Retrofit — BMW Coding IE",
     "description": "BMW coding Dublin — diagnostic ISTA, coding și retrofit, la fața locului sau la distanță prin ENET. CarPlay, Android Auto, lumină ambientală, cruise control, conversii Japonia→UE. Seriile F și G."
-  },
-  "VinDecoder": {
-    "eyebrow": "Decodor VIN",
-    "heading": "Identifică-ți BMW-ul după VIN",
-    "intro": "Introdu numărul VIN din 17 caractere — îți identificăm modelul BMW și îți arătăm ce se poate coda pe el.",
-    "placeholder": "ex. WBA8E9G50GNT...",
-    "button": "Decodează VIN",
-    "decoding": "Se decodează…",
-    "invalid": "Nu pare un VIN valid din 17 caractere. Verifică și încearcă din nou.",
-    "notBmw": "Acest VIN nu este BMW — codăm doar BMW. Verifică numărul?",
-    "error": "Nu am putut decoda VIN-ul acum. Încearcă din nou sau trimite-ni-l pe WhatsApp.",
-    "resultTitle": "BMW-ul tău",
-    "model": "Model",
-    "series": "Serie",
-    "year": "An",
-    "body": "Caroserie",
-    "engine": "Motor",
-    "ctaOptions": "Opțiuni de codare",
-    "ctaWhatsApp": "Întreabă ce se poate coda",
-    "waText": "Bună — VIN-ul BMW-ului meu este",
-    "download": "Descarcă informațiile vehiculului",
-    "headUnit": "Unitate iDrive probabilă",
-    "headUnitNote": "Estimare după model și an — unitatea exactă depinde de opțiunile din fabrică, confirmată pe mașină."
   },
   "Reviews": {
     "eyebrow": "Recenzii",

@@ -87,15 +87,6 @@
     "q6": "My import is Japanese spec — can you convert it?",
     "a6": "Japan→EU conversions are a regular job: region change, FSC, ETC mirror handling and TCB considerations. Send the details and we will tell you what your specific car needs."
   },
-  "QuoteBuilder": {
-    "eyebrow": "06 / Build your quote",
-    "heading1": "PICK WHAT",
-    "heading2": "YOU WANT",
-    "intro": "Tick everything you’re interested in — we’ll total the fixed prices live. Anything priced \"on request\" gets flagged so we can confirm it with you directly.",
-    "estimatedTotal": "Estimated total",
-    "customNote": "+ items priced on request",
-    "sendToBooking": "Send to booking form"
-  },
   "Contact": {
     "eyebrow": "07 / Book",
     "heading1": "BOOK",
@@ -207,29 +198,6 @@
   "HomeMetadata": {
     "title": "BMW Coding Dublin & Ireland | CarPlay, Diagnostics & Retrofits",
     "description": "BMW coding, diagnostics and retrofits in Dublin and across Ireland. Apple CarPlay, Android Auto, ISTA diagnostics, Japan to EU conversion, map updates and remote coding."
-  },
-  "VinDecoder": {
-    "eyebrow": "VIN Decoder",
-    "heading": "Decode your BMW",
-    "intro": "Enter your 17-character VIN and we'll identify your exact BMW — then check what we can code on it.",
-    "placeholder": "e.g. WBA8E9G50GNT...",
-    "button": "Decode VIN",
-    "decoding": "Decoding…",
-    "invalid": "That doesn't look like a valid 17-character VIN. Please check and try again.",
-    "notBmw": "That VIN isn't a BMW — we only code BMWs. Double-check the number?",
-    "error": "Couldn't decode that VIN right now. Try again, or send it to us on WhatsApp.",
-    "resultTitle": "Your BMW",
-    "model": "Model",
-    "series": "Series",
-    "year": "Year",
-    "body": "Body",
-    "engine": "Engine",
-    "ctaOptions": "See coding options",
-    "ctaWhatsApp": "Ask what's codable",
-    "waText": "Hi — my BMW VIN is",
-    "download": "Download vehicle info",
-    "headUnit": "Likely head unit",
-    "headUnitNote": "Estimated from model & year — the exact unit depends on factory options, confirmed on the car."
   },
   "Reviews": {
     "eyebrow": "Reviews",

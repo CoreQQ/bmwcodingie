@@ -87,15 +87,6 @@
     "q6": "Mój samochód to import ze specyfikacją japońską — można go przekonwertować?",
     "a6": "Konwersje Japonia→UE to dla nas standardowe zlecenie: zmiana regionu, FSC, obsługa lusterek ETC i kwestie TCB. Wyślij szczegóły, a powiemy, czego potrzebuje konkretnie Twój samochód."
   },
-  "QuoteBuilder": {
-    "eyebrow": "06 / Zbuduj swoją wycenę",
-    "heading1": "WYBIERZ, CZEGO",
-    "heading2": "POTRZEBUJESZ",
-    "intro": "Zaznacz wszystko, co Cię interesuje — zsumujemy stałe ceny na żywo. Wszystko oznaczone jako „na zapytanie” zostanie wyróżnione, abyśmy mogli to z Tobą bezpośrednio potwierdzić.",
-    "estimatedTotal": "Szacowana suma",
-    "customNote": "+ pozycje wyceniane na zapytanie",
-    "sendToBooking": "Przejdź do formularza rezerwacji"
-  },
   "Contact": {
     "eyebrow": "07 / Rezerwacja",
     "heading1": "ZAREZERWUJ",
@@ -207,29 +198,6 @@
   "HomeMetadata": {
     "title": "Kodowanie BMW Dublin | Kodowanie, Diagnostyka i Retrofity — BMW Coding IE",
     "description": "Kodowanie BMW Dublin — diagnostyka ISTA, kodowanie i retrofity, na miejscu lub zdalnie przez ENET. CarPlay, Android Auto, oświetlenie ambientowe, tempomat, konwersje Japonia→UE. Seria F i G."
-  },
-  "VinDecoder": {
-    "eyebrow": "Dekoder VIN",
-    "heading": "Rozpoznaj swoje BMW po VIN",
-    "intro": "Wpisz 17-znakowy numer VIN — rozpoznamy Twój model BMW i pokażemy, co można w nim zakodować.",
-    "placeholder": "np. WBA8E9G50GNT...",
-    "button": "Dekoduj VIN",
-    "decoding": "Dekodowanie…",
-    "invalid": "To nie wygląda na prawidłowy 17-znakowy VIN. Sprawdź i spróbuj ponownie.",
-    "notBmw": "Ten VIN to nie BMW — kodujemy tylko BMW. Sprawdź numer?",
-    "error": "Nie udało się teraz odczytać VIN. Spróbuj ponownie lub wyślij go do nas na WhatsApp.",
-    "resultTitle": "Twoje BMW",
-    "model": "Model",
-    "series": "Seria",
-    "year": "Rok",
-    "body": "Nadwozie",
-    "engine": "Silnik",
-    "ctaOptions": "Zobacz opcje kodowania",
-    "ctaWhatsApp": "Zapytaj o kodowanie",
-    "waText": "Cześć — numer VIN mojego BMW to",
-    "download": "Pobierz informacje o pojeździe",
-    "headUnit": "Prawdopodobna jednostka iDrive",
-    "headUnitNote": "Szacunek na podstawie modelu i roku — dokładna jednostka zależy od opcji fabrycznych, potwierdzana na aucie."
   },
   "Reviews": {
     "eyebrow": "Opinie",
