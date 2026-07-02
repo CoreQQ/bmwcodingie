@@ -82,6 +82,24 @@ export async function getSchedule(
   return out;
 }
 
+import { DEFAULT_HOURS, type HoursMap } from './hours';
+
+/** Working hours from business_hours, falling back to the built-in defaults. */
+export async function getHours(sb: SupabaseClient): Promise<HoursMap> {
+  try {
+    const { data } = await sb.from('business_hours').select('*');
+    const rows = (data ?? []) as { weekday: number; open_hour: number; close_hour: number; closed: boolean }[];
+    if (!rows.length) return DEFAULT_HOURS;
+    const map: HoursMap = { ...DEFAULT_HOURS };
+    for (const r of rows) {
+      map[r.weekday] = r.closed ? null : [r.open_hour, r.close_hour];
+    }
+    return map;
+  } catch {
+    return DEFAULT_HOURS;
+  }
+}
+
 export async function getBlockedDates(sb: SupabaseClient): Promise<string[]> {
   const today = new Date().toISOString().slice(0, 10);
   const { data } = await sb.from('blocked_dates').select('day').gte('day', today);

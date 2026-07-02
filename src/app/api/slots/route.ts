@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { getHours } from '@/lib/stats';
+import { DEFAULT_HOURS } from '@/lib/hours';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,10 +11,10 @@ export const dynamic = 'force-dynamic';
 // exposed — never any customer data (the bookings table stays unreadable to anon).
 export async function GET() {
   const sb = getSupabaseAdmin();
-  if (!sb) return NextResponse.json({ taken: [], blocked: [] });
+  if (!sb) return NextResponse.json({ taken: [], blocked: [], hours: DEFAULT_HOURS });
 
   const today = new Date().toISOString().slice(0, 10);
-  const [{ data, error }, blockedRes] = await Promise.all([
+  const [{ data, error }, blockedRes, hours] = await Promise.all([
     sb
       .from('bookings')
       .select('slot_date, slot_time')
@@ -20,17 +22,18 @@ export async function GET() {
       .not('slot_date', 'is', null)
       .gte('slot_date', today),
     sb.from('blocked_dates').select('day').gte('day', today),
+    getHours(sb),
   ]);
 
   const blocked = ((blockedRes.data ?? []) as { day: string }[]).map((r) => r.day);
-  if (error || !data) return NextResponse.json({ taken: [], blocked });
+  if (error || !data) return NextResponse.json({ taken: [], blocked, hours });
 
   const taken = data
     .filter((r) => r.slot_date && r.slot_time)
     .map((r) => ({ date: r.slot_date as string, time: r.slot_time as string }));
 
   return NextResponse.json(
-    { taken, blocked },
+    { taken, blocked, hours },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 }

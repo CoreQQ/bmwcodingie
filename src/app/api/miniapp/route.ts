@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { validateMiniAppAuth } from '@/lib/miniappAuth';
-import { getBusinessStats, getSchedule, getBlockedDates } from '@/lib/stats';
+import { getBusinessStats, getSchedule, getBlockedDates, getHours } from '@/lib/stats';
 
 export const runtime = 'nodejs';
 
+// Refresh cached public pages after content edits from the Mini App.
+const refreshSite = () => revalidatePath('/', 'layout');
+
 // Backend for the owner's Telegram Mini App. Every call carries initData,
-// validated against the bot token and restricted to the owner chat.
+// validated against the bot token and restricted to the owner.
 export async function POST(req: Request) {
-  let body: { initData?: string; action?: string; id?: number; status?: string; day?: string };
+  let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
@@ -26,35 +30,113 @@ export async function POST(req: Request) {
   const sb = getSupabaseAdmin();
   if (!sb) return NextResponse.json({ ok: false, error: 'no_db' }, { status: 503 });
 
-  switch (body.action) {
+  const bad = () => NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 });
+
+  switch (String(body.action)) {
     case 'overview': {
-      const [schedule, blocked, stats] = await Promise.all([
+      const [schedule, blocked, stats, hours, servicesRes, reviewsRes] = await Promise.all([
         getSchedule(sb, 14),
         getBlockedDates(sb),
         getBusinessStats(sb),
+        getHours(sb),
+        sb.from('services').select('id, title, price_label, visible, sort_order').order('sort_order'),
+        sb.from('reviews').select('*').order('sort_order'),
       ]);
-      return NextResponse.json({ ok: true, schedule, blocked, stats });
+      return NextResponse.json({
+        ok: true,
+        schedule,
+        blocked,
+        stats,
+        hours,
+        services: servicesRes.data ?? [],
+        reviews: reviewsRes.data ?? [],
+      });
     }
 
     case 'setStatus': {
       const id = Number(body.id);
       const status = String(body.status);
-      if (!id || !['confirmed', 'declined', 'cancelled', 'pending'].includes(status)) {
-        return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 });
-      }
+      if (!id || !['confirmed', 'declined', 'cancelled', 'pending'].includes(status)) return bad();
       await sb.from('bookings').update({ status }).eq('id', id);
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'reschedule': {
+      const id = Number(body.id);
+      const slot_date = String(body.slot_date ?? '');
+      const slot_time = String(body.slot_time ?? '').slice(0, 40);
+      if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(slot_date) || !slot_time) return bad();
+      await sb.from('bookings').update({ slot_date, slot_time }).eq('id', id);
       return NextResponse.json({ ok: true });
     }
 
     case 'toggleBlock': {
       const day = String(body.day ?? '');
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) {
-        return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 });
-      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return bad();
       const { data } = await sb.from('blocked_dates').select('day').eq('day', day).maybeSingle();
       if (data) await sb.from('blocked_dates').delete().eq('day', day);
       else await sb.from('blocked_dates').upsert({ day });
       return NextResponse.json({ ok: true, blocked: !data });
+    }
+
+    case 'updateService': {
+      const id = Number(body.id);
+      if (!id) return bad();
+      const patch: Record<string, unknown> = {};
+      if (typeof body.title === 'string' && body.title.trim()) patch.title = body.title.trim().slice(0, 160);
+      if (typeof body.price_label === 'string') patch.price_label = body.price_label.trim().slice(0, 60);
+      if (typeof body.visible === 'boolean') patch.visible = body.visible;
+      if (!Object.keys(patch).length) return bad();
+      await sb.from('services').update(patch).eq('id', id);
+      refreshSite();
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'addReview': {
+      const author = String(body.author ?? '').trim().slice(0, 120);
+      const bodyText = String(body.body ?? '').trim().slice(0, 1000);
+      if (!author || !bodyText) return bad();
+      await sb.from('reviews').insert({
+        author,
+        body: bodyText,
+        car: String(body.car ?? '').trim().slice(0, 120),
+        rating: Math.max(1, Math.min(5, Number(body.rating) || 5)),
+        visible: true,
+        sort_order: 0,
+      });
+      refreshSite();
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'updateReview': {
+      const id = Number(body.id);
+      if (!id) return bad();
+      const patch: Record<string, unknown> = {};
+      if (typeof body.visible === 'boolean') patch.visible = body.visible;
+      if (typeof body.rating === 'number') patch.rating = Math.max(1, Math.min(5, body.rating));
+      if (!Object.keys(patch).length) return bad();
+      await sb.from('reviews').update(patch).eq('id', id);
+      refreshSite();
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'deleteReview': {
+      const id = Number(body.id);
+      if (!id) return bad();
+      await sb.from('reviews').delete().eq('id', id);
+      refreshSite();
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'setHours': {
+      const weekday = Number(body.weekday);
+      const closed = Boolean(body.closed);
+      const open_hour = Math.max(0, Math.min(23, Number(body.open_hour) || 0));
+      const close_hour = Math.max(0, Math.min(24, Number(body.close_hour) || 0));
+      if (!Number.isInteger(weekday) || weekday < 0 || weekday > 6) return bad();
+      if (!closed && close_hour - open_hour < 2) return bad(); // need room for one window
+      await sb.from('business_hours').upsert({ weekday, open_hour, close_hour, closed });
+      return NextResponse.json({ ok: true });
     }
 
     default:

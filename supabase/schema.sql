@@ -109,6 +109,19 @@ create table if not exists invoice_drafts (
 );
 alter table invoice_drafts enable row level security;
 
+-- Editable working hours (per weekday) driving the public slot picker.
+create table if not exists business_hours (
+  weekday int primary key check (weekday between 0 and 6),
+  open_hour int not null,
+  close_hour int not null,
+  closed boolean not null default false
+);
+alter table business_hours enable row level security;
+insert into business_hours (weekday, open_hour, close_hour, closed) values
+  (0,11,23,false),(1,19,23,false),(2,19,23,false),(3,19,23,false),
+  (4,19,23,false),(5,19,23,false),(6,11,23,false)
+on conflict (weekday) do nothing;
+
 -- Days the owner has blocked out — hidden from the public slot picker.
 create table if not exists blocked_dates (
   day date primary key

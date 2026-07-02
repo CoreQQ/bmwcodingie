@@ -4,6 +4,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { CalendarCheck, Clock3, XCircle, CircleSlash, MessageCircle, Phone, Wrench, Car } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/site/Logo';
+import { AutoRefresh } from '@/components/site/AutoRefresh';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getSettings, waLink } from '@/lib/data';
 import type { Booking } from '@/lib/types';
@@ -75,6 +76,7 @@ export default async function BookingStatus({
 
   return (
     <div className="grain relative flex min-h-screen flex-col items-center px-5 py-10">
+      <AutoRefresh />
       <div className="blueprint absolute inset-0 -z-10 opacity-40" />
       <div className="absolute inset-0 -z-10 hero-glow" />
 
