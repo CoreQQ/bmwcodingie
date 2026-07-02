@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
+import { unstable_noStore as noStore } from 'next/cache';
 import { CalendarCheck, Clock3, XCircle, CircleSlash, MessageCircle, Phone, Wrench, Car } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/site/Logo';
@@ -60,6 +61,7 @@ export default async function BookingStatus({
 }) {
   const { locale, token } = await params;
   setRequestLocale(locale);
+  noStore(); // belt-and-braces: never serve this page from any cache
 
   if (!/^[0-9a-f-]{36}$/i.test(token)) notFound();
   const sb = getSupabaseAdmin();
@@ -113,6 +115,10 @@ export default async function BookingStatus({
 
         <p className="mt-8 text-center font-mono text-[11px] uppercase tracking-widest text-faint">
           BMW Coding · Dublin & Ireland
+        </p>
+        <p className="mt-2 text-center font-mono text-[10px] text-faint/60">
+          {b.status} · checked{' '}
+          {new Date().toLocaleTimeString('en-IE', { timeZone: 'Europe/Dublin', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
         </p>
       </div>
     </div>
