@@ -104,7 +104,7 @@ export default async function LocaleLayout({
           addressRegion: 'Co. Dublin',
           addressCountry: 'IE',
         },
-        geo: { '@type': 'GeoCoordinates', latitude: 53.291, longitude: -6.462 },
+        geo: { '@type': 'GeoCoordinates', latitude: 53.3000625, longitude: -6.4818572 },
         openingHoursSpecification: [
           {
             '@type': 'OpeningHoursSpecification',

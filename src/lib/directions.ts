@@ -4,15 +4,12 @@
 // address. Instead we route to exact coordinates of the CORRECT entrance and
 // (optionally) force the approach with a via-point.
 //
-// TODO(owner): replace ENTRANCE (and APPROACH if needed) with exact
-// coordinates — long-press the spot in Google Maps and copy "lat, lng".
+/** The gate/door people should actually drive to (owner-provided pin). */
+export const ENTRANCE = { lat: 53.3000625, lng: -6.4818572 };
 
-/** The gate/door people should actually drive to. */
-export const ENTRANCE = { lat: 53.2909, lng: -6.4622 };
-
-/** Optional via-point on the correct road, to force the right approach.
- *  Set to null if routing straight to ENTRANCE already avoids the dead end. */
-export const APPROACH: { lat: number; lng: number } | null = null;
+/** Via-point on the correct approach road (owner-provided) — forces the
+ *  route to come in the right way instead of the dead-end side. */
+export const APPROACH: { lat: number; lng: number } | null = { lat: 53.2966168, lng: -6.4813073 };
 
 export const ADDRESS_LINE = 'Grants View, Greenogue Business Park, Rathcoole, Co. Dublin';
 
