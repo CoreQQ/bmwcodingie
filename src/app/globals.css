@@ -153,7 +153,7 @@ html {
   }
 
   .btn-primary {
-    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_30px_-6px_rgba(23,134,212,0.75)];
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_30px_-6px_rgba(23,134,212,0.75)] active:scale-[0.97];
   }
   /* Sheen that sweeps across the primary button on hover */
   .btn-primary::after {
@@ -172,7 +172,7 @@ html {
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-300 hover:border-m-blue/70 hover:text-ink;
+    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-all duration-300 hover:border-m-blue/70 hover:text-ink active:scale-[0.97];
   }
 
   /* Nav link with an M-blue underline that grows on hover */

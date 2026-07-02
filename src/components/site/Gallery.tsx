@@ -54,12 +54,12 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
         {items.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 [&>*]:mb-4">
+          <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:block sm:columns-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:columns-3 sm:[&>*]:mb-4">
             {items.map((g, i) => (
               <button
                 key={g.id}
                 onClick={() => setActive(i)}
-                className="group relative block w-full overflow-hidden border border-white/8 bg-graphite-800"
+                className="group relative block w-[82%] shrink-0 snap-center overflow-hidden border border-white/8 bg-graphite-800 sm:w-full"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
