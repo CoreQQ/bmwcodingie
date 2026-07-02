@@ -50,6 +50,7 @@ export async function POST(req: Request) {
         hours,
         services: servicesRes.data ?? [],
         reviews: reviewsRes.data ?? [],
+        reviewUrl: process.env.GOOGLE_REVIEW_URL ?? '',
       });
     }
 

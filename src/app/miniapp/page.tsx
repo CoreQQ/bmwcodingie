@@ -19,6 +19,7 @@ type Overview = {
   hours: HoursMap;
   services: ServiceRow[];
   reviews: Review[];
+  reviewUrl?: string;
 };
 
 type TgWebApp = {
@@ -261,9 +262,24 @@ function BookingCard({ b, data, busy, act }: { b: Booking; data: Overview; busy:
           </>
         )}
         {b.status === 'confirmed' && (
-          <ActionBtn disabled={busy} onClick={() => void act({ action: 'setStatus', id: b.id, status: 'cancelled' }, 'warning')}>
-            <Trash2 size={13} /> Free slot
-          </ActionBtn>
+          <>
+            <ActionBtn disabled={busy} onClick={() => void act({ action: 'setStatus', id: b.id, status: 'cancelled' }, 'warning')}>
+              <Trash2 size={13} /> Free slot
+            </ActionBtn>
+            {data.reviewUrl && (
+              <ActionBtn
+                onClick={() => {
+                  const first = b.name.trim().split(/\s+/)[0] || 'there';
+                  const svc = b.service ? ` — hope the ${b.service} is treating you well` : '';
+                  void navigator.clipboard
+                    .writeText(`Hi ${first}! Thanks for trusting us with your BMW${svc}. If you have 30 seconds, a quick Google review would mean a lot: ${data.reviewUrl}`)
+                    .then(() => getTg()?.HapticFeedback?.notificationOccurred('success'));
+                }}
+              >
+                <Star size={13} /> Ask review
+              </ActionBtn>
+            )}
+          </>
         )}
         <ActionBtn disabled={busy} onClick={() => { setReschedule((v) => !v); setPickDay(''); }}>
           <Clock3 size={13} /> Move
