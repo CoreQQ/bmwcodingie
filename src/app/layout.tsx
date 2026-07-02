@@ -25,6 +25,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  // Tints the mobile browser chrome to match the site's graphite background.
+  themeColor: '#0A0B0D',
 };
 
 export const metadata: Metadata = {

@@ -110,7 +110,7 @@ export function ChatWidget() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? t('closeChat') : t('chatWithUs')}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center border border-bmw bg-graphite-900 text-bmw shadow-lg transition-all hover:bg-bmw hover:text-white"
+        className="fixed bottom-20 right-6 z-50 flex h-14 w-14 items-center justify-center border border-bmw bg-graphite-900 text-bmw shadow-lg transition-all hover:bg-bmw hover:text-white md:bottom-6"
         style={{ borderRadius: 0 }}
       >
         {open ? <X size={22} /> : <MessageCircle size={22} />}
@@ -119,7 +119,7 @@ export function ChatWidget() {
       {/* Chat panel */}
       {open && (
         <div
-          className="fixed bottom-24 right-6 z-50 flex w-[min(380px,calc(100vw-2rem))] flex-col border border-white/10 bg-graphite-900 shadow-2xl"
+          className="fixed bottom-[9.5rem] right-6 z-50 flex w-[min(380px,calc(100vw-2rem))] flex-col border border-white/10 bg-graphite-900 shadow-2xl md:bottom-24"
           style={{ height: 'min(520px, calc(100vh - 120px))' }}
         >
           {/* Header */}

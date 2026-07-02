@@ -14,6 +14,7 @@ import { Faq } from '@/components/site/Faq';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
 import { ChatWidgetLazy as ChatWidget } from '@/components/site/ChatWidgetLazy';
+import { MobileActionBar } from '@/components/site/MobileActionBar';
 import { getCatalog, getGallery, getReviews, getSettings } from '@/lib/data';
 
 // Serve cached HTML for fast TTFB/LCP. Admin edits revalidate the site
@@ -66,6 +67,7 @@ export default async function HomePage({
       </main>
       <Footer settings={settings} />
       <ChatWidget />
+      <MobileActionBar phone={settings.phone} whatsapp={settings.whatsapp} />
     </div>
   );
 }

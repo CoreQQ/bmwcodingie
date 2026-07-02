@@ -4,6 +4,7 @@ import { getSettings, waLink } from '@/lib/data';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { SERVICE_PAGES, HONEST_COMPATIBILITY_NOTE } from '@/lib/servicePages';
+import { MobileActionBar } from './MobileActionBar';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const AREA = ['Dublin', 'Kildare', 'Wicklow', 'Meath', 'Ireland'];
@@ -212,6 +213,7 @@ export async function ServiceLanding({ slug }: { slug: string }) {
       </main>
 
       <Footer settings={settings} />
+      <MobileActionBar phone={settings.phone} whatsapp={settings.whatsapp} />
     </div>
   );
 }
