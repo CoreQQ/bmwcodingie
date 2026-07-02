@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { unstable_noStore as noStore } from 'next/cache';
-import { CalendarCheck, Clock3, XCircle, CircleSlash, MessageCircle, Phone, Wrench, Car } from 'lucide-react';
+import { CalendarCheck, Clock3, XCircle, CircleSlash, MessageCircle, Phone, Wrench, Car, MapPin } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/site/Logo';
 import { AutoRefresh } from '@/components/site/AutoRefresh';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getSettings, waLink } from '@/lib/data';
+import { googleDirectionsUrl } from '@/lib/directions';
 import type { Booking } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -112,6 +113,17 @@ export default async function BookingStatus({
             <Phone size={15} /> Call us
           </a>
         </div>
+
+        {b.status === 'confirmed' && (
+          <a
+            href={googleDirectionsUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-ghost mt-3 flex w-full items-center justify-center gap-2"
+          >
+            <MapPin size={15} /> Directions to the workshop
+          </a>
+        )}
 
         <p className="mt-8 text-center font-mono text-[11px] uppercase tracking-widest text-faint">
           BMW Coding · Dublin & Ireland

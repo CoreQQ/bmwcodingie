@@ -116,7 +116,8 @@
     "slotTimePrompt": "Alege o oră",
     "slotNote": "Intervalul este o cerere — îl confirmăm printr-un mesaj înainte să devină definitiv.",
     "slotTaken": "Ocupat",
-    "trackBooking": "Urmărește programarea →"
+    "trackBooking": "Urmărește programarea →",
+    "findUs": "Cum ne găsești →"
   },
   "Footer": {
     "pitch": "Coding, diagnostic și retrofit BMW independent, în Dublin și în toată Irlanda — la fața locului sau la distanță prin ENET.",
