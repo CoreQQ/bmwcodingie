@@ -69,6 +69,8 @@ export type Lead = {
   slot_time?: string;
   /** Database row id — required for the confirm/decline buttons to work. */
   id?: number;
+  /** Public tracking token — appended to copy-replies as a status link. */
+  public_token?: string;
   /** false when the lead could not be written to the database */
   persisted?: boolean;
 };
@@ -89,27 +91,30 @@ function shortName(name: string): string {
   return n.length > 40 ? `${n.slice(0, 40)}…` : n || 'there';
 }
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
+
 /** Ready-to-paste reply confirming the slot (owner copies → sends to customer). */
-export function confirmReply(name: string, slot: string): string {
+export function confirmReply(name: string, slot: string, token?: string): string {
   const s = slot ? ` — ${slot}` : '';
-  return `Hi ${shortName(name)}! Your BMW coding slot${s} is confirmed ✅ See you then. If anything changes or you want to add details, just reply here.`;
+  const link = token ? ` Track it here: ${SITE}/b/${token}` : '';
+  return `Hi ${shortName(name)}! Your BMW coding slot${s} is confirmed ✅${link}`;
 }
 
 /** Ready-to-paste reply offering alternatives when the slot is taken. */
-export function declineReply(name: string, slot: string): string {
+export function declineReply(name: string, slot: string, _token?: string): string {
   const s = slot ? ` ${slot}` : ' that time';
   return `Hi ${shortName(name)}, thanks for the request! Unfortunately${s} is no longer free. We'd still love to fit you in — what other day or time suits, and we'll sort it out.`;
 }
 
 /** Build the inline keyboard for a slot booking notification. */
-function bookingKeyboard(id: number, name: string, slot: string): InlineKeyboard {
+function bookingKeyboard(id: number, name: string, slot: string, token?: string): InlineKeyboard {
   return {
     inline_keyboard: [
       [
         { text: '✅ Confirm', callback_data: `bk:confirm:${id}` },
         { text: '❌ Slot taken', callback_data: `bk:decline:${id}` },
       ],
-      [{ text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(name, slot) } }],
+      [{ text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(name, slot, token) } }],
       [{ text: '📋 Copy "offer other times" reply', copy_text: { text: declineReply(name, slot) } }],
     ],
   };
@@ -152,7 +157,7 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
   const slot = formatSlot(lead.slot_date, lead.slot_time);
   // Confirm/decline buttons only make sense for a saved slot booking.
   const keyboard =
-    lead.id && slot ? bookingKeyboard(lead.id, lead.name, slot) : undefined;
+    lead.id && slot ? bookingKeyboard(lead.id, lead.name, slot, lead.public_token) : undefined;
   return sendTelegramMessage(lines.join('\n'), keyboard);
 }
 
@@ -182,7 +187,7 @@ export async function editBookingMessage(
   const text = [...(await bookingDetailLines(lead)), '', stamp].join('\n');
   const button: InlineButton =
     outcome === 'confirmed'
-      ? { text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(lead.name, slot) } }
+      ? { text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(lead.name, slot, lead.public_token) } }
       : { text: '📋 Copy "offer other times" reply', copy_text: { text: declineReply(lead.name, slot) } };
   await tgCall('editMessageText', {
     chat_id: chatId,

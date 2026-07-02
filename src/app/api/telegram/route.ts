@@ -19,7 +19,10 @@ import {
   tryHandleInvoiceText,
 } from '@/lib/invoiceFlow';
 import { getBusinessStats } from '@/lib/stats';
+import { calendarToken } from '@/lib/calendar';
 import type { Booking } from '@/lib/types';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
 export const runtime = 'nodejs';
 
@@ -88,6 +91,23 @@ export async function POST(req: Request) {
       const rows = await upcomingBookings(sb);
       const { text: out, keyboard } = buildBookingsMenu(rows);
       await sendOwnerMessage(out, keyboard);
+      return ok();
+    }
+    if (/^\/calendar(@\w+)?\b/.test(text)) {
+      const url = `${SITE_URL}/api/calendar/${calendarToken()}.ics`;
+      const webcal = url.replace(/^https:/, 'webcal:');
+      await sendOwnerMessage(
+        [
+          '📆 <b>Your bookings calendar</b>',
+          '━━━━━━━━━━━━━━━━━━━',
+          'Subscribe once and confirmed bookings appear in your phone calendar automatically.',
+          '',
+          `<b>iPhone:</b> tap → <a href="${webcal}">${webcal}</a>`,
+          `<b>Any calendar app:</b> add subscription → <code>${url}</code>`,
+          '',
+          '⚠️ This link is private — anyone with it can see your bookings.',
+        ].join('\n'),
+      );
       return ok();
     }
     if (/^\/stats(@\w+)?\b/.test(text)) {
@@ -197,6 +217,7 @@ export async function POST(req: Request) {
     message: booking.message,
     slot_date: booking.slot_date,
     slot_time: booking.slot_time,
+    public_token: booking.public_token,
   };
   await editBookingMessage(chatId, messageId, lead, status);
   await answerCallback(cq.id, status === 'confirmed' ? 'Marked as confirmed ✅' : 'Marked as declined ❌');

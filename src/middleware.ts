@@ -31,5 +31,5 @@ export async function middleware(req: NextRequest) {
 export const config = {
   // /admin/:path* keeps the auth branch running; the second pattern hands
   // everything else (except api/_next/_vercel/static files) to next-intl.
-  matcher: ['/admin/:path*', '/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/admin/:path*', '/((?!api|_next|_vercel|miniapp|.*\\..*).*)'],
 };
