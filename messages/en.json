@@ -210,5 +210,19 @@
     "options": "Coding options",
     "days": "Days a week",
     "upfront": "Upfront payment"
+  },
+  "Demo": {
+    "eyebrow": "Try it live",
+    "heading": "WHAT CODING FEELS LIKE",
+    "intro": "This is a demo of real options we enable. Tap the switches — everything you see here can be coded on your BMW.",
+    "sport": "Sport displays",
+    "digital": "Digital speed",
+    "vim": "Video in Motion",
+    "ambient": "Ambient light",
+    "welcome": "Welcome scene",
+    "vimLocked": "Playback unavailable while driving",
+    "vimHint": "Enable Video in Motion",
+    "cta": "Code this on my BMW",
+    "moving": "Vehicle in motion"
   }
 }

@@ -210,5 +210,19 @@
     "options": "Kodavimo parinkčių",
     "days": "Dienos per savaitę",
     "upfront": "Išankstinis mokėjimas"
+  },
+  "Demo": {
+    "eyebrow": "Išbandyk gyvai",
+    "heading": "KAIP VEIKIA KODAVIMAS",
+    "intro": "Tai tikrų parinkčių demonstracija. Spauskite jungiklius — viską, ką matote, galima užkoduoti jūsų BMW.",
+    "sport": "Sporto ekranai",
+    "digital": "Skaitmeninis greitis",
+    "vim": "Video in Motion",
+    "ambient": "Salono apšvietimas",
+    "welcome": "Pasisveikinimo scena",
+    "vimLocked": "Vaizdo įrašai nepasiekiami važiuojant",
+    "vimHint": "Įjunkite Video in Motion",
+    "cta": "Noriu to savo BMW",
+    "moving": "Automobilis juda"
   }
 }
