@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { Reveal } from './Reveal';
+import { GlowCard } from './GlowCard';
 
 const TOOLING = ['ISTA / Rheingold', 'E-Sys + PSdZData', 'BimmerCode', 'FA / VO coding', 'ENET / OBD'];
 
@@ -36,7 +37,7 @@ export async function WhyUs({ settings }: { settings: SiteSettings }) {
           {/* Right: tooling + platforms */}
           <div className="col-span-12 lg:col-span-5 lg:pt-16">
             <Reveal>
-              <div className="border border-white/10 bg-graphite-800/50 p-7">
+              <GlowCard className="border border-white/10 bg-graphite-800/50 p-7">
                 <h3 className="label mb-5">{t('equipment')}</h3>
                 <div className="flex flex-wrap gap-2">
                   {TOOLING.map((tool) => (
@@ -58,7 +59,7 @@ export async function WhyUs({ settings }: { settings: SiteSettings }) {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </GlowCard>
             </Reveal>
           </div>
         </div>
@@ -69,9 +70,9 @@ export async function WhyUs({ settings }: { settings: SiteSettings }) {
 
 function Stat({ n, label, accent = 'text-ink' }: { n: string; label: string; accent?: string }) {
   return (
-    <div className="bg-graphite-900 p-5">
+    <GlowCard className="bg-graphite-900 p-5">
       <div className={`font-display text-4xl leading-none ${accent}`}>{n}</div>
       <div className="label mt-2">{label}</div>
-    </div>
+    </GlowCard>
   );
 }
