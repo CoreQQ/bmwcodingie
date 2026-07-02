@@ -3,28 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-
-// Booking availability: weekdays 19:00–23:00 (evenings), weekends 11:00–23:00.
-// Mirror this in the structured data and footer hours if it changes.
-const HOURS: Record<number, [number, number] | null> = {
-  0: [11, 23], // Sun
-  1: [19, 23], // Mon
-  2: [19, 23], // Tue
-  3: [19, 23], // Wed
-  4: [19, 23], // Thu
-  5: [19, 23], // Fri
-  6: [11, 23], // Sat
-};
+import { DEFAULT_HOURS, windowsFor as windowsForHours, type HoursMap } from '@/lib/hours';
 
 const pad = (n: number) => String(n).padStart(2, '0');
-
-function windowsFor(weekday: number): string[] {
-  const r = HOURS[weekday];
-  if (!r) return [];
-  const out: string[] = [];
-  for (let h = r[0]; h + 2 <= r[1]; h += 2) out.push(`${pad(h)}:00–${pad(h + 2)}:00`);
-  return out;
-}
 
 /** Local YYYY-MM-DD (avoids the UTC off-by-one of toISOString). */
 function ymd(d: Date): string {
@@ -50,23 +31,27 @@ export function SlotPicker({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  // Slots already taken (confirmed bookings) and owner-blocked days.
+  // Slots already taken (confirmed bookings), owner-blocked days and live hours.
   const [taken, setTaken] = useState<Set<string>>(new Set());
   const [blocked, setBlocked] = useState<Set<string>>(new Set());
+  const [hours, setHours] = useState<HoursMap>(DEFAULT_HOURS);
   useEffect(() => {
     let alive = true;
     fetch('/api/slots')
       .then((r) => r.json())
-      .then((d: { taken?: { date: string; time: string }[]; blocked?: string[] }) => {
+      .then((d: { taken?: { date: string; time: string }[]; blocked?: string[]; hours?: HoursMap }) => {
         if (!alive) return;
         if (Array.isArray(d.taken)) setTaken(new Set(d.taken.map((s) => `${s.date}|${s.time}`)));
         if (Array.isArray(d.blocked)) setBlocked(new Set(d.blocked));
+        if (d.hours && typeof d.hours === 'object') setHours(d.hours);
       })
       .catch(() => {});
     return () => {
       alive = false;
     };
   }, []);
+
+  const windowsFor = (weekday: number) => windowsForHours(hours, weekday);
 
   // Next ~2 weeks of bookable days (every day has evening/weekend slots).
   const days = useMemo(() => {
@@ -76,10 +61,11 @@ export function SlotPicker({
     for (let i = 1; i <= 24 && out.length < 14; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
-      if (HOURS[d.getDay()]) out.push(d);
+      if (hours[d.getDay()]) out.push(d);
     }
     return out;
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hours]);
 
   const selectedDay = value.date ? new Date(`${value.date}T00:00:00`) : null;
   const times = selectedDay ? windowsFor(selectedDay.getDay()) : [];
