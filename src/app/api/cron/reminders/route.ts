@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { sendOwnerMessage } from '@/lib/telegram';
+import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
 import type { Booking } from '@/lib/types';
+
+const REVIEW_URL = process.env.GOOGLE_REVIEW_URL;
+
+function reviewAsk(name: string, service: string): string {
+  const first = name.trim().split(/\s+/)[0] || 'there';
+  const svc = service ? ` — hope the ${service} is treating you well` : '';
+  return `Hi ${first}! Thanks for trusting us with your BMW${svc}. If you have 30 seconds, a quick Google review would mean a lot: ${REVIEW_URL}`;
+}
 
 export const runtime = 'nodejs';
 
@@ -46,5 +54,27 @@ export async function GET(req: Request) {
   lines.push(...(tomorrows.length ? fmt(tomorrows) : ['  —']));
 
   await sendOwnerMessage(lines.join('\n'));
+
+  // Review nudge: yesterday's confirmed jobs, one copy-button per client.
+  if (REVIEW_URL) {
+    const yesterday = dayKey(-1);
+    const { data: done } = await sb
+      .from('bookings')
+      .select('name, service')
+      .eq('slot_date', yesterday)
+      .eq('status', 'confirmed');
+    const jobs = (done ?? []) as { name: string; service: string }[];
+    if (jobs.length) {
+      await sendOwnerWithMarkup(
+        '⭐ <b>Yesterday\'s jobs</b> — tap to copy a review request, paste it to the client:',
+        {
+          inline_keyboard: jobs.slice(0, 6).map((j) => [
+            { text: `📋 Ask ${j.name.split(' ')[0]} for a review`, copy_text: { text: reviewAsk(j.name, j.service) } },
+          ]),
+        },
+      );
+    }
+  }
+
   return NextResponse.json({ ok: true, sent: true });
 }
