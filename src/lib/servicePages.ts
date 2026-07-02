@@ -453,6 +453,7 @@ export const SERVICE_NAV: { slug: string; label: string }[] = [
   { slug: 'remote-bmw-coding-ireland', label: 'Remote BMW Coding' },
   { slug: 'bmw-coding-list', label: 'BMW Coding List' },
   { slug: 'blog', label: 'Guides & Articles' },
+  { slug: 'find-us', label: 'Find Us · Directions' },
 ];
 
 /** Build per-page Next.js metadata (title, description, canonical, OG, Twitter). */

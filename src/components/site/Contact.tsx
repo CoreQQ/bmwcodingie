@@ -7,6 +7,7 @@ import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { trackMetaEvent } from './MetaPixel';
 import { trackGoogleConversion } from './GoogleAdsTag';
+import { Link } from '@/i18n/navigation';
 import { SlotPicker } from './SlotPicker';
 
 export function Contact({
@@ -133,6 +134,12 @@ export function Contact({
               <MapPin size={16} className="mt-0.5 shrink-0 text-bmw" />
               <span>{settings.service_area}</span>
             </div>
+            <Link
+              href="/find-us"
+              className="mt-3 inline-block font-mono text-xs uppercase tracking-widest text-bmw underline-offset-4 hover:underline"
+            >
+              {t('findUs')}
+            </Link>
           </div>
 
           {/* Right: form */}

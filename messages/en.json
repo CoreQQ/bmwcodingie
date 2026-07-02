@@ -116,7 +116,8 @@
     "slotTimePrompt": "Pick a time",
     "slotNote": "Slots are requests — we'll confirm by message before they're final.",
     "slotTaken": "Booked",
-    "trackBooking": "Track your booking →"
+    "trackBooking": "Track your booking →",
+    "findUs": "How to find the workshop →"
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",
