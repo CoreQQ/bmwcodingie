@@ -17,15 +17,12 @@ function NavItem({
   onClick?: () => void;
   children: React.ReactNode;
 }) {
-  if (href.startsWith('#')) {
-    return (
-      <a href={href} className={className} onClick={onClick}>
-        {children}
-      </a>
-    );
-  }
+  // Section anchors live on the homepage — prefix them with "/" so the nav
+  // works from every page (service landings, blog, find-us, …). On the
+  // homepage itself "/#section" still just scrolls.
+  const target = href.startsWith('#') ? `/${href}` : href;
   return (
-    <Link href={href} className={className} onClick={onClick}>
+    <Link href={target} className={className} onClick={onClick}>
       {children}
     </Link>
   );
@@ -64,9 +61,9 @@ export function Header() {
       >
         <div className="mx-auto flex max-w-edge items-center justify-between px-4 py-3 md:px-8 md:py-4">
           {/* Wordmark */}
-          <a href="#top" className="group inline-flex items-center">
+          <Link href="/" className="group inline-flex items-center">
             <Logo className="h-16 w-auto md:h-20" />
-          </a>
+          </Link>
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-9 md:flex">
@@ -80,9 +77,9 @@ export function Header() {
               </NavItem>
             ))}
             <LanguageSwitcher />
-            <a href="#contact" className="btn-primary">
+            <Link href="/#contact" className="btn-primary">
               {t('bookNow')}
-            </a>
+            </Link>
           </nav>
 
           {/* Mobile toggle */}
@@ -123,13 +120,13 @@ export function Header() {
                 </NavItem>
               ))}
               <LanguageSwitcher mobile />
-              <a
-                href="#contact"
+              <Link
+                href="/#contact"
                 onClick={() => setOpen(false)}
                 className="btn-primary mt-5 w-full"
               >
                 {t('bookNow')}
-              </a>
+              </Link>
             </nav>
           </div>
         </div>
