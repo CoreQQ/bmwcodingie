@@ -5,8 +5,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const BODY = `# BMW Coding (bmwcoding.ie)
 
 > Independent BMW coding, diagnostics and retrofit service based in Dublin,
-> Ireland. In-person across Dublin, Kildare, Wicklow and Meath; remote coding
-> over ENET anywhere in Ireland. F-series and G-series BMWs (NBT, NBT Evo,
+> Ireland. Workshop at Greenogue Business Park, Rathcoole (West Dublin, off
+> the N7); mobile visits across Dublin, Kildare, Wicklow and Meath; remote
+> coding over ENET anywhere in Ireland. F-series and G-series BMWs (NBT, NBT Evo,
 > MGU / iDrive 6-8). Tooling: ISTA/Rheingold, E-Sys + PSdZData, BimmerCode.
 > Payment on completion. Not affiliated with BMW AG.
 
