@@ -94,6 +94,8 @@ alter table site_settings add column if not exists translations jsonb not null d
 alter table bookings add column if not exists slot_date date;
 alter table bookings add column if not exists slot_time text not null default '';
 alter table bookings add column if not exists status text not null default 'pending';
+-- Public tracking token for the customer's booking-status page (/b/<token>).
+alter table bookings add column if not exists public_token uuid not null default gen_random_uuid();
 
 -- One in-progress invoice draft per Telegram chat, driven by the bot's
 -- /invoice wizard. Server-role access only (RLS on, no public policies).

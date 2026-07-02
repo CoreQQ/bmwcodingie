@@ -53,6 +53,7 @@ export type Booking = {
   slot_date: string | null;
   slot_time: string;
   status: BookingStatus;
+  public_token?: string;
   handled: boolean;
   created_at: string;
 };

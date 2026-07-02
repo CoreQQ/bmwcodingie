@@ -19,6 +19,7 @@ export function Contact({
   const t = useTranslations('Contact');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [trackToken, setTrackToken] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '',
     contact: '',
@@ -66,6 +67,8 @@ export function Contact({
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error('failed');
+      const data = await res.json().catch(() => ({}));
+      setTrackToken(typeof data.token === 'string' ? data.token : null);
       setStatus('sent');
       trackMetaEvent('Lead', { content_name: form.service || 'General enquiry' });
       trackGoogleConversion();
@@ -209,6 +212,14 @@ export function Contact({
                 {status === 'sent' ? (
                   <div role="alert" className="border border-bmw/40 bg-bmw/10 p-4 text-sm text-ink">
                     {t('sentMessage')}
+                    {trackToken && (
+                      <a
+                        href={`/b/${trackToken}`}
+                        className="mt-3 block font-mono text-xs uppercase tracking-widest text-bmw underline-offset-4 hover:underline"
+                      >
+                        {t('trackBooking')}
+                      </a>
+                    )}
                   </div>
                 ) : (
                   <button

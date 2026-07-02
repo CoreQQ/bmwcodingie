@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   const { data, error } = await sb
     .from('bookings')
     .insert({ ...lead, status: 'pending' })
-    .select('id')
+    .select('id, public_token')
     .single();
 
   if (error || !data) {
@@ -62,6 +62,7 @@ export async function POST(req: Request) {
   }
 
   // Saved — notify. Telegram failure never affects the visitor's success response.
-  await notifyTelegram({ ...lead, id: data.id as number, persisted: true });
-  return NextResponse.json({ ok: true, persisted: true });
+  const token = (data.public_token as string) || undefined;
+  await notifyTelegram({ ...lead, id: data.id as number, public_token: token, persisted: true });
+  return NextResponse.json({ ok: true, persisted: true, token });
 }

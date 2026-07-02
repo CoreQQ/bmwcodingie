@@ -13,7 +13,7 @@ export function VisitorPing() {
 
   useEffect(() => {
     if (consent !== 'accepted') return;
-    if (!pathname || pathname.startsWith('/admin')) return;
+    if (!pathname || pathname.startsWith('/admin') || pathname.startsWith('/miniapp')) return;
     if (sessionStorage.getItem(SESSION_KEY)) return;
     sessionStorage.setItem(SESSION_KEY, '1');
 

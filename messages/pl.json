@@ -115,7 +115,8 @@
     "slotOptional": "opcjonalnie",
     "slotTimePrompt": "Wybierz godzinę",
     "slotNote": "Termin to prośba — potwierdzimy go wiadomością, zanim stanie się ostateczny.",
-    "slotTaken": "Zajęte"
+    "slotTaken": "Zajęte",
+    "trackBooking": "Śledź swoją rezerwację →"
   },
   "Footer": {
     "pitch": "Niezależne kodowanie, diagnostyka i retrofity BMW na terenie Dublina i całej Irlandii — na miejscu lub zdalnie przez ENET.",
