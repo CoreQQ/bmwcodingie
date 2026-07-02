@@ -99,10 +99,12 @@ export default async function LocaleLayout({
         ],
         address: {
           '@type': 'PostalAddress',
-          addressLocality: 'Dublin',
+          streetAddress: 'Grants View, Greenogue Business Park',
+          addressLocality: 'Rathcoole',
+          addressRegion: 'Co. Dublin',
           addressCountry: 'IE',
         },
-        geo: { '@type': 'GeoCoordinates', latitude: 53.3498, longitude: -6.2603 },
+        geo: { '@type': 'GeoCoordinates', latitude: 53.291, longitude: -6.462 },
         openingHoursSpecification: [
           {
             '@type': 'OpeningHoursSpecification',
