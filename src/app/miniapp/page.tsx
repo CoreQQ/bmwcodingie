@@ -36,9 +36,17 @@ type TgWebApp = {
 // reloads, in sessionStorage under __telegram__initParams.
 function recoverInitData(): string {
   try {
+    // 1) Hash captured by the inline script in layout.tsx, before hydration.
+    const early = sessionStorage.getItem('__tg_hash');
+    if (early) {
+      const fromEarly = new URLSearchParams(early).get('tgWebAppData');
+      if (fromEarly) return fromEarly;
+    }
+    // 2) Live URL fragment.
     const hash = window.location.hash.slice(1);
     const fromHash = new URLSearchParams(hash).get('tgWebAppData');
     if (fromHash) return fromHash;
+    // 3) telegram-web-app.js's own session store.
     const stored = sessionStorage.getItem('__telegram__initParams');
     if (stored) {
       const parsed = JSON.parse(stored) as { tgWebAppData?: string };
@@ -112,7 +120,12 @@ export default function MiniApp() {
         tg.ready();
         tg.expand();
         const hasAuth = Boolean(tg.initData || recoverInitData());
-        setDebugInfo(`${tg.platform ?? '?'} · v${tg.version ?? '?'} · auth:${hasAuth ? 'yes' : 'none'}`);
+        let rawHash = 'none';
+        try {
+          if (sessionStorage.getItem('__tg_hash')) rawHash = 'early';
+          else if (window.location.hash.includes('tgWebAppData')) rawHash = 'live';
+        } catch { /* ignore */ }
+        setDebugInfo(`${tg.platform ?? '?'} · v${tg.version ?? '?'} · auth:${hasAuth ? 'yes' : 'none'} · hash:${rawHash}`);
         if (!hasAuth) setState('noauth');
         else void load();
       } else if (tries > 40) {
