@@ -73,6 +73,7 @@ export const metadata: Metadata = {
     images: ['/og.jpg'],
   },
   robots: { index: true, follow: true },
+  verification: { google: 'a-hsX_ynxFXHXAANoFr_0Py4hanbe_CwDQmLLtaAdys' },
 };
 
 // The root layout stays locale-independent so pages can render statically and
