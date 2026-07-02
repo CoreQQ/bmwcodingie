@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Car,
   Star,
+  CalendarDays,
 } from 'lucide-react';
 import { logout } from '@/app/admin/actions';
 
@@ -25,6 +26,7 @@ const LINKS = [
   { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/content', label: 'Content & Contacts', icon: FileText },
   { href: '/admin/bookings', label: 'Bookings', icon: Inbox },
+  { href: '/admin/schedule', label: 'Schedule', icon: CalendarDays },
 ];
 
 export function AdminNav() {

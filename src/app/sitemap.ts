@@ -1,11 +1,14 @@
 import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 import { ALL_SERVICE_SLUGS } from '@/lib/servicePages';
+import { BLOG_POSTS } from '@/lib/blog';
 
 const PATHS = [
   { path: '', priority: 1 },
   { path: '/models', priority: 0.8 },
   { path: '/bmw-coding-list', priority: 0.8 },
+  { path: '/blog', priority: 0.7 },
+  ...BLOG_POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.7 })),
   ...ALL_SERVICE_SLUGS.map((slug) => ({ path: `/${slug}`, priority: 0.9 })),
 ];
 

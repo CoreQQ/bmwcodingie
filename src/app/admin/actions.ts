@@ -343,6 +343,21 @@ export async function saveCompatibility(formData: FormData) {
 
 // ─────────────────────────── Bookings ───────────────────────────
 
+// ─────────────────────────── Schedule ───────────────────────────
+
+export async function toggleBlockedDay(formData: FormData) {
+  const sb = getSupabaseAdmin();
+  if (!sb) return;
+  const day = String(formData.get('day') ?? '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
+  if (formData.get('blocked') === 'true') {
+    await sb.from('blocked_dates').delete().eq('day', day);
+  } else {
+    await sb.from('blocked_dates').upsert({ day });
+  }
+  revalidatePath('/admin/schedule');
+}
+
 // ─────────────────────────── Reviews ───────────────────────────
 
 export async function createReview(formData: FormData) {

@@ -203,5 +203,11 @@
     "eyebrow": "Opinie",
     "heading": "CO MÓWIĄ KIEROWCY",
     "count": "{n} zweryfikowanych opinii"
+  },
+  "StatsBand": {
+    "options": "Opcji kodowania",
+    "days": "Dni w tygodniu",
+    "languages": "Języków",
+    "upfront": "Przedpłata"
   }
 }

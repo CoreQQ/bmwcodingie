@@ -107,6 +107,12 @@ create table if not exists invoice_drafts (
 );
 alter table invoice_drafts enable row level security;
 
+-- Days the owner has blocked out — hidden from the public slot picker.
+create table if not exists blocked_dates (
+  day date primary key
+);
+alter table blocked_dates enable row level security;
+
 -- Customer reviews shown on the site (owner-managed in the admin panel).
 create table if not exists reviews (
   id bigint generated always as identity primary key,

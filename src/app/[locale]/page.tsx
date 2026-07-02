@@ -5,6 +5,7 @@ import { Preloader } from '@/components/site/Preloader';
 import { ScrollProgress } from '@/components/site/ScrollProgress';
 import { Hero } from '@/components/site/Hero';
 import { Marquee } from '@/components/site/Marquee';
+import { StatsBand } from '@/components/site/StatsBand';
 import { Services } from '@/components/site/Services';
 import { HowItWorks } from '@/components/site/HowItWorks';
 import { Gallery } from '@/components/site/Gallery';
@@ -59,6 +60,7 @@ export default async function HomePage({
         <Marquee />
         <Services catalog={catalog} />
         <HowItWorks />
+        <StatsBand />
         <Gallery items={gallery} />
         <WhyUs settings={settings} />
         <Reviews reviews={reviews} />

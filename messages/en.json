@@ -203,5 +203,11 @@
     "eyebrow": "Reviews",
     "heading": "WHAT DRIVERS SAY",
     "count": "{n} verified reviews"
+  },
+  "StatsBand": {
+    "options": "Coding options",
+    "days": "Days a week",
+    "languages": "Languages",
+    "upfront": "Upfront payment"
   }
 }
