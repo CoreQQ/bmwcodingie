@@ -43,7 +43,11 @@ export async function Services({ catalog }: { catalog: CategoryWithServices[] })
               <ul className="col-span-12 md:col-span-8">
                 {cat.services.map((s, i) => (
                   <Reveal as="li" key={s.id} delay={i * 50}>
-                    <div className="group grid grid-cols-12 items-baseline gap-3 border-b border-white/8 py-6 transition-colors hover:bg-white/[0.015]">
+                    <div className="group relative grid grid-cols-12 items-baseline gap-3 border-b border-white/8 py-6 transition-all duration-300 hover:bg-white/[0.02] hover:pl-5">
+                      <span
+                        className="m-stripe-v absolute bottom-4 left-0 top-4 w-[3px] origin-top scale-y-0 transition-transform duration-300 group-hover:scale-y-100"
+                        aria-hidden="true"
+                      />
                       <div className="col-span-12 sm:col-span-8">
                         <div className="flex items-center gap-3">
                           <h4 className="text-lg font-semibold text-ink">{s.title}</h4>

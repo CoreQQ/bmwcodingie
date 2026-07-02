@@ -196,6 +196,56 @@ html {
   }
 }
 
+/* ---- Infinite marquee band ----
+   The track holds two identical halves; translating -50% loops seamlessly. */
+.marquee {
+  overflow: hidden;
+  user-select: none;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  animation: marquee 40s linear infinite;
+  will-change: transform;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Outlined display text (used by the marquee for alternating words) */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+}
+
+/* ---- Pointer-tracked glow card (Linear/Vercel-style) ----
+   A client component keeps --mx/--my in sync with the cursor. */
+.glow-card {
+  position: relative;
+}
+.glow-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(46, 155, 230, 0.16),
+    transparent 65%
+  );
+}
+.glow-card:hover::after {
+  opacity: 1;
+}
+
 /* ---- Preloader logo reveal ----
    Two bars in the background colour cover the logo, then retract (width 100%→0)
    to "unwrap" it — after which the overlay collapses. */
@@ -250,6 +300,9 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .preloader {
     display: none !important;
+  }
+  .marquee-track {
+    animation: none;
   }
   .reveal,
   .reveal.is-in {

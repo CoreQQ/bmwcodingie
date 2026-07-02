@@ -2,6 +2,7 @@ import { Star } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { Review } from '@/lib/types';
 import { Reveal } from './Reveal';
+import { GlowCard } from './GlowCard';
 
 function Stars({ rating }: { rating: number }) {
   const r = Math.max(0, Math.min(5, rating));
@@ -48,7 +49,7 @@ export async function Reviews({ reviews }: { reviews: Review[] }) {
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {reviews.map((r) => (
-            <figure key={r.id} className="flex flex-col border border-white/8 bg-graphite-800/40 p-5">
+            <GlowCard as="figure" key={r.id} className="flex flex-col border border-white/8 bg-graphite-800/40 p-5">
               <Stars rating={r.rating} />
               <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-muted">
                 “{r.body}”
@@ -59,7 +60,7 @@ export async function Reviews({ reviews }: { reviews: Review[] }) {
                   <span className="font-mono text-[11px] uppercase tracking-wider text-faint">{r.car}</span>
                 )}
               </figcaption>
-            </figure>
+            </GlowCard>
           ))}
         </div>
       </div>

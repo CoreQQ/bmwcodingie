@@ -2,15 +2,18 @@ import { ArrowDown, MapPin } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
+import { HeroSpotlight } from './HeroSpotlight';
+import { GlowCard } from './GlowCard';
 
 export async function Hero({ settings }: { settings: SiteSettings }) {
   const t = await getTranslations('Hero');
   return (
     <section id="top" className="relative overflow-hidden">
-      {/* Background: blueprint grid + atmospheric blue glow. */}
+      {/* Background: blueprint grid + atmospheric blue glow + pointer spotlight. */}
       <div className="absolute inset-0 -z-10">
         <div className="blueprint absolute inset-0 opacity-60" />
         <div className="absolute inset-0 hero-glow" />
+        <HeroSpotlight />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-graphite-900 to-transparent" />
       </div>
 
@@ -70,7 +73,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
 
           {/* Spec readout card — offset right */}
           <div className="col-span-12 lg:col-span-4 lg:pt-24">
-            <div className="border border-white/10 bg-graphite-800">
+            <GlowCard className="border border-white/10 bg-graphite-800">
               <div className="m-stripe h-1 w-full" />
               <div className="space-y-0 divide-y divide-white/5">
                 <SpecRow k={t('specFormat')} v={t('specFormatValue')} />
@@ -83,7 +86,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
                 <MapPin size={15} className="text-bmw" />
                 <span>{settings.service_area}</span>
               </div>
-            </div>
+            </GlowCard>
 
             <a
               href={waLink(settings.whatsapp, 'Hi — I have a BMW and I need coding.')}
