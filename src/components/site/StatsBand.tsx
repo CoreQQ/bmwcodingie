@@ -12,14 +12,13 @@ export async function StatsBand() {
   const STATS: { value: number; prefix?: string; suffix?: string; label: string }[] = [
     { value: Math.floor(codingCount / 10) * 10, suffix: '+', label: t('options') },
     { value: 7, label: t('days') },
-    { value: 6, label: t('languages') },
     { value: 0, prefix: '€', label: t('upfront') },
   ];
 
   return (
     <section className="relative border-t border-white/5 bg-graphite-800/30 py-14 md:py-16">
       <div className="mx-auto max-w-edge px-5 md:px-8">
-        <Reveal className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
+        <Reveal className="grid grid-cols-3 gap-x-4 gap-y-10 md:gap-x-8">
           {STATS.map((s) => (
             <div key={s.label} className="text-center">
               <CountUp
