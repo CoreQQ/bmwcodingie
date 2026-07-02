@@ -15,8 +15,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 });
   }
 
-  if (!validateMiniAppAuth(String(body.initData ?? ''))) {
-    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
+  const auth = validateMiniAppAuth(String(body.initData ?? ''));
+  if (!auth.ok) {
+    return NextResponse.json(
+      { ok: false, error: 'unauthorized', reason: auth.reason, userId: auth.userId ?? null },
+      { status: 401 },
+    );
   }
 
   const sb = getSupabaseAdmin();

@@ -78,7 +78,14 @@ export default function MiniApp() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ initData, ...payload }),
     });
-    if (!res.ok) throw new Error(String(res.status));
+    if (!res.ok) {
+      let detail = '';
+      try {
+        const j = await res.json();
+        detail = [j.reason, j.userId ? `id ${j.userId}` : ''].filter(Boolean).join(' · ');
+      } catch { /* ignore */ }
+      throw new Error(`${res.status}|${detail}`);
+    }
     return res.json();
   }, []);
 
@@ -88,7 +95,9 @@ export default function MiniApp() {
       setData(d);
       setState('ready');
     } catch (e) {
-      setState((e as Error).message === '401' ? 'noauth' : 'error');
+      const [code, detail] = (e as Error).message.split('|');
+      if (detail) setDebugInfo((d) => `${d} · ${detail}`.replace(/^ · /, ''));
+      setState(code === '401' ? 'noauth' : 'error');
     }
   }, [api]);
 
@@ -102,8 +111,9 @@ export default function MiniApp() {
         window.clearInterval(t);
         tg.ready();
         tg.expand();
-        setDebugInfo(`${tg.platform ?? '?'} · v${tg.version ?? '?'}`);
-        if (!tg.initData && !recoverInitData()) setState('noauth');
+        const hasAuth = Boolean(tg.initData || recoverInitData());
+        setDebugInfo(`${tg.platform ?? '?'} · v${tg.version ?? '?'} · auth:${hasAuth ? 'yes' : 'none'}`);
+        if (!hasAuth) setState('noauth');
         else void load();
       } else if (tries > 40) {
         window.clearInterval(t);
