@@ -203,5 +203,11 @@
     "eyebrow": "Recenzii",
     "heading": "CE SPUN CLIENȚII",
     "count": "{n} recenzii verificate"
+  },
+  "StatsBand": {
+    "options": "Opțiuni de codare",
+    "days": "Zile pe săptămână",
+    "languages": "Limbi",
+    "upfront": "Plată în avans"
   }
 }

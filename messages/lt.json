@@ -203,5 +203,11 @@
     "eyebrow": "Atsiliepimai",
     "heading": "KĄ SAKO KLIENTAI",
     "count": "{n} patvirtintų atsiliepimų"
+  },
+  "StatsBand": {
+    "options": "Kodavimo parinkčių",
+    "days": "Dienos per savaitę",
+    "languages": "Kalbos",
+    "upfront": "Išankstinis mokėjimas"
   }
 }

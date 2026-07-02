@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Wrench, Images, Inbox, FileText, ArrowRight } from 'lucide-react';
+import { Wrench, Images, Inbox, FileText, ArrowRight, TrendingUp, CalendarDays } from 'lucide-react';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { PageHeading, Card } from '@/components/admin/ui';
 import {
@@ -8,13 +8,17 @@ import {
   adminGetBookings,
   adminGetCategories,
 } from '@/lib/admin-data';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { getBusinessStats, type BusinessStats } from '@/lib/stats';
 
 export default async function AdminDashboard() {
-  const [services, gallery, bookings, categories] = await Promise.all([
+  const sb = getSupabaseAdmin();
+  const [services, gallery, bookings, categories, biz] = await Promise.all([
     adminGetServices(),
     adminGetGallery(),
     adminGetBookings(),
     adminGetCategories(),
+    sb ? getBusinessStats(sb) : Promise.resolve(null as BusinessStats | null),
   ]);
 
   const newBookings = bookings.filter((b) => !b.handled).length;
@@ -44,6 +48,68 @@ export default async function AdminDashboard() {
           );
         })}
       </div>
+
+      {biz && (
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <Card className="p-5">
+            <h2 className="mb-4 flex items-center gap-2 font-medium text-ink">
+              <TrendingUp size={16} className="text-bmw" /> Enquiries
+            </h2>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <div className="font-display text-3xl text-ink">{biz.last7}</div>
+                <div className="mt-1 text-[11px] uppercase tracking-wide text-faint">Last 7 days</div>
+              </div>
+              <div>
+                <div className="font-display text-3xl text-ink">{biz.last30}</div>
+                <div className="mt-1 text-[11px] uppercase tracking-wide text-faint">Last 30 days</div>
+              </div>
+              <div>
+                <div className="font-display text-3xl text-ink">{biz.total}</div>
+                <div className="mt-1 text-[11px] uppercase tracking-wide text-faint">All time</div>
+              </div>
+            </div>
+            {biz.topServices.length > 0 && (
+              <div className="mt-5 border-t border-white/5 pt-4">
+                <h3 className="mb-2 text-[11px] uppercase tracking-wide text-faint">Most requested</h3>
+                <ul className="space-y-1.5">
+                  {biz.topServices.map((t) => (
+                    <li key={t.service} className="flex items-baseline justify-between gap-3 text-sm">
+                      <span className="truncate text-muted">{t.service}</span>
+                      <span className="font-mono text-xs text-ink">{t.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="mb-4 flex items-center gap-2 font-medium text-ink">
+              <CalendarDays size={16} className="text-bmw" /> Upcoming confirmed
+              <span className="ml-auto font-mono text-xs text-faint">
+                {biz.confirmedUpcoming} confirmed · {biz.pending} pending
+              </span>
+            </h2>
+            {biz.nextBookings.length === 0 ? (
+              <p className="text-sm text-muted">No confirmed slots coming up.</p>
+            ) : (
+              <ul className="space-y-2">
+                {biz.nextBookings.map((b) => (
+                  <li key={b.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-b border-white/5 pb-2 text-sm">
+                    <span className="font-mono text-xs text-bmw">{b.slot_date} · {b.slot_time}</span>
+                    <span className="text-ink">{b.name}</span>
+                    {b.service && <span className="text-xs text-faint">{b.service}</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Link href="/admin/schedule" className="mt-4 inline-flex items-center gap-1.5 text-sm text-bmw hover:underline">
+              Open schedule <ArrowRight size={14} />
+            </Link>
+          </Card>
+        </div>
+      )}
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         <QuickLink href="/admin/services" title="Edit services & prices" desc="Add, reorder, hide or re-price coding services." />

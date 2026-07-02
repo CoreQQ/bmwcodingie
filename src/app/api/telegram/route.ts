@@ -18,6 +18,7 @@ import {
   tryHandleInvoiceCallback,
   tryHandleInvoiceText,
 } from '@/lib/invoiceFlow';
+import { getBusinessStats } from '@/lib/stats';
 import type { Booking } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -87,6 +88,25 @@ export async function POST(req: Request) {
       const rows = await upcomingBookings(sb);
       const { text: out, keyboard } = buildBookingsMenu(rows);
       await sendOwnerMessage(out, keyboard);
+      return ok();
+    }
+    if (/^\/stats(@\w+)?\b/.test(text)) {
+      const s = await getBusinessStats(sb);
+      const lines = [
+        '📊 <b>Business stats</b>',
+        '━━━━━━━━━━━━━━━━━━━',
+        `📥 Enquiries: <b>${s.last7}</b> this week · <b>${s.last30}</b> this month · ${s.total} all time`,
+        `📅 Slots: ✅ ${s.confirmedUpcoming} confirmed upcoming · ⏳ ${s.pending} pending`,
+      ];
+      if (s.topServices.length) {
+        lines.push('', '<b>Most requested:</b>');
+        for (const t of s.topServices) lines.push(`  ${t.count} × ${t.service}`);
+      }
+      if (s.nextBookings.length) {
+        lines.push('', '<b>Next confirmed:</b>');
+        for (const b of s.nextBookings) lines.push(`  ${b.slot_date} ${b.slot_time} — ${b.name}`);
+      }
+      await sendOwnerMessage(lines.join('\n'));
       return ok();
     }
     // Otherwise, feed it to an active invoice draft (if any).

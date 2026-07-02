@@ -50,16 +50,17 @@ export function SlotPicker({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  // Slots already taken (confirmed bookings), as a set of "date|time" keys.
+  // Slots already taken (confirmed bookings) and owner-blocked days.
   const [taken, setTaken] = useState<Set<string>>(new Set());
+  const [blocked, setBlocked] = useState<Set<string>>(new Set());
   useEffect(() => {
     let alive = true;
     fetch('/api/slots')
       .then((r) => r.json())
-      .then((d: { taken?: { date: string; time: string }[] }) => {
-        if (alive && Array.isArray(d.taken)) {
-          setTaken(new Set(d.taken.map((s) => `${s.date}|${s.time}`)));
-        }
+      .then((d: { taken?: { date: string; time: string }[]; blocked?: string[] }) => {
+        if (!alive) return;
+        if (Array.isArray(d.taken)) setTaken(new Set(d.taken.map((s) => `${s.date}|${s.time}`)));
+        if (Array.isArray(d.blocked)) setBlocked(new Set(d.blocked));
       })
       .catch(() => {});
     return () => {
@@ -98,7 +99,7 @@ export function SlotPicker({
         <>
       {/* Date chips */}
       <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {days.map((d) => {
+        {days.filter((d) => !blocked.has(ymd(d))).map((d) => {
           const key = ymd(d);
           const active = value.date === key;
           // Dim a day whose every window is already taken.
