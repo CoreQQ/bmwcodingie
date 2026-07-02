@@ -24,10 +24,31 @@ type Overview = {
 
 type TgWebApp = {
   initData: string;
+  platform?: string;
+  version?: string;
   ready: () => void;
   expand: () => void;
   HapticFeedback?: { impactOccurred: (s: string) => void; notificationOccurred: (t: string) => void };
 };
+
+// Fallbacks for clients where telegram-web-app.js hasn't populated initData:
+// the raw payload lives in the URL fragment (#tgWebAppData=...) and, on
+// reloads, in sessionStorage under __telegram__initParams.
+function recoverInitData(): string {
+  try {
+    const hash = window.location.hash.slice(1);
+    const fromHash = new URLSearchParams(hash).get('tgWebAppData');
+    if (fromHash) return fromHash;
+    const stored = sessionStorage.getItem('__telegram__initParams');
+    if (stored) {
+      const parsed = JSON.parse(stored) as { tgWebAppData?: string };
+      if (parsed.tgWebAppData) return parsed.tgWebAppData;
+    }
+  } catch {
+    /* ignore */
+  }
+  return '';
+}
 
 const getTg = (): TgWebApp | undefined =>
   (window as unknown as { Telegram?: { WebApp?: TgWebApp } }).Telegram?.WebApp;
@@ -47,13 +68,15 @@ export default function MiniApp() {
   const [data, setData] = useState<Overview | null>(null);
   const [state, setState] = useState<'boot' | 'noauth' | 'ready' | 'error'>('boot');
   const [busy, setBusy] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
 
   const api = useCallback(async (payload: Record<string, unknown>) => {
     const tg = getTg();
+    const initData = tg?.initData || recoverInitData();
     const res = await fetch('/api/miniapp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ initData: tg?.initData ?? '', ...payload }),
+      body: JSON.stringify({ initData, ...payload }),
     });
     if (!res.ok) throw new Error(String(res.status));
     return res.json();
@@ -79,10 +102,12 @@ export default function MiniApp() {
         window.clearInterval(t);
         tg.ready();
         tg.expand();
-        if (!tg.initData) setState('noauth');
+        setDebugInfo(`${tg.platform ?? '?'} · v${tg.version ?? '?'}`);
+        if (!tg.initData && !recoverInitData()) setState('noauth');
         else void load();
       } else if (tries > 40) {
         window.clearInterval(t);
+        setDebugInfo('no telegram script');
         setState('noauth');
       }
     }, 100);
@@ -151,9 +176,15 @@ export default function MiniApp() {
       <div className="px-4 py-4">
         {state === 'boot' && <p className="py-16 text-center text-sm text-muted">Loading…</p>}
         {state === 'noauth' && (
-          <p className="py-16 text-center text-sm text-muted">
-            Open this app from the bot&apos;s menu button in Telegram.
-          </p>
+          <div className="py-16 text-center">
+            <p className="text-sm text-muted">
+              Open this app from the bot&apos;s menu button in Telegram.
+            </p>
+            <p className="mt-2 text-xs text-faint">
+              Tip: the menu-button URL must start with <span className="text-muted">https://www.</span>
+            </p>
+            {debugInfo && <p className="mt-4 font-mono text-[10px] text-faint">{debugInfo}</p>}
+          </div>
         )}
         {state === 'error' && (
           <p className="py-16 text-center text-sm text-muted">Couldn&apos;t load — pull the refresh button.</p>
