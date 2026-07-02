@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Reveal } from './Reveal';
 
 export function Faq() {
   const t = useTranslations('Faq');
@@ -32,15 +33,15 @@ export function Faq() {
       />
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <div className="grid grid-cols-12 gap-x-4 md:gap-x-10 gap-y-10">
-          <div className="col-span-12 md:col-span-4">
+          <Reveal className="col-span-12 md:col-span-4">
             <div className="mb-4 flex items-center gap-3">
               <span className="label">{t('eyebrow')}</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
-            <h2 className="font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.9]">
+            <h2 className="text-balance font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.9]">
               {t('heading1')} <br /> {t('heading2')}
             </h2>
-          </div>
+          </Reveal>
 
           <div className="col-span-12 md:col-span-8">
             <ul className="border-t border-white/8">

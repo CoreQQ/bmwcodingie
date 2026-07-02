@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { GalleryItem } from '@/lib/types';
+import { Reveal } from './Reveal';
 
 export function Gallery({ items }: { items: GalleryItem[] }) {
   const t = useTranslations('Gallery');
@@ -37,18 +38,18 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
   return (
     <section id="work" className="relative border-t border-white/5 py-20 md:py-28">
       <div className="mx-auto max-w-edge px-5 md:px-8">
-        <div className="mb-12 grid grid-cols-12 items-end gap-6">
+        <Reveal className="mb-12 grid grid-cols-12 items-end gap-6">
           <div className="col-span-12 md:col-span-8">
             <div className="mb-4 flex items-center gap-3">
               <span className="label">{t('eyebrow')}</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
-            <h2 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
+            <h2 className="text-balance font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
               {t('heading')}
             </h2>
           </div>
           <p className="col-span-12 text-muted md:col-span-4 md:text-right">{t('intro')}</p>
-        </div>
+        </Reveal>
 
         {items.length === 0 ? (
           <EmptyState />
@@ -66,6 +67,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                     src={g.image_url}
                     alt={g.caption || t('altFallback')}
                     loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                   />
                 </div>

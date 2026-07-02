@@ -32,17 +32,6 @@ export function Contact({
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  // Lets the quote builder hand off its selection without prop drilling —
-  // both sections are mounted on the same page at the same time.
-  useEffect(() => {
-    function onQuoteApply(e: Event) {
-      const detail = (e as CustomEvent<{ service: string; message: string }>).detail;
-      setForm((f) => ({ ...f, service: detail.service, message: detail.message }));
-    }
-    window.addEventListener('quote:apply', onQuoteApply);
-    return () => window.removeEventListener('quote:apply', onQuoteApply);
-  }, []);
-
   // The /models page hands off its selection via sessionStorage since it's a
   // separate page navigation, not a same-page event.
   useEffect(() => {

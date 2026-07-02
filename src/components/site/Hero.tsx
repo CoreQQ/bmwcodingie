@@ -7,15 +7,10 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
   const t = await getTranslations('Hero');
   return (
     <section id="top" className="relative overflow-hidden">
-      {/* Background: blueprint grid + atmospheric blue glow.
-          Drop a real photo at /public/hero.jpg to override the gradient. */}
+      {/* Background: blueprint grid + atmospheric blue glow. */}
       <div className="absolute inset-0 -z-10">
         <div className="blueprint absolute inset-0 opacity-60" />
         <div className="absolute inset-0 hero-glow" />
-        <div
-          className="absolute inset-0 bg-[url('/hero.jpg')] bg-cover bg-center opacity-0 [background-blend-mode:overlay]"
-          style={{ opacity: 'var(--hero-photo, 0)' }}
-        />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-graphite-900 to-transparent" />
       </div>
 
