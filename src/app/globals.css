@@ -283,6 +283,55 @@ html {
   }
 }
 
+/* ---- Interactive coding demo ---- */
+.demo-needle {
+  transition: transform 1.1s cubic-bezier(0.34, 1.3, 0.5, 1);
+}
+.demo-eq span {
+  animation: demo-eq 0.9s ease-in-out infinite;
+  transform-origin: bottom;
+}
+@keyframes demo-eq {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.demo-progress {
+  animation: demo-progress 24s linear infinite;
+}
+@keyframes demo-progress {
+  from {
+    width: 4%;
+  }
+  to {
+    width: 96%;
+  }
+}
+/* One-shot light sweep for the "welcome scene" button (remounted per press) */
+.demo-welcome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(46, 155, 230, 0.3) 48%,
+    rgba(255, 255, 255, 0.18) 52%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  animation: demo-sweep 1.3s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+@keyframes demo-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 /* ---- Scroll reveal ---- */
 .reveal {
   opacity: 0;
@@ -308,6 +357,14 @@ html {
   .reveal.is-in {
     opacity: 1;
     transform: none;
+    animation: none;
+  }
+  .demo-needle {
+    transition: none;
+  }
+  .demo-eq span,
+  .demo-progress,
+  .demo-welcome {
     animation: none;
   }
   .btn-primary::after,

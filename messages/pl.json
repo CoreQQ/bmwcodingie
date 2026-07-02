@@ -210,5 +210,19 @@
     "options": "Opcji kodowania",
     "days": "Dni w tygodniu",
     "upfront": "Przedpłata"
+  },
+  "Demo": {
+    "eyebrow": "Wypróbuj na żywo",
+    "heading": "TAK DZIAŁA KODOWANIE",
+    "intro": "To demo prawdziwych opcji, które odblokowujemy. Przełączaj — wszystko, co tu widzisz, można zakodować w Twoim BMW.",
+    "sport": "Wyświetlacze sport",
+    "digital": "Cyfrowa prędkość",
+    "vim": "Video in Motion",
+    "ambient": "Oświetlenie ambientowe",
+    "welcome": "Scena powitalna",
+    "vimLocked": "Odtwarzanie niedostępne podczas jazdy",
+    "vimHint": "Włącz Video in Motion",
+    "cta": "Zakoduj to w moim BMW",
+    "moving": "Pojazd w ruchu"
   }
 }

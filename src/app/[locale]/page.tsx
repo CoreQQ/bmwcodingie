@@ -7,6 +7,7 @@ import { Hero } from '@/components/site/Hero';
 import { Marquee } from '@/components/site/Marquee';
 import { StatsBand } from '@/components/site/StatsBand';
 import { Services } from '@/components/site/Services';
+import { CodingDemo } from '@/components/site/CodingDemo';
 import { HowItWorks } from '@/components/site/HowItWorks';
 import { Gallery } from '@/components/site/Gallery';
 import { WhyUs } from '@/components/site/WhyUs';
@@ -59,6 +60,7 @@ export default async function HomePage({
         <Hero settings={settings} />
         <Marquee />
         <Services catalog={catalog} />
+        <CodingDemo />
         <HowItWorks />
         <StatsBand />
         <Gallery items={gallery} />

@@ -210,5 +210,19 @@
     "options": "Opțiuni de codare",
     "days": "Zile pe săptămână",
     "upfront": "Plată în avans"
+  },
+  "Demo": {
+    "eyebrow": "Încearcă live",
+    "heading": "CUM SE SIMTE CODAREA",
+    "intro": "Acesta e un demo cu opțiuni reale pe care le activăm. Apasă comutatoarele — tot ce vezi aici poate fi codat pe BMW-ul tău.",
+    "sport": "Afișaje sport",
+    "digital": "Viteză digitală",
+    "vim": "Video in Motion",
+    "ambient": "Lumini ambientale",
+    "welcome": "Scenă de întâmpinare",
+    "vimLocked": "Redare indisponibilă în mers",
+    "vimHint": "Activează Video in Motion",
+    "cta": "Vreau asta pe BMW-ul meu",
+    "moving": "Vehicul în mișcare"
   }
 }
