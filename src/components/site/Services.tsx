@@ -1,7 +1,7 @@
-import { Check } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { CategoryWithServices } from '@/lib/types';
 import { Reveal } from './Reveal';
+import { ServiceRows } from './ServiceRows';
 
 export async function Services({ catalog }: { catalog: CategoryWithServices[] }) {
   const t = await getTranslations('Services');
@@ -23,7 +23,7 @@ export async function Services({ catalog }: { catalog: CategoryWithServices[] })
           </p>
         </div>
 
-        <div className="space-y-16 md:space-y-24">
+        <div className="space-y-12 md:space-y-16">
           {catalog.map((cat, ci) => (
             <div key={cat.id} className="grid grid-cols-12 gap-x-4 md:gap-x-8 gap-y-6">
               {/* Sticky category header (left rail) */}
@@ -39,37 +39,17 @@ export async function Services({ catalog }: { catalog: CategoryWithServices[] })
                 </div>
               </div>
 
-              {/* Service rows */}
-              <ul className="col-span-12 md:col-span-8">
-                {cat.services.map((s, i) => (
-                  <Reveal as="li" key={s.id} delay={i * 50}>
-                    <div className="group relative grid grid-cols-12 items-baseline gap-3 border-b border-white/8 py-6 transition-all duration-300 hover:bg-white/[0.02] hover:pl-5">
-                      <span
-                        className="m-stripe-v absolute bottom-4 left-0 top-4 w-[3px] origin-top scale-y-0 transition-transform duration-300 group-hover:scale-y-100"
-                        aria-hidden="true"
-                      />
-                      <div className="col-span-12 sm:col-span-8">
-                        <div className="flex items-center gap-3">
-                          <h4 className="text-lg font-semibold text-ink">{s.title}</h4>
-                          {s.mobile_available && (
-                            <span className="inline-flex items-center gap-1 border border-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-faint">
-                              <Check size={10} className="text-bmw" /> {t('remoteOk')}
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-1.5 max-w-md text-sm leading-relaxed text-muted">
-                          {s.description}
-                        </p>
-                      </div>
-                      <div className="col-span-12 text-left sm:col-span-4 sm:text-right">
-                        <span className="font-mono text-sm sm:text-base text-bmw transition-colors group-hover:text-ink">
-                          {s.price_label}
-                        </span>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
-              </ul>
+              {/* Service rows (top 3 visible, rest expandable) */}
+              <div className="col-span-12 md:col-span-8">
+                <Reveal>
+                  <ServiceRows
+                    services={cat.services}
+                    remoteOkLabel={t('remoteOk')}
+                    showAllLabel={t('showAll')}
+                    showLessLabel={t('showLess')}
+                  />
+                </Reveal>
+              </div>
             </div>
           ))}
         </div>

@@ -33,7 +33,9 @@
     "heading": "CE CODĂM",
     "intro": "Prețuri fixe acolo unde se poate, „la cerere” onest acolo unde decide maşina. Majoritatea lucrărilor se pot face la fața locului sau la distanță — retrofiturile de hardware se fac doar la fața locului.",
     "remoteOk": "Disponibil la distanță",
-    "footnote": "Nu vezi exact ce ai nevoie? Funcțiile ascunse și codarea personalizată fac parte din meseria noastră — scrie-ne ce maşină ai și ce vrei, iar noi îți spunem direct dacă e posibil."
+    "footnote": "Nu vezi exact ce ai nevoie? Funcțiile ascunse și codarea personalizată fac parte din meseria noastră — scrie-ne ce maşină ai și ce vrei, iar noi îți spunem direct dacă e posibil.",
+    "showAll": "Arată toate {n}",
+    "showLess": "Restrânge"
   },
   "HowItWorks": {
     "eyebrow": "02 / Proces",

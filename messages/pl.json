@@ -33,7 +33,9 @@
     "heading": "CO KODUJEMY",
     "intro": "Stałe ceny tam, gdzie da się je podać, i szczera wycena „na zapytanie” tam, gdzie decyduje sam samochód. Większość prac można wykonać na miejscu lub zdalnie — retrofity sprzętowe tylko na miejscu.",
     "remoteOk": "Możliwe zdalnie",
-    "footnote": "Nie widzisz swojej dokładnej potrzeby na liście? Odblokowywanie ukrytych funkcji i niestandardowe kodowanie to nasza codzienność — napisz, jaki masz samochód i czego potrzebujesz, a powiemy wprost, czy jest to możliwe."
+    "footnote": "Nie widzisz swojej dokładnej potrzeby na liście? Odblokowywanie ukrytych funkcji i niestandardowe kodowanie to nasza codzienność — napisz, jaki masz samochód i czego potrzebujesz, a powiemy wprost, czy jest to możliwe.",
+    "showAll": "Pokaż wszystkie {n}",
+    "showLess": "Zwiń"
   },
   "HowItWorks": {
     "eyebrow": "02 / Proces",
