@@ -8,6 +8,7 @@ import {
   editBookingMessage,
   editMessage,
   isOwner,
+  registerBotCommands,
   sendOwnerMessage,
   type BookingRow,
   type Lead,
@@ -143,6 +144,15 @@ export async function POST(req: Request) {
       } else {
         await sendOwnerMessage(`❌ Failed: ${sent.error || 'unknown error'}`);
       }
+      return ok();
+    }
+    if (/^\/setup(@\w+)?\b/.test(text) || /^\/start(@\w+)?\b/.test(text)) {
+      const done = await registerBotCommands();
+      await sendOwnerMessage(
+        done
+          ? '✅ Меню команд обновлено. Закрой и открой этот чат — рядом с полем ввода появится кнопка ☰ Меню. Также список выпадает, если набрать «/».'
+          : '❌ Не удалось обновить меню — попробуй ещё раз через минуту.',
+      );
       return ok();
     }
     if (/^\/review(@\w+)?\b/.test(text)) {

@@ -42,6 +42,27 @@ async function tgCall(method: string, payload: Record<string, unknown>): Promise
   }
 }
 
+/**
+ * Register the bot's command menu (the ☰ Menu button next to the input).
+ * Called by the owner's /setup command so BotFather isn't needed.
+ */
+export async function registerBotCommands(): Promise<boolean> {
+  const commands = [
+    { command: 'bookings', description: '📋 Заявки: подтвердить / отклонить / освободить' },
+    { command: 'stats', description: '📊 Статистика: заявки, топ услуг, записи' },
+    { command: 'invoice', description: '🧾 Создать PDF-инвойс' },
+    { command: 'review', description: '⭐ Тексты «попросите отзыв» со ссылкой' },
+    { command: 'calendar', description: '📆 Подписка на календарь записей' },
+    { command: 'wa', description: '💬 Ответить в WhatsApp (когда подключим)' },
+    { command: 'setup', description: '🔧 Обновить меню команд' },
+    { command: 'cancel', description: '✖️ Отменить создание инвойса' },
+  ];
+  const set = (await tgCall('setMyCommands', { commands })) as { ok?: boolean } | null;
+  // Make sure the menu button actually shows the command list.
+  await tgCall('setChatMenuButton', { menu_button: { type: 'commands' } });
+  return Boolean(set && set.ok);
+}
+
 /** Shared sender — never throws, returns false on any failure. */
 async function sendTelegramMessage(text: string, replyMarkup?: InlineKeyboard): Promise<boolean> {
   if (!telegramConfigured) {
