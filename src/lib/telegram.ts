@@ -296,7 +296,11 @@ export function buildBookingsMenu(rows: BookingRow[]): { text: string; keyboard:
 }
 
 /** Drill-down for one date: each slot with customer + status, plus a back button. */
-export function buildBookingsDay(date: string, rows: BookingRow[]): { text: string; keyboard: InlineKeyboard } {
+export function buildBookingsDay(
+  date: string,
+  rows: BookingRow[],
+  freeWindows?: string[],
+): { text: string; keyboard: InlineKeyboard } {
   const list = rows
     .filter((r) => r.slot_date === date && (r.status === 'pending' || r.status === 'confirmed'))
     .sort((a, b) => a.slot_time.localeCompare(b.slot_time));
@@ -314,8 +318,18 @@ export function buildBookingsDay(date: string, rows: BookingRow[]): { text: stri
     if (r.message) lines.push(`   💬 ${esc(r.message)}`);
   }
 
+  if (freeWindows) {
+    lines.push('');
+    lines.push(
+      freeWindows.length
+        ? `🕐 <b>Free:</b> ${freeWindows.map(esc).join(' · ')}`
+        : '🕐 No free windows left this day.',
+    );
+  }
+
   const buttons: InlineButton[][] = list.map((r) => [
     { text: `🗑 Free ${r.slot_time}`, callback_data: `bkfree:${r.id}` },
+    { text: '🕓 Move', callback_data: `bkmv:${r.id}` },
   ]);
   buttons.push([{ text: '← Back to dates', callback_data: 'bklist' }]);
 

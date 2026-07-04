@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { DEFAULT_HOURS, windowsFor as windowsForHours, type HoursMap } from '@/lib/hours';
+import { DEFAULT_HOURS, windowsFor as windowsForHours, windowsOverlap, type HoursMap } from '@/lib/hours';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -51,6 +51,16 @@ export function SlotPicker({
     };
   }, []);
 
+  // A window is unavailable if ANY confirmed booking overlaps it in time
+  // (slots start every hour, so 11:00–13:00 blocks 12:00–14:00 too).
+  const isWindowTaken = (dateKey: string, w: string) => {
+    for (const entry of taken) {
+      const sep = entry.indexOf('|');
+      if (entry.slice(0, sep) === dateKey && windowsOverlap(entry.slice(sep + 1), w)) return true;
+    }
+    return false;
+  };
+
   const windowsFor = (weekday: number) => windowsForHours(hours, weekday);
 
   // Next ~2 weeks of bookable days (every day has evening/weekend slots).
@@ -90,7 +100,7 @@ export function SlotPicker({
           const active = value.date === key;
           // Dim a day whose every window is already taken.
           const dayWindows = windowsFor(d.getDay());
-          const full = dayWindows.length > 0 && dayWindows.every((w) => taken.has(`${key}|${w}`));
+          const full = dayWindows.length > 0 && dayWindows.every((w) => isWindowTaken(key, w));
           return (
             <button
               key={key}
@@ -124,7 +134,7 @@ export function SlotPicker({
           <div className="flex flex-wrap gap-2">
             {times.map((w) => {
               const active = value.time === w;
-              const isTaken = taken.has(`${value.date}|${w}`);
+              const isTaken = isWindowTaken(value.date, w);
               return (
                 <button
                   key={w}
