@@ -9,12 +9,26 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
   const t = await getTranslations('Hero');
   return (
     <section id="top" className="relative overflow-hidden">
-      {/* Background: blueprint grid + atmospheric blue glow + pointer spotlight. */}
+      {/* Background: real workshop shot (duotone-dimmed) + blueprint grid +
+          atmospheric blue glow + pointer spotlight. */}
       <div className="absolute inset-0 -z-10">
-        <div className="blueprint absolute inset-0 opacity-60" />
+        <picture>
+          <source media="(max-width: 640px)" srcSet="/hero-bg-mobile.jpg" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hero-bg.jpg"
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover opacity-45"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-gradient-to-r from-graphite-900/95 via-graphite-900/70 to-graphite-900/40" />
+        <div className="blueprint absolute inset-0 opacity-40" />
         <div className="absolute inset-0 hero-glow" />
         <HeroSpotlight />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-graphite-900 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-graphite-900/80 to-transparent" />
       </div>
 
       <div className="mx-auto max-w-edge px-5 pb-16 pt-20 sm:pt-28 md:px-8 md:pb-28 md:pt-44">
@@ -82,8 +96,8 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
                 <SpecRow k={t('specPlatforms')} v={t('specPlatformsValue')} />
                 <SpecRow k={t('specPayment')} v={t('specPaymentValue')} />
               </div>
-              <div className="flex items-center gap-2 border-t border-white/10 px-5 py-4 text-sm text-muted">
-                <MapPin size={15} className="text-bmw" />
+              <div className="flex items-start gap-2 border-t border-white/10 px-5 py-4 text-sm text-muted">
+                <MapPin size={15} className="mt-0.5 shrink-0 text-bmw" />
                 <span>{settings.service_area}</span>
               </div>
             </GlowCard>

@@ -335,10 +335,10 @@ html {
 /* ---- Scroll reveal ---- */
 .reveal {
   opacity: 0;
-  transform: translateY(26px);
+  transform: translateY(16px);
 }
 .reveal.is-in {
-  animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes fade-up {
   to {

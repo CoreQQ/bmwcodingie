@@ -33,7 +33,9 @@
     "heading": "KĄ MES KODUOJAME",
     "intro": "Fiksuotos kainos, kai galime jas nurodyti, ir sąžiningas „pagal užklausą“ įkainojimas, kai sprendžia automobilis. Daugumą darbų galime atlikti gyvai arba nuotoliniu būdu — techninės įrangos retrofitai atliekami tik gyvai.",
     "remoteOk": "Galima nuotoliniu būdu",
-    "footnote": "Nematote tiksliai to, ko reikia? Paslėptų funkcijų aktyvavimas ir individualus kodavimas — tai dalis mūsų darbo. Parašykite, koks automobilis ir ko norite, ir mes tiesiai pasakysime, ar tai įmanoma."
+    "footnote": "Nematote tiksliai to, ko reikia? Paslėptų funkcijų aktyvavimas ir individualus kodavimas — tai dalis mūsų darbo. Parašykite, koks automobilis ir ko norite, ir mes tiesiai pasakysime, ar tai įmanoma.",
+    "showAll": "Rodyti visas {n}",
+    "showLess": "Sutraukti"
   },
   "HowItWorks": {
     "eyebrow": "02 / Procesas",

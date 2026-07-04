@@ -94,7 +94,7 @@ export function SlotPicker({
       ) : (
         <>
       {/* Date chips */}
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
         {days.filter((d) => !blocked.has(ymd(d))).map((d) => {
           const key = ymd(d);
           const active = value.date === key;

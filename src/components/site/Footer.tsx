@@ -94,52 +94,41 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
           </div>
         </div>
 
-        {/* SEO internal links to dedicated service pages */}
-        <div className="border-t border-white/8 py-8">
-          <h3 className="label mb-4">BMW Coding Services</h3>
-          <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted sm:grid-cols-3 lg:grid-cols-4">
-            {SERVICE_NAV.map((s) => (
-              <li key={s.slug}>
-                <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
-                  {s.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* SEO internal links: coverage areas */}
-        <div className="border-t border-white/8 py-8">
-          <h3 className="label mb-4">BMW Coding by Area</h3>
-          <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted sm:grid-cols-3 lg:grid-cols-6">
-            <li>
-              <Link href="/bmw-coding-dublin" className="transition-colors hover:text-ink">
-                Dublin
+        {/* SEO internal links — collapsible on phones, always open on md+ */}
+        <LinkBlock title="BMW Coding Services" cols="sm:grid-cols-3 lg:grid-cols-4">
+          {SERVICE_NAV.map((s) => (
+            <li key={s.slug}>
+              <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                {s.label}
               </Link>
             </li>
-            {LOCATION_NAV.map((s) => (
-              <li key={s.slug}>
-                <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
-                  {s.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+          ))}
+        </LinkBlock>
 
-        {/* SEO internal links: by BMW model */}
-        <div className="border-t border-white/8 py-8">
-          <h3 className="label mb-4">BMW Coding by Model</h3>
-          <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted sm:grid-cols-3 lg:grid-cols-4">
-            {CHASSIS_NAV.map((s) => (
-              <li key={s.slug}>
-                <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
-                  {s.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <LinkBlock title="BMW Coding by Area" cols="sm:grid-cols-3 lg:grid-cols-6">
+          <li>
+            <Link href="/bmw-coding-dublin" className="transition-colors hover:text-ink">
+              Dublin
+            </Link>
+          </li>
+          {LOCATION_NAV.map((s) => (
+            <li key={s.slug}>
+              <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                {s.label}
+              </Link>
+            </li>
+          ))}
+        </LinkBlock>
+
+        <LinkBlock title="BMW Coding by Model" cols="sm:grid-cols-3 lg:grid-cols-4">
+          {CHASSIS_NAV.map((s) => (
+            <li key={s.slug}>
+              <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                {s.label}
+              </Link>
+            </li>
+          ))}
+        </LinkBlock>
 
         <div className="flex flex-col items-start justify-between gap-3 border-t border-white/8 py-6 text-xs text-faint md:flex-row md:items-center">
           <span>{t('copyright', { year })}</span>
@@ -148,5 +137,38 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
       </div>
       <div className="m-stripe h-1 w-full" />
     </footer>
+  );
+}
+
+/**
+ * Footer link block: plain grid on md+, a <details> accordion on phones so
+ * three SEO blocks don't take two screens of scrolling. Links stay in the
+ * HTML either way, so crawlers see them on every viewport.
+ */
+function LinkBlock({
+  title,
+  cols,
+  children,
+}: {
+  title: string;
+  cols: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-t border-white/8">
+      {/* md+: always visible */}
+      <div className="hidden py-8 md:block">
+        <h3 className="label mb-4">{title}</h3>
+        <ul className={`grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted ${cols}`}>{children}</ul>
+      </div>
+      {/* phones: collapsible */}
+      <details className="group py-4 md:hidden">
+        <summary className="label flex cursor-pointer list-none items-center justify-between py-2 [&::-webkit-details-marker]:hidden">
+          {title}
+          <span className="text-faint transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 pb-3 pt-2 text-sm text-muted">{children}</ul>
+      </details>
+    </div>
   );
 }

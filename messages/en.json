@@ -33,7 +33,9 @@
     "heading": "WHAT WE CODE",
     "intro": "Fixed prices where we can give them, honest “on request” where the car decides. Most jobs can be done in person or remotely — hardware retrofits are in-person only.",
     "remoteOk": "Remote OK",
-    "footnote": "Don’t see your exact request? Hidden features and bespoke coding are part of the job — message us the car and what you want, and we’ll tell you straight whether it’s possible."
+    "footnote": "Don’t see your exact request? Hidden features and bespoke coding are part of the job — message us the car and what you want, and we’ll tell you straight whether it’s possible.",
+    "showAll": "Show all {n} options",
+    "showLess": "Show less"
   },
   "HowItWorks": {
     "eyebrow": "02 / Process",
