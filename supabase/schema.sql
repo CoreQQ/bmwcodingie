@@ -227,3 +227,24 @@ insert into car_models (chassis_code, label, year_from, year_to, sort_order) val
   ('G05', 'X5 (G05)', 2018, null, 9),
   ('E90', '3 Series (E90/E91/E92/E93)', 2005, 2013, 10)
 on conflict (chassis_code) do nothing;
+
+-- ── WhatsApp AI auto-responder ──────────────────────────────────────
+-- Conversation memory + per-chat pause flag for the Cloud API bot.
+create table if not exists wa_messages (
+  msg_id text primary key,            -- Meta message id (dedupes webhook retries)
+  wa_id text not null,                -- customer number, digits only
+  role text not null check (role in ('user', 'assistant')),
+  content text not null,
+  via text not null default 'ai',     -- customer | ai | owner
+  created_at timestamptz not null default now()
+);
+create index if not exists wa_messages_chat_idx on wa_messages (wa_id, created_at);
+
+create table if not exists wa_chats (
+  wa_id text primary key,
+  name text,
+  paused boolean not null default false,
+  last_at timestamptz not null default now()
+);
+alter table wa_messages enable row level security;
+alter table wa_chats enable row level security;

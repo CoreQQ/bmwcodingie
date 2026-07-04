@@ -21,6 +21,7 @@ import {
 import { getBusinessStats } from '@/lib/stats';
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
+import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
 import type { Booking } from '@/lib/types';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
@@ -115,6 +116,35 @@ export async function POST(req: Request) {
       );
       return ok();
     }
+    if (/^\/wa(@\w+)?\b/.test(text)) {
+      // "/wa +353871234567 your reply" — manual WhatsApp reply from Telegram.
+      if (!isWhatsAppConfigured()) {
+        await sendOwnerMessage('⚠️ WhatsApp is not connected yet (set WHATSAPP_TOKEN / WHATSAPP_PHONE_ID).');
+        return ok();
+      }
+      const rest = text.replace(/^\/wa(@\w+)?\s*/, '');
+      const m = rest.match(/^(\+?[\d\s()-]{7,})\s+([\s\S]+)$/);
+      if (!m) {
+        await sendOwnerMessage('Usage: <code>/wa +353871234567 your message</code>');
+        return ok();
+      }
+      const to = normalizeWaNumber(m[1]);
+      const body = m[2].trim();
+      const sent = await sendWhatsAppText(to, body);
+      if (sent.ok) {
+        await sb.from('wa_messages').insert({
+          msg_id: sent.id || `owner:${Date.now()}`,
+          wa_id: to,
+          role: 'assistant',
+          content: body,
+          via: 'owner',
+        });
+        await sendOwnerMessage(`✅ Sent to <code>+${to}</code>`);
+      } else {
+        await sendOwnerMessage(`❌ Failed: ${sent.error || 'unknown error'}`);
+      }
+      return ok();
+    }
     if (/^\/review(@\w+)?\b/.test(text)) {
       // Optional "/review Name Service" — first token is the name.
       const rest = text.replace(/^\/review(@\w+)?\s*/, '').trim();
@@ -177,6 +207,20 @@ export async function POST(req: Request) {
 
   const chatId = cq.message.chat.id;
   const messageId = cq.message.message_id;
+
+  // WhatsApp AI pause/resume per chat.
+  if (cq.data.startsWith('wap:') || cq.data.startsWith('war:')) {
+    const waId = cq.data.slice(4);
+    const paused = cq.data.startsWith('wap:');
+    await sb.from('wa_chats').upsert({ wa_id: waId, paused });
+    await answerCallback(cq.id, paused ? 'AI paused for this chat' : 'AI resumed for this chat');
+    await sendOwnerMessage(
+      paused
+        ? `⏸ AI paused for <code>+${waId}</code> — reply with <code>/wa +${waId} your text</code>`
+        : `▶️ AI resumed for <code>+${waId}</code>`,
+    );
+    return ok();
+  }
 
   // Invoice wizard price-choice callbacks.
   if (cq.data.startsWith('inv:')) {
