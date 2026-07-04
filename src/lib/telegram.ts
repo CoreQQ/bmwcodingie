@@ -56,6 +56,8 @@ export async function registerBotCommands(): Promise<boolean> {
     { command: 'client', description: '👤 История клиента: /client имя или номер' },
     { command: 'reply', description: '📋 Готовые ответы клиентам' },
     { command: 'paid', description: '💶 Записать оплату: /paid 120 Имя Услуга' },
+    { command: 'ban', description: '⛔️ Забанить: /ban C-007 причина' },
+    { command: 'banlist', description: '📵 Список забаненных' },
     { command: 'wa', description: '💬 Ответить в WhatsApp (когда подключим)' },
     { command: 'setup', description: '🔧 Обновить меню команд' },
     { command: 'cancel', description: '✖️ Отменить создание инвойса' },
@@ -105,6 +107,8 @@ export type Lead = {
   persisted?: boolean;
   /** Pre-built "repeat customer" line (HTML), added by the booking route. */
   repeatNote?: string;
+  /** Pre-built client-code / blacklist line (HTML), added by the booking route. */
+  clientNote?: string;
 };
 
 /** Human-readable slot label, e.g. "Mon, 14 Jul · 14:00–16:00". Returns '' if no slot. */
@@ -165,6 +169,7 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
   if (lead.message) lines.push(`💬 <b>Description:</b> ${esc(lead.message)}`);
+  if (lead.clientNote) lines.push(lead.clientNote);
   if (lead.repeatNote) lines.push(lead.repeatNote);
   return lines;
 }

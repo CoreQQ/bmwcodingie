@@ -265,3 +265,14 @@ create table if not exists app_config (
   value text not null
 );
 alter table app_config enable row level security;
+
+-- ── Clients registry: permanent per-client code + blacklist flag ────
+create table if not exists clients (
+  id bigserial primary key,           -- the client code: C-001, C-002, …
+  phone_key text unique not null,     -- last digits of the phone, format-proof
+  name text,
+  banned boolean not null default false,
+  ban_reason text,
+  created_at timestamptz not null default now()
+);
+alter table clients enable row level security;

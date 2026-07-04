@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { notifyTelegram } from '@/lib/telegram';
-import { repeatCustomerNote } from '@/lib/crm';
+import { repeatCustomerNote, ensureClient, clientCode } from '@/lib/crm';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
@@ -64,12 +64,32 @@ export async function POST(req: Request) {
 
   // Saved — notify. Telegram failure never affects the visitor's success response.
   const token = (data.public_token as string) || undefined;
-  const repeatNote = await repeatCustomerNote(sb, contact, data.id as number).catch(() => null);
+  const [repeatNote, client] = await Promise.all([
+    repeatCustomerNote(sb, contact, data.id as number).catch(() => null),
+    ensureClient(sb, contact, name).catch(() => null),
+  ]);
+
+  // Blacklisted client: auto-decline so no slot is held, but the visitor
+  // still sees a normal success — no hint that they're blocked.
+  if (client?.banned) {
+    await sb.from('bookings').update({ status: 'declined' }).eq('id', data.id);
+    await notifyTelegram({
+      ...lead,
+      id: data.id as number,
+      public_token: token,
+      persisted: true,
+      clientNote: `⛔️ <b>BLACKLISTED</b> · ${clientCode(client.id)}${client.ban_reason ? ` · ${client.ban_reason}` : ''} — auto-declined, slot not held`,
+      repeatNote: repeatNote ?? undefined,
+    });
+    return NextResponse.json({ ok: true, persisted: true, token });
+  }
+
   await notifyTelegram({
     ...lead,
     id: data.id as number,
     public_token: token,
     persisted: true,
+    clientNote: client ? `🆔 <b>Client:</b> ${clientCode(client.id)}` : undefined,
     repeatNote: repeatNote ?? undefined,
   });
   return NextResponse.json({ ok: true, persisted: true, token });
