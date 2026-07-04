@@ -17,6 +17,7 @@ type Overview = {
   blocked: string[];
   stats: BusinessStats;
   hours: HoursMap;
+  slotDuration: number;
   services: ServiceRow[];
   reviews: Review[];
   reviewUrl?: string;
@@ -202,7 +203,7 @@ export default function MiniApp() {
             {tab === 'schedule' && <ScheduleTab data={data} busy={busy} act={act} />}
             {tab === 'services' && <ServicesTab services={data.services} busy={busy} act={act} />}
             {tab === 'reviews' && <ReviewsTab reviews={data.reviews} busy={busy} act={act} />}
-            {tab === 'hours' && <HoursTab hours={data.hours} busy={busy} act={act} />}
+            {tab === 'hours' && <HoursTab hours={data.hours} slotDuration={data.slotDuration || 2} busy={busy} act={act} />}
             {tab === 'stats' && <StatsTab stats={data.stats} />}
           </>
         )}
@@ -306,7 +307,7 @@ function BookingCard({ b, data, busy, act }: { b: Booking; data: Overview; busy:
             <>
               <p className="mb-2 mt-3 font-mono text-[10px] uppercase tracking-wider text-faint">New time</p>
               <div className="flex flex-wrap gap-1.5">
-                {windowsFor(data.hours, new Date(`${pickDay}T00:00:00`).getDay()).map((w) => {
+                {windowsFor(data.hours, new Date(`${pickDay}T00:00:00`).getDay(), data.slotDuration || 2).map((w) => {
                   const isTaken = [...taken].some((entry) => {
                     const sep = entry.indexOf('|');
                     return entry.slice(0, sep) === pickDay && windowsOverlap(entry.slice(sep + 1), w);
@@ -590,12 +591,32 @@ function HourRow({ weekday, value, busy, act }: { weekday: number; value: [numbe
   );
 }
 
-function HoursTab({ hours, busy, act }: { hours: HoursMap; busy: boolean; act: Act }) {
+function HoursTab({ hours, slotDuration, busy, act }: { hours: HoursMap; slotDuration: number; busy: boolean; act: Act }) {
   const order = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun
   return (
     <div className="space-y-2">
+      <div className="mb-4 border border-white/8 bg-graphite-800/40 p-4">
+        <h2 className="label mb-3">Slot length</h2>
+        <div className="flex gap-2">
+          {[1, 2, 3, 4].map((d) => (
+            <button
+              key={d}
+              disabled={busy || d === slotDuration}
+              onClick={() => void act({ action: 'setSlotDuration', duration: d })}
+              className={`flex-1 border px-3 py-2.5 font-mono text-xs ${
+                d === slotDuration ? 'border-bmw bg-bmw/10 text-ink' : 'border-white/10 text-muted active:scale-95'
+              }`}
+            >
+              {d}h
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-[11px] text-faint">
+          Windows start every hour and last this long — applies to the site picker, moves and the bot.
+        </p>
+      </div>
       <p className="mb-3 text-xs text-faint">
-        Booking windows are 2-hour blocks inside these hours. Changes apply to the site&apos;s slot picker instantly.
+        Booking windows run inside these hours. Changes apply to the site&apos;s slot picker instantly.
       </p>
       {order.map((wd) => <HourRow key={wd} weekday={wd} value={hours[wd] ?? null} busy={busy} act={act} />)}
     </div>

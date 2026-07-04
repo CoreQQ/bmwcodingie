@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { DEFAULT_HOURS, windowsFor as windowsForHours, windowsOverlap, type HoursMap } from '@/lib/hours';
+import { DEFAULT_HOURS, DEFAULT_SLOT_DURATION, windowsFor as windowsForHours, windowsOverlap, type HoursMap } from '@/lib/hours';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -35,15 +35,17 @@ export function SlotPicker({
   const [taken, setTaken] = useState<Set<string>>(new Set());
   const [blocked, setBlocked] = useState<Set<string>>(new Set());
   const [hours, setHours] = useState<HoursMap>(DEFAULT_HOURS);
+  const [duration, setDuration] = useState<number>(DEFAULT_SLOT_DURATION);
   useEffect(() => {
     let alive = true;
     fetch('/api/slots')
       .then((r) => r.json())
-      .then((d: { taken?: { date: string; time: string }[]; blocked?: string[]; hours?: HoursMap }) => {
+      .then((d: { taken?: { date: string; time: string }[]; blocked?: string[]; hours?: HoursMap; duration?: number }) => {
         if (!alive) return;
         if (Array.isArray(d.taken)) setTaken(new Set(d.taken.map((s) => `${s.date}|${s.time}`)));
         if (Array.isArray(d.blocked)) setBlocked(new Set(d.blocked));
         if (d.hours && typeof d.hours === 'object') setHours(d.hours);
+        if (typeof d.duration === 'number' && d.duration >= 1 && d.duration <= 4) setDuration(d.duration);
       })
       .catch(() => {});
     return () => {
@@ -61,7 +63,7 @@ export function SlotPicker({
     return false;
   };
 
-  const windowsFor = (weekday: number) => windowsForHours(hours, weekday);
+  const windowsFor = (weekday: number) => windowsForHours(hours, weekday, duration);
 
   // Next ~2 weeks of bookable days (every day has evening/weekend slots).
   const days = useMemo(() => {

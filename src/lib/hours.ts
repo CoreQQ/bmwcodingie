@@ -17,12 +17,15 @@ export const DEFAULT_HOURS: HoursMap = {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
-/** Two-hour booking windows starting every hour (11:00–13:00, 12:00–14:00, …). */
-export function windowsFor(hours: HoursMap, weekday: number): string[] {
+export const DEFAULT_SLOT_DURATION = 2;
+
+/** Booking windows starting every hour (11:00–13:00, 12:00–14:00, …).
+ *  `duration` is the window length in hours — owner-configurable. */
+export function windowsFor(hours: HoursMap, weekday: number, duration = DEFAULT_SLOT_DURATION): string[] {
   const r = hours[weekday];
   if (!r) return [];
   const out: string[] = [];
-  for (let h = r[0]; h + 2 <= r[1]; h += 1) out.push(`${pad(h)}:00–${pad(h + 2)}:00`);
+  for (let h = r[0]; h + duration <= r[1]; h += 1) out.push(windowLabel(h, duration));
   return out;
 }
 
@@ -41,8 +44,8 @@ export function windowsOverlap(a: string, b: string): boolean {
 }
 
 /** Build the window label for a start hour, e.g. 12 → "12:00–14:00". */
-export function windowLabel(startHour: number): string {
-  return `${pad(startHour)}:00–${pad(startHour + 2)}:00`;
+export function windowLabel(startHour: number, duration = DEFAULT_SLOT_DURATION): string {
+  return `${pad(startHour)}:00–${pad(startHour + duration)}:00`;
 }
 
 export const WEEKDAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

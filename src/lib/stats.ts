@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Booking } from './types';
+import { DEFAULT_SLOT_DURATION } from './hours';
 
 export type BusinessStats = {
   total: number;
@@ -123,4 +124,15 @@ export async function getBlockedDates(sb: SupabaseClient): Promise<string[]> {
   const today = new Date().toISOString().slice(0, 10);
   const { data } = await sb.from('blocked_dates').select('day').gte('day', today);
   return ((data ?? []) as { day: string }[]).map((r) => r.day);
+}
+
+/** Owner-configurable slot length in hours (app_config table, 1–4h, default 2). */
+export async function getSlotDuration(sb: SupabaseClient): Promise<number> {
+  const { data } = await sb
+    .from('app_config')
+    .select('value')
+    .eq('key', 'slot_duration_hours')
+    .maybeSingle();
+  const n = Number(data?.value);
+  return Number.isInteger(n) && n >= 1 && n <= 4 ? n : DEFAULT_SLOT_DURATION;
 }
