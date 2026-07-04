@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { validateMiniAppAuth } from '@/lib/miniappAuth';
-import { getBusinessStats, getSchedule, getBlockedDates, getHours } from '@/lib/stats';
+import { getBusinessStats, getSchedule, getBlockedDates, getHours, getSlotDuration } from '@/lib/stats';
 import { REVIEW_URL } from '@/lib/reviewTemplates';
 
 export const runtime = 'nodejs';
@@ -35,11 +35,12 @@ export async function POST(req: Request) {
 
   switch (String(body.action)) {
     case 'overview': {
-      const [schedule, blocked, stats, hours, servicesRes, reviewsRes] = await Promise.all([
+      const [schedule, blocked, stats, hours, slotDuration, servicesRes, reviewsRes] = await Promise.all([
         getSchedule(sb, 14),
         getBlockedDates(sb),
         getBusinessStats(sb),
         getHours(sb),
+        getSlotDuration(sb),
         sb.from('services').select('id, title, price_label, visible, sort_order').order('sort_order'),
         sb.from('reviews').select('*').order('sort_order'),
       ]);
@@ -49,6 +50,7 @@ export async function POST(req: Request) {
         blocked,
         stats,
         hours,
+        slotDuration,
         services: servicesRes.data ?? [],
         reviews: reviewsRes.data ?? [],
         reviewUrl: REVIEW_URL,
@@ -127,6 +129,19 @@ export async function POST(req: Request) {
       if (!id) return bad();
       await sb.from('reviews').delete().eq('id', id);
       refreshSite();
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'setSlotDuration': {
+      const d = Number(body.duration);
+      if (!Number.isInteger(d) || d < 1 || d > 4) return bad();
+      const { error } = await sb.from('app_config').upsert({ key: 'slot_duration_hours', value: String(d) });
+      if (error) {
+        return NextResponse.json(
+          { ok: false, error: 'Run the app_config migration in Supabase first.' },
+          { status: 500 },
+        );
+      }
       return NextResponse.json({ ok: true });
     }
 

@@ -258,3 +258,10 @@ create table if not exists payments (
   created_at timestamptz not null default now()
 );
 alter table payments enable row level security;
+
+-- ── App config (key-value, e.g. slot duration) ──────────────────────
+create table if not exists app_config (
+  key text primary key,
+  value text not null
+);
+alter table app_config enable row level security;

@@ -19,7 +19,7 @@ import {
   tryHandleInvoiceCallback,
   tryHandleInvoiceText,
 } from '@/lib/invoiceFlow';
-import { getBusinessStats, getHours, getBlockedDates } from '@/lib/stats';
+import { getBusinessStats, getHours, getBlockedDates, getSlotDuration } from '@/lib/stats';
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
@@ -60,8 +60,9 @@ async function upcomingBookings(sb: SupabaseClient): Promise<BookingRow[]> {
 
 /** Free (non-overlapping) windows for a date, given confirmed bookings. */
 async function freeWindowsFor(sb: SupabaseClient, date: string, excludeId?: number): Promise<string[]> {
-  const [hours, { data }] = await Promise.all([
+  const [hours, duration, { data }] = await Promise.all([
     getHours(sb),
+    getSlotDuration(sb),
     sb
       .from('bookings')
       .select('id, slot_time')
@@ -72,7 +73,7 @@ async function freeWindowsFor(sb: SupabaseClient, date: string, excludeId?: numb
     (b) => b.slot_time && b.id !== excludeId,
   );
   const weekday = new Date(`${date}T00:00:00`).getDay();
-  return windowsFor(hours, weekday).filter((w) => !busy.some((b) => windowsOverlap(b.slot_time, w)));
+  return windowsFor(hours, weekday, duration).filter((w) => !busy.some((b) => windowsOverlap(b.slot_time, w)));
 }
 
 export async function POST(req: Request) {
@@ -440,7 +441,7 @@ export async function POST(req: Request) {
   if (mvt) {
     const id = Number(mvt[1]);
     const date = mvt[2];
-    const slotTime = windowLabel(Number(mvt[3]));
+    const slotTime = windowLabel(Number(mvt[3]), await getSlotDuration(sb));
     const { data: bRow } = await sb
       .from('bookings')
       .select('name, public_token, slot_date, slot_time')
