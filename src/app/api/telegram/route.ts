@@ -23,7 +23,7 @@ import { getBusinessStats, getHours, getBlockedDates, getSlotDuration } from '@/
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
-import { findClients, formatClient } from '@/lib/crm';
+import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
 import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import type { Booking } from '@/lib/types';
@@ -175,6 +175,65 @@ export async function POST(req: Request) {
           ? '✅ Меню команд обновлено. Закрой и открой этот чат — рядом с полем ввода появится кнопка ☰ Меню. Также список выпадает, если набрать «/».'
           : '❌ Не удалось обновить меню — попробуй ещё раз через минуту.',
       );
+      return ok();
+    }
+    if (/^\/banlist(@\w+)?\b/.test(text)) {
+      const { data } = await sb
+        .from('clients')
+        .select('id, phone_key, name, ban_reason')
+        .eq('banned', true)
+        .order('id');
+      const list = (data ?? []) as { id: number; phone_key: string; name: string | null; ban_reason: string | null }[];
+      if (!list.length) {
+        await sendOwnerMessage('📵 Blacklist is empty.');
+        return ok();
+      }
+      const lines = ['⛔️ <b>Blacklist</b>', '━━━━━━━━━━━━━━━━━━━'];
+      for (const c of list) {
+        lines.push(
+          `<code>${clientCode(c.id)}</code> · ${escapeHtml(c.name || '—')} · …${c.phone_key.slice(-6)}${c.ban_reason ? ` — ${escapeHtml(c.ban_reason)}` : ''}`,
+        );
+      }
+      lines.push('', 'Unban: <code>/unban C-001</code>');
+      await sendOwnerMessage(lines.join('\n'));
+      return ok();
+    }
+    if (/^\/ban(@\w+)?\b/.test(text)) {
+      const rest = text.replace(/^\/ban(@\w+)?\s*/, '').trim();
+      const m = rest.match(/^(\S+)\s*([\s\S]*)$/);
+      if (!m) {
+        await sendOwnerMessage('Usage: <code>/ban C-007 reason</code> or <code>/ban 0871234567 reason</code>');
+        return ok();
+      }
+      let client = await resolveClient(sb, m[1]);
+      // Unknown number → create the record so the ban sticks pre-emptively.
+      if (!client && /\d{6,}/.test(m[1].replace(/\D/g, ''))) {
+        client = await ensureClient(sb, m[1]);
+      }
+      if (!client) {
+        await sendOwnerMessage(`Client not found for «${escapeHtml(m[1])}». Use a C-code from /client or a phone number.`);
+        return ok();
+      }
+      const reason = m[2].trim() || null;
+      const { error } = await sb.from('clients').update({ banned: true, ban_reason: reason }).eq('id', client.id);
+      if (error) {
+        await sendOwnerMessage(`❌ ${escapeHtml(error.message)} — run the clients migration in Supabase.`);
+        return ok();
+      }
+      await sendOwnerMessage(
+        `⛔️ Banned <code>${clientCode(client.id)}</code> · ${escapeHtml(client.name || '—')}${reason ? ` — ${escapeHtml(reason)}` : ''}\nTheir future bookings are auto-declined silently. Undo: <code>/unban ${clientCode(client.id)}</code>`,
+      );
+      return ok();
+    }
+    if (/^\/unban(@\w+)?\b/.test(text)) {
+      const q = text.replace(/^\/unban(@\w+)?\s*/, '').trim();
+      const client = q ? await resolveClient(sb, q) : null;
+      if (!client) {
+        await sendOwnerMessage('Usage: <code>/unban C-007</code> or <code>/unban 0871234567</code>');
+        return ok();
+      }
+      await sb.from('clients').update({ banned: false, ban_reason: null }).eq('id', client.id);
+      await sendOwnerMessage(`✅ Unbanned <code>${clientCode(client.id)}</code> · ${escapeHtml(client.name || '—')}`);
       return ok();
     }
     if (/^\/client(@\w+)?\b/.test(text)) {
