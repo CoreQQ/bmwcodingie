@@ -6,6 +6,7 @@ import { BLOG_POSTS } from '@/lib/blog';
 
 const PATHS = [
   { path: '', priority: 1 },
+  { path: '/bmw-coding-ireland', priority: 0.9 },
   { path: '/models', priority: 0.8 },
   { path: '/bmw-coding-list', priority: 0.8 },
   { path: '/blog', priority: 0.7 },

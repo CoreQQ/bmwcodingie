@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
+import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
 
-const REVIEW_URL = process.env.GOOGLE_REVIEW_URL;
-
+// Uses the shared "short & friendly" template so /review and the daily nudge
+// stay consistent.
 function reviewAsk(name: string, service: string): string {
-  const first = name.trim().split(/\s+/)[0] || 'there';
-  const svc = service ? ` — hope the ${service} is treating you well` : '';
-  return `Hi ${first}! Thanks for trusting us with your BMW${svc}. If you have 30 seconds, a quick Google review would mean a lot: ${REVIEW_URL}`;
+  return REVIEW_TEMPLATES[0].build(name, service);
 }
 
 export const runtime = 'nodejs';
@@ -56,7 +55,7 @@ export async function GET(req: Request) {
   await sendOwnerMessage(lines.join('\n'));
 
   // Review nudge: yesterday's confirmed jobs, one copy-button per client.
-  if (REVIEW_URL) {
+  if (hasReviewUrl()) {
     const yesterday = dayKey(-1);
     const { data: done } = await sb
       .from('bookings')
