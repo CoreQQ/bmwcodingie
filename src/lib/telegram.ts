@@ -57,8 +57,14 @@ export async function registerBotCommands(): Promise<boolean> {
     { command: 'setup', description: '🔧 Обновить меню команд' },
     { command: 'cancel', description: '✖️ Отменить создание инвойса' },
   ];
+  // Register for private chats, all groups, and (explicitly) the owner's
+  // chat/group — groups need their own scope or Telegram won't list commands.
   const set = (await tgCall('setMyCommands', { commands })) as { ok?: boolean } | null;
-  // Make sure the menu button actually shows the command list.
+  await tgCall('setMyCommands', { commands, scope: { type: 'all_group_chats' } });
+  if (TG_CHAT_ID) {
+    await tgCall('setMyCommands', { commands, scope: { type: 'chat', chat_id: Number(TG_CHAT_ID) || TG_CHAT_ID } });
+  }
+  // Make the private-chat menu button show the command list too.
   await tgCall('setChatMenuButton', { menu_button: { type: 'commands' } });
   return Boolean(set && set.ok);
 }
