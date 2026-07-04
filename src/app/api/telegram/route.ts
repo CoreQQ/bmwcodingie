@@ -20,9 +20,14 @@ import {
 } from '@/lib/invoiceFlow';
 import { getBusinessStats } from '@/lib/stats';
 import { calendarToken } from '@/lib/calendar';
+import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 export const runtime = 'nodejs';
 
@@ -108,6 +113,30 @@ export async function POST(req: Request) {
           '⚠️ This link is private — anyone with it can see your bookings.',
         ].join('\n'),
       );
+      return ok();
+    }
+    if (/^\/review(@\w+)?\b/.test(text)) {
+      // Optional "/review Name Service" — first token is the name.
+      const rest = text.replace(/^\/review(@\w+)?\s*/, '').trim();
+      const [name = '', ...svcParts] = rest.split(/\s+/);
+      const service = svcParts.join(' ');
+      const lines = [
+        '⭐ <b>Review request templates</b>',
+        '━━━━━━━━━━━━━━━━━━━',
+        name
+          ? `For <b>${name}</b>${service ? ` · ${service}` : ''} — tap a message to copy it:`
+          : 'Tap a message to copy it. Tip: send <code>/review John 530e CarPlay</code> to personalise.',
+        '',
+      ];
+      for (const tpl of REVIEW_TEMPLATES) {
+        lines.push(`<b>${tpl.label}</b>`);
+        lines.push(`<code>${escapeHtml(tpl.build(name || 'there', service))}</code>`);
+        lines.push('');
+      }
+      if (!hasReviewUrl()) {
+        lines.push('⚠️ Set <code>GOOGLE_REVIEW_URL</code> in Vercel so the link is included automatically.');
+      }
+      await sendOwnerMessage(lines.join('\n'));
       return ok();
     }
     if (/^\/stats(@\w+)?\b/.test(text)) {

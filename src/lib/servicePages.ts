@@ -446,6 +446,7 @@ export const ALL_SERVICE_SLUGS = Object.keys(SERVICE_PAGES);
 
 /** Footer / homepage internal-link list. */
 export const SERVICE_NAV: { slug: string; label: string }[] = [
+  { slug: 'bmw-coding-ireland', label: 'BMW Coding Ireland' },
   { slug: 'bmw-coding-dublin', label: 'BMW Coding Dublin' },
   { slug: 'apple-carplay-activation-dublin', label: 'Apple CarPlay Activation' },
   { slug: 'bmw-android-auto-activation', label: 'Android Auto Activation' },

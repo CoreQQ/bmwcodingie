@@ -21,6 +21,9 @@ const BODY = `# BMW Coding (bmwcoding.ie)
 - [Map Updates & FSC Codes](${SITE_URL}/bmw-map-updates-fsc-codes): navigation activation and updates
 - [Remote BMW Coding](${SITE_URL}/remote-bmw-coding-ireland): ENET sessions anywhere in Ireland
 
+## Coverage hub
+- [BMW Coding Ireland](${SITE_URL}/bmw-coding-ireland): every county and every model in one place
+
 ## By area
 - [BMW Coding Dublin](${SITE_URL}/bmw-coding-dublin): in-person + remote
 - Commuter belt (in person): [Kildare](${SITE_URL}/bmw-coding-kildare), [Wicklow](${SITE_URL}/bmw-coding-wicklow), [Meath](${SITE_URL}/bmw-coding-meath), [Louth](${SITE_URL}/bmw-coding-louth)
