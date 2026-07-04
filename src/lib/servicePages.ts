@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { routing } from '@/i18n/routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -23,6 +24,8 @@ export type ServicePage = {
   related: RelatedLink[];
   /** Short, pre-filled WhatsApp message for this service. */
   waMessage: string;
+  /** areaServed override for schema (defaults to Dublin + surrounding). */
+  area?: string[];
 };
 
 // Reusable honest closing note shown on every page.
@@ -456,15 +459,20 @@ export const SERVICE_NAV: { slug: string; label: string }[] = [
   { slug: 'find-us', label: 'Find Us · Directions' },
 ];
 
-/** Build per-page Next.js metadata (title, description, canonical, OG, Twitter). */
-export function serviceMetadata(slug: string): Metadata {
-  const p = SERVICE_PAGES[slug];
-  if (!p) return {};
-  const url = `/${slug}`;
+/** Build metadata for any landing page object (title, description, canonical, hreflang, OG). */
+export function buildLandingMetadata(p: ServicePage): Metadata {
+  const url = `/${p.slug}`;
+  const languages: Record<string, string> = Object.fromEntries(
+    routing.locales.map((l) => [
+      l,
+      l === routing.defaultLocale ? `${SITE_URL}${url}` : `${SITE_URL}/${l}${url}`,
+    ]),
+  );
+  languages['x-default'] = `${SITE_URL}${url}`;
   return {
     title: p.metaTitle,
     description: p.metaDescription,
-    alternates: { canonical: url },
+    alternates: { canonical: url, languages },
     openGraph: {
       type: 'website',
       url: `${SITE_URL}${url}`,
@@ -480,4 +488,11 @@ export function serviceMetadata(slug: string): Metadata {
       images: ['/og.jpg'],
     },
   };
+}
+
+/** Metadata for the original service pages (kept for the static routes). */
+export function serviceMetadata(slug: string): Metadata {
+  const p = SERVICE_PAGES[slug];
+  if (!p) return {};
+  return buildLandingMetadata(p);
 }
