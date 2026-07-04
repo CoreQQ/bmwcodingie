@@ -4,6 +4,8 @@ import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { Link } from '@/i18n/navigation';
 import { SERVICE_NAV } from '@/lib/servicePages';
+import { LOCATION_NAV } from '@/lib/locationPages';
+import { CHASSIS_NAV } from '@/lib/chassisPages';
 import { Logo } from './Logo';
 
 export async function Footer({ settings }: { settings: SiteSettings }) {
@@ -97,6 +99,39 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
           <h3 className="label mb-4">BMW Coding Services</h3>
           <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted sm:grid-cols-3 lg:grid-cols-4">
             {SERVICE_NAV.map((s) => (
+              <li key={s.slug}>
+                <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* SEO internal links: coverage areas */}
+        <div className="border-t border-white/8 py-8">
+          <h3 className="label mb-4">BMW Coding by Area</h3>
+          <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted sm:grid-cols-3 lg:grid-cols-6">
+            <li>
+              <Link href="/bmw-coding-dublin" className="transition-colors hover:text-ink">
+                Dublin
+              </Link>
+            </li>
+            {LOCATION_NAV.map((s) => (
+              <li key={s.slug}>
+                <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* SEO internal links: by BMW model */}
+        <div className="border-t border-white/8 py-8">
+          <h3 className="label mb-4">BMW Coding by Model</h3>
+          <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted sm:grid-cols-3 lg:grid-cols-4">
+            {CHASSIS_NAV.map((s) => (
               <li key={s.slug}>
                 <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
                   {s.label}

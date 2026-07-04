@@ -3,15 +3,17 @@ import { Link } from '@/i18n/navigation';
 import { getSettings, waLink } from '@/lib/data';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { SERVICE_PAGES, HONEST_COMPATIBILITY_NOTE } from '@/lib/servicePages';
+import { HONEST_COMPATIBILITY_NOTE } from '@/lib/servicePages';
+import { ALL_LANDINGS } from '@/lib/landings';
 import { MobileActionBar } from './MobileActionBar';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
-const AREA = ['Dublin', 'Kildare', 'Wicklow', 'Meath', 'Ireland'];
+const DEFAULT_AREA = ['Dublin', 'Kildare', 'Wicklow', 'Meath', 'Ireland'];
 
 export async function ServiceLanding({ slug }: { slug: string }) {
-  const p = SERVICE_PAGES[slug];
+  const p = ALL_LANDINGS[slug];
   if (!p) return null;
+  const AREA = p.area ?? DEFAULT_AREA;
   const settings = await getSettings();
 
   const wa = waLink(settings.whatsapp, p.waMessage);

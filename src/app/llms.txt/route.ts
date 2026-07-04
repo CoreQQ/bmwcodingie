@@ -21,6 +21,16 @@ const BODY = `# BMW Coding (bmwcoding.ie)
 - [Map Updates & FSC Codes](${SITE_URL}/bmw-map-updates-fsc-codes): navigation activation and updates
 - [Remote BMW Coding](${SITE_URL}/remote-bmw-coding-ireland): ENET sessions anywhere in Ireland
 
+## By area
+- [BMW Coding Dublin](${SITE_URL}/bmw-coding-dublin): in-person + remote
+- Commuter belt (in person): [Kildare](${SITE_URL}/bmw-coding-kildare), [Wicklow](${SITE_URL}/bmw-coding-wicklow), [Meath](${SITE_URL}/bmw-coding-meath), [Louth](${SITE_URL}/bmw-coding-louth)
+- Nationwide (remote ENET): [Cork](${SITE_URL}/bmw-coding-cork), [Galway](${SITE_URL}/bmw-coding-galway), [Limerick](${SITE_URL}/bmw-coding-limerick), [Waterford](${SITE_URL}/bmw-coding-waterford), [Kilkenny](${SITE_URL}/bmw-coding-kilkenny), [Wexford](${SITE_URL}/bmw-coding-wexford), [Westmeath](${SITE_URL}/bmw-coding-westmeath)
+
+## By model
+- 3 Series: [F30](${SITE_URL}/bmw-f30-coding), [G20](${SITE_URL}/bmw-g20-coding) · 5 Series: [F10](${SITE_URL}/bmw-f10-coding), [G30](${SITE_URL}/bmw-g30-coding)
+- [F20 1 Series](${SITE_URL}/bmw-f20-coding), [F32 4 Series](${SITE_URL}/bmw-f32-coding), [M3/M4](${SITE_URL}/bmw-m3-m4-coding), [7 Series](${SITE_URL}/bmw-7-series-coding)
+- SUVs: [X1](${SITE_URL}/bmw-x1-coding), [X3](${SITE_URL}/bmw-x3-coding), [X5](${SITE_URL}/bmw-x5-coding)
+
 ## Reference
 - [Full coding list](${SITE_URL}/bmw-coding-list): every codeable feature by category
 - [Model checker](${SITE_URL}/models): what's possible per chassis and year

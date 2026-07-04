@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 import { ALL_SERVICE_SLUGS } from '@/lib/servicePages';
+import { DYNAMIC_LANDING_SLUGS } from '@/lib/landings';
 import { BLOG_POSTS } from '@/lib/blog';
 
 const PATHS = [
@@ -11,6 +12,7 @@ const PATHS = [
   { path: '/find-us', priority: 0.6 },
   ...BLOG_POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.7 })),
   ...ALL_SERVICE_SLUGS.map((slug) => ({ path: `/${slug}`, priority: 0.9 })),
+  ...DYNAMIC_LANDING_SLUGS.map((slug) => ({ path: `/${slug}`, priority: 0.8 })),
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
