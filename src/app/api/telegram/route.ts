@@ -19,11 +19,12 @@ import {
   tryHandleInvoiceCallback,
   tryHandleInvoiceText,
 } from '@/lib/invoiceFlow';
-import { getBusinessStats } from '@/lib/stats';
+import { getBusinessStats, getHours, getBlockedDates } from '@/lib/stats';
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { findClients, formatClient } from '@/lib/crm';
+import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import type { Booking } from '@/lib/types';
 
@@ -54,6 +55,24 @@ async function upcomingBookings(sb: SupabaseClient): Promise<BookingRow[]> {
     .gte('slot_date', today)
     .in('status', ['pending', 'confirmed']);
   return (data ?? []) as BookingRow[];
+}
+
+
+/** Free (non-overlapping) windows for a date, given confirmed bookings. */
+async function freeWindowsFor(sb: SupabaseClient, date: string, excludeId?: number): Promise<string[]> {
+  const [hours, { data }] = await Promise.all([
+    getHours(sb),
+    sb
+      .from('bookings')
+      .select('id, slot_time')
+      .eq('slot_date', date)
+      .eq('status', 'confirmed'),
+  ]);
+  const busy = ((data ?? []) as { id: number; slot_time: string }[]).filter(
+    (b) => b.slot_time && b.id !== excludeId,
+  );
+  const weekday = new Date(`${date}T00:00:00`).getDay();
+  return windowsFor(hours, weekday).filter((w) => !busy.some((b) => windowsOverlap(b.slot_time, w)));
 }
 
 export async function POST(req: Request) {
@@ -337,8 +356,8 @@ export async function POST(req: Request) {
   // Drill into a single date.
   const day = /^bkday:(\d{4}-\d{2}-\d{2})$/.exec(cq.data);
   if (day) {
-    const rows = await upcomingBookings(sb);
-    const { text, keyboard } = buildBookingsDay(day[1], rows);
+    const [rows, freeWins] = await Promise.all([upcomingBookings(sb), freeWindowsFor(sb, day[1])]);
+    const { text, keyboard } = buildBookingsDay(day[1], rows, freeWins);
     await editMessage(chatId, messageId, text, keyboard);
     await answerCallback(cq.id);
     return ok();
@@ -354,9 +373,92 @@ export async function POST(req: Request) {
     await answerCallback(cq.id, 'Slot freed ✓');
     const date = (row?.slot_date as string | null) ?? null;
     if (date) {
-      const rows = await upcomingBookings(sb);
-      const { text, keyboard } = buildBookingsDay(date, rows);
+      const [rows, freeWins] = await Promise.all([upcomingBookings(sb), freeWindowsFor(sb, date)]);
+      const { text, keyboard } = buildBookingsDay(date, rows, freeWins);
       await editMessage(chatId, messageId, text, keyboard);
+    }
+    return ok();
+  }
+
+  // Move a booking: pick a day → pick a free window → done.
+  const mv = /^bkmv:(\d+)$/.exec(cq.data);
+  if (mv) {
+    const id = Number(mv[1]);
+    const blocked = new Set(await getBlockedDates(sb));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days: string[] = [];
+    for (let i = 0; days.length < 10 && i < 21; i++) {
+      const d = new Date(today.getTime() + i * 86400000).toISOString().slice(0, 10);
+      if (!blocked.has(d)) days.push(d);
+    }
+    const rows: { text: string; callback_data: string }[][] = [];
+    for (let i = 0; i < days.length; i += 2) {
+      rows.push(
+        days.slice(i, i + 2).map((d) => ({
+          text: new Date(`${d}T00:00:00`).toLocaleDateString('en-IE', { weekday: 'short', day: '2-digit', month: 'short' }),
+          callback_data: `bkmvd:${id}:${d}`,
+        })),
+      );
+    }
+    rows.push([{ text: '← Back', callback_data: 'bklist' }]);
+    await editMessage(chatId, messageId, '🕓 <b>Move booking</b> — pick a new day:', { inline_keyboard: rows });
+    await answerCallback(cq.id);
+    return ok();
+  }
+
+  const mvd = /^bkmvd:(\d+):(\d{4}-\d{2}-\d{2})$/.exec(cq.data);
+  if (mvd) {
+    const id = Number(mvd[1]);
+    const date = mvd[2];
+    const wins = await freeWindowsFor(sb, date, id);
+    if (!wins.length) {
+      await answerCallback(cq.id, 'No free windows that day — pick another.');
+      return ok();
+    }
+    const rows: { text: string; callback_data: string }[][] = [];
+    for (let i = 0; i < wins.length; i += 2) {
+      rows.push(
+        wins.slice(i, i + 2).map((w) => ({
+          text: w,
+          callback_data: `bkmvt:${id}:${date}:${parseInt(w, 10)}`,
+        })),
+      );
+    }
+    rows.push([{ text: '← Back', callback_data: `bkmv:${id}` }]);
+    await editMessage(
+      chatId,
+      messageId,
+      `🕓 <b>Move booking</b> — free windows on <b>${date}</b>:`,
+      { inline_keyboard: rows },
+    );
+    await answerCallback(cq.id);
+    return ok();
+  }
+
+  const mvt = /^bkmvt:(\d+):(\d{4}-\d{2}-\d{2}):(\d{1,2})$/.exec(cq.data);
+  if (mvt) {
+    const id = Number(mvt[1]);
+    const date = mvt[2];
+    const slotTime = windowLabel(Number(mvt[3]));
+    const { data: bRow } = await sb
+      .from('bookings')
+      .select('name, public_token, slot_date, slot_time')
+      .eq('id', id)
+      .single();
+    await sb.from('bookings').update({ slot_date: date, slot_time: slotTime }).eq('id', id);
+    await answerCallback(cq.id, 'Moved ✓');
+    const [rows, freeWins] = await Promise.all([upcomingBookings(sb), freeWindowsFor(sb, date)]);
+    const { text, keyboard } = buildBookingsDay(date, rows, freeWins);
+    await editMessage(chatId, messageId, text, keyboard);
+    if (bRow?.name) {
+      const label = new Date(`${date}T00:00:00`).toLocaleDateString('en-IE', { weekday: 'short', day: '2-digit', month: 'short' });
+      const track = bRow.public_token ? ` Track it here: ${SITE_URL}/b/${bRow.public_token}` : '';
+      const msgTxt = `Hi ${String(bRow.name).trim().split(/\s+/)[0]}! Quick update — your BMW coding slot is now ${label} · ${slotTime} ✅${track}`;
+      await sendOwnerMessage(
+        `✅ Moved <b>${escapeHtml(String(bRow.name))}</b> → ${label} · ${slotTime}`,
+        { inline_keyboard: [[{ text: '📋 Copy new-time message', copy_text: { text: msgTxt.slice(0, 256) } }]] } as never,
+      );
     }
     return ok();
   }

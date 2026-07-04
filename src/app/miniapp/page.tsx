@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import type { Booking, Review } from '@/lib/types';
 import type { BusinessStats } from '@/lib/stats';
-import { windowsFor, WEEKDAY_LABELS, type HoursMap } from '@/lib/hours';
+import { windowsFor, windowsOverlap, WEEKDAY_LABELS, type HoursMap } from '@/lib/hours';
 
 type ServiceRow = { id: number; title: string; price_label: string; visible: boolean; sort_order: number };
 
@@ -307,7 +307,10 @@ function BookingCard({ b, data, busy, act }: { b: Booking; data: Overview; busy:
               <p className="mb-2 mt-3 font-mono text-[10px] uppercase tracking-wider text-faint">New time</p>
               <div className="flex flex-wrap gap-1.5">
                 {windowsFor(data.hours, new Date(`${pickDay}T00:00:00`).getDay()).map((w) => {
-                  const isTaken = taken.has(`${pickDay}|${w}`);
+                  const isTaken = [...taken].some((entry) => {
+                    const sep = entry.indexOf('|');
+                    return entry.slice(0, sep) === pickDay && windowsOverlap(entry.slice(sep + 1), w);
+                  });
                   return (
                     <button
                       key={w}
