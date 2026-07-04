@@ -53,6 +53,9 @@ export async function registerBotCommands(): Promise<boolean> {
     { command: 'invoice', description: '🧾 Создать PDF-инвойс' },
     { command: 'review', description: '⭐ Тексты «попросите отзыв» со ссылкой' },
     { command: 'calendar', description: '📆 Подписка на календарь записей' },
+    { command: 'client', description: '👤 История клиента: /client имя или номер' },
+    { command: 'reply', description: '📋 Готовые ответы клиентам' },
+    { command: 'paid', description: '💶 Записать оплату: /paid 120 Имя Услуга' },
     { command: 'wa', description: '💬 Ответить в WhatsApp (когда подключим)' },
     { command: 'setup', description: '🔧 Обновить меню команд' },
     { command: 'cancel', description: '✖️ Отменить создание инвойса' },
@@ -100,6 +103,8 @@ export type Lead = {
   public_token?: string;
   /** false when the lead could not be written to the database */
   persisted?: boolean;
+  /** Pre-built "repeat customer" line (HTML), added by the booking route. */
+  repeatNote?: string;
 };
 
 /** Human-readable slot label, e.g. "Mon, 14 Jul · 14:00–16:00". Returns '' if no slot. */
@@ -160,6 +165,7 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
   if (lead.message) lines.push(`💬 <b>Description:</b> ${esc(lead.message)}`);
+  if (lead.repeatNote) lines.push(lead.repeatNote);
   return lines;
 }
 

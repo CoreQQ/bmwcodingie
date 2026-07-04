@@ -248,3 +248,13 @@ create table if not exists wa_chats (
 );
 alter table wa_messages enable row level security;
 alter table wa_chats enable row level security;
+
+-- ── Payments log (/paid command) ────────────────────────────────────
+create table if not exists payments (
+  id bigserial primary key,
+  amount numeric(10,2) not null,
+  client text,
+  service text,
+  created_at timestamptz not null default now()
+);
+alter table payments enable row level security;

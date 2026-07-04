@@ -23,6 +23,8 @@ import { getBusinessStats } from '@/lib/stats';
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { findClients, formatClient } from '@/lib/crm';
+import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import type { Booking } from '@/lib/types';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
@@ -155,6 +157,80 @@ export async function POST(req: Request) {
       );
       return ok();
     }
+    if (/^\/client(@\w+)?\b/.test(text)) {
+      const q = text.replace(/^\/client(@\w+)?\s*/, '').trim();
+      if (q.length < 2) {
+        await sendOwnerMessage('Usage: <code>/client John</code> or <code>/client 0871234567</code>');
+        return ok();
+      }
+      const matches = await findClients(sb, q);
+      if (!matches.length) {
+        await sendOwnerMessage(`No clients found for «${escapeHtml(q)}».`);
+        return ok();
+      }
+      const blocks = matches.map((m) => formatClient(m, escapeHtml).join('\n'));
+      await sendOwnerMessage(['👥 <b>Client history</b>', '━━━━━━━━━━━━━━━━━━━', blocks.join('\n\n')].join('\n'));
+      return ok();
+    }
+    if (/^\/reply(@\w+)?\b/.test(text)) {
+      const key = text.replace(/^\/reply(@\w+)?\s*/, '').trim().toLowerCase();
+      const direct = key ? getReply(key) : undefined;
+      if (direct) {
+        await sendOwnerMessage(`<b>${direct.label}</b>\n<code>${escapeHtml(direct.text)}</code>`);
+        return ok();
+      }
+      const keyboard = {
+        inline_keyboard: CANNED_REPLIES.map((r) => [{ text: r.label, callback_data: `rt:${r.key}` }]),
+      };
+      await sendOwnerMessage('📋 <b>Ready replies</b> — pick one, then tap the text to copy:', keyboard);
+      return ok();
+    }
+    if (/^\/paid(@\w+)?\b/.test(text)) {
+      const rest = text.replace(/^\/paid(@\w+)?\s*/, '').trim();
+      const m = rest.match(/^(\d+(?:[.,]\d{1,2})?)\s*(?:€|eur)?\s*(\S+)?\s*([\s\S]*)?$/i);
+      if (!rest || !m) {
+        // No args → show the money summary.
+        const { data: pays } = await sb
+          .from('payments')
+          .select('amount, client, service, created_at')
+          .order('created_at', { ascending: false })
+          .limit(200);
+        const list = (pays ?? []) as { amount: number; client: string | null; service: string | null; created_at: string }[];
+        if (!list.length) {
+          await sendOwnerMessage('💶 No payments logged yet.\nRecord one: <code>/paid 120 John CarPlay</code>');
+          return ok();
+        }
+        const since = (d: number) => Date.now() - d * 86400000;
+        const sum = (ms: number) =>
+          list.filter((x) => new Date(x.created_at).getTime() >= ms).reduce((a, x) => a + Number(x.amount || 0), 0);
+        const lines = [
+          '💶 <b>Money</b>',
+          '━━━━━━━━━━━━━━━━━━━',
+          `This week: <b>€${sum(since(7)).toFixed(0)}</b> · This month: <b>€${sum(since(30)).toFixed(0)}</b>`,
+          '',
+          '<b>Recent:</b>',
+        ];
+        for (const x of list.slice(0, 6)) {
+          const d = new Date(x.created_at).toLocaleDateString('en-IE', { day: '2-digit', month: 'short' });
+          lines.push(`  €${Number(x.amount).toFixed(0)} — ${escapeHtml([x.client, x.service].filter(Boolean).join(' · ') || '—')} (${d})`);
+        }
+        lines.push('', 'Add: <code>/paid 120 John CarPlay</code>');
+        await sendOwnerMessage(lines.join('\n'));
+        return ok();
+      }
+      const amount = parseFloat(m[1].replace(',', '.'));
+      const client = (m[2] || '').trim();
+      const service = (m[3] || '').trim();
+      const { error } = await sb.from('payments').insert({ amount, client: client || null, service: service || null });
+      if (error) {
+        await sendOwnerMessage(`❌ Could not save: ${escapeHtml(error.message)}\n(Run the payments migration in Supabase if you haven't.)`);
+        return ok();
+      }
+      await sendOwnerMessage(
+        `✅ Logged <b>€${amount.toFixed(0)}</b>${client ? ` — ${escapeHtml(client)}` : ''}${service ? ` · ${escapeHtml(service)}` : ''}\nSee totals: /paid`,
+      );
+      return ok();
+    }
     if (/^\/review(@\w+)?\b/.test(text)) {
       // Optional "/review Name Service" — first token is the name.
       const rest = text.replace(/^\/review(@\w+)?\s*/, '').trim();
@@ -187,6 +263,9 @@ export async function POST(req: Request) {
         `📥 Enquiries: <b>${s.last7}</b> this week · <b>${s.last30}</b> this month · ${s.total} all time`,
         `📅 Slots: ✅ ${s.confirmedUpcoming} confirmed upcoming · ⏳ ${s.pending} pending`,
       ];
+      if (s.paymentsCount > 0) {
+        lines.push(`💶 Revenue: <b>€${s.revenue7.toFixed(0)}</b> this week · <b>€${s.revenue30.toFixed(0)}</b> this month`);
+      }
       if (s.topServices.length) {
         lines.push('', '<b>Most requested:</b>');
         for (const t of s.topServices) lines.push(`  ${t.count} × ${t.service}`);
@@ -217,6 +296,14 @@ export async function POST(req: Request) {
 
   const chatId = cq.message.chat.id;
   const messageId = cq.message.message_id;
+
+  // Canned reply pick → send the text as a tap-to-copy block.
+  if (cq.data.startsWith('rt:')) {
+    const r = getReply(cq.data.slice(3));
+    await answerCallback(cq.id);
+    if (r) await sendOwnerMessage(`<b>${r.label}</b>\n<code>${escapeHtml(r.text)}</code>`);
+    return ok();
+  }
 
   // WhatsApp AI pause/resume per chat.
   if (cq.data.startsWith('wap:') || cq.data.startsWith('war:')) {
