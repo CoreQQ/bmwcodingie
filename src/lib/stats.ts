@@ -9,6 +9,9 @@ export type BusinessStats = {
   confirmedUpcoming: number;
   topServices: { service: string; count: number }[];
   nextBookings: Booking[];
+  revenue7: number;
+  revenue30: number;
+  paymentsCount: number;
 };
 
 /** Aggregates booking data for the admin dashboard and the bot's /stats. */
@@ -18,6 +21,14 @@ export async function getBusinessStats(sb: SupabaseClient): Promise<BusinessStat
     .select('*')
     .order('created_at', { ascending: false });
   const bookings = (data ?? []) as Booking[];
+
+  // Revenue from the /paid log. The table may not exist yet — treat as empty.
+  const { data: pays } = await sb
+    .from('payments')
+    .select('amount, created_at')
+    .order('created_at', { ascending: false })
+    .limit(500);
+  const payments = (pays ?? []) as { amount: number; created_at: string }[];
 
   const now = Date.now();
   const days = (n: number) => now - n * 24 * 60 * 60 * 1000;
@@ -42,6 +53,11 @@ export async function getBusinessStats(sb: SupabaseClient): Promise<BusinessStat
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
+  const revenueSince = (ms: number) =>
+    payments
+      .filter((p) => new Date(p.created_at).getTime() >= ms)
+      .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
   return {
     total: bookings.length,
     last7,
@@ -50,6 +66,9 @@ export async function getBusinessStats(sb: SupabaseClient): Promise<BusinessStat
     confirmedUpcoming: upcoming.length,
     topServices,
     nextBookings: upcoming.slice(0, 5),
+    revenue7: revenueSince(days(7)),
+    revenue30: revenueSince(days(30)),
+    paymentsCount: payments.length,
   };
 }
 

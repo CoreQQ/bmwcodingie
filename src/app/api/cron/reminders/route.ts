@@ -37,7 +37,17 @@ export async function GET(req: Request) {
     .in('status', ['pending', 'confirmed'])
     .order('slot_time', { ascending: true });
   const rows = (data ?? []) as Booking[];
-  if (!rows.length) return NextResponse.json({ ok: true, skipped: 'empty' });
+
+  // Stale requests: pending for over 24h — easy to lose, costly to ignore.
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: staleData } = await sb
+    .from('bookings')
+    .select('name, service, slot_date, slot_time, created_at')
+    .eq('status', 'pending')
+    .lt('created_at', dayAgo)
+    .order('created_at', { ascending: true })
+    .limit(10);
+  const stale = (staleData ?? []) as Booking[];
 
   const icon = (s: string) => (s === 'confirmed' ? '✅' : '⏳');
   const fmt = (list: Booking[]) =>
@@ -46,13 +56,22 @@ export async function GET(req: Request) {
   const todays = rows.filter((b) => b.slot_date === today);
   const tomorrows = rows.filter((b) => b.slot_date === tomorrow);
 
-  const lines = ['⏰ <b>Daily agenda</b>', '━━━━━━━━━━━━━━━━━━━'];
-  lines.push(`<b>Today</b> (${today}):`);
-  lines.push(...(todays.length ? fmt(todays) : ['  —']));
-  lines.push('', `<b>Tomorrow</b> (${tomorrow}):`);
-  lines.push(...(tomorrows.length ? fmt(tomorrows) : ['  —']));
-
-  await sendOwnerMessage(lines.join('\n'));
+  if (rows.length || stale.length) {
+    const lines = ['⏰ <b>Daily agenda</b>', '━━━━━━━━━━━━━━━━━━━'];
+    lines.push(`<b>Today</b> (${today}):`);
+    lines.push(...(todays.length ? fmt(todays) : ['  —']));
+    lines.push('', `<b>Tomorrow</b> (${tomorrow}):`);
+    lines.push(...(tomorrows.length ? fmt(tomorrows) : ['  —']));
+    if (stale.length) {
+      lines.push('', `⚠️ <b>Waiting for your reply over 24h:</b>`);
+      for (const b of stale) {
+        const slot = b.slot_date ? ` · ${b.slot_date} ${b.slot_time ?? ''}`.trimEnd() : '';
+        lines.push(`  ⏳ ${b.name}${b.service ? ` — ${b.service}` : ''}${slot}`);
+      }
+      lines.push('  → /bookings to confirm or free them');
+    }
+    await sendOwnerMessage(lines.join('\n'));
+  }
 
   // Review nudge: yesterday's confirmed jobs, one copy-button per client.
   if (hasReviewUrl()) {

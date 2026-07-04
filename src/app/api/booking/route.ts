@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { notifyTelegram } from '@/lib/telegram';
+import { repeatCustomerNote } from '@/lib/crm';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
@@ -63,6 +64,13 @@ export async function POST(req: Request) {
 
   // Saved — notify. Telegram failure never affects the visitor's success response.
   const token = (data.public_token as string) || undefined;
-  await notifyTelegram({ ...lead, id: data.id as number, public_token: token, persisted: true });
+  const repeatNote = await repeatCustomerNote(sb, contact, data.id as number).catch(() => null);
+  await notifyTelegram({
+    ...lead,
+    id: data.id as number,
+    public_token: token,
+    persisted: true,
+    repeatNote: repeatNote ?? undefined,
+  });
   return NextResponse.json({ ok: true, persisted: true, token });
 }
