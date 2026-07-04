@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { validateMiniAppAuth } from '@/lib/miniappAuth';
 import { getBusinessStats, getSchedule, getBlockedDates, getHours } from '@/lib/stats';
+import { REVIEW_URL } from '@/lib/reviewTemplates';
 
 export const runtime = 'nodejs';
 
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
         hours,
         services: servicesRes.data ?? [],
         reviews: reviewsRes.data ?? [],
-        reviewUrl: process.env.GOOGLE_REVIEW_URL ?? '',
+        reviewUrl: REVIEW_URL,
       });
     }
 

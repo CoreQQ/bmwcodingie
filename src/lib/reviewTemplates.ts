@@ -3,7 +3,11 @@
 // Google's policies and risks the whole Business Profile). The link points at
 // GOOGLE_REVIEW_URL when it's set.
 
-const REVIEW_URL = process.env.GOOGLE_REVIEW_URL || '';
+// The Google "write a review" link for our Business Profile. Public by design
+// (it's the link we hand customers), so it's baked in as the default and can
+// still be overridden with the GOOGLE_REVIEW_URL env var.
+export const REVIEW_URL =
+  process.env.GOOGLE_REVIEW_URL || 'https://g.page/r/CSrBIpWSafFsECE/review';
 
 function firstName(name: string): string {
   return name.trim().split(/\s+/)[0] || 'there';
