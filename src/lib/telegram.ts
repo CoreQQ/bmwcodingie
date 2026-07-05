@@ -109,6 +109,8 @@ export type Lead = {
   repeatNote?: string;
   /** Pre-built client-code / blacklist line (HTML), added by the booking route. */
   clientNote?: string;
+  /** Ad attribution, e.g. "google / cpc / carplay" — set when the visitor came from a campaign. */
+  source?: string;
 };
 
 /** Human-readable slot label, e.g. "Mon, 14 Jul · 14:00–16:00". Returns '' if no slot. */
@@ -169,6 +171,7 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
   if (lead.message) lines.push(`💬 <b>Description:</b> ${esc(lead.message)}`);
+  if (lead.source) lines.push(`📣 <b>Source:</b> ${esc(lead.source)}`);
   if (lead.clientNote) lines.push(lead.clientNote);
   if (lead.repeatNote) lines.push(lead.repeatNote);
   return lines;
@@ -435,6 +438,7 @@ export type VisitorPing = {
   isp?: string;
   language?: string;
   isReturning?: boolean;
+  source?: string;
 };
 
 /** Sends a "someone's on the site" notification with full visit details. */
@@ -445,6 +449,7 @@ export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
     `🕒 <b>Time:</b> ${esc(dublinTime())}`,
     `📄 <b>Page:</b> ${esc(v.path)}`,
     `🔗 <b>Source:</b> ${esc(v.referrer || 'Direct / unknown')}`,
+    ...(v.source ? [`📣 <b>Campaign:</b> ${esc(v.source)}`] : []),
     `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}${v.os ? ` · ${esc(v.os)}` : ''}`,
   ];
   if (v.browser) lines.push(`🧭 <b>Browser:</b> ${esc(v.browser)}`);

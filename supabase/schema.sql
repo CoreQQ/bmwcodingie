@@ -276,3 +276,6 @@ create table if not exists clients (
   created_at timestamptz not null default now()
 );
 alter table clients enable row level security;
+
+-- ── Ad attribution on bookings (utm/gclid label captured on the site) ──
+alter table bookings add column if not exists source text;

@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { MetaPixel } from '@/components/site/MetaPixel';
 import { GoogleAdsTag } from '@/components/site/GoogleAdsTag';
+import { Attribution } from '@/components/site/Attribution';
 import { VisitorPing } from '@/components/site/VisitorPing';
 
 const bebas = Bebas_Neue({
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased">
         <MetaPixel />
         <GoogleAdsTag />
+        <Attribution />
         <noscript>
           <style>{`.reveal{opacity:1!important;transform:none!important;animation:none!important}`}</style>
         </noscript>

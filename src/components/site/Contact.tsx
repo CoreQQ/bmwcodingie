@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { trackMetaEvent } from './MetaPixel';
+import { getAttribution } from '@/lib/attribution';
 import { trackGoogleConversion } from './GoogleAdsTag';
 import { Link } from '@/i18n/navigation';
 import { SlotPicker } from './SlotPicker';
@@ -65,7 +66,7 @@ export function Contact({
       const res = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, source: getAttribution() }),
       });
       if (!res.ok) throw new Error('failed');
       const data = await res.json().catch(() => ({}));
