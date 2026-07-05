@@ -49,12 +49,14 @@ export async function POST(req: Request) {
   }
 
   // Insert and read the new id back so the Telegram confirm/decline buttons
-  // can reference this exact booking.
-  const { data, error } = await sb
-    .from('bookings')
-    .insert({ name, contact, bmw_model, service, message, slot_date, slot_time, source, status: 'pending' })
-    .select('id, public_token')
-    .single();
+  // can reference this exact booking. The source column is a recent addition —
+  // if its migration hasn't run yet, retry without it rather than lose a lead.
+  const row = { name, contact, bmw_model, service, message, slot_date, slot_time, source, status: 'pending' };
+  let { data, error } = await sb.from('bookings').insert(row).select('id, public_token').single();
+  if (error && /source/i.test(error.message)) {
+    const { source: _dropped, ...withoutSource } = row;
+    ({ data, error } = await sb.from('bookings').insert(withoutSource).select('id, public_token').single());
+  }
 
   if (error || !data) {
     console.error('[booking] insert failed:', error?.message);
