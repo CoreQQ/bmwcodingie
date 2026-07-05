@@ -45,6 +45,7 @@ export async function POST(req: Request) {
   const referrer = body.referrer ? String(body.referrer).trim().slice(0, 200) : undefined;
   const device = body.device === 'mobile' ? 'mobile' : 'desktop';
   const isReturning = body.isReturning === true;
+  const source = body.source ? String(body.source).trim().slice(0, 160) : undefined;
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const last = lastNotified.get(ip);
@@ -57,6 +58,6 @@ export async function POST(req: Request) {
   const language = req.headers.get('accept-language')?.split(',')[0]?.trim();
   const { country, city, isp } = await geolocate(ip);
 
-  await notifyVisitor({ path, referrer, device, ip, browser, os, country, city, isp, language, isReturning });
+  await notifyVisitor({ path, referrer, device, ip, browser, os, country, city, isp, language, isReturning, source });
   return NextResponse.json({ ok: true });
 }

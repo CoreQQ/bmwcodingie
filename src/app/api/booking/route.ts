@@ -26,6 +26,7 @@ export async function POST(req: Request) {
   const bmw_model = String(body.bmw_model ?? '').trim().slice(0, 160);
   const service = String(body.service ?? '').trim().slice(0, 160);
   const message = String(body.message ?? '').trim().slice(0, 2000);
+  const source = String(body.source ?? '').trim().slice(0, 160) || null;
 
   // Requested slot — optional. slot_date must be a plain YYYY-MM-DD date.
   const rawDate = String(body.slot_date ?? '').trim().slice(0, 10);
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Name and contact required' }, { status: 400 });
   }
 
-  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time };
+  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, source: source ?? undefined };
   const sb = getSupabaseAdmin();
 
   // No DB configured yet — accept the lead so the form still works in preview,
@@ -51,7 +52,7 @@ export async function POST(req: Request) {
   // can reference this exact booking.
   const { data, error } = await sb
     .from('bookings')
-    .insert({ ...lead, status: 'pending' })
+    .insert({ name, contact, bmw_model, service, message, slot_date, slot_time, source, status: 'pending' })
     .select('id, public_token')
     .single();
 
