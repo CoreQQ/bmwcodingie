@@ -26,6 +26,7 @@ import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib
 import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
 import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
+import { CHEAT_SHEET, CHEAT_DISCLAIMER, findCheat, formatCheat } from '@/lib/cheatsheet';
 import type { Booking } from '@/lib/types';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
@@ -249,6 +250,76 @@ export async function POST(req: Request) {
       }
       const blocks = matches.map((m) => formatClient(m, escapeHtml).join('\n'));
       await sendOwnerMessage(['👥 <b>Client history</b>', '━━━━━━━━━━━━━━━━━━━', blocks.join('\n\n')].join('\n'));
+      return ok();
+    }
+    if (/^\/cheat(@\w+)?\b/.test(text)) {
+      const rest = text.replace(/^\/cheat(@\w+)?\s*/, '').trim();
+
+      // /cheat add Title | body text
+      const addM = /^add\s+([\s\S]+)$/i.exec(rest);
+      if (addM) {
+        const [title, ...bodyParts] = addM[1].split('|');
+        const body = bodyParts.join('|').trim();
+        if (!title.trim() || !body) {
+          await sendOwnerMessage('Add a note: <code>/cheat add F30 ambient | FEM_BODY → AMBIENT = aktiv, 11 colours</code>');
+          return ok();
+        }
+        const { error } = await sb
+          .from('cheat_notes')
+          .insert({ title: title.trim().slice(0, 120), body: body.slice(0, 1000), keywords: title.trim().toLowerCase() });
+        if (error) {
+          await sendOwnerMessage(`❌ ${escapeHtml(error.message)} — run the cheat_notes migration in Supabase.`);
+          return ok();
+        }
+        await sendOwnerMessage(`✅ Saved to your cheat-sheet: <b>${escapeHtml(title.trim())}</b>`);
+        return ok();
+      }
+
+      // /cheat del 5
+      const delM = /^del(?:ete)?\s+(\d+)$/i.exec(rest);
+      if (delM) {
+        await sb.from('cheat_notes').delete().eq('id', Number(delM[1]));
+        await sendOwnerMessage(`🗑 Deleted note #${delM[1]}.`);
+        return ok();
+      }
+
+      // No query → list categories + own notes.
+      if (!rest) {
+        const { data: mine } = await sb
+          .from('cheat_notes')
+          .select('id, title')
+          .order('created_at', { ascending: false })
+          .limit(30);
+        const lines = ['🔧 <b>Coding cheat-sheet</b>', CHEAT_DISCLAIMER, '', '<b>Search:</b> <code>/cheat vim</code> · <code>/cheat mirrors</code>', '', '<b>Built-in topics:</b>'];
+        lines.push(CHEAT_SHEET.map((e) => `• ${escapeHtml(e.title)}`).join('\n'));
+        const list = (mine ?? []) as { id: number; title: string }[];
+        if (list.length) {
+          lines.push('', '<b>Your notes:</b>');
+          for (const n of list) lines.push(`• <code>#${n.id}</code> ${escapeHtml(n.title)}`);
+        }
+        lines.push('', 'Add: <code>/cheat add Title | details</code> · Remove: <code>/cheat del 5</code>');
+        await sendOwnerMessage(lines.join('\n'));
+        return ok();
+      }
+
+      // Search built-in + custom notes.
+      const builtin = findCheat(rest);
+      const { data: notesData } = await sb
+        .from('cheat_notes')
+        .select('id, title, body, keywords')
+        .or(`title.ilike.%${rest}%,keywords.ilike.%${rest}%,body.ilike.%${rest}%`)
+        .limit(5);
+      const notes = (notesData ?? []) as { id: number; title: string; body: string }[];
+
+      if (!builtin.length && !notes.length) {
+        await sendOwnerMessage(`No cheat entries for «${escapeHtml(rest)}». See all: /cheat`);
+        return ok();
+      }
+      const blocks: string[] = builtin.map((e) => formatCheat(e, escapeHtml));
+      for (const n of notes) {
+        blocks.push(`📝 <b>${escapeHtml(n.title)}</b> <code>#${n.id}</code>\n${escapeHtml(n.body)}`);
+      }
+      await sendOwnerMessage([blocks.join('\n\n'), '', CHEAT_DISCLAIMER].join('\n'));
       return ok();
     }
     if (/^\/reply(@\w+)?\b/.test(text)) {

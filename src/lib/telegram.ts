@@ -55,6 +55,7 @@ export async function registerBotCommands(): Promise<boolean> {
     { command: 'calendar', description: '📆 Подписка на календарь записей' },
     { command: 'client', description: '👤 История клиента: /client имя или номер' },
     { command: 'reply', description: '📋 Готовые ответы клиентам' },
+    { command: 'cheat', description: '🔧 Шпаргалка кодировок: /cheat vim' },
     { command: 'paid', description: '💶 Записать оплату: /paid 120 Имя Услуга' },
     { command: 'ban', description: '⛔️ Забанить: /ban C-007 причина' },
     { command: 'banlist', description: '📵 Список забаненных' },

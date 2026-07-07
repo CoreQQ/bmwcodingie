@@ -279,3 +279,13 @@ alter table clients enable row level security;
 
 -- ── Ad attribution on bookings (utm/gclid label captured on the site) ──
 alter table bookings add column if not exists source text;
+
+-- ── Personal coding cheat-sheet notes (/cheat add) ──────────────────
+create table if not exists cheat_notes (
+  id bigserial primary key,
+  title text not null,
+  body text not null,
+  keywords text,
+  created_at timestamptz not null default now()
+);
+alter table cheat_notes enable row level security;
