@@ -12,6 +12,35 @@ function reviewAsk(name: string, service: string): string {
 
 export const runtime = 'nodejs';
 
+// IndexNow: tell Bing-family crawlers (which also feed ChatGPT, Copilot and
+// DuckDuckGo) that our key pages changed. Free, no auth beyond the key file.
+const INDEXNOW_KEY = 'f8a4c1d9e2b7465a9c3d1e8f7b2a6054';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
+
+async function pingIndexNow(): Promise<void> {
+  try {
+    const { BLOG_POSTS } = await import('@/lib/blog');
+    const urls = [
+      `${SITE}/`,
+      `${SITE}/bmw-coding-ireland`,
+      `${SITE}/blog`,
+      ...BLOG_POSTS.map((p) => `${SITE}/blog/${p.slug}`),
+    ];
+    await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        host: new URL(SITE).host,
+        key: INDEXNOW_KEY,
+        keyLocation: `${SITE}/${INDEXNOW_KEY}.txt`,
+        urlList: urls,
+      }),
+    });
+  } catch {
+    // best-effort — never fail the cron over it
+  }
+}
+
 // Daily agenda reminder (Vercel cron, 07:00 UTC — see vercel.json). Sends the
 // owner today's and tomorrow's slot bookings; stays silent when both are empty.
 export async function GET(req: Request) {
@@ -93,6 +122,8 @@ export async function GET(req: Request) {
       );
     }
   }
+
+  await pingIndexNow();
 
   return NextResponse.json({ ok: true, sent: true });
 }
