@@ -354,10 +354,15 @@ export function buildBookingsDay(
     );
   }
 
-  const buttons: InlineButton[][] = list.map((r) => [
-    { text: `🗑 Free ${r.slot_time}`, callback_data: `bkfree:${r.id}` },
-    { text: '🕓 Move', callback_data: `bkmv:${r.id}` },
-  ]);
+  const buttons: InlineButton[][] = [];
+  for (const r of list) {
+    buttons.push([{ text: `— ${r.slot_time} · ${r.name} —`, callback_data: `bknoop:${r.id}` }]);
+    buttons.push([
+      { text: '💶 Paid', callback_data: `bkpaid:${r.id}` },
+      { text: '🕓 Move', callback_data: `bkmv:${r.id}` },
+      { text: '🗑 Free', callback_data: `bkfree:${r.id}` },
+    ]);
+  }
   buttons.push([{ text: '← Back to dates', callback_data: 'bklist' }]);
 
   return { text: lines.join('\n'), keyboard: { inline_keyboard: buttons } };
