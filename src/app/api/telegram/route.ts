@@ -10,6 +10,7 @@ import {
   isOwner,
   registerBotCommands,
   sendOwnerMessage,
+  sendOwnerWithMarkup,
   type BookingRow,
   type Lead,
 } from '@/lib/telegram';
@@ -508,6 +509,72 @@ export async function POST(req: Request) {
       const { text, keyboard } = buildBookingsDay(date, rows, freeWins);
       await editMessage(chatId, messageId, text, keyboard);
     }
+    return ok();
+  }
+
+  // Header row in the day view — just a label, no action.
+  if (cq.data.startsWith('bknoop:')) {
+    await answerCallback(cq.id);
+    return ok();
+  }
+
+  // "💶 Paid" on a booking → show quick amount choices.
+  const paid = /^bkpaid:(\d+)$/.exec(cq.data);
+  if (paid) {
+    const id = Number(paid[1]);
+    const { data: bRow } = await sb
+      .from('bookings')
+      .select('name, service')
+      .eq('id', id)
+      .single();
+    if (!bRow) {
+      await answerCallback(cq.id, 'Booking not found.');
+      return ok();
+    }
+    // Offer the service's own price (parsed) plus common amounts.
+    const amounts = new Set<number>();
+    if (bRow.service) {
+      const { data: svc } = await sb
+        .from('services')
+        .select('price_label')
+        .eq('title', bRow.service)
+        .maybeSingle();
+      const p = svc?.price_label ? parseInt(String(svc.price_label).replace(/[^\d]/g, ''), 10) : NaN;
+      if (Number.isFinite(p) && p > 0) amounts.add(p);
+    }
+    [60, 80, 120, 150].forEach((a) => amounts.add(a));
+    const sorted = [...amounts].sort((a, b) => a - b);
+    const rows: { text: string; callback_data: string }[][] = [];
+    for (let i = 0; i < sorted.length; i += 3) {
+      rows.push(sorted.slice(i, i + 3).map((a) => ({ text: `€${a}`, callback_data: `bkpaidamt:${id}:${a}` })));
+    }
+    await sendOwnerWithMarkup(
+      `💶 Log payment for <b>${escapeHtml(String(bRow.name))}</b>${bRow.service ? ` · ${escapeHtml(String(bRow.service))}` : ''}\nPick an amount, or type <code>/paid 137 ${escapeHtml(String(bRow.name).split(/\s+/)[0])}</code> for a custom one.`,
+      { inline_keyboard: rows },
+    );
+    await answerCallback(cq.id);
+    return ok();
+  }
+
+  const paidAmt = /^bkpaidamt:(\d+):(\d+)$/.exec(cq.data);
+  if (paidAmt) {
+    const id = Number(paidAmt[1]);
+    const amount = Number(paidAmt[2]);
+    const { data: bRow } = await sb.from('bookings').select('name, service').eq('id', id).single();
+    const { error } = await sb.from('payments').insert({
+      amount,
+      client: bRow?.name ?? null,
+      service: bRow?.service ?? null,
+    });
+    if (error) {
+      await answerCallback(cq.id, 'Failed — run payments migration.');
+      await sendOwnerMessage(`❌ Could not log payment: ${escapeHtml(error.message)}`);
+      return ok();
+    }
+    await answerCallback(cq.id, `Logged €${amount} ✓`);
+    await sendOwnerMessage(
+      `✅ Logged <b>€${amount}</b> — ${escapeHtml(String(bRow?.name ?? ''))}${bRow?.service ? ` · ${escapeHtml(String(bRow.service))}` : ''}\nTotals: /paid`,
+    );
     return ok();
   }
 
