@@ -119,7 +119,17 @@
     "slotNote": "Intervalul este o cerere — îl confirmăm printr-un mesaj înainte să devină definitiv.",
     "slotTaken": "Ocupat",
     "trackBooking": "Urmărește programarea →",
-    "findUs": "Cum ne găsești →"
+    "findUs": "Cum ne găsești →",
+    "heardLabel": "De unde ai auzit de noi?",
+    "heardPlaceholder": "Alege…",
+    "heardGoogle": "Căutare Google",
+    "heardInstagram": "Instagram",
+    "heardFriend": "Prieten / recomandare",
+    "heardGroup": "Grup / forum BMW",
+    "heardReturning": "Sunt client fidel",
+    "heardOther": "Altele",
+    "contactPrefLabel": "Cum și când să te contactăm",
+    "contactPrefPlaceholder": "ex. WhatsApp după 18:00"
   },
   "Footer": {
     "pitch": "Coding, diagnostic și retrofit BMW independent, în Dublin și în toată Irlanda — la fața locului sau la distanță prin ENET.",

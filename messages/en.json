@@ -119,7 +119,17 @@
     "slotNote": "Slots are requests — we'll confirm by message before they're final.",
     "slotTaken": "Booked",
     "trackBooking": "Track your booking →",
-    "findUs": "How to find the workshop →"
+    "findUs": "How to find the workshop →",
+    "heardLabel": "How did you hear about us?",
+    "heardPlaceholder": "Select…",
+    "heardGoogle": "Google search",
+    "heardInstagram": "Instagram",
+    "heardFriend": "Friend / word of mouth",
+    "heardGroup": "BMW group / forum",
+    "heardReturning": "I'm a returning customer",
+    "heardOther": "Other",
+    "contactPrefLabel": "Best way & time to reach you",
+    "contactPrefPlaceholder": "e.g. WhatsApp after 6pm"
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",

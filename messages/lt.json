@@ -119,7 +119,17 @@
     "slotNote": "Laikas yra užklausa — patvirtinsime jį žinute, kol jis taps galutinis.",
     "slotTaken": "Užimta",
     "trackBooking": "Sekti savo rezervaciją →",
-    "findUs": "Kaip rasti dirbtuves →"
+    "findUs": "Kaip rasti dirbtuves →",
+    "heardLabel": "Iš kur apie mus sužinojote?",
+    "heardPlaceholder": "Pasirinkite…",
+    "heardGoogle": "Google paieška",
+    "heardInstagram": "Instagram",
+    "heardFriend": "Draugas / rekomendacija",
+    "heardGroup": "BMW grupė / forumas",
+    "heardReturning": "Esu nuolatinis klientas",
+    "heardOther": "Kita",
+    "contactPrefLabel": "Kaip ir kada susisiekti",
+    "contactPrefPlaceholder": "pvz. WhatsApp po 18:00"
   },
   "Footer": {
     "pitch": "Nepriklausomas BMW kodavimas, diagnostika ir retrofitai visame Dubline ir Airijoje — gyvai arba nuotoliniu būdu per ENET.",

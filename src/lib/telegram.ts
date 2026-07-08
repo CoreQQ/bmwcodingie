@@ -112,6 +112,18 @@ export type Lead = {
   clientNote?: string;
   /** Ad attribution, e.g. "google / cpc / carplay" — set when the visitor came from a campaign. */
   source?: string;
+  /** "How did you hear about us" — customer-selected. */
+  howHeard?: string;
+  /** Preferred contact channel/time, free text. */
+  contactPref?: string;
+  /** First page the visitor landed on (intent signal). */
+  landing?: string;
+  /** Device · OS · browser, derived from the request. */
+  device?: string;
+  /** Browser/accept language. */
+  language?: string;
+  /** How long the visitor browsed before booking, e.g. "3m 20s". */
+  dwell?: string;
 };
 
 /** Human-readable slot label, e.g. "Mon, 14 Jul · 14:00–16:00". Returns '' if no slot. */
@@ -172,7 +184,13 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
   if (lead.message) lines.push(`💬 <b>Description:</b> ${esc(lead.message)}`);
-  if (lead.source) lines.push(`📣 <b>Source:</b> ${esc(lead.source)}`);
+  if (lead.contactPref) lines.push(`📞 <b>Reach:</b> ${esc(lead.contactPref)}`);
+  if (lead.howHeard) lines.push(`👋 <b>Heard via:</b> ${esc(lead.howHeard)}`);
+  if (lead.source) lines.push(`📣 <b>Ad source:</b> ${esc(lead.source)}`);
+  if (lead.landing) lines.push(`📄 <b>Landed on:</b> ${esc(lead.landing)}`);
+  const ctx = [lead.device, lead.language].filter(Boolean).join(' · ');
+  if (ctx) lines.push(`🖥 <b>Device:</b> ${esc(ctx)}`);
+  if (lead.dwell) lines.push(`⏱ <b>On site:</b> ${esc(lead.dwell)} before booking`);
   if (lead.clientNote) lines.push(lead.clientNote);
   if (lead.repeatNote) lines.push(lead.repeatNote);
   return lines;

@@ -119,7 +119,17 @@
     "slotNote": "Слот — это заявка: мы подтвердим её сообщением, прежде чем она станет окончательной.",
     "slotTaken": "Занято",
     "trackBooking": "Отследить вашу запись →",
-    "findUs": "Как найти мастерскую →"
+    "findUs": "Как найти мастерскую →",
+    "heardLabel": "Откуда узнали о нас?",
+    "heardPlaceholder": "Выберите…",
+    "heardGoogle": "Поиск Google",
+    "heardInstagram": "Instagram",
+    "heardFriend": "Друг / по рекомендации",
+    "heardGroup": "BMW-группа / форум",
+    "heardReturning": "Я уже ваш клиент",
+    "heardOther": "Другое",
+    "contactPrefLabel": "Как и когда удобнее связаться",
+    "contactPrefPlaceholder": "напр. WhatsApp после 18:00"
   },
   "Footer": {
     "pitch": "Независимое кодирование, диагностика и установка дополнительного оборудования для BMW по Dublin и Ирландии — лично или удалённо через ENET.",
