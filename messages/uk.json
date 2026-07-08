@@ -119,7 +119,17 @@
     "slotNote": "Слот — це запит: ми підтвердимо його повідомленням, перш ніж він стане остаточним.",
     "slotTaken": "Зайнято",
     "trackBooking": "Відстежити ваш запис →",
-    "findUs": "Як знайти майстерню →"
+    "findUs": "Як знайти майстерню →",
+    "heardLabel": "Звідки дізналися про нас?",
+    "heardPlaceholder": "Оберіть…",
+    "heardGoogle": "Пошук Google",
+    "heardInstagram": "Instagram",
+    "heardFriend": "Друг / за рекомендацією",
+    "heardGroup": "BMW-група / форум",
+    "heardReturning": "Я вже ваш клієнт",
+    "heardOther": "Інше",
+    "contactPrefLabel": "Як і коли зручніше зв’язатися",
+    "contactPrefPlaceholder": "напр. WhatsApp після 18:00"
   },
   "Footer": {
     "pitch": "Незалежне кодування, діагностика та retrofit BMW по всьому Дубліну та Ірландії — особисто або віддалено через ENET.",

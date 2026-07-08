@@ -119,7 +119,17 @@
     "slotNote": "Termin to prośba — potwierdzimy go wiadomością, zanim stanie się ostateczny.",
     "slotTaken": "Zajęte",
     "trackBooking": "Śledź swoją rezerwację →",
-    "findUs": "Jak trafić do warsztatu →"
+    "findUs": "Jak trafić do warsztatu →",
+    "heardLabel": "Skąd o nas wiesz?",
+    "heardPlaceholder": "Wybierz…",
+    "heardGoogle": "Wyszukiwarka Google",
+    "heardInstagram": "Instagram",
+    "heardFriend": "Znajomy / polecenie",
+    "heardGroup": "Grupa / forum BMW",
+    "heardReturning": "Jestem stałym klientem",
+    "heardOther": "Inne",
+    "contactPrefLabel": "Jak i kiedy się kontaktować",
+    "contactPrefPlaceholder": "np. WhatsApp po 18:00"
   },
   "Footer": {
     "pitch": "Niezależne kodowanie, diagnostyka i retrofity BMW na terenie Dublina i całej Irlandii — na miejscu lub zdalnie przez ENET.",

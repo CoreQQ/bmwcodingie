@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { trackMetaEvent } from './MetaPixel';
-import { getAttribution } from '@/lib/attribution';
+import { getAttribution, getLanding, getTimeOnSite } from '@/lib/attribution';
 import { trackGoogleConversion } from './GoogleAdsTag';
 import { Link } from '@/i18n/navigation';
 import { SlotPicker } from './SlotPicker';
@@ -27,6 +27,8 @@ export function Contact({
     contact: '',
     bmw_model: '',
     service: '',
+    how_heard: '',
+    contact_pref: '',
     message: '',
     slot_date: '',
     slot_time: '',
@@ -66,7 +68,13 @@ export function Contact({
       const res = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, source: getAttribution() }),
+        body: JSON.stringify({
+          ...form,
+          source: getAttribution(),
+          landing: getLanding(),
+          language: typeof navigator !== 'undefined' ? navigator.language : undefined,
+          dwell: getTimeOnSite(),
+        }),
       });
       if (!res.ok) throw new Error('failed');
       const data = await res.json().catch(() => ({}));
@@ -74,7 +82,7 @@ export function Contact({
       setStatus('sent');
       trackMetaEvent('Lead', { content_name: form.service || 'General enquiry' });
       trackGoogleConversion();
-      setForm({ name: '', contact: '', bmw_model: '', service: '', message: '', slot_date: '', slot_time: '' });
+      setForm({ name: '', contact: '', bmw_model: '', service: '', how_heard: '', contact_pref: '', message: '', slot_date: '', slot_time: '' });
     } catch {
       setStatus('error');
       setErrorMsg(t('submitError'));
@@ -211,6 +219,28 @@ export function Contact({
                     className={`${inputCls} resize-none`}
                   />
                 </Field>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label={t('heardLabel')}>
+                    <select value={form.how_heard} onChange={update('how_heard')} className={inputCls}>
+                      <option value="">{t('heardPlaceholder')}</option>
+                      <option value="Google" className="bg-graphite-800">{t('heardGoogle')}</option>
+                      <option value="Instagram" className="bg-graphite-800">{t('heardInstagram')}</option>
+                      <option value="Friend / word of mouth" className="bg-graphite-800">{t('heardFriend')}</option>
+                      <option value="BMW group / forum" className="bg-graphite-800">{t('heardGroup')}</option>
+                      <option value="Returning customer" className="bg-graphite-800">{t('heardReturning')}</option>
+                      <option value="Other" className="bg-graphite-800">{t('heardOther')}</option>
+                    </select>
+                  </Field>
+                  <Field label={t('contactPrefLabel')}>
+                    <input
+                      value={form.contact_pref}
+                      onChange={update('contact_pref')}
+                      placeholder={t('contactPrefPlaceholder')}
+                      className={inputCls}
+                    />
+                  </Field>
+                </div>
 
                 <SlotPicker
                   value={{ date: form.slot_date, time: form.slot_time }}

@@ -289,3 +289,8 @@ create table if not exists cheat_notes (
   created_at timestamptz not null default now()
 );
 alter table cheat_notes enable row level security;
+
+-- ── Richer booking context (optional lead fields) ───────────────────
+alter table bookings add column if not exists how_heard text;
+alter table bookings add column if not exists contact_pref text;
+alter table bookings add column if not exists landing text;

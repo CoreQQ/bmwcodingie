@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { parseUserAgent } from '@/lib/parseUserAgent';
 import { notifyTelegram } from '@/lib/telegram';
 import { repeatCustomerNote, ensureClient, clientCode } from '@/lib/crm';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
@@ -27,6 +28,18 @@ export async function POST(req: Request) {
   const service = String(body.service ?? '').trim().slice(0, 160);
   const message = String(body.message ?? '').trim().slice(0, 2000);
   const source = String(body.source ?? '').trim().slice(0, 160) || null;
+  const how_heard = String(body.how_heard ?? '').trim().slice(0, 60) || null;
+  const contact_pref = String(body.contact_pref ?? '').trim().slice(0, 120) || null;
+  const landing = String(body.landing ?? '').trim().slice(0, 120) || null;
+  const dwell = String(body.dwell ?? '').trim().slice(0, 20) || undefined;
+
+  // Free context from the request itself — no extra form fields needed.
+  const ua = req.headers.get('user-agent') || '';
+  const { browser, os } = parseUserAgent(ua);
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
+  const device = ua ? `${isMobile ? 'Mobile' : 'Desktop'}${os ? ` · ${os}` : ''}${browser ? ` · ${browser}` : ''}` : undefined;
+  const acceptLang = (req.headers.get('accept-language') || '').split(',')[0].trim().slice(0, 20);
+  const language = String(body.language ?? '').trim().slice(0, 20) || acceptLang || undefined;
 
   // Requested slot — optional. slot_date must be a plain YYYY-MM-DD date.
   const rawDate = String(body.slot_date ?? '').trim().slice(0, 10);
@@ -37,7 +50,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Name and contact required' }, { status: 400 });
   }
 
-  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, source: source ?? undefined };
+  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, source: source ?? undefined, howHeard: how_heard ?? undefined, contactPref: contact_pref ?? undefined, landing: landing ?? undefined, device, language, dwell };
   const sb = getSupabaseAdmin();
 
   // No DB configured yet — accept the lead so the form still works in preview,
@@ -49,13 +62,25 @@ export async function POST(req: Request) {
   }
 
   // Insert and read the new id back so the Telegram confirm/decline buttons
-  // can reference this exact booking. The source column is a recent addition —
-  // if its migration hasn't run yet, retry without it rather than lose a lead.
-  const row = { name, contact, bmw_model, service, message, slot_date, slot_time, source, status: 'pending' };
-  let { data, error } = await sb.from('bookings').insert(row).select('id, public_token').single();
-  if (error && /source/i.test(error.message)) {
-    const { source: _dropped, ...withoutSource } = row;
-    ({ data, error } = await sb.from('bookings').insert(withoutSource).select('id, public_token').single());
+  // can reference this exact booking. Some columns (source, how_heard,
+  // contact_pref, landing) are recent additions — if a migration hasn't run,
+  // drop the offending column and retry rather than lose a lead.
+  const row: Record<string, unknown> = {
+    name, contact, bmw_model, service, message, slot_date, slot_time,
+    source, how_heard, contact_pref, landing, status: 'pending',
+  };
+  let data: { id: number; public_token: string } | null = null;
+  let error: { message: string } | null = null;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const res = await sb.from('bookings').insert(row).select('id, public_token').single();
+    data = (res.data as { id: number; public_token: string } | null) ?? null;
+    error = res.error;
+    if (!error) break;
+    // PostgREST names the missing column in the error — strip it and retry.
+    const missing = /'(\w+)' column|column "?(\w+)"?/i.exec(error.message);
+    const col = missing?.[1] || missing?.[2];
+    if (col && col in row && col !== 'name' && col !== 'contact') delete row[col];
+    else break;
   }
 
   if (error || !data) {
