@@ -85,6 +85,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bebas.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
+        {/* Guard against the "removeChild/insertBefore: not a child" crash that
+            browser auto-translate (Google Translate etc.) triggers by swapping
+            React's text nodes. Runs before hydration; no-ops the bad call
+            instead of letting it throw. Canonical community mitigation. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){if(typeof Node!=='function'||!Node.prototype)return;var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c&&c.parentNode!==this){return c;}return r.apply(this,arguments);};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this){return n;}return i.apply(this,arguments);};})();`,
+          }}
+        />
         <MetaPixel />
         <GoogleAdsTag />
         <Attribution />
