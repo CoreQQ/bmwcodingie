@@ -3,6 +3,8 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { validateMiniAppAuth } from '@/lib/miniappAuth';
 import { getBusinessStats, getSchedule, getBlockedDates, getHours, getSlotDuration } from '@/lib/stats';
+import { getCrmClients } from '@/lib/crmData';
+import { ensureClient } from '@/lib/crm';
 import { REVIEW_URL } from '@/lib/reviewTemplates';
 
 export const runtime = 'nodejs';
@@ -129,6 +131,39 @@ export async function POST(req: Request) {
       if (!id) return bad();
       await sb.from('reviews').delete().eq('id', id);
       refreshSite();
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'clients': {
+      const clients = await getCrmClients(sb);
+      const q = String(body.q ?? '').trim().toLowerCase();
+      const filtered = q
+        ? clients.filter(
+            (c) =>
+              c.name.toLowerCase().includes(q) ||
+              c.contact.replace(/\D/g, '').includes(q.replace(/\D/g, '')) ||
+              (c.code && c.code.toLowerCase().includes(q)),
+          )
+        : clients;
+      return NextResponse.json({ ok: true, clients: filtered.slice(0, 100), total: clients.length });
+    }
+
+    case 'clientNote': {
+      const contact = String(body.contact ?? '');
+      const note = String(body.note ?? '').slice(0, 1000);
+      const client = await ensureClient(sb, contact);
+      if (!client) return bad();
+      await sb.from('clients').update({ note: note || null }).eq('id', client.id);
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'setBan': {
+      const contact = String(body.contact ?? '');
+      const banned = Boolean(body.banned);
+      const reason = String(body.reason ?? '').slice(0, 200) || null;
+      const client = await ensureClient(sb, contact);
+      if (!client) return bad();
+      await sb.from('clients').update({ banned, ban_reason: banned ? reason : null }).eq('id', client.id);
       return NextResponse.json({ ok: true });
     }
 

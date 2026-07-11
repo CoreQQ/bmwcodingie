@@ -294,3 +294,6 @@ alter table cheat_notes enable row level security;
 alter table bookings add column if not exists how_heard text;
 alter table bookings add column if not exists contact_pref text;
 alter table bookings add column if not exists landing text;
+
+-- ── CRM: per-client note ────────────────────────────────────────────
+alter table clients add column if not exists note text;
