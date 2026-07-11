@@ -35,9 +35,10 @@ export default async function LocaleLayout({
     getTranslations('CookieConsent'),
   ]);
 
-  const sameAs = settings.instagram
-    ? [`https://instagram.com/${settings.instagram.replace(/^@/, '')}`]
-    : [];
+  const sameAs = [
+    settings.instagram ? `https://instagram.com/${settings.instagram.replace(/^@/, '')}` : null,
+    settings.telegram ? `https://t.me/${settings.telegram.replace(/^@/, '')}` : null,
+  ].filter(Boolean) as string[];
 
   // Only emit rating data when there are real reviews — never fabricate it.
   const ratingData =

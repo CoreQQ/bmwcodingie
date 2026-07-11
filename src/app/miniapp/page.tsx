@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Script from 'next/script';
 import {
   CalendarDays, Check, X, Trash2, Ban, Phone, TrendingUp, RefreshCw,
-  LockOpen, Clock3, Wrench, Star, Eye, EyeOff, Save, Plus,
+  LockOpen, Clock3, Wrench, Star, Eye, EyeOff, Save, Plus, Users, MessageCircle,
 } from 'lucide-react';
 import type { Booking, Review } from '@/lib/types';
 import type { BusinessStats } from '@/lib/stats';
@@ -67,6 +67,7 @@ type Act = (p: Record<string, unknown>, h?: 'success' | 'warning') => Promise<vo
 const TABS = [
   ['today', 'Today'],
   ['schedule', 'Schedule'],
+  ['clients', 'Clients'],
   ['services', 'Services'],
   ['reviews', 'Reviews'],
   ['hours', 'Hours'],
@@ -201,6 +202,7 @@ export default function MiniApp() {
           <>
             {tab === 'today' && <TodayTab data={data} todayKey={todayKey} busy={busy} act={act} />}
             {tab === 'schedule' && <ScheduleTab data={data} busy={busy} act={act} />}
+            {tab === 'clients' && <ClientsTab api={api} reviewUrl={data.reviewUrl} />}
             {tab === 'services' && <ServicesTab services={data.services} busy={busy} act={act} />}
             {tab === 'reviews' && <ReviewsTab reviews={data.reviews} busy={busy} act={act} />}
             {tab === 'hours' && <HoursTab hours={data.hours} slotDuration={data.slotDuration || 2} busy={busy} act={act} />}
@@ -620,6 +622,218 @@ function HoursTab({ hours, slotDuration, busy, act }: { hours: HoursMap; slotDur
       </p>
       {order.map((wd) => <HourRow key={wd} weekday={wd} value={hours[wd] ?? null} busy={busy} act={act} />)}
     </div>
+  );
+}
+
+/* ── Clients (CRM) ────────────────────────────────────────── */
+
+type CrmJob = { date: string | null; created_at: string; service: string | null; bmw_model: string | null; status: string };
+type CrmClient = {
+  id: number | null; code: string | null; name: string; contact: string;
+  jobs: CrmJob[]; enquiries: number; confirmed: number; totalPaid: number;
+  lastActivity: string; banned: boolean; banReason: string | null; note: string | null;
+};
+
+function ClientsTab({
+  api,
+  reviewUrl,
+}: {
+  api: (p: Record<string, unknown>) => Promise<{ clients?: CrmClient[]; total?: number }>;
+  reviewUrl?: string;
+}) {
+  const [list, setList] = useState<CrmClient[]>([]);
+  const [total, setTotal] = useState(0);
+  const [q, setQ] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState<string | null>(null);
+
+  const load = useCallback(
+    async (query: string) => {
+      setLoading(true);
+      try {
+        const d = await api({ action: 'clients', q: query });
+        setList(d.clients ?? []);
+        setTotal(d.total ?? 0);
+      } catch {
+        setList([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [api],
+  );
+
+  useEffect(() => {
+    void load('');
+  }, [load]);
+
+  return (
+    <div className="space-y-3">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void load(q);
+        }}
+        className="flex gap-2"
+      >
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search name, number or C-007…"
+          className="flex-1 border border-white/10 bg-graphite-800 px-3 py-2.5 text-sm outline-none focus:border-bmw"
+        />
+        <button type="submit" className="border border-white/10 px-4 text-sm text-muted active:scale-95">Go</button>
+      </form>
+
+      <p className="text-[11px] text-faint">
+        {loading ? 'Loading…' : `${list.length}${list.length < total ? ` of ${total}` : ''} client${total === 1 ? '' : 's'}`}
+      </p>
+
+      {list.map((c) => {
+        const key = c.contact;
+        const isOpen = open === key;
+        const first = c.name.trim().split(/\s+/)[0] || 'there';
+        return (
+          <div key={key} className={`border ${c.banned ? 'border-m-red/40' : 'border-white/8'} bg-graphite-800/60`}>
+            <button
+              onClick={() => setOpen(isOpen ? null : key)}
+              className="flex w-full items-center gap-2 p-3 text-left active:bg-white/[0.02]"
+            >
+              <span className="flex-1 truncate">
+                <span className="font-medium">{c.name}</span>
+                {c.code && <span className="ml-2 font-mono text-[10px] text-bmw">{c.code}</span>}
+                {c.banned && <span className="ml-2 text-[10px] text-m-red">⛔️</span>}
+                <span className="block truncate text-[11px] text-faint">{c.contact}</span>
+              </span>
+              <span className="shrink-0 text-right">
+                {c.totalPaid > 0 && <span className="block font-mono text-sm text-emerald-400">€{c.totalPaid.toFixed(0)}</span>}
+                <span className="block font-mono text-[10px] text-faint">{c.enquiries} job{c.enquiries === 1 ? '' : 's'}</span>
+              </span>
+            </button>
+
+            {isOpen && (
+              <div className="border-t border-white/5 p-3">
+                <div className="mb-3 flex flex-wrap gap-2">
+                  <a href={`tel:${c.contact.replace(/[^\d+]/g, '')}`} className="flex items-center gap-1.5 border border-white/10 px-3 py-2 text-[11px] active:scale-95">
+                    <Phone size={12} /> Call
+                  </a>
+                  <a
+                    href={`https://wa.me/${c.contact.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 border border-white/10 px-3 py-2 text-[11px] active:scale-95"
+                  >
+                    <MessageCircle size={12} /> WhatsApp
+                  </a>
+                  {reviewUrl && (
+                    <button
+                      onClick={() =>
+                        void navigator.clipboard
+                          .writeText(`Hi ${first}! Thanks for trusting us with your BMW. If you have 30 seconds, a quick Google review would mean a lot: ${reviewUrl}`)
+                          .then(() => getTg()?.HapticFeedback?.notificationOccurred('success'))
+                      }
+                      className="flex items-center gap-1.5 border border-white/10 px-3 py-2 text-[11px] active:scale-95"
+                    >
+                      <Star size={12} /> Ask review
+                    </button>
+                  )}
+                  <BanToggle client={c} api={api} onDone={() => load(q)} />
+                </div>
+
+                <NoteEditor client={c} api={api} onSaved={() => load(q)} />
+
+                <p className="mt-3 mb-1 font-mono text-[10px] uppercase tracking-wider text-faint">History</p>
+                <ul className="space-y-1">
+                  {c.jobs.slice(0, 12).map((j, i) => (
+                    <li key={i} className="flex items-baseline gap-2 text-[11px] text-muted">
+                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[j.status] ?? 'bg-faint'}`} />
+                      <span className="text-faint">{(j.date || j.created_at).slice(0, 10)}</span>
+                      <span className="truncate">{[j.service, j.bmw_model].filter(Boolean).join(' · ') || 'enquiry'}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function NoteEditor({
+  client,
+  api,
+  onSaved,
+}: {
+  client: CrmClient;
+  api: (p: Record<string, unknown>) => Promise<unknown>;
+  onSaved: () => void;
+}) {
+  const [note, setNote] = useState(client.note ?? '');
+  const [saving, setSaving] = useState(false);
+  const dirty = note !== (client.note ?? '');
+  return (
+    <div>
+      <textarea
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        rows={2}
+        placeholder="Private note (car quirks, deal, reminders)…"
+        className="w-full resize-none border border-white/10 bg-graphite-800 px-3 py-2 text-xs outline-none focus:border-bmw"
+      />
+      {dirty && (
+        <button
+          disabled={saving}
+          onClick={async () => {
+            setSaving(true);
+            try {
+              await api({ action: 'clientNote', contact: client.contact, note });
+              getTg()?.HapticFeedback?.notificationOccurred('success');
+              onSaved();
+            } finally {
+              setSaving(false);
+            }
+          }}
+          className="mt-1.5 flex items-center gap-1.5 border border-bmw/50 bg-bmw/10 px-3 py-1.5 text-[11px] text-ink active:scale-95"
+        >
+          <Save size={12} /> Save note
+        </button>
+      )}
+    </div>
+  );
+}
+
+function BanToggle({
+  client,
+  api,
+  onDone,
+}: {
+  client: CrmClient;
+  api: (p: Record<string, unknown>) => Promise<unknown>;
+  onDone: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          const reason = client.banned ? '' : (window.prompt('Ban reason (optional):') ?? '');
+          await api({ action: 'setBan', contact: client.contact, banned: !client.banned, reason });
+          getTg()?.HapticFeedback?.notificationOccurred('warning');
+          onDone();
+        } finally {
+          setBusy(false);
+        }
+      }}
+      className={`flex items-center gap-1.5 border px-3 py-2 text-[11px] active:scale-95 ${
+        client.banned ? 'border-emerald-500/40 text-emerald-400' : 'border-m-red/40 text-m-red'
+      }`}
+    >
+      <Ban size={12} /> {client.banned ? 'Unban' : 'Ban'}
+    </button>
   );
 }
 
