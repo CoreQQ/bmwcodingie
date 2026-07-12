@@ -44,7 +44,8 @@ export async function POST(req: Request) {
   // Requested slot — optional. slot_date must be a plain YYYY-MM-DD date.
   const rawDate = String(body.slot_date ?? '').trim().slice(0, 10);
   const slot_date = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : null;
-  const slot_time = String(body.slot_time ?? '').trim().slice(0, 40);
+  const rawTime = String(body.slot_time ?? '').trim().slice(0, 40);
+  const slot_time = /^\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}$/.test(rawTime) ? rawTime : '';
 
   if (!name || !contact) {
     return NextResponse.json({ ok: false, error: 'Name and contact required' }, { status: 400 });

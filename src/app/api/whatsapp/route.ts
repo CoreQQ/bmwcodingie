@@ -6,6 +6,7 @@ import { WHATSAPP_PROMPT } from '@/lib/assistantPrompt';
 import { sendWhatsAppText, markWhatsAppRead, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
 import { translateToRussian } from '@/lib/translate';
+import { isRateLimited } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -136,6 +137,16 @@ async function handleMessage(
           { text: '📋 Number', copy_text: { text: `+${waId}` } },
         ]],
       },
+    );
+    return;
+  }
+
+  // Cost cap: at most 20 AI replies per sender per hour; beyond that we
+  // mirror to the owner without answering.
+  if (isRateLimited(`wa-ai:${waId}`, 20, 60 * 60 * 1000)) {
+    await sendOwnerWithMarkup(
+      `💬 <b>WhatsApp</b> · ${escapeHtml(label)}<code>+${waId}</code>\n«${escapeHtml(text)}»${escapeHtml(ruLine)}\n\n🤖 Rate limit hit for this chat this hour — reply yourself: <code>/wa +${waId} </code>`,
+      { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: `+${waId}` } }]] },
     );
     return;
   }
