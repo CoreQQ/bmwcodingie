@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { validateMiniAppAuth } from '@/lib/miniappAuth';
 import { getBusinessStats, getSchedule, getBlockedDates, getHours, getSlotDuration } from '@/lib/stats';
 import { getCrmClients } from '@/lib/crmData';
-import { ensureClient } from '@/lib/crm';
+import { ensureClient, phoneKey } from '@/lib/crm';
 import { REVIEW_URL } from '@/lib/reviewTemplates';
 
 export const runtime = 'nodejs';
@@ -155,6 +155,32 @@ export async function POST(req: Request) {
       if (!client) return bad();
       await sb.from('clients').update({ note: note || null }).eq('id', client.id);
       return NextResponse.json({ ok: true });
+    }
+
+    case 'renameClient': {
+      const contact = String(body.contact ?? '');
+      const name = String(body.name ?? '').trim().slice(0, 120);
+      if (!name) return bad();
+      const client = await ensureClient(sb, contact, name);
+      if (!client) return bad();
+      await sb.from('clients').update({ name }).eq('id', client.id);
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'deleteClient': {
+      // Full removal: the client record AND their bookings (matched by the
+      // same phone-suffix logic the CRM groups by). Payments stay — they're
+      // financial history.
+      const contact = String(body.contact ?? '');
+      const key = phoneKey(contact);
+      if (key.length < 6) return bad();
+      const { data: rows } = await sb.from('bookings').select('id, contact').limit(2000);
+      const ids = ((rows ?? []) as { id: number; contact: string }[])
+        .filter((b) => phoneKey(b.contact) === key)
+        .map((b) => b.id);
+      if (ids.length) await sb.from('bookings').delete().in('id', ids);
+      await sb.from('clients').delete().eq('phone_key', key);
+      return NextResponse.json({ ok: true, removedBookings: ids.length });
     }
 
     case 'setBan': {

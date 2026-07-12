@@ -738,6 +738,30 @@ function ClientsTab({
                     </button>
                   )}
                   <BanToggle client={c} api={api} onDone={() => load(q)} />
+                  <button
+                    onClick={async () => {
+                      const name = window.prompt('Client name (first + last):', c.name);
+                      if (!name || !name.trim()) return;
+                      await api({ action: 'renameClient', contact: c.contact, name: name.trim() });
+                      getTg()?.HapticFeedback?.notificationOccurred('success');
+                      void load(q);
+                    }}
+                    className="flex items-center gap-1.5 border border-white/10 px-3 py-2 text-[11px] active:scale-95"
+                  >
+                    ✏️ Rename
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!window.confirm(`Delete ${c.name} (${c.code ?? c.contact}) and their ${c.enquiries} booking(s)? Payments are kept.`)) return;
+                      await api({ action: 'deleteClient', contact: c.contact });
+                      getTg()?.HapticFeedback?.notificationOccurred('warning');
+                      setOpen(null);
+                      void load(q);
+                    }}
+                    className="flex items-center gap-1.5 border border-m-red/40 px-3 py-2 text-[11px] text-m-red active:scale-95"
+                  >
+                    <Trash2 size={12} /> Delete
+                  </button>
                 </div>
 
                 <NoteEditor client={c} api={api} onSaved={() => load(q)} />

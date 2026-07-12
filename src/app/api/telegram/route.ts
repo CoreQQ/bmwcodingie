@@ -371,7 +371,7 @@ export async function POST(req: Request) {
         return ok();
       }
 
-      const m = rest.match(/^(\d+(?:[.,]\d{1,2})?)\s*(?:€|eur)?\s*(\S+)?\s*([\s\S]*)?$/i);
+      const m = rest.match(/^(\d+(?:[.,]\d{1,2})?)\s*(?:€|eur)?\s*([\s\S]*)$/i);
       if (!rest || !m) {
         // No args → show the money summary.
         const { data: pays } = await sb
@@ -398,13 +398,30 @@ export async function POST(req: Request) {
           const d = new Date(x.created_at).toLocaleDateString('en-IE', { day: '2-digit', month: 'short' });
           lines.push(`  <code>#${x.id}</code> €${Number(x.amount).toFixed(0)} — ${escapeHtml([x.client, x.service].filter(Boolean).join(' · ') || '—')} (${d})`);
         }
-        lines.push('', 'Add: <code>/paid 120 John CarPlay</code> · Undo: <code>/paid del last</code> or <code>/paid del 12</code>');
+        lines.push('', 'Add: <code>/paid 120 C-007 CarPlay</code> or <code>/paid 120 John Smith - CarPlay</code>', 'Undo: <code>/paid del last</code> or <code>/paid del 12</code>');
         await sendOwnerMessage(lines.join('\n'));
         return ok();
       }
       const amount = parseFloat(m[1].replace(',', '.'));
-      const client = (m[2] || '').trim();
-      const service = (m[3] || '').trim();
+      // Who + what: "C-007 CarPlay" (code → full name), "John Smith - CarPlay"
+      // (dash separates a multi-word name), or "John CarPlay" (first word = name).
+      const tail = (m[2] || '').trim();
+      let client = '';
+      let service = '';
+      const codeM = /^(c[-\s]?0*\d+)\b\s*([\s\S]*)$/i.exec(tail);
+      if (codeM) {
+        const c = await resolveClient(sb, codeM[1]);
+        client = c?.name || codeM[1].toUpperCase();
+        service = codeM[2].trim();
+      } else if (tail.includes(' - ')) {
+        const [n, ...svc] = tail.split(' - ');
+        client = n.trim();
+        service = svc.join(' - ').trim();
+      } else {
+        const [n = '', ...svc] = tail.split(/\s+/);
+        client = n;
+        service = svc.join(' ');
+      }
       const { error } = await sb.from('payments').insert({ amount, client: client || null, service: service || null });
       if (error) {
         await sendOwnerMessage(`❌ Could not save: ${escapeHtml(error.message)}\n(Run the payments migration in Supabase if you haven't.)`);
@@ -418,14 +435,28 @@ export async function POST(req: Request) {
     if (/^\/review(@\w+)?\b/.test(text)) {
       // Optional "/review Name Service" — first token is the name.
       const rest = text.replace(/^\/review(@\w+)?\s*/, '').trim();
-      const [name = '', ...svcParts] = rest.split(/\s+/);
-      const service = svcParts.join(' ');
+      let name = '';
+      let service = '';
+      const codeM = /^(c[-\s]?0*\d+)\b\s*([\s\S]*)$/i.exec(rest);
+      if (codeM) {
+        const c = await resolveClient(sb, codeM[1]);
+        name = c?.name || '';
+        service = codeM[2].trim();
+      } else if (rest.includes(' - ')) {
+        const [n, ...svc] = rest.split(' - ');
+        name = n.trim();
+        service = svc.join(' - ').trim();
+      } else {
+        const [n = '', ...svcParts] = rest.split(/\s+/);
+        name = n;
+        service = svcParts.join(' ');
+      }
       const lines = [
         '⭐ <b>Review request templates</b>',
         '━━━━━━━━━━━━━━━━━━━',
         name
           ? `For <b>${name}</b>${service ? ` · ${service}` : ''} — tap a message to copy it:`
-          : 'Tap a message to copy it. Tip: send <code>/review John 530e CarPlay</code> to personalise.',
+          : 'Tap a message to copy it. Personalise: <code>/review C-007 CarPlay</code> or <code>/review John Smith - CarPlay</code>.',
         '',
       ];
       for (const tpl of REVIEW_TEMPLATES) {
