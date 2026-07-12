@@ -338,15 +338,48 @@ export async function POST(req: Request) {
     }
     if (/^\/paid(@\w+)?\b/.test(text)) {
       const rest = text.replace(/^\/paid(@\w+)?\s*/, '').trim();
+
+      // Fix a mistake: /paid del last  |  /paid del 12
+      const del = /^del(?:ete)?\s+(last|\d+)$/i.exec(rest);
+      if (del) {
+        type PayRow = { id: number; amount: number; client: string | null };
+        let row: PayRow | null = null;
+        if (del[1].toLowerCase() === 'last') {
+          const { data } = await sb
+            .from('payments')
+            .select('id, amount, client')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          row = (data as PayRow | null) ?? null;
+        } else {
+          const { data } = await sb
+            .from('payments')
+            .select('id, amount, client')
+            .eq('id', Number(del[1]))
+            .maybeSingle();
+          row = (data as PayRow | null) ?? null;
+        }
+        if (!row) {
+          await sendOwnerMessage('Nothing to delete — check the id in /paid.');
+          return ok();
+        }
+        await sb.from('payments').delete().eq('id', row.id);
+        await sendOwnerMessage(
+          `🗑 Deleted payment <code>#${row.id}</code> — €${Number(row.amount).toFixed(0)}${row.client ? ` · ${escapeHtml(row.client)}` : ''}\nRe-add if needed: <code>/paid ${Number(row.amount).toFixed(0)} ${escapeHtml(row.client || '')}</code>`,
+        );
+        return ok();
+      }
+
       const m = rest.match(/^(\d+(?:[.,]\d{1,2})?)\s*(?:€|eur)?\s*(\S+)?\s*([\s\S]*)?$/i);
       if (!rest || !m) {
         // No args → show the money summary.
         const { data: pays } = await sb
           .from('payments')
-          .select('amount, client, service, created_at')
+          .select('id, amount, client, service, created_at')
           .order('created_at', { ascending: false })
           .limit(200);
-        const list = (pays ?? []) as { amount: number; client: string | null; service: string | null; created_at: string }[];
+        const list = (pays ?? []) as { id: number; amount: number; client: string | null; service: string | null; created_at: string }[];
         if (!list.length) {
           await sendOwnerMessage('💶 No payments logged yet.\nRecord one: <code>/paid 120 John CarPlay</code>');
           return ok();
@@ -363,9 +396,9 @@ export async function POST(req: Request) {
         ];
         for (const x of list.slice(0, 6)) {
           const d = new Date(x.created_at).toLocaleDateString('en-IE', { day: '2-digit', month: 'short' });
-          lines.push(`  €${Number(x.amount).toFixed(0)} — ${escapeHtml([x.client, x.service].filter(Boolean).join(' · ') || '—')} (${d})`);
+          lines.push(`  <code>#${x.id}</code> €${Number(x.amount).toFixed(0)} — ${escapeHtml([x.client, x.service].filter(Boolean).join(' · ') || '—')} (${d})`);
         }
-        lines.push('', 'Add: <code>/paid 120 John CarPlay</code>');
+        lines.push('', 'Add: <code>/paid 120 John CarPlay</code> · Undo: <code>/paid del last</code> or <code>/paid del 12</code>');
         await sendOwnerMessage(lines.join('\n'));
         return ok();
       }
@@ -378,7 +411,7 @@ export async function POST(req: Request) {
         return ok();
       }
       await sendOwnerMessage(
-        `✅ Logged <b>€${amount.toFixed(0)}</b>${client ? ` — ${escapeHtml(client)}` : ''}${service ? ` · ${escapeHtml(service)}` : ''}\nSee totals: /paid`,
+        `✅ Logged <b>€${amount.toFixed(0)}</b>${client ? ` — ${escapeHtml(client)}` : ''}${service ? ` · ${escapeHtml(service)}` : ''}\nTotals: /paid · Mistake? <code>/paid del last</code>`,
       );
       return ok();
     }
