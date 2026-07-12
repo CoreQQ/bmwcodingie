@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { HeroSpotlight } from './HeroSpotlight';
+import { Parallax } from './Parallax';
 import { GlowCard } from './GlowCard';
 
 export async function Hero({ settings }: { settings: SiteSettings }) {
@@ -12,17 +13,19 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
       {/* Background: real workshop shot (duotone-dimmed) + blueprint grid +
           atmospheric blue glow + pointer spotlight. */}
       <div className="absolute inset-0 -z-10">
-        <picture>
-          <source media="(max-width: 640px)" srcSet="/hero-bg-mobile.jpg" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/hero-bg.jpg"
-            alt=""
-            aria-hidden="true"
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover opacity-45"
-          />
-        </picture>
+        <Parallax speed={0.18} className="absolute -inset-y-[12%] inset-x-0">
+          <picture>
+            <source media="(max-width: 640px)" srcSet="/hero-bg-mobile.jpg" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/hero-bg.jpg"
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover opacity-45"
+            />
+          </picture>
+        </Parallax>
         <div className="absolute inset-0 bg-gradient-to-r from-graphite-900/95 via-graphite-900/70 to-graphite-900/40" />
         <div className="blueprint absolute inset-0 opacity-40" />
         <div className="absolute inset-0 hero-glow" />

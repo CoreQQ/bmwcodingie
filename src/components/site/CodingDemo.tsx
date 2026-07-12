@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Reveal } from './Reveal';
+import { Parallax } from './Parallax';
 
 // Interactive "what coding feels like" demo: a stylised cluster + iDrive
 // screen where visitors flip real coding options and watch the car react.
@@ -151,6 +152,7 @@ export function CodingDemo() {
           <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
             {/* Dashboard mockup */}
             <div className="lg:col-span-7">
+              <Parallax speed={-0.05}>
               <div
                 className={`relative overflow-hidden rounded-2xl border bg-graphite-800/80 p-4 transition-all duration-500 md:p-6 ${
                   sport ? 'border-m-red/30' : 'border-white/10'
@@ -239,6 +241,7 @@ export function CodingDemo() {
                   }
                 />
               </div>
+              </Parallax>
             </div>
 
             {/* Controls */}
