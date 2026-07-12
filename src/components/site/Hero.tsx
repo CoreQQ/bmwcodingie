@@ -13,7 +13,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
       {/* Background: real workshop shot (duotone-dimmed) + blueprint grid +
           atmospheric blue glow + pointer spotlight. */}
       <div className="absolute inset-0 -z-10">
-        <Parallax speed={0.18} className="absolute -inset-y-[12%] inset-x-0">
+        <Parallax speed={0.32} className="absolute -inset-y-[18%] inset-x-0">
           <picture>
             <source media="(max-width: 640px)" srcSet="/hero-bg-mobile.jpg" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -36,8 +36,9 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
 
       <div className="mx-auto max-w-edge px-5 pb-16 pt-20 sm:pt-28 md:px-8 md:pb-28 md:pt-44">
         <div className="grid grid-cols-12 gap-y-12 md:gap-x-10">
-          {/* Headline block */}
+          {/* Headline block — drifts against the bg for real depth */}
           <div className="col-span-12 lg:col-span-8">
+            <Parallax speed={-0.06}>
             <div className="mb-7 flex items-center gap-3 reveal is-in">
               <span className="m-stripe h-[3px] w-12" />
               <span className="label text-muted">{t('eyebrow')}</span>
@@ -86,6 +87,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
             >
               <ArrowDown size={14} className="animate-bounce" /> {t('scroll')}
             </a>
+            </Parallax>
           </div>
 
           {/* Spec readout card — offset right */}

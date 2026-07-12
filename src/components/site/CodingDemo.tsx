@@ -143,16 +143,18 @@ export function CodingDemo() {
           <span className="label">{t('eyebrow')}</span>
           <span className="m-stripe h-[2px] w-10" />
         </div>
+        <Parallax speed={-0.07}>
         <h2 className="mb-4 max-w-3xl font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
           {t('heading')}
         </h2>
+        </Parallax>
         <p className="mb-12 max-w-xl text-sm leading-relaxed text-muted">{t('intro')}</p>
 
         <Reveal>
           <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
             {/* Dashboard mockup */}
             <div className="lg:col-span-7">
-              <Parallax speed={-0.05}>
+              <Parallax speed={-0.09}>
               <div
                 className={`relative overflow-hidden rounded-2xl border bg-graphite-800/80 p-4 transition-all duration-500 md:p-6 ${
                   sport ? 'border-m-red/30' : 'border-white/10'
