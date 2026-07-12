@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import { notifyVisitor } from '@/lib/telegram';
 import { parseUserAgent } from '@/lib/parseUserAgent';
 
@@ -34,6 +35,12 @@ async function geolocate(ip: string): Promise<Geo> {
 }
 
 export async function POST(req: Request) {
+  // One ping per session per visitor is normal — anything chatty is abuse
+  // aimed at flooding the owner's Telegram.
+  if (isRateLimited(`visit:${clientIp(req)}`, 4, 10 * 60 * 1000)) {
+    return NextResponse.json({ ok: true });
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();

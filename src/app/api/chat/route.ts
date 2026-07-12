@@ -19,12 +19,15 @@ export async function POST(req: Request) {
     return new Response('Invalid body', { status: 400 });
   }
 
-  const messages = (body.messages ?? []).filter(
-    (m): m is { role: 'user' | 'assistant'; content: string } =>
-      (m.role === 'user' || m.role === 'assistant') &&
-      typeof m.content === 'string' &&
-      m.content.trim().length > 0,
-  );
+  const messages = (body.messages ?? [])
+    .filter(
+      (m): m is { role: 'user' | 'assistant'; content: string } =>
+        (m.role === 'user' || m.role === 'assistant') &&
+        typeof m.content === 'string' &&
+        m.content.trim().length > 0,
+    )
+    // Cap each message so oversized payloads can't run up model-token costs.
+    .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }));
 
   if (messages.length === 0 || messages[messages.length - 1].role !== 'user') {
     return new Response('Last message must be from user', { status: 400 });
