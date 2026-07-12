@@ -76,7 +76,7 @@ export async function getCrmClients(sb: SupabaseClient): Promise<CrmClient[]> {
       g = {
         id: c?.id ?? null,
         code: c ? clientCode(c.id) : null,
-        name: b.name || c?.name || '—',
+        name: c?.name || b.name || '—',
         contact: b.contact,
         jobs: [],
         enquiries: 0,
