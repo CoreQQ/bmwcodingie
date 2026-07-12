@@ -3,10 +3,9 @@ import { routing } from '@/i18n/routing';
 import { ALL_SERVICE_SLUGS } from '@/lib/servicePages';
 import { DYNAMIC_LANDING_SLUGS } from '@/lib/landings';
 import { BLOG_POSTS } from '@/lib/blog';
-import { getGallery } from '@/lib/data';
 
-// Refresh daily so newly-uploaded gallery photos enter the image sitemap.
-export const revalidate = 86400;
+// Gallery photos live in a separate image sitemap (/image-sitemap.xml) because
+// Next 14's MetadataRoute.Sitemap drops the `images` field.
 
 const PATHS = [
   { path: '', priority: 1 },
@@ -20,7 +19,7 @@ const PATHS = [
   ...DYNAMIC_LANDING_SLUGS.map((slug) => ({ path: `/${slug}`, priority: 0.8 })),
 ];
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
   function localeUrl(locale: string, path: string) {
@@ -28,22 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return `${base}${prefix}${path}`;
   }
 
-  // Real work photos → image sitemap on the homepage entry (opens Google Images).
-  const gallery = await getGallery().catch(() => []);
-  const homeImages = gallery
-    .map((g) => g.image_url)
-    .filter((u): u is string => typeof u === 'string' && u.startsWith('http'))
-    .slice(0, 30);
-
   return PATHS.flatMap(({ path, priority }) =>
     routing.locales.map((locale) => ({
       url: localeUrl(locale, path),
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority,
-      ...(path === '' && locale === routing.defaultLocale && homeImages.length
-        ? { images: homeImages }
-        : {}),
       alternates: {
         languages: Object.fromEntries(
           routing.locales.map((l) => [l, localeUrl(l, path)]),
