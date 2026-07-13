@@ -91,7 +91,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             instead of letting it throw. Canonical community mitigation. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){if(typeof Node!=='function'||!Node.prototype)return;var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c&&c.parentNode!==this){return c;}return r.apply(this,arguments);};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this){return n;}return i.apply(this,arguments);};})();`,
+            __html: `(function(){if(typeof Node==='function'&&Node.prototype){var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c&&c.parentNode!==this){return c;}return r.apply(this,arguments);};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this){return n;}return i.apply(this,arguments);};}
+var chunkFail=function(m){return m&&/Loading chunk [^ ]+ failed|ChunkLoadError|Failed to fetch dynamically imported module/i.test(String(m));};
+var reloadOnce=function(){try{if(sessionStorage.getItem('__chunk_reload'))return;sessionStorage.setItem('__chunk_reload','1');location.reload();}catch(e){}};
+window.addEventListener('error',function(e){if(chunkFail(e&&e.message))reloadOnce();});
+window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;if(chunkFail(r&&(r.message||r)))reloadOnce();});})();`,
           }}
         />
         <MetaPixel />
