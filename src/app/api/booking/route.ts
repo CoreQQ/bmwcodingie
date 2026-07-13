@@ -26,7 +26,9 @@ export async function POST(req: Request) {
   const name = String(body.name ?? '').trim().slice(0, 120);
   const contact = String(body.contact ?? '').trim().slice(0, 120);
   const bmw_model = String(body.bmw_model ?? '').trim().slice(0, 160);
-  const service = String(body.service ?? '').trim().slice(0, 160);
+  const service =
+    String(body.service ?? '').trim().slice(0, 160) ||
+    (body.consultation ? 'Consultation / question' : '');
   const message = String(body.message ?? '').trim().slice(0, 2000);
   const source = String(body.source ?? '').trim().slice(0, 160) || null;
   const how_heard = String(body.how_heard ?? '').trim().slice(0, 60) || null;

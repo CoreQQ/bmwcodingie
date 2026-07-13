@@ -129,7 +129,10 @@
     "heardReturning": "Jestem stałym klientem",
     "heardOther": "Inne",
     "contactPrefLabel": "Jak i kiedy się kontaktować",
-    "contactPrefPlaceholder": "np. WhatsApp po 18:00"
+    "contactPrefPlaceholder": "np. WhatsApp po 18:00",
+    "slotRequiredMark": "wymagane",
+    "slotMissing": "Wybierz datę i godzinę powyżej — lub użyj przycisku konsultacji poniżej, jeśli masz tylko pytanie.",
+    "consultButton": "💬 Tylko pytanie / konsultacja"
   },
   "Footer": {
     "pitch": "Niezależne kodowanie, diagnostyka i retrofity BMW na terenie Dublina i całej Irlandii — na miejscu lub zdalnie przez ENET.",

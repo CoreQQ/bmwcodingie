@@ -56,11 +56,17 @@ export function Contact({
     }
   }, []);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent, consult = false) {
     e.preventDefault();
     if (!form.name.trim() || !form.contact.trim()) {
       setStatus('error');
       setErrorMsg(t('validationError'));
+      return;
+    }
+    // Bookings need a slot; the consultation path below skips it.
+    if (!consult && (!form.slot_date || !form.slot_time)) {
+      setStatus('error');
+      setErrorMsg(t('slotMissing'));
       return;
     }
     setStatus('sending');
@@ -70,6 +76,7 @@ export function Contact({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          ...(consult ? { slot_date: '', slot_time: '', consultation: true } : {}),
           source: getAttribution(),
           landing: getLanding(),
           language: typeof navigator !== 'undefined' ? navigator.language : undefined,
@@ -266,6 +273,14 @@ export function Contact({
                     className="btn-primary w-full disabled:opacity-60"
                   >
                     {status === 'sending' ? t('sendingButton') : t('sendButton')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={status === 'sending'}
+                    onClick={(e) => void submit(e, true)}
+                    className="btn-ghost mt-3 w-full"
+                  >
+                    {t('consultButton')}
                   </button>
                 )}
                 {status === 'error' && (
