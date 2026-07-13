@@ -4,6 +4,7 @@ import { parseUserAgent } from '@/lib/parseUserAgent';
 import { notifyTelegram } from '@/lib/telegram';
 import { repeatCustomerNote, ensureClient, clientCode } from '@/lib/crm';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
+import { requestCountry, isServiceArea } from '@/lib/geo';
 
 export const runtime = 'nodejs';
 
@@ -38,6 +39,8 @@ export async function POST(req: Request) {
   const { browser, os } = parseUserAgent(ua);
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
   const device = ua ? `${isMobile ? 'Mobile' : 'Desktop'}${os ? ` · ${os}` : ''}${browser ? ` · ${browser}` : ''}` : undefined;
+  const country = requestCountry(req);
+  const foreign = !isServiceArea(req);
   const acceptLang = (req.headers.get('accept-language') || '').split(',')[0].trim().slice(0, 20);
   const language = String(body.language ?? '').trim().slice(0, 20) || acceptLang || undefined;
 
@@ -51,7 +54,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Name and contact required' }, { status: 400 });
   }
 
-  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, source: source ?? undefined, howHeard: how_heard ?? undefined, contactPref: contact_pref ?? undefined, landing: landing ?? undefined, device, language, dwell };
+  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, source: source ?? undefined, howHeard: how_heard ?? undefined, contactPref: contact_pref ?? undefined, landing: landing ?? undefined, device: foreign && device ? `${device} · 🌍 ${country} — outside service area` : device, language, dwell };
   const sb = getSupabaseAdmin();
 
   // No DB configured yet — accept the lead so the form still works in preview,

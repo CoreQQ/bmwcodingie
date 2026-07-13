@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
+import { isServiceArea } from '@/lib/geo';
 import { notifyVisitor } from '@/lib/telegram';
 import { parseUserAgent } from '@/lib/parseUserAgent';
 
@@ -40,6 +41,8 @@ export async function POST(req: Request) {
   if (isRateLimited(`visit:${clientIp(req)}`, 4, 10 * 60 * 1000)) {
     return NextResponse.json({ ok: true });
   }
+  // Visitors outside the service area don't page the owner.
+  if (!isServiceArea(req)) return NextResponse.json({ ok: true });
 
   let body: Record<string, unknown>;
   try {

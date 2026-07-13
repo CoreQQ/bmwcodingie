@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
+import { isServiceArea } from '@/lib/geo';
 import { SITE_CHAT_PROMPT } from '@/lib/assistantPrompt';
 
 export const runtime = 'nodejs';
@@ -8,6 +9,13 @@ const client = new Anthropic();
 
 
 export async function POST(req: Request) {
+  // The assistant costs money per message — reserve it for the service area.
+  if (!isServiceArea(req)) {
+    return new Response(
+      'Our service covers Ireland — for anything else, email us and we will point you to someone local.',
+      { status: 403 },
+    );
+  }
   if (isRateLimited(`chat:${clientIp(req)}`, 15, 5 * 60 * 1000)) {
     return new Response('Too many requests — please slow down a little.', { status: 429 });
   }
