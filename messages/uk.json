@@ -129,7 +129,10 @@
     "heardReturning": "Я вже ваш клієнт",
     "heardOther": "Інше",
     "contactPrefLabel": "Як і коли зручніше зв’язатися",
-    "contactPrefPlaceholder": "напр. WhatsApp після 18:00"
+    "contactPrefPlaceholder": "напр. WhatsApp після 18:00",
+    "slotRequiredMark": "обов'язково",
+    "slotMissing": "Оберіть дату і час вище — або скористайтеся кнопкою консультації нижче, якщо у вас просто питання.",
+    "consultButton": "💬 Просто питання / консультація"
   },
   "Footer": {
     "pitch": "Незалежне кодування, діагностика та retrofit BMW по всьому Дубліну та Ірландії — особисто або віддалено через ENET.",

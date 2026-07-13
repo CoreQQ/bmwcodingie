@@ -129,7 +129,10 @@
     "heardReturning": "Esu nuolatinis klientas",
     "heardOther": "Kita",
     "contactPrefLabel": "Kaip ir kada susisiekti",
-    "contactPrefPlaceholder": "pvz. WhatsApp po 18:00"
+    "contactPrefPlaceholder": "pvz. WhatsApp po 18:00",
+    "slotRequiredMark": "privaloma",
+    "slotMissing": "Pasirinkite datą ir laiką aukščiau — arba spauskite konsultacijos mygtuką žemiau, jei turite tik klausimą.",
+    "consultButton": "💬 Tik klausimas / konsultacija"
   },
   "Footer": {
     "pitch": "Nepriklausomas BMW kodavimas, diagnostika ir retrofitai visame Dubline ir Airijoje — gyvai arba nuotoliniu būdu per ENET.",

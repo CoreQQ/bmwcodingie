@@ -87,7 +87,7 @@ export function SlotPicker({
       <div className="flex items-center gap-2">
         <CalendarClock size={16} className="text-bmw" />
         <span className="label">{t('slotHeading')}</span>
-        <span className="text-[11px] text-faint">· {t('slotOptional')}</span>
+        <span className="text-[11px] text-bmw">· {t('slotRequiredMark')}</span>
       </div>
 
       {!mounted ? (

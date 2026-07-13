@@ -129,7 +129,10 @@
     "heardReturning": "Sunt client fidel",
     "heardOther": "Altele",
     "contactPrefLabel": "Cum și când să te contactăm",
-    "contactPrefPlaceholder": "ex. WhatsApp după 18:00"
+    "contactPrefPlaceholder": "ex. WhatsApp după 18:00",
+    "slotRequiredMark": "obligatoriu",
+    "slotMissing": "Alege data și ora mai sus — sau folosește butonul de consultanță de mai jos dacă ai doar o întrebare.",
+    "consultButton": "💬 Doar o întrebare / consultanță"
   },
   "Footer": {
     "pitch": "Coding, diagnostic și retrofit BMW independent, în Dublin și în toată Irlanda — la fața locului sau la distanță prin ENET.",

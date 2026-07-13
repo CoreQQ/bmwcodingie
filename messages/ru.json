@@ -129,7 +129,10 @@
     "heardReturning": "Я уже ваш клиент",
     "heardOther": "Другое",
     "contactPrefLabel": "Как и когда удобнее связаться",
-    "contactPrefPlaceholder": "напр. WhatsApp после 18:00"
+    "contactPrefPlaceholder": "напр. WhatsApp после 18:00",
+    "slotRequiredMark": "обязательно",
+    "slotMissing": "Выберите дату и время выше — или нажмите кнопку консультации ниже, если у вас просто вопрос.",
+    "consultButton": "💬 Просто вопрос / консультация"
   },
   "Footer": {
     "pitch": "Независимое кодирование, диагностика и установка дополнительного оборудования для BMW по Dublin и Ирландии — лично или удалённо через ENET.",

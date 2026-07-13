@@ -129,7 +129,10 @@
     "heardReturning": "I'm a returning customer",
     "heardOther": "Other",
     "contactPrefLabel": "Best way & time to reach you",
-    "contactPrefPlaceholder": "e.g. WhatsApp after 6pm"
+    "contactPrefPlaceholder": "e.g. WhatsApp after 6pm",
+    "slotRequiredMark": "required",
+    "slotMissing": "Please pick a date and time above — or use the consultation button below if you just have a question.",
+    "consultButton": "💬 Just a question / consultation"
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",
