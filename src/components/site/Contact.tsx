@@ -267,21 +267,23 @@ export function Contact({
                     )}
                   </div>
                 ) : (
-                  <button
-                    type="submit"
-                    disabled={status === 'sending'}
-                    className="btn-primary w-full disabled:opacity-60"
-                  >
-                    {status === 'sending' ? t('sendingButton') : t('sendButton')}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={status === 'sending'}
-                    onClick={(e) => void submit(e, true)}
-                    className="btn-ghost mt-3 w-full"
-                  >
-                    {t('consultButton')}
-                  </button>
+                  <>
+                    <button
+                      type="submit"
+                      disabled={status === 'sending'}
+                      className="btn-primary w-full disabled:opacity-60"
+                    >
+                      {status === 'sending' ? t('sendingButton') : t('sendButton')}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={status === 'sending'}
+                      onClick={(e) => void submit(e, true)}
+                      className="btn-ghost mt-3 w-full"
+                    >
+                      {t('consultButton')}
+                    </button>
+                  </>
                 )}
                 {status === 'error' && (
                   <p role="alert" className="text-sm text-m-red">{errorMsg}</p>
