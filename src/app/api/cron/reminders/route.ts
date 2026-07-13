@@ -71,7 +71,7 @@ export async function GET(req: Request) {
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const { data: staleData } = await sb
     .from('bookings')
-    .select('name, service, slot_date, slot_time, created_at')
+    .select('id, name, service, slot_date, slot_time, created_at')
     .eq('status', 'pending')
     .lt('created_at', dayAgo)
     .order('created_at', { ascending: true })
@@ -97,9 +97,18 @@ export async function GET(req: Request) {
         const slot = b.slot_date ? ` · ${b.slot_date} ${b.slot_time ?? ''}`.trimEnd() : '';
         lines.push(`  ⏳ ${b.name}${b.service ? ` — ${b.service}` : ''}${slot}`);
       }
-      lines.push('  → /bookings to confirm or free them');
+      lines.push('  Slot requests: /bookings · No-slot enquiries: buttons below');
     }
-    await sendOwnerMessage(lines.join('\n'));
+    // Dismiss buttons work for ANY stale booking — including no-slot enquiries
+    // that /bookings (upcoming slots only) never shows.
+    const keyboard = stale.length
+      ? {
+          inline_keyboard: stale.slice(0, 10).map((b) => [
+            { text: `✖️ Dismiss ${b.name.slice(0, 24)}`, callback_data: `bkfree:${b.id}` },
+          ]),
+        }
+      : undefined;
+    await sendOwnerWithMarkup(lines.join('\n'), keyboard);
   }
 
   // Review nudge: yesterday's confirmed jobs, one copy-button per client.
