@@ -239,5 +239,12 @@
     "vimHint": "Włącz Video in Motion",
     "cta": "Zakoduj to w moim BMW",
     "moving": "Pojazd w ruchu"
+  },
+  "Referral": {
+    "eyebrow": "Poleć znajomemu",
+    "heading": "PRZYPROWADŹ ZNAJOMEGO — ZGARNIJ 10%",
+    "text": "Poleć nas znajomemu. Gdy jego zlecenie wyniesie €80 lub więcej, dostajesz 10% jego rachunku w gotówce — bez kuponów i gwiazdek. Wystarczy powiedzieć, kto go przysłał.",
+    "badge": "rachunku · gotówką",
+    "terms": "Dotyczy zrealizowanych zleceń od €80. Polecającego podaje się przy rezerwacji lub na miejscu. Wypłata gotówką lub przelewem po zakończeniu pracy. Bez limitu — trzech znajomych, trzy wypłaty."
   }
 }

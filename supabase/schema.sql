@@ -297,3 +297,10 @@ alter table bookings add column if not exists landing text;
 
 -- ── CRM: per-client note ────────────────────────────────────────────
 alter table clients add column if not exists note text;
+
+-- Per-job economics: direct costs (FSC codes, parts) and a revenue share
+-- (referrer / partner cut), so /paid can report true net profit.
+alter table payments add column if not exists cost numeric not null default 0;
+alter table payments add column if not exists cost_note text;
+alter table payments add column if not exists share_pct numeric not null default 0;
+alter table payments add column if not exists share_name text;

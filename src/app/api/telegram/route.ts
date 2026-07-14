@@ -376,36 +376,91 @@ export async function POST(req: Request) {
         // No args → show the money summary.
         const { data: pays } = await sb
           .from('payments')
-          .select('id, amount, client, service, created_at')
+          .select('id, amount, client, service, created_at, cost, share_pct, share_name')
           .order('created_at', { ascending: false })
           .limit(200);
-        const list = (pays ?? []) as { id: number; amount: number; client: string | null; service: string | null; created_at: string }[];
+        const list = (pays ?? []) as { id: number; amount: number; client: string | null; service: string | null; created_at: string; cost?: number | null; share_pct?: number | null; share_name?: string | null }[];
         if (!list.length) {
           await sendOwnerMessage('💶 No payments logged yet.\nRecord one: <code>/paid 120 John CarPlay</code>');
           return ok();
         }
         const since = (d: number) => Date.now() - d * 86400000;
-        const sum = (ms: number) =>
-          list.filter((x) => new Date(x.created_at).getTime() >= ms).reduce((a, x) => a + Number(x.amount || 0), 0);
+        const shareOf = (x: (typeof list)[number]) =>
+          Math.round((Number(x.amount || 0) - Number(x.cost || 0)) * Number(x.share_pct || 0)) / 100;
+        const netOf = (x: (typeof list)[number]) =>
+          Number(x.amount || 0) - Number(x.cost || 0) - shareOf(x);
+        const agg = (ms: number) => {
+          const rows = list.filter((x) => new Date(x.created_at).getTime() >= ms);
+          return {
+            gross: rows.reduce((a, x) => a + Number(x.amount || 0), 0),
+            cost: rows.reduce((a, x) => a + Number(x.cost || 0), 0),
+            share: rows.reduce((a, x) => a + shareOf(x), 0),
+            net: rows.reduce((a, x) => a + netOf(x), 0),
+          };
+        };
+        const w = agg(since(7));
+        const mo = agg(since(30));
+        const fmtAgg = (a: typeof w) =>
+          a.cost || a.share
+            ? `€${a.gross.toFixed(0)} − costs €${a.cost.toFixed(0)} − shares €${a.share.toFixed(2)} = <b>net €${a.net.toFixed(2)}</b>`
+            : `<b>€${a.gross.toFixed(0)}</b>`;
+        // Owed per person this month (settle in cash, then log however you like).
+        const owed = new Map<string, number>();
+        for (const x of list.filter((y) => new Date(y.created_at).getTime() >= since(30))) {
+          const sh = shareOf(x);
+          if (sh > 0) {
+            const k = (x.share_name || 'partner').trim();
+            owed.set(k, (owed.get(k) ?? 0) + sh);
+          }
+        }
         const lines = [
           '💶 <b>Money</b>',
           '━━━━━━━━━━━━━━━━━━━',
-          `This week: <b>€${sum(since(7)).toFixed(0)}</b> · This month: <b>€${sum(since(30)).toFixed(0)}</b>`,
+          `Week: ${fmtAgg(w)}`,
+          `Month: ${fmtAgg(mo)}`,
+          ...(owed.size
+            ? ['', '<b>Owed this month:</b>', ...[...owed].map(([k, v]) => `  🤝 ${escapeHtml(k)}: €${v.toFixed(2)}`)]
+            : []),
           '',
           '<b>Recent:</b>',
         ];
         for (const x of list.slice(0, 6)) {
           const d = new Date(x.created_at).toLocaleDateString('en-IE', { day: '2-digit', month: 'short' });
-          lines.push(`  <code>#${x.id}</code> €${Number(x.amount).toFixed(0)} — ${escapeHtml([x.client, x.service].filter(Boolean).join(' · ') || '—')} (${d})`);
+          const extra = Number(x.cost || 0) || Number(x.share_pct || 0) ? ` → net €${netOf(x).toFixed(2)}` : '';
+          lines.push(`  <code>#${x.id}</code> €${Number(x.amount).toFixed(0)}${extra} — ${escapeHtml([x.client, x.service].filter(Boolean).join(' · ') || '—')} (${d})`);
         }
-        lines.push('', 'Add: <code>/paid 120 C-007 CarPlay</code> or <code>/paid 120 John Smith - CarPlay</code>', 'Undo: <code>/paid del last</code> or <code>/paid del 12</code>');
+        lines.push(
+          '',
+          'Add: <code>/paid 120 C-007 CarPlay</code> or <code>/paid 120 John Smith - CarPlay</code>',
+          'With economics: <code>/paid 200 John CarPlay cost 50 FSC share 25 Alex</code>',
+          'Undo: <code>/paid del last</code> or <code>/paid del 12</code>',
+        );
         await sendOwnerMessage(lines.join('\n'));
         return ok();
       }
       const amount = parseFloat(m[1].replace(',', '.'));
       // Who + what: "C-007 CarPlay" (code → full name), "John Smith - CarPlay"
       // (dash separates a multi-word name), or "John CarPlay" (first word = name).
-      const tail = (m[2] || '').trim();
+      let tail = (m[2] || '').trim();
+      // Economics tokens anywhere in the text:
+      //   cost 50 [note]  → direct expense (FSC code, part)
+      //   share 25 [Name] → % of (amount - costs) owed to a partner/referrer
+      let cost = 0;
+      let costNote = '';
+      let sharePct = 0;
+      let shareName = '';
+      const costM = /\bcost:?\s*(\d+(?:[.,]\d{1,2})?)(?:\s+(\w[\w -]{0,30}?))?(?=\s+share\b|$)/i.exec(tail);
+      if (costM) {
+        cost = parseFloat(costM[1].replace(',', '.'));
+        costNote = (costM[2] || '').trim();
+        tail = tail.replace(costM[0], '').trim();
+      }
+      const shareM = /\bshare:?\s*(\d{1,2})%?(?:\s+(\w[\w -]{0,30}?))?(?=\s+cost\b|$)/i.exec(tail);
+      if (shareM) {
+        sharePct = Math.min(90, Number(shareM[1]));
+        shareName = (shareM[2] || '').trim();
+        tail = tail.replace(shareM[0], '').trim();
+      }
       let client = '';
       let service = '';
       const codeM = /^(c[-\s]?0*\d+)\b\s*([\s\S]*)$/i.exec(tail);
@@ -422,13 +477,29 @@ export async function POST(req: Request) {
         client = n;
         service = svc.join(' ');
       }
-      const { error } = await sb.from('payments').insert({ amount, client: client || null, service: service || null });
+      const shareEur = sharePct ? Math.round((amount - cost) * sharePct) / 100 : 0;
+      const net = amount - cost - shareEur;
+      let { error } = await sb.from('payments').insert({
+        amount, client: client || null, service: service || null,
+        cost, cost_note: costNote || null, share_pct: sharePct, share_name: shareName || null,
+      });
+      if (error && (cost || sharePct)) {
+        // Economics columns not migrated yet — save the basic row, warn once.
+        const basic = await sb.from('payments').insert({ amount, client: client || null, service: service || null });
+        error = basic.error;
+        if (!error) {
+          await sendOwnerMessage('⚠️ Saved without cost/share — run the payments migration in Supabase (see RUNBOOK).');
+        }
+      }
       if (error) {
         await sendOwnerMessage(`❌ Could not save: ${escapeHtml(error.message)}\n(Run the payments migration in Supabase if you haven't.)`);
         return ok();
       }
+      const econ = cost || sharePct
+        ? `\n− costs €${cost.toFixed(0)}${costNote ? ` (${escapeHtml(costNote)})` : ''}${sharePct ? ` · − share €${shareEur.toFixed(2)} (${sharePct}%${shareName ? ` → ${escapeHtml(shareName)}` : ''})` : ''}\n= <b>Net €${net.toFixed(2)}</b>`
+        : '';
       await sendOwnerMessage(
-        `✅ Logged <b>€${amount.toFixed(0)}</b>${client ? ` — ${escapeHtml(client)}` : ''}${service ? ` · ${escapeHtml(service)}` : ''}\nTotals: /paid · Mistake? <code>/paid del last</code>`,
+        `✅ Logged <b>€${amount.toFixed(0)}</b>${client ? ` — ${escapeHtml(client)}` : ''}${service ? ` · ${escapeHtml(service)}` : ''}${econ}\nTotals: /paid · Mistake? <code>/paid del last</code>`,
       );
       return ok();
     }
