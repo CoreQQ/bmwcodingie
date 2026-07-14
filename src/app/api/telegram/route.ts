@@ -103,7 +103,10 @@ export async function POST(req: Request) {
   // ── Owner messages: commands + invoice wizard input ────────────
   const msg = update.message;
   if (msg?.text) {
-    const text = msg.text.trim();
+    let text = msg.text.trim();
+    if (text === '💰 Money') text = '/paid';
+    else if (text === '📅 Bookings') text = '/bookings';
+    else if (text === '📊 Stats') text = '/stats';
     if (!isOwner(msg.chat.id)) return ok();
     if (!sb) {
       await sendOwnerMessage('Database not configured.');
@@ -172,11 +175,31 @@ export async function POST(req: Request) {
     }
     if (/^\/setup(@\w+)?\b/.test(text) || /^\/start(@\w+)?\b/.test(text)) {
       const done = await registerBotCommands();
-      await sendOwnerMessage(
+      await sendOwnerWithMarkup(
         done
-          ? '✅ Меню команд обновлено. Закрой и открой этот чат — рядом с полем ввода появится кнопка ☰ Меню. Также список выпадает, если набрать «/».'
+          ? '✅ Меню команд обновлено, быстрые кнопки внизу установлены. Закрой и открой чат, если клавиатура не появилась.'
           : '❌ Не удалось обновить меню — попробуй ещё раз через минуту.',
+        {
+          keyboard: [
+            [{ text: '💶 Paid' }, { text: '📅 Bookings' }],
+            [{ text: '💰 Money' }, { text: '📊 Stats' }],
+          ],
+          resize_keyboard: true,
+          is_persistent: true,
+        },
       );
+      return ok();
+    }
+    // Persistent reply-keyboard shortcuts (installed by /setup).
+    if (text === '💶 Paid') {
+      const amounts = [40, 60, 80, 100, 120, 150, 200, 250];
+      await sendOwnerWithMarkup('💶 <b>Log a payment</b> — tap the amount:', {
+        inline_keyboard: [
+          amounts.slice(0, 4).map((a) => ({ text: `€${a}`, callback_data: `paidq:${a}` })),
+          amounts.slice(4).map((a) => ({ text: `€${a}`, callback_data: `paidq:${a}` })),
+          [{ text: '✍️ Other / with details', callback_data: 'paidq:custom' }],
+        ],
+      });
       return ok();
     }
     if (/^\/banlist(@\w+)?\b/.test(text)) {
@@ -584,6 +607,29 @@ export async function POST(req: Request) {
   const messageId = cq.message.message_id;
 
   // Canned reply pick → send the text as a tap-to-copy block.
+  if (cq.data.startsWith('paidq:')) {
+    const v = cq.data.slice(6);
+    if (v === 'custom') {
+      await answerCallback(cq.id, 'Type it in the field below');
+      await sendOwnerMessage(
+        'Type: <code>/paid 120 John CarPlay</code>\nFull economics: <code>/paid 200 John CarPlay cost 50 FSC share 25 Alex</code>',
+      );
+      return ok();
+    }
+    const amount = Number(v);
+    if (amount > 0) {
+      const { error } = await sb.from('payments').insert({ amount });
+      if (error) {
+        await answerCallback(cq.id, 'Failed — run the payments migration');
+      } else {
+        await answerCallback(cq.id, `Logged €${amount}`);
+        await sendOwnerMessage(
+          `✅ Logged <b>€${amount}</b>\nAdd client/costs? <code>/paid del last</code> then retype, e.g. <code>/paid ${amount} John CarPlay cost 50 FSC</code>\nTotals: 💰 Money`,
+        );
+      }
+    }
+    return ok();
+  }
   if (cq.data.startsWith('rt:')) {
     const r = getReply(cq.data.slice(3));
     await answerCallback(cq.id);
