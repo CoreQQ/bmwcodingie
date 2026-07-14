@@ -239,5 +239,12 @@
     "vimHint": "Įjunkite Video in Motion",
     "cta": "Noriu to savo BMW",
     "moving": "Automobilis juda"
+  },
+  "Referral": {
+    "eyebrow": "Rekomenduok draugui",
+    "heading": "ATVESK DRAUGĄ — GAUK 10%",
+    "text": "Rekomenduok mus draugui. Jei jo užsakymas nuo €80, gauni 10% jo sąskaitos grynaisiais — jokių kuponų ar smulkaus šrifto. Tiesiog pasakykite, kas atvedė.",
+    "badge": "nuo sąskaitos · grynais",
+    "terms": "Galioja atliktiems darbams nuo €80. Rekomendavusysis nurodomas registruojantis arba vietoje. Išmokama grynaisiais ar pavedimu užbaigus darbą. Be limito — trys draugai, trys išmokos."
   }
 }

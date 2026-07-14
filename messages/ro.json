@@ -239,5 +239,12 @@
     "vimHint": "Activează Video in Motion",
     "cta": "Vreau asta pe BMW-ul meu",
     "moving": "Vehicul în mișcare"
+  },
+  "Referral": {
+    "eyebrow": "Recomandă un prieten",
+    "heading": "ADU UN PRIETEN — PRIMEȘTI 10%",
+    "text": "Recomandă-ne unui prieten. Când lucrarea lui e de €80 sau mai mult, primești 10% din nota lui, cash — fără cupoane, fără text mărunt. Doar spuneți cine v-a trimis.",
+    "badge": "din notă · cash",
+    "terms": "Valabil pentru lucrări finalizate de €80+. Cel care recomandă e menționat la programare sau la fața locului. Plata cash sau prin transfer după finalizarea lucrării. Fără limită — trei prieteni, trei plăți."
   }
 }

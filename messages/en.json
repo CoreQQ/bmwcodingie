@@ -239,5 +239,12 @@
     "vimHint": "Enable Video in Motion",
     "cta": "Code this on my BMW",
     "moving": "Vehicle in motion"
+  },
+  "Referral": {
+    "eyebrow": "Refer a friend",
+    "heading": "BRING A FRIEND — EARN 10%",
+    "text": "Recommend us to a friend. When their job is €80 or more, you get 10% of their bill in cash — no coupons, no fine print. Just tell us who sent them.",
+    "badge": "of their bill · cash",
+    "terms": "Applies to completed jobs of €80+. The referrer is named at booking or drop-off. Paid in cash or by transfer once the friend’s job is done. No limit — three friends, three payouts."
   }
 }

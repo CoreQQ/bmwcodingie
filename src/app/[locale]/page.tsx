@@ -12,6 +12,7 @@ import { HowItWorks } from '@/components/site/HowItWorks';
 import { Gallery } from '@/components/site/Gallery';
 import { WhyUs } from '@/components/site/WhyUs';
 import { Reviews } from '@/components/site/Reviews';
+import { ReferralBanner } from '@/components/site/ReferralBanner';
 import { Faq } from '@/components/site/Faq';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
@@ -66,6 +67,7 @@ export default async function HomePage({
         <Gallery items={gallery} />
         <WhyUs settings={settings} />
         <Reviews reviews={reviews} />
+        <ReferralBanner />
         <Faq />
         <Contact settings={settings} serviceOptions={serviceOptions} />
       </main>
