@@ -278,6 +278,52 @@ const CHASSIS: ChassisFacts[] = [
     },
     related: ['bmw-g30-coding', 'bmw-x5-coding', 'bmw-f10-coding'],
   },
+  {
+    slug: 'bmw-f-series-coding',
+    title: 'F Series (All Models)',
+    short: 'F-series BMW',
+    codes: 'F10, F15, F20, F25, F30, F31, F32, F34, F36, F48',
+    years: '2010\u20132019',
+    genNote:
+      'The F generation is the sweet spot for BMW coding in Ireland: nearly every comfort, lighting and display behaviour lives in software, and LCI cars with NBT Evo take full Apple CarPlay activation. Whether it is a 1 Series hatch or an X5, the feature set is broadly the same \u2014 hidden features, Video in Motion, digital speed, mirror and window comfort coding, and Japan-import conversions.',
+    headUnits: 'CIC and Business on early cars, NBT from ~2013, NBT Evo (ID5/ID6) on LCI builds',
+    popular: [
+      'Apple CarPlay activation on NBT Evo builds',
+      'Video in Motion and full menus while driving',
+      'Digital speed and sport displays in the cluster',
+      'Auto-folding mirrors, one-touch windows, comfort access tweaks',
+      'Welcome lights, ambient lighting and DRL behaviour',
+      'Japan-import conversion: region, radio bands, FSC, EU maps',
+    ],
+    faq: {
+      q: 'Which F-series models do you cover?',
+      a: 'All of them \u2014 1/2/3/4/5/7 Series and X1\u2013X6 on F chassis. The exact feature list depends on the head unit and build year, so send the model, year and VIN and we confirm what your car supports.',
+    },
+    related: ['bmw-f30-coding', 'bmw-f10-coding', 'bmw-f20-coding'],
+  },
+  {
+    slug: 'bmw-g-series-coding',
+    title: 'G Series (All Models)',
+    short: 'G-series BMW',
+    codes: 'G01, G05, G11, G20, G21, G30, G31',
+    years: '2017 onwards',
+    genNote:
+      'G-series cars ship with iDrive 7/8 where BMW gates many features behind options and subscriptions \u2014 which makes coding especially rewarding: wireless CarPlay behaviour, extended displays, comfort functions and camera options can often be enabled on the equipment already in the car. We code G bodies in person or remotely over ENET.',
+    headUnits: 'iDrive 6 on the earliest builds, iDrive 7 (ID7) on most, iDrive 8 on the newest',
+    popular: [
+      'Full-screen wireless Apple CarPlay behaviour',
+      'Video in Motion on iDrive 7',
+      'Extended digital cluster and HUD options',
+      'Comfort closing, mirror and lighting behaviour',
+      'Camera views and parking assistant options',
+      'Sport displays and drive-mode memory',
+    ],
+    faq: {
+      q: 'Is coding safe on a G series still under warranty?',
+      a: 'Coding changes settings that already exist in the car and is fully reversible \u2014 we can return everything to factory before a dealer visit. Tell us the build and we will be straight about what is sensible on a warranty car.',
+    },
+    related: ['bmw-g20-coding', 'bmw-g30-coding', 'bmw-x3-coding'],
+  },
 ];
 
 function buildChassisPage(f: ChassisFacts): ServicePage {
