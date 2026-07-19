@@ -304,3 +304,14 @@ alter table payments add column if not exists cost numeric not null default 0;
 alter table payments add column if not exists cost_note text;
 alter table payments add column if not exists share_pct numeric not null default 0;
 alter table payments add column if not exists share_name text;
+
+-- Anonymous section-attention analytics: seconds each page section was
+-- actually on screen. No IP, no UA, no identifiers — pure aggregates.
+create table if not exists section_time (
+  id bigserial primary key,
+  day date not null default current_date,
+  path text not null,
+  section text not null,
+  seconds numeric not null,
+  created_at timestamptz not null default now()
+);
