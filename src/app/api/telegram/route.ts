@@ -575,6 +575,24 @@ export async function POST(req: Request) {
       if (s.paymentsCount > 0) {
         lines.push(`💶 Revenue: <b>€${s.revenue7.toFixed(0)}</b> this week · <b>€${s.revenue30.toFixed(0)}</b> this month`);
       }
+      // Section attention: where visitors actually spend their time (7 days).
+      const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+      const { data: att } = await sb
+        .from('section_time')
+        .select('section, seconds')
+        .gte('day', weekAgo)
+        .limit(5000);
+      if (att?.length) {
+        const bySec = new Map<string, number>();
+        for (const r of att as { section: string; seconds: number }[]) {
+          bySec.set(r.section, (bySec.get(r.section) ?? 0) + Number(r.seconds || 0));
+        }
+        const top = [...bySec].sort((a, b) => b[1] - a[1]).slice(0, 8);
+        const fmtT = (v: number) =>
+          v >= 3600 ? `${Math.floor(v / 3600)}h ${Math.round((v % 3600) / 60)}m` : `${Math.round(v / 60)}m`;
+        lines.push('', '<b>⏱ Attention by section (7d):</b>');
+        for (const [k, v] of top) lines.push(`  ${fmtT(v)} — ${escapeHtml(k)}`);
+      }
       if (s.topServices.length) {
         lines.push('', '<b>Most requested:</b>');
         for (const t of s.topServices) lines.push(`  ${t.count} × ${t.service}`);
