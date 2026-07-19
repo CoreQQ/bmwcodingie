@@ -21,6 +21,7 @@ type Overview = {
   services: ServiceRow[];
   reviews: Review[];
   reviewUrl?: string;
+  attention?: { section: string; seconds: number }[];
 };
 
 type TgWebApp = {
@@ -206,7 +207,7 @@ export default function MiniApp() {
             {tab === 'services' && <ServicesTab services={data.services} busy={busy} act={act} />}
             {tab === 'reviews' && <ReviewsTab reviews={data.reviews} busy={busy} act={act} />}
             {tab === 'hours' && <HoursTab hours={data.hours} slotDuration={data.slotDuration || 2} busy={busy} act={act} />}
-            {tab === 'stats' && <StatsTab stats={data.stats} />}
+            {tab === 'stats' && <StatsTab stats={data.stats} attention={data.attention} />}
           </>
         )}
       </div>
@@ -863,7 +864,12 @@ function BanToggle({
 
 /* ── Stats ────────────────────────────────────────────────── */
 
-function StatsTab({ stats }: { stats: BusinessStats }) {
+function fmtAttention(v: number): string {
+  if (v >= 3600) return `${Math.floor(v / 3600)}h ${Math.round((v % 3600) / 60)}m`;
+  return `${Math.max(1, Math.round(v / 60))}m`;
+}
+
+function StatsTab({ stats, attention }: { stats: BusinessStats; attention?: { section: string; seconds: number }[] }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-3 gap-2">
@@ -878,6 +884,37 @@ function StatsTab({ stats }: { stats: BusinessStats }) {
         <h2 className="label mb-3 flex items-center gap-2"><TrendingUp size={13} className="text-bmw" /> Slots</h2>
         <p className="text-sm text-muted">✅ {stats.confirmedUpcoming} confirmed upcoming · ⏳ {stats.pending} pending</p>
       </div>
+      {stats.paymentsCount > 0 && (
+        <div className="border border-white/8 bg-graphite-800/40 p-4">
+          <h2 className="label mb-3">💶 Revenue</h2>
+          <p className="text-sm text-muted">
+            <span className="font-display text-2xl text-ink">€{stats.revenue7.toFixed(0)}</span> this week ·{' '}
+            <span className="font-display text-2xl text-ink">€{stats.revenue30.toFixed(0)}</span> this month
+          </p>
+          <p className="mt-2 text-[11px] text-faint">Net after costs & shares: 💰 Money in the bot chat</p>
+        </div>
+      )}
+      {!!attention?.length && (
+        <div className="border border-white/8 bg-graphite-800/40 p-4">
+          <h2 className="label mb-3">⏱ Attention by section · 7d</h2>
+          <ul className="space-y-2">
+            {attention.map((a) => {
+              const max = attention[0].seconds || 1;
+              return (
+                <li key={a.section} className="text-sm">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="truncate text-muted">{a.section}</span>
+                    <span className="shrink-0 font-mono text-xs">{fmtAttention(a.seconds)}</span>
+                  </div>
+                  <div className="mt-1 h-1 w-full bg-white/5">
+                    <div className="h-1 bg-bmw" style={{ width: `${Math.max(4, (a.seconds / max) * 100)}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
       {stats.topServices.length > 0 && (
         <div className="border border-white/8 bg-graphite-800/40 p-4">
           <h2 className="label mb-3">Most requested</h2>

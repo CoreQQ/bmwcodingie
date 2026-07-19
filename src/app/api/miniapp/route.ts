@@ -46,11 +46,28 @@ export async function POST(req: Request) {
         sb.from('services').select('id, title, price_label, visible, sort_order').order('sort_order'),
         sb.from('reviews').select('*').order('sort_order'),
       ]);
+      // Section attention (7 days) — anonymous aggregates for the Stats tab.
+      const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+      const { data: att } = await sb
+        .from('section_time')
+        .select('section, seconds')
+        .gte('day', weekAgo)
+        .limit(5000);
+      const bySec = new Map<string, number>();
+      for (const r of (att ?? []) as { section: string; seconds: number }[]) {
+        bySec.set(r.section, (bySec.get(r.section) ?? 0) + Number(r.seconds || 0));
+      }
+      const attention = [...bySec]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([section, seconds]) => ({ section, seconds: Math.round(seconds) }));
+
       return NextResponse.json({
         ok: true,
         schedule,
         blocked,
         stats,
+        attention,
         hours,
         slotDuration,
         services: servicesRes.data ?? [],
