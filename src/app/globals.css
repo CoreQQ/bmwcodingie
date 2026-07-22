@@ -152,27 +152,13 @@ html {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
+  /* Buttons: simple and solid — colour shift on hover, slight press on tap. */
   .btn-primary {
-    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-all duration-300 hover:bg-bmw-dark hover:shadow-[0_0_30px_-6px_rgba(23,134,212,0.75)] active:scale-[0.97];
-  }
-  /* Sheen that sweeps across the primary button on hover */
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 45%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transform: translateX(-160%) skewX(-20deg);
-    transition: transform 0.6s ease;
-  }
-  .btn-primary:hover::after {
-    transform: translateX(320%) skewX(-20deg);
+    @apply inline-flex items-center justify-center gap-2 bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-colors duration-200 hover:bg-bmw-dark active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-all duration-300 hover:border-m-blue/70 hover:text-ink active:scale-[0.97];
+    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-200 hover:border-m-blue/70 hover:bg-white/5 active:scale-[0.98];
   }
 
   /* Nav link with an M-blue underline that grows on hover */
@@ -376,7 +362,6 @@ html {
   .demo-welcome {
     animation: none;
   }
-  .btn-primary::after,
   [class*='animate-'] {
     animation: none !important;
     transition: none !important;
