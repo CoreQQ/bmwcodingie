@@ -5,7 +5,6 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { GalleryItem } from '@/lib/types';
 import { Reveal } from './Reveal';
-import { Parallax } from './Parallax';
 
 export function Gallery({ items }: { items: GalleryItem[] }) {
   const t = useTranslations('Gallery');
@@ -45,9 +44,9 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
               <span className="label">{t('eyebrow')}</span>
               <span className="m-stripe h-[2px] w-10" />
             </div>
-            <Parallax speed={-0.07}><h2 className="text-balance font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
+            <h2 className="text-balance font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
               {t('heading')}
-            </h2></Parallax>
+            </h2>
           </div>
           <p className="col-span-12 text-muted md:col-span-4 md:text-right">{t('intro')}</p>
         </Reveal>

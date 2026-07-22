@@ -1,6 +1,5 @@
 import { getTranslations } from 'next-intl/server';
 import { Reveal } from './Reveal';
-import { Parallax } from './Parallax';
 
 export async function HowItWorks() {
   const t = await getTranslations('HowItWorks');
@@ -17,9 +16,9 @@ export async function HowItWorks() {
           <span className="label">{t('eyebrow')}</span>
           <span className="m-stripe h-[2px] w-10" />
         </div>
-        <Parallax speed={-0.07}><h2 className="mb-16 max-w-3xl font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
+        <h2 className="mb-16 max-w-3xl font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.9]">
           {t('heading')}
-        </h2></Parallax>
+        </h2>
 
         <div className="grid grid-cols-1 gap-px bg-white/8 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
