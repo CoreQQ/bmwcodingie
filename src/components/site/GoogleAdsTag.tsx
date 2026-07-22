@@ -7,7 +7,7 @@ import { useCookieConsent } from '@/lib/useCookieConsent';
 // Public measurement id (visible in any page source) — baked in so the tag
 // works without env config; env var still wins if set.
 const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-17881862993';
-const CONVERSION_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
+const CONVERSION_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL || 'EuOdCIWFl9QcENGm3s5C';
 
 // Google Consent Mode v2: the tag loads for everyone with all storage DENIED
 // by default (cookieless pings only — GDPR-safe, and Google's tag scanner can
