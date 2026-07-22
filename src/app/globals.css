@@ -346,6 +346,15 @@ html {
     transform: translateY(0);
   }
 }
+/* Phones: keep reveals simple — a quick fade with a tiny lift. */
+@media (max-width: 767px) {
+  .reveal {
+    transform: translateY(6px);
+  }
+  .reveal.is-in {
+    animation-duration: 0.35s;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .preloader {
     display: none !important;

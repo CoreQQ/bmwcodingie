@@ -21,6 +21,8 @@ export function Parallax({
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Desktop-only: on phones scroll-linked movement reads as jank, not depth.
+    if (window.matchMedia('(max-width: 767px)').matches) return;
     let raf = 0;
     const host = el.parentElement ?? el;
     const update = () => {
