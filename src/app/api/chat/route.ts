@@ -2,6 +2,9 @@ import Anthropic from '@anthropic-ai/sdk';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import { isServiceArea } from '@/lib/geo';
 import { SITE_CHAT_PROMPT } from '@/lib/assistantPrompt';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { notifyTelegram } from '@/lib/telegram';
+import { ensureClient, clientCode, phoneKey } from '@/lib/crm';
 
 export const runtime = 'nodejs';
 
@@ -49,6 +52,24 @@ export async function POST(req: Request) {
     max_tokens: 512,
     system: SITE_CHAT_PROMPT,
     messages: trimmed,
+    tools: [
+      {
+        name: 'save_lead',
+        description:
+          "Save the visitor's contact details as a lead so the team follows up. Call exactly once, only when you have both a name and a phone number the visitor actually provided.",
+        input_schema: {
+          type: 'object' as const,
+          properties: {
+            name: { type: 'string', description: 'Visitor name as given' },
+            phone: { type: 'string', description: 'Phone number as given' },
+            bmw_model: { type: 'string', description: 'Car model/year if mentioned' },
+            service: { type: 'string', description: 'What they want done, short' },
+            note: { type: 'string', description: 'Any useful context from the chat' },
+          },
+          required: ['name', 'phone'],
+        },
+      },
+    ],
   });
 
   const encoder = new TextEncoder();
@@ -61,6 +82,67 @@ export async function POST(req: Request) {
         ) {
           controller.enqueue(encoder.encode(event.delta.text));
         }
+      }
+      // If the model captured a lead, persist it and notify the owner.
+      try {
+        const final = await stream.finalMessage();
+        const tool = final.content.find(
+          (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use' && b.name === 'save_lead',
+        );
+        if (tool) {
+          const inp = tool.input as {
+            name?: string; phone?: string; bmw_model?: string; service?: string; note?: string;
+          };
+          const name = String(inp.name ?? '').trim().slice(0, 120);
+          const phone = String(inp.phone ?? '').trim().slice(0, 120);
+          if (name && phoneKey(phone).length >= 7) {
+            const bmw_model = String(inp.bmw_model ?? '').trim().slice(0, 160);
+            const service = String(inp.service ?? '').trim().slice(0, 160);
+            const note = String(inp.note ?? '').trim().slice(0, 1000);
+            const sb = getSupabaseAdmin();
+            let id: number | undefined;
+            let banned = false;
+            let code: string | undefined;
+            if (sb) {
+              const { data } = await sb
+                .from('bookings')
+                .insert({ name, contact: phone, bmw_model, service, message: note, source: 'AI chat', status: 'pending' })
+                .select('id')
+                .single();
+              id = (data as { id: number } | null)?.id;
+              const cl = await ensureClient(sb, phone, name).catch(() => null);
+              banned = cl?.banned ?? false;
+              code = cl ? clientCode(cl.id) : undefined;
+              if (banned && id) await sb.from('bookings').update({ status: 'declined' }).eq('id', id);
+            }
+            await notifyTelegram({
+              name,
+              contact: phone,
+              bmw_model,
+              service,
+              message: note,
+              slot_date: null,
+              slot_time: '',
+              source: '🤖 AI chat on site',
+              id,
+              persisted: Boolean(id),
+              clientNote: banned
+                ? `⛔️ BLACKLISTED · ${code ?? ''} — auto-declined`
+                : code
+                  ? `🆔 <b>Client:</b> ${code}`
+                  : undefined,
+            });
+            controller.enqueue(
+              encoder.encode(`\n\n✅ Saved — we'll text ${phone} shortly to confirm the details.`),
+            );
+          } else {
+            controller.enqueue(
+              encoder.encode(`\n\nHmm, that number looks incomplete — could you double-check it?`),
+            );
+          }
+        }
+      } catch {
+        // Never break the chat over lead persistence.
       }
       controller.close();
     },
