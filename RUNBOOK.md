@@ -63,9 +63,24 @@ unknown columns and retries; other readers fall back to defaults.
 `/paid [120 Name Service]` · `/ban` `/unban` `/banlist` · `/calendar` ICS ·
 `/wa +353… text` (when WA connected) · `/setup` re-registers this menu.
 
-Mini App **PULT** tabs: Today · Schedule (block days) · Clients (CRM: search,
-LTV, history, notes, ban, call/WhatsApp/review) · Services · Reviews · Hours
-(+ slot length 1–4h) · Stats.
+Mini App **PULT** tabs: Today · Money (full accounting) · Schedule (block
+days) · Clients (CRM: search, LTV, history, notes, ban, rename, delete,
+call/WhatsApp/review) · Services · Reviews · Hours (+ slot length 1–4h) · Stats.
+
+**Installable app (iOS + Windows).** PULT is a PWA (`/manifest.webmanifest`
++ `/sw.js`, scope `/miniapp`). iPhone: open `bmwcoding.ie/miniapp` in Safari
+→ Share → *Add to Home Screen*. Windows: open in Chrome/Edge → *Install* icon
+in the address bar. Outside Telegram it shows a **password sign-in**
+(`ADMIN_PASSWORD`); the key is stored in localStorage (`pult_key`) and sent as
+`adminKey` on every `/api/miniapp` call — same owner access as Telegram
+initData. Log out = clear the app's site data.
+
+**Money tab / accounting.** Per job: client, paid, costs (FSC/parts), net
+(= paid − costs), partner share (% of net, default 25%), and *yours*
+(= net − share). 30-day totals: received / costs / net profit / to-pay-out,
+plus owed-per-person. Add-job form + per-row delete. Same rows and math as the
+bot's `/paid` (economics columns in `payments`: `cost`, `cost_note`,
+`share_pct`, `share_name`).
 
 ## Slot logic
 
