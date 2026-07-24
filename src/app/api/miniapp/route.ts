@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { validateMiniAppAuth } from '@/lib/miniappAuth';
+import { checkPassword } from '@/lib/auth';
 import { getBusinessStats, getSchedule, getBlockedDates, getHours, getSlotDuration } from '@/lib/stats';
 import { getCrmClients } from '@/lib/crmData';
 import { ensureClient, phoneKey } from '@/lib/crm';
@@ -24,10 +25,15 @@ export async function POST(req: Request) {
 
   const auth = validateMiniAppAuth(String(body.initData ?? ''));
   if (!auth.ok) {
-    return NextResponse.json(
-      { ok: false, error: 'unauthorized', reason: auth.reason, userId: auth.userId ?? null },
-      { status: 401 },
-    );
+    // Standalone app mode (PWA on iOS/Windows): the admin password grants
+    // the same owner access as Telegram initData.
+    const key = String(body.adminKey ?? '');
+    if (!key || !checkPassword(key)) {
+      return NextResponse.json(
+        { ok: false, error: 'unauthorized', reason: auth.reason, userId: auth.userId ?? null },
+        { status: 401 },
+      );
+    }
   }
 
   const sb = getSupabaseAdmin();
@@ -37,7 +43,7 @@ export async function POST(req: Request) {
 
   switch (String(body.action)) {
     case 'overview': {
-      const [schedule, blocked, stats, hours, slotDuration, servicesRes, reviewsRes] = await Promise.all([
+      const [schedule, blocked, stats, hours, slotDuration, servicesRes, reviewsRes, paymentsRes] = await Promise.all([
         getSchedule(sb, 14),
         getBlockedDates(sb),
         getBusinessStats(sb),
@@ -45,6 +51,7 @@ export async function POST(req: Request) {
         getSlotDuration(sb),
         sb.from('services').select('id, title, price_label, visible, sort_order').order('sort_order'),
         sb.from('reviews').select('*').order('sort_order'),
+        sb.from('payments').select('*').order('created_at', { ascending: false }).limit(200),
       ]);
       // Section attention (7 days) — anonymous aggregates for the Stats tab.
       const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
@@ -72,6 +79,7 @@ export async function POST(req: Request) {
         slotDuration,
         services: servicesRes.data ?? [],
         reviews: reviewsRes.data ?? [],
+        payments: paymentsRes.data ?? [],
         reviewUrl: REVIEW_URL,
       });
     }
@@ -171,6 +179,38 @@ export async function POST(req: Request) {
       const client = await ensureClient(sb, contact);
       if (!client) return bad();
       await sb.from('clients').update({ note: note || null }).eq('id', client.id);
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'addPayment': {
+      const amount = Number(body.amount);
+      if (!Number.isFinite(amount) || amount <= 0 || amount > 100000) return bad();
+      const cost = Math.max(0, Math.min(100000, Number(body.cost) || 0));
+      const share_pct = Math.max(0, Math.min(90, Number(body.share_pct) || 0));
+      const row = {
+        amount,
+        client: String(body.client ?? '').trim().slice(0, 120) || null,
+        service: String(body.service ?? '').trim().slice(0, 160) || null,
+        cost,
+        cost_note: String(body.cost_note ?? '').trim().slice(0, 160) || null,
+        share_pct,
+        share_name: String(body.share_name ?? '').trim().slice(0, 120) || null,
+      };
+      let { error } = await sb.from('payments').insert(row);
+      if (error && (cost || share_pct)) {
+        // Economics columns not migrated yet — keep the base record.
+        ({ error } = await sb
+          .from('payments')
+          .insert({ amount, client: row.client, service: row.service }));
+      }
+      if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
+
+    case 'delPayment': {
+      const id = Number(body.id);
+      if (!id) return bad();
+      await sb.from('payments').delete().eq('id', id);
       return NextResponse.json({ ok: true });
     }
 

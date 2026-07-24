@@ -12,6 +12,17 @@ import { windowsFor, windowsOverlap, WEEKDAY_LABELS, type HoursMap } from '@/lib
 
 type ServiceRow = { id: number; title: string; price_label: string; visible: boolean; sort_order: number };
 
+type PaymentRow = {
+  id: number;
+  amount: number;
+  client: string | null;
+  service: string | null;
+  cost?: number | null;
+  share_pct?: number | null;
+  share_name?: string | null;
+  created_at: string;
+};
+
 type Overview = {
   schedule: { day: string; bookings: Booking[] }[];
   blocked: string[];
@@ -20,6 +31,7 @@ type Overview = {
   slotDuration: number;
   services: ServiceRow[];
   reviews: Review[];
+  payments?: PaymentRow[];
   reviewUrl?: string;
   attention?: { section: string; seconds: number }[];
 };
@@ -67,6 +79,7 @@ type Act = (p: Record<string, unknown>, h?: 'success' | 'warning') => Promise<vo
 
 const TABS = [
   ['today', 'Today'],
+  ['money', 'Money'],
   ['schedule', 'Schedule'],
   ['clients', 'Clients'],
   ['services', 'Services'],
@@ -89,7 +102,11 @@ export default function MiniApp() {
     const res = await fetch('/api/miniapp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ initData, ...payload }),
+      body: JSON.stringify({
+        initData,
+        adminKey: (typeof localStorage !== 'undefined' && localStorage.getItem('pult_key')) || undefined,
+        ...payload,
+      }),
     });
     if (!res.ok) {
       let detail = '';
@@ -129,12 +146,24 @@ export default function MiniApp() {
         else void load();
       } else if (tries > 40) {
         window.clearInterval(t);
-        setDebugInfo('no telegram script');
-        setState('noauth');
+        if (localStorage.getItem('pult_key')) {
+          setDebugInfo('standalone app');
+          void load();
+        } else {
+          setDebugInfo('standalone app · enter password');
+          setState('noauth');
+        }
       }
     }, 100);
     return () => window.clearInterval(t);
   }, [load]);
+
+  // Register the service worker so PULT installs as a standalone app.
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+    }
+  }, []);
 
   const act: Act = async (payload, haptic = 'success') => {
     if (busy) return;
@@ -190,8 +219,29 @@ export default function MiniApp() {
       <div className="px-4 py-4">
         {state === 'boot' && <p className="py-16 text-center text-sm text-muted">Loading…</p>}
         {state === 'noauth' && (
-          <div className="py-16 text-center">
-            <p className="text-sm text-muted">Open this app from the bot&apos;s menu button in Telegram.</p>
+          <div className="mx-auto max-w-xs py-16 text-center">
+            <p className="text-sm text-muted">Open from the Telegram bot — or sign in with the admin password:</p>
+            <form
+              className="mt-5 space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const v = (new FormData(e.currentTarget).get('pw') as string)?.trim();
+                if (!v) return;
+                localStorage.setItem('pult_key', v);
+                setState('boot');
+                void load();
+              }}
+            >
+              <input
+                name="pw"
+                type="password"
+                placeholder="Admin password"
+                className="w-full border border-white/10 bg-graphite-800/60 px-4 py-3 text-sm text-ink outline-none focus:border-bmw"
+              />
+              <button type="submit" className="w-full border border-bmw bg-bmw/15 px-4 py-3 font-mono text-[11px] uppercase tracking-widest text-ink active:scale-95">
+                Sign in
+              </button>
+            </form>
             {debugInfo && <p className="mt-4 font-mono text-[10px] text-faint">{debugInfo}</p>}
           </div>
         )}
@@ -202,6 +252,7 @@ export default function MiniApp() {
         {state === 'ready' && data && (
           <>
             {tab === 'today' && <TodayTab data={data} todayKey={todayKey} busy={busy} act={act} />}
+            {tab === 'money' && <MoneyTab payments={data.payments ?? []} busy={busy} act={act} />}
             {tab === 'schedule' && <ScheduleTab data={data} busy={busy} act={act} />}
             {tab === 'clients' && <ClientsTab api={api} reviewUrl={data.reviewUrl} />}
             {tab === 'services' && <ServicesTab services={data.services} busy={busy} act={act} />}
@@ -928,6 +979,121 @@ function StatsTab({ stats, attention }: { stats: BusinessStats; attention?: { se
           </ul>
         </div>
       )}
+    </div>
+  );
+}
+
+
+// ── Money: full per-job accounting ──
+// paid − costs = net; share % of net is owed to the partner; rest is yours.
+function payShare(p: PaymentRow): number {
+  return Math.round((Number(p.amount || 0) - Number(p.cost || 0)) * Number(p.share_pct || 0)) / 100;
+}
+function payNet(p: PaymentRow): number {
+  return Number(p.amount || 0) - Number(p.cost || 0);
+}
+
+function MoneyTab({ payments, busy, act }: { payments: PaymentRow[]; busy: boolean; act: Act }) {
+  const [form, setForm] = useState({ client: '', amount: '', service: '', cost: '', share: '25', shareName: '' });
+  const since30 = Date.now() - 30 * 86400000;
+  const month = payments.filter((p) => new Date(p.created_at).getTime() >= since30);
+  const sum = (f: (p: PaymentRow) => number, list: PaymentRow[]) => list.reduce((a, p) => a + f(p), 0);
+  const gross = sum((p) => Number(p.amount || 0), month);
+  const costs = sum((p) => Number(p.cost || 0), month);
+  const shares = sum(payShare, month);
+  const owed = new Map<string, number>();
+  for (const p of month) {
+    const sh = payShare(p);
+    if (sh > 0) owed.set((p.share_name || 'partner').trim(), (owed.get((p.share_name || 'partner').trim()) ?? 0) + sh);
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-2">
+        {([
+          [`€${gross.toFixed(0)}`, 'Received · 30d'],
+          [`€${costs.toFixed(0)}`, 'Costs · 30d'],
+          [`€${(gross - costs).toFixed(0)}`, 'Net profit · 30d'],
+          [`€${shares.toFixed(2)}`, 'To pay out · 30d'],
+        ] as const).map(([n, label]) => (
+          <div key={label} className="border border-white/8 bg-graphite-800/40 p-4 text-center">
+            <div className="font-display text-2xl">{n}</div>
+            <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-faint">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {owed.size > 0 && (
+        <div className="border border-white/8 bg-graphite-800/40 p-4">
+          <h2 className="label mb-2">🤝 Owed this month</h2>
+          {[...owed].map(([k, v]) => (
+            <p key={k} className="text-sm text-muted">{k}: <span className="text-ink">€{v.toFixed(2)}</span></p>
+          ))}
+        </div>
+      )}
+
+      <form
+        className="space-y-2 border border-white/8 bg-graphite-800/40 p-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const amount = parseFloat(form.amount.replace(',', '.'));
+          if (!amount) return;
+          void act({
+            action: 'addPayment',
+            amount,
+            client: form.client,
+            service: form.service,
+            cost: parseFloat(form.cost.replace(',', '.')) || 0,
+            share_pct: parseFloat(form.share) || 0,
+            share_name: form.shareName,
+          });
+          setForm({ client: '', amount: '', service: '', cost: '', share: '25', shareName: '' });
+        }}
+      >
+        <h2 className="label mb-1">＋ Log a job</h2>
+        <div className="grid grid-cols-2 gap-2">
+          <input value={form.client} onChange={(e) => setForm({ ...form, client: e.target.value })} placeholder="Client" className="border border-white/10 bg-graphite-900 px-3 py-2.5 text-sm outline-none focus:border-bmw" />
+          <input value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="Paid €" inputMode="decimal" className="border border-white/10 bg-graphite-900 px-3 py-2.5 text-sm outline-none focus:border-bmw" />
+          <input value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value })} placeholder="Service" className="border border-white/10 bg-graphite-900 px-3 py-2.5 text-sm outline-none focus:border-bmw" />
+          <input value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} placeholder="Costs € (FSC, parts)" inputMode="decimal" className="border border-white/10 bg-graphite-900 px-3 py-2.5 text-sm outline-none focus:border-bmw" />
+          <input value={form.share} onChange={(e) => setForm({ ...form, share: e.target.value })} placeholder="Share %" inputMode="numeric" className="border border-white/10 bg-graphite-900 px-3 py-2.5 text-sm outline-none focus:border-bmw" />
+          <input value={form.shareName} onChange={(e) => setForm({ ...form, shareName: e.target.value })} placeholder="Share to (name)" className="border border-white/10 bg-graphite-900 px-3 py-2.5 text-sm outline-none focus:border-bmw" />
+        </div>
+        <button type="submit" disabled={busy} className="w-full border border-bmw bg-bmw/15 px-4 py-3 font-mono text-[11px] uppercase tracking-widest active:scale-95 disabled:opacity-50">
+          Save job
+        </button>
+      </form>
+
+      <div className="space-y-2">
+        {payments.map((p) => {
+          const share = payShare(p);
+          const net = payNet(p);
+          const d = new Date(p.created_at).toLocaleDateString('en-IE', { day: '2-digit', month: 'short' });
+          return (
+            <div key={p.id} className="border border-white/8 bg-graphite-800/40 p-3">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="truncate text-sm text-ink">{p.client || '—'}{p.service ? ` · ${p.service}` : ''}</span>
+                <span className="shrink-0 font-mono text-[10px] text-faint">{d}</span>
+              </div>
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px]">
+                <span className="text-ink">💶 €{Number(p.amount).toFixed(0)}</span>
+                {Number(p.cost || 0) > 0 && <span className="text-faint">− €{Number(p.cost).toFixed(0)} costs</span>}
+                <span className="text-emerald-400/90">net €{net.toFixed(2)}</span>
+                {share > 0 && <span className="text-amber-400/90">🤝 €{share.toFixed(2)}{p.share_name ? ` → ${p.share_name}` : ''}</span>}
+                {share > 0 && <span className="text-bmw">yours €{(net - share).toFixed(2)}</span>}
+                <button
+                  onClick={() => { if (window.confirm('Delete this payment?')) void act({ action: 'delPayment', id: p.id }, 'warning'); }}
+                  className="ml-auto text-m-red/80 active:scale-95"
+                  aria-label="Delete payment"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+        {!payments.length && <p className="py-8 text-center text-sm text-faint">No payments yet — log the first job above.</p>}
+      </div>
     </div>
   );
 }

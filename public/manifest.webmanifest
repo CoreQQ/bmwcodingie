@@ -1,0 +1,14 @@
+{
+  "name": "BMW Coding PULT",
+  "short_name": "PULT",
+  "description": "Admin cockpit for BMW Coding IE — bookings, clients, money.",
+  "start_url": "/miniapp",
+  "scope": "/miniapp",
+  "display": "standalone",
+  "background_color": "#0A0B0D",
+  "theme_color": "#0A0B0D",
+  "icons": [
+    { "src": "/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
