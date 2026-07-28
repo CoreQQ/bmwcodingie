@@ -107,6 +107,7 @@ export async function POST(req: Request) {
     if (text === '💰 Money') text = '/paid';
     else if (text === '📅 Bookings') text = '/bookings';
     else if (text === '📊 Stats') text = '/stats';
+    else if (text === '💶 Paid') text = '/log';
     if (!isOwner(msg.chat.id)) return ok();
     if (!sb) {
       await sendOwnerMessage('Database not configured.');
@@ -181,8 +182,8 @@ export async function POST(req: Request) {
           : '❌ Не удалось обновить меню — попробуй ещё раз через минуту.',
         {
           keyboard: [
-            [{ text: '💶 Paid' }, { text: '📅 Bookings' }],
-            [{ text: '💰 Money' }, { text: '📊 Stats' }],
+            [{ text: '/log 💶' }, { text: '/bookings 📅' }],
+            [{ text: '/paid 💰' }, { text: '/stats 📊' }],
           ],
           resize_keyboard: true,
           is_persistent: true,
@@ -191,7 +192,7 @@ export async function POST(req: Request) {
       return ok();
     }
     // Persistent reply-keyboard shortcuts (installed by /setup).
-    if (text === '💶 Paid') {
+    if (/^\/log(@\w+)?\b/.test(text)) {
       const amounts = [40, 60, 80, 100, 120, 150, 200, 250];
       await sendOwnerWithMarkup('💶 <b>Log a payment</b> — tap the amount:', {
         inline_keyboard: [
@@ -642,7 +643,7 @@ export async function POST(req: Request) {
       } else {
         await answerCallback(cq.id, `Logged €${amount}`);
         await sendOwnerMessage(
-          `✅ Logged <b>€${amount}</b>\nAdd client/costs? <code>/paid del last</code> then retype, e.g. <code>/paid ${amount} John CarPlay cost 50 FSC</code>\nTotals: 💰 Money`,
+          `✅ Logged <b>€${amount}</b>\nAdd client/costs? <code>/paid del last</code> then retype, e.g. <code>/paid ${amount} John CarPlay cost 50 FSC</code>\nTotals: /paid`,
         );
       }
     }
