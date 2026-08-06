@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
 import { translateToRussian } from '@/lib/translate';
+import { generateWaReply } from '@/lib/waAgent';
+import { ensureClient } from '@/lib/crm';
+import { isRateLimited } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
@@ -73,12 +76,35 @@ export async function POST(req: Request) {
     }
   }
 
+  // Generate our own reply (ManyChat just delivers it) unless the owner
+  // paused this chat or we hit the per-sender cost cap.
+  let reply = aiReply;
+  if (sb && text && !paused && !aiReply) {
+    if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
+      reply = '';
+    } else {
+      try {
+        void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
+        reply = await generateWaReply(sb, phone, text, name || undefined);
+        await sb.from('wa_messages').insert({
+          msg_id: `mc:${phone}:${Date.now()}:ai`,
+          wa_id: phone,
+          role: 'assistant',
+          content: reply,
+          via: 'ai',
+        });
+      } catch {
+        reply = ''; // fall through: owner still gets the message in Telegram
+      }
+    }
+  }
+
   // Mirror to the owner's Telegram.
   const label = name ? `${escapeHtml(name)} · ` : '';
   const ruLine = text ? await translateToRussian(text).then((t) => (t && t !== text ? `\n🇷🇺 ${escapeHtml(t)}` : '')) : '';
   const lines = [`💬 <b>WhatsApp (ManyChat)</b> · ${label}<code>+${phone}</code>`];
   if (text) lines.push(`«${escapeHtml(text)}»${ruLine}`);
-  if (aiReply) lines.push(`🤖 ${escapeHtml(aiReply)}`);
+  if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
   if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
   await sendOwnerWithMarkup(lines.join('\n'), {
     inline_keyboard: [[
@@ -87,8 +113,9 @@ export async function POST(req: Request) {
     ]],
   });
 
-  // ManyChat reads these fields to decide whether to let its AI answer.
-  return NextResponse.json({ ok: true, paused, ai_enabled: !paused });
+  // ManyChat sends `reply` back to the customer; `paused` lets its flow
+  // branch when the owner has taken the chat over.
+  return NextResponse.json({ ok: true, paused, ai_enabled: !paused, reply });
 }
 
 export function GET() {
