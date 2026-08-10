@@ -65,12 +65,12 @@ export function SlotPicker({
 
   const windowsFor = (weekday: number) => windowsForHours(hours, weekday, duration);
 
-  // Next ~2 weeks of bookable days (every day has evening/weekend slots).
+  // Next month of bookable days (every day has evening/weekend slots).
   const days = useMemo(() => {
     const out: Date[] = [];
     const start = new Date();
     start.setHours(0, 0, 0, 0);
-    for (let i = 1; i <= 24 && out.length < 14; i++) {
+    for (let i = 1; i <= 35 && out.length < 31; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       if (hours[d.getDay()]) out.push(d);
