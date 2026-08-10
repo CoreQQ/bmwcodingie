@@ -13,6 +13,13 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Stale-tab-vs-fresh-deploy crashes self-heal via the reload guard in the
+    // root layout — reporting them just spams the owner with noise.
+    const selfHealing =
+      /Loading chunk [^ ]+ failed|ChunkLoadError|Failed to fetch dynamically imported module|parallelRoutes|\.children'\)/i.test(
+        String(error?.message ?? ''),
+      );
+    if (selfHealing) return;
     try {
       fetch('/api/error-report', {
         method: 'POST',
