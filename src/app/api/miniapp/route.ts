@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   switch (String(body.action)) {
     case 'overview': {
       const [schedule, blocked, stats, hours, slotDuration, servicesRes, reviewsRes, paymentsRes] = await Promise.all([
-        getSchedule(sb, 14),
+        getSchedule(sb, 31),
         getBlockedDates(sb),
         getBusinessStats(sb),
         getHours(sb),
