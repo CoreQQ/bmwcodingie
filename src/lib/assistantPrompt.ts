@@ -11,8 +11,8 @@ const CORE_FACTS = `Key facts about us:
 - Payment is on completion — no upfront payment required
 
 Our services include:
-- Apple CarPlay activation (from €120, wired or wireless on NBT/NBT Evo/MGU)
-- Android Auto activation (from €120, iDrive 7/MGU only)
+- Apple CarPlay activation — €150 on NBT Evo (iDrive 5/6), €200 on MGU (iDrive 7/8); one-off, no subscription
+- Android Auto activation — €200 on MGU (iDrive 7/8) only
 - Video in Motion (from €60)
 - Ambient lighting retrofit — OEM contour lighting (price on request)
 - Welcome/Coming Home lighting animations (from €50)
@@ -21,7 +21,7 @@ Our services include:
 - Comfort Access & auto mirror folding (from €50)
 - Speed limit & traffic sign recognition (from €60)
 - Start/Stop memory & seatbelt reminders (from €40)
-- Japan → EU conversion / region change (from €150)
+- Japan → EU conversion / region change — €250 on NBT Evo, €280 on MGU (CarPlay included)
 - Full ISTA diagnostics with written report (from €80)
 - Hidden features & custom coding (price on request)
 - Stage 1 / Stage 2 ECU remap (price on request)
