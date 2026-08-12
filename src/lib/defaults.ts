@@ -27,8 +27,8 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     sort_order: 1,
     translations: {},
     services: [
-      svc(1, 1, 'Apple CarPlay activation', 'Wired or full wireless CarPlay enabled on NBT, NBT Evo and MGU head units.', 'from €120'),
-      svc(2, 1, 'Android Auto activation', 'Enabled where supported — iDrive 7 (MGU) only; iDrive 6 / NBT Evo assessed per car.', 'from €120'),
+      svc(1, 1, 'Apple CarPlay activation', 'Wired or full wireless CarPlay enabled on NBT Evo and MGU head units.', '€150 NBT Evo · €200 MGU'),
+      svc(2, 1, 'Android Auto activation', 'Enabled where supported — iDrive 7/8 (MGU) only; iDrive 6 / NBT Evo assessed per car.', '€200 MGU'),
       svc(3, 1, 'Video in Motion', 'Watch video and use full screen functions while the car is moving.', 'from €60'),
       svc(4, 1, 'BMW Apps & Remote Services', 'Activate connected apps, Remote Services and online features in the head unit.', 'from €80'),
       svc(5, 1, 'Navigation FSC & map codes', 'FSC generation for navigation activation and map updates.', 'On request'),
@@ -67,7 +67,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     sort_order: 4,
     translations: {},
     services: [
-      svc(14, 4, 'Japan → EU conversion', 'Region change, FSC, ETC mirror and TCB hardware considerations for JDM imports.', 'from €150'),
+      svc(14, 4, 'Japan → EU conversion', 'Region change, radio bands, navigation FSC, EU maps and ETC handling for JDM imports.', '€250 NBT Evo · €280 MGU'),
       svc(15, 4, 'Full ISTA diagnostics', 'Complete fault scan, read and clear codes, written summary of findings.', 'from €80'),
       svc(16, 4, 'Hidden features & custom coding', 'Bespoke coding to your spec — tell us what you want, we will scope it.', 'On request'),
     ],

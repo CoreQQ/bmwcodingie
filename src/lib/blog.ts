@@ -172,7 +172,7 @@ export const BLOG_POSTS: BlogPost[] = [
     title: 'How Much Does BMW Coding Cost in Ireland?',
     metaTitle: 'BMW Coding Prices Ireland 2026 | CarPlay, Diagnostics & More | BMW Coding',
     description:
-      'Real 2026 prices for BMW coding in Ireland: CarPlay activation from €120, diagnostics from €80, Video in Motion from €60, Japan import conversion from €150 — and what decides the final price.',
+      'Real 2026 prices for BMW coding in Ireland: CarPlay activation from €150, diagnostics from €80, Video in Motion from €60, Japan import conversion from €250 — and what decides the final price.',
     date: '2026-07-04',
     readMinutes: 5,
     intro: [
@@ -185,13 +185,13 @@ export const BLOG_POSTS: BlogPost[] = [
           'Most pure-software jobs have a known price because the work is predictable once we confirm your build supports the feature.',
         ],
         bullets: [
-          'Apple CarPlay activation — from €120 (wired or wireless, no subscription)',
-          'Android Auto activation — from €120 (iDrive 7 / MGU builds)',
+          'Apple CarPlay activation — €150 on NBT Evo, €200 on MGU (no subscription)',
+          'Android Auto activation — €200 (iDrive 7 / 8, MGU builds)',
           'Full ISTA diagnostics with written summary — from €80',
           'Video in Motion — from €60',
           'Sport displays / digital cluster layouts — from €60',
           'Comfort pack (mirrors, windows, chimes, lighting) — from €40–50 per item, bundled cheaper',
-          'Japan → EU conversion — from €150 (region, radio bands, language)',
+          'Japan → EU conversion — €250 NBT Evo, €280 MGU (CarPlay included)',
         ],
       },
       {
@@ -304,7 +304,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Imports travel far and sit in compounds. A complete diagnostic scan across every control unit shows the honest state of the car — stored faults, battery registration state, anything the auction sheet did not mention. We include a written summary you can keep with the car\u2019s file.',
         ],
         bullets: [
-          'Full conversion (region, bands, language) — from €150',
+          'Full conversion (region, bands, nav FSC, EU maps) — €250 NBT Evo, €280 MGU',
           'Navigation FSC + EU maps — quoted per system',
           'ISTA scan with written summary — from €80',
           'All demonstrated working before you pay',
