@@ -81,13 +81,15 @@
     "q2": "Kuriuos BMW modelius aptarnaujate?",
     "a2": "F ir G serijos automobilius su NBT, NBT Evo ir MGU (iDrive 6/7/8) galvaniniais blokais. Atsiųskite savo modelį, metus ir iš VIN gautą konfigūraciją, ir mes tiksliai patvirtinsime, kas įmanoma jūsų automobiliui.",
     "q3": "Ar man reikia kur nors atvažiuoti?",
-    "a3": "Dažniausiai ne. Darbus gyvai atliekame pas jus namuose, darbovietėje ar kur automobilis pastatytas Dubline ir aplinkiniuose grafštuose. Taip pat siūlome kodavimą nuotoliniu būdu — jūs liekate savo vietoje ir prijungiate nešiojamąjį kompiuterį su ENET kabeliu prie automobilio, kol mes dirbame.",
+    "a3": "Dažniausiai ne. Darbus gyvai atliekame pas jus namuose, darbovietėje ar kur automobilis pastatytas Dubline ir aplinkiniuose grafštuose. Taip pat siūlome kodavimą nuotoliniu būdu — jūs liekate savo vietoje ir prijungiate nešiojamąjį kompiuterį su ENET kabeliu prie automobilio, kol mes dirbame. Už atvykimą taikomas mokestis — žr. žemiau.",
     "q4": "Kaip apmokėti?",
     "a4": "Po darbo atlikimo, kai pamatote, kad funkcija veikia. Kortele ar grynaisiais. Diagnostikos ir konversijų kainos patvirtinamos prieš pradedant darbą, todėl netikėtumų nebus.",
     "q5": "Ar galite ne tik koduoti, bet ir įrengti techninę įrangą?",
     "a5": "Taip — foninis apšvietimas, greičio palaikymo sistema ir panašūs retrofitai, kuriems reikia laidų ar modulių, gali būti įvertinti. Tai darbai, atliekami tik gyvai, kai kuriems iš anksto reikia užsakyti dalis, todėl parašykite mums iš anksto, ir pateiksime pilną darbo įkainį.",
     "q6": "Mano importuotas automobilis yra Japonijos specifikacijos — galite jį konvertuoti?",
-    "a6": "Konversija iš Japonijos į ES specifikaciją — dažnas darbas: regiono pakeitimas, FSC, ETC veidrodžių valdymas ir TCB aspektai. Atsiųskite informaciją, ir pasakysime, ko konkrečiai reikia jūsų automobiliui."
+    "a6": "Konversija iš Japonijos į ES specifikaciją — dažnas darbas: regiono pakeitimas, FSC, ETC veidrodžių valdymas ir TCB aspektai. Atsiųskite informaciją, ir pasakysime, ko konkrečiai reikia jūsų automobiliui.",
+    "q7": "Ar atvykimas pas automobilį yra mokamas?",
+    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų dirbtuvių Greenogue Business Park, Rathcoole. Tikslią kelionės kainą sužinosite prieš registraciją. Atvykus į dirbtuves arba dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
   },
   "Contact": {
     "eyebrow": "07 / Rezervacija",

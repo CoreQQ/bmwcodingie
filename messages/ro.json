@@ -81,13 +81,15 @@
     "q2": "Pe ce modele BMW lucrați?",
     "a2": "Seriile F și G, cu unitățile centrale NBT, NBT Evo și MGU (iDrive 6/7/8). Trimite-ne modelul, anul și configurația derivată din VIN și îți confirmăm exact ce este posibil pe maşina ta.",
     "q3": "Trebuie să mă deplasez undeva?",
-    "a3": "De obicei nu. Pentru lucrările la fața locului venim acasă la tine, la serviciu sau oriunde este parcată maşina, în Dublin și județele din jur. Oferim și coding la distanță — rămâi unde ești și conectezi un laptop la maşină printr-un cablu ENET, în timp ce noi lucrăm.",
+    "a3": "De obicei nu. Pentru lucrările la fața locului venim acasă la tine, la serviciu sau oriunde este parcată maşina, în Dublin și județele din jur. Oferim și coding la distanță — rămâi unde ești și conectezi un laptop la maşină printr-un cablu ENET, în timp ce noi lucrăm. Pentru deplasare se percepe o taxă — vezi mai jos.",
     "q4": "Cum plătesc?",
     "a4": "La finalizare, după ce ai văzut funcția în funcțiune. Card sau numerar. Prețurile pentru diagnoză și conversii se confirmă înainte să începem, ca să nu existe surprize.",
     "q5": "Puteți face și retrofit hardware, nu doar coding?",
     "a5": "Da — iluminare ambientală, cruise control și alte retrofituri similare care necesită cablaj sau module pot fi evaluate. Acestea sunt lucrări care se fac la fața locului și unele necesită piese comandate în avans, așa că scrie-ne din timp și îți facem o ofertă completă.",
     "q6": "Maşina mea este import din Japonia — o puteți converti?",
-    "a6": "Conversiile Japonia→UE sunt o lucrare obișnuită pentru noi: schimbarea regiunii, FSC, gestionarea oglinzilor pentru ETC și aspectele legate de TCB. Trimite-ne detaliile și îți spunem exact de ce are nevoie maşina ta."
+    "a6": "Conversiile Japonia→UE sunt o lucrare obișnuită pentru noi: schimbarea regiunii, FSC, gestionarea oglinzilor pentru ETC și aspectele legate de TCB. Trimite-ne detaliile și îți spunem exact de ce are nevoie maşina ta.",
+    "q7": "Deplasarea la mașină este cu plată?",
+    "a7": "Da — pentru deplasare se percepe o taxă: €20 în Dublin și împrejurimi, apoi €1.25 pe kilometru dincolo, calculat de la atelierul nostru din Greenogue Business Park, Rathcoole. Costul exact al deplasării îți este comunicat înainte de programare. Dacă vii la atelier sau lucrarea se face remote prin ENET, nu există taxă de deplasare."
   },
   "Contact": {
     "eyebrow": "07 / Programare",
