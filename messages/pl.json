@@ -81,13 +81,15 @@
     "q2": "Jakie modele BMW obsługujecie?",
     "a2": "Serie F i G z jednostkami głównymi NBT, NBT Evo oraz MGU (iDrive 6/7/8). Wyślij nam model, rok i dane budowy odczytane z VIN, a my potwierdzimy, co dokładnie jest możliwe w Twoim samochodzie.",
     "q3": "Czy muszę gdzieś jechać?",
-    "a3": "Zwykle nie. Przy pracach na miejscu przyjeżdżamy do Twojego domu, miejsca pracy lub gdziekolwiek samochód jest zaparkowany na terenie Dublina i okolicznych hrabstw. Oferujemy też kodowanie zdalne — zostajesz tam, gdzie jesteś, i podłączasz do samochodu laptop z kablem ENET, a my pracujemy zdalnie.",
+    "a3": "Zwykle nie. Przy pracach na miejscu przyjeżdżamy do Twojego domu, miejsca pracy lub gdziekolwiek samochód jest zaparkowany na terenie Dublina i okolicznych hrabstw. Oferujemy też kodowanie zdalne — zostajesz tam, gdzie jesteś, i podłączasz do samochodu laptop z kablem ENET, a my pracujemy zdalnie. Za dojazd pobierana jest opłata — szczegóły poniżej.",
     "q4": "Jak mogę zapłacić?",
     "a4": "Po wykonaniu usługi, gdy zobaczysz, że funkcja działa. Karta lub gotówka. Ceny diagnostyki i konwersji potwierdzamy przed rozpoczęciem pracy, więc nie ma niespodzianek.",
     "q5": "Czy robicie też retrofity sprzętowe, nie tylko kodowanie?",
     "a5": "Tak — oświetlenie ambientowe, tempomat i podobne retrofity wymagające okablowania lub modułów możemy wycenić. To prace wykonywane na miejscu, a niektóre wymagają wcześniejszego zamówienia części, więc napisz do nas z wyprzedzeniem, a podamy pełną wycenę.",
     "q6": "Mój samochód to import ze specyfikacją japońską — można go przekonwertować?",
-    "a6": "Konwersje Japonia→UE to dla nas standardowe zlecenie: zmiana regionu, FSC, obsługa lusterek ETC i kwestie TCB. Wyślij szczegóły, a powiemy, czego potrzebuje konkretnie Twój samochód."
+    "a6": "Konwersje Japonia→UE to dla nas standardowe zlecenie: zmiana regionu, FSC, obsługa lusterek ETC i kwestie TCB. Wyślij szczegóły, a powiemy, czego potrzebuje konkretnie Twój samochód.",
+    "q7": "Czy dojazd do samochodu jest płatny?",
+    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszego warsztatu w Greenogue Business Park, Rathcoole. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy wizycie w warsztacie lub kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
   },
   "Contact": {
     "eyebrow": "07 / Rezerwacja",

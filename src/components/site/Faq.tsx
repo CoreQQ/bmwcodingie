@@ -7,7 +7,7 @@ import { Reveal } from './Reveal';
 
 export function Faq() {
   const t = useTranslations('Faq');
-  const FAQS = [1, 2, 3, 4, 5, 6].map((i) => ({
+  const FAQS = [1, 2, 3, 4, 5, 6, 7].map((i) => ({
     q: t(`q${i}` as Parameters<typeof t>[0]),
     a: t(`a${i}` as Parameters<typeof t>[0]),
   }));
