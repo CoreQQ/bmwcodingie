@@ -7,6 +7,8 @@ import { ensureClient } from '@/lib/crm';
 import { isRateLimited } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
+// ManyChat's External Request gives up quickly — keep the whole turn short.
+export const maxDuration = 30;
 
 // Bridge for a ManyChat WhatsApp bot: ManyChat calls this via an "External
 // Request" on each inbound message. We mirror the chat to the owner's Telegram
@@ -85,7 +87,7 @@ export async function POST(req: Request) {
     } else {
       try {
         void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
-        reply = await generateWaReply(sb, phone, text, name || undefined);
+        reply = await generateWaReply(sb, phone, text, name || undefined, 'claude-haiku-4-5-20251001');
         await sb.from('wa_messages').insert({
           msg_id: `mc:${phone}:${Date.now()}:ai`,
           wa_id: phone,

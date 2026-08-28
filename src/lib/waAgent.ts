@@ -35,6 +35,8 @@ export async function generateWaReply(
   waId: string,
   text: string,
   profileName?: string,
+  /** Fast model for transports that time out quickly (ManyChat waits seconds). */
+  model = 'claude-opus-4-8',
 ): Promise<string> {
   const { data: history } = await sb
     .from('wa_messages')
@@ -52,7 +54,7 @@ export async function generateWaReply(
 
   const client = new Anthropic();
   const response = await client.messages.create({
-    model: 'claude-opus-4-8',
+    model,
     max_tokens: 500,
     system: WHATSAPP_PROMPT,
     messages,
