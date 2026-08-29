@@ -12,6 +12,7 @@ const PATHS = [
   { path: '/bmw-coding-ireland', priority: 0.9 },
   { path: '/models', priority: 0.8 },
   { path: '/bmw-coding-list', priority: 0.8 },
+  { path: '/bmw-coding-price-calculator', priority: 0.9 },
   { path: '/blog', priority: 0.7 },
   { path: '/find-us', priority: 0.6 },
   ...BLOG_POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.7 })),

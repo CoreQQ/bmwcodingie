@@ -96,6 +96,11 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
 
         {/* SEO internal links — collapsible on phones, always open on md+ */}
         <LinkBlock title="BMW Coding Services" cols="sm:grid-cols-3 lg:grid-cols-4">
+          <li>
+            <Link href="/bmw-coding-price-calculator" className="text-bmw transition-colors hover:text-ink">
+              Price calculator
+            </Link>
+          </li>
           {SERVICE_NAV.map((s) => (
             <li key={s.slug}>
               <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
