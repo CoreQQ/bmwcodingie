@@ -88,6 +88,26 @@ export async function POST(req: Request) {
   // Optional: the reply ManyChat's AI produced, so we can mirror it too.
   const aiReply = String(body.reply ?? '').trim().slice(0, 4000);
 
+  // A message we cannot read (photo, voice note, sticker) must never end in
+  // silence: answer helpfully and make sure the owner sees it.
+  if (phone && !text && !aiReply && !imageUrl) {
+    const fallback =
+      "Got that 👍 I can't open attachments here — could you type it out for me? " +
+      'If it is your iDrive screen: tell me the model and year and I will confirm ' +
+      'which system you have and the exact price.';
+    await sendOwnerWithMarkup(
+      `💬 <b>WhatsApp (ManyChat)</b> · ${name ? `${escapeHtml(name)} · ` : ''}<code>${
+        isPhone ? `+${phone}` : `ManyChat id ${phone}`
+      }</code>\n📎 <i>sent an attachment the bot cannot read (photo / voice / sticker)</i>`,
+      {
+        inline_keyboard: [[
+          { text: '📋 Number', copy_text: { text: isPhone ? `+${phone}` : phone } },
+        ]],
+      },
+    ).catch(() => undefined);
+    return NextResponse.json({ ok: true, paused: false, ai_enabled: true, reply: fallback });
+  }
+
   if (!phone || (!text && !aiReply && !imageUrl)) {
     // Echo what actually arrived — guessing which ManyChat field is empty
     // from the other side is painful.
@@ -202,7 +222,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 7,
+    v: 8,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
