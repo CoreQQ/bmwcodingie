@@ -180,14 +180,22 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true, paused, ai_enabled: !paused, reply, ...(aiError ? { error: aiError } : {}) });
 }
 
-export function GET() {
-  // `db` tells us whether the service-role key reached this deployment —
-  // without it the bridge can only mirror, never answer.
+export async function GET() {
+  // `db`/`ai` tell us whether this deployment can talk to Supabase and the
+  // model; `memory` says whether the conversation tables exist — without them
+  // the agent answers every message with no recollection of the last one.
+  const sb = getSupabaseAdmin();
+  let memory = false;
+  if (sb) {
+    const { error } = await sb.from('wa_messages').select('msg_id').limit(1);
+    memory = !error;
+  }
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 4,
-    db: Boolean(getSupabaseAdmin()),
+    v: 5,
+    db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
+    memory,
   });
 }
