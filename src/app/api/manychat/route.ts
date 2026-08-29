@@ -125,5 +125,13 @@ export async function POST(req: Request) {
 }
 
 export function GET() {
-  return NextResponse.json({ ok: true, hint: 'ManyChat External Request endpoint — POST only.' });
+  // `db` tells us whether the service-role key reached this deployment —
+  // without it the bridge can only mirror, never answer.
+  return NextResponse.json({
+    ok: true,
+    hint: 'ManyChat External Request endpoint — POST only.',
+    v: 2,
+    db: Boolean(getSupabaseAdmin()),
+    ai: Boolean(process.env.ANTHROPIC_API_KEY),
+  });
 }
