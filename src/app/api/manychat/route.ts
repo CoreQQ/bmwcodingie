@@ -21,6 +21,35 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+
+/**
+ * ManyChat can send a flat body or its whole contact object (the "Add Full
+ * Contact Data" button), and names the phone differently per channel. Rather
+ * than demanding one exact shape, walk the payload and take the first usable
+ * value for each field. Placeholder text that was never substituted (no
+ * digits in a phone, "{{...}}" or "⟦...⟧" in a text) is ignored.
+ */
+function deepFind(body: unknown, keys: string[], depth = 0): string {
+  if (depth > 4 || !body || typeof body !== 'object') return '';
+  const obj = body as Record<string, unknown>;
+  for (const k of keys) {
+    const v = obj[k];
+    if (typeof v === 'string' || typeof v === 'number') {
+      const str = String(v).trim();
+      if (str && !/^[{⟦]|[}⟧]$/.test(str)) return str;
+    }
+  }
+  for (const v of Object.values(obj)) {
+    if (v && typeof v === 'object') {
+      const found = deepFind(v, keys, depth + 1);
+      if (found) return found;
+    }
+  }
+  return '';
+}
+
+const unresolved = (s: string) => /\{\{|⟦|⟧/.test(s);
+
 export async function POST(req: Request) {
   const secret = process.env.MANYCHAT_SECRET;
   const url = new URL(req.url);
@@ -36,19 +65,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 });
   }
 
-  const name = String(body.name ?? '').trim().slice(0, 120);
-  // ManyChat exposes the number under different system fields depending on
-  // channel and account age — accept every spelling, and fall back to the
-  // subscriber id so a chat without a phone still works.
-  const rawPhone = String(
-    body.phone ?? body.whatsapp ?? body.wa_id ?? body.whatsapp_phone ?? body.contact_phone ?? '',
-  ).replace(/[^\d]/g, '');
-  const subscriberId = String(body.user_id ?? body.subscriber_id ?? body.id ?? '')
+  const firstName = deepFind(body, ['first_name', 'name']);
+  const lastName = deepFind(body, ['last_name']);
+  const name = `${firstName} ${lastName}`.trim().slice(0, 120);
+  const rawPhone = deepFind(body, [
+    'phone', 'whatsapp', 'wa_id', 'whatsapp_phone', 'contact_phone', 'optin_phone',
+  ]).replace(/[^\d]/g, '');
+  const subscriberId = deepFind(body, ['user_id', 'subscriber_id', 'id', 'key'])
     .replace(/[^\d]/g, '')
     .slice(0, 24);
   const isPhone = rawPhone.length >= 8;
   const phone = (isPhone ? rawPhone : subscriberId).slice(0, 24);
-  const text = String(body.text ?? body.message ?? '').trim().slice(0, 4000);
+  const rawText = deepFind(body, ['text', 'message', 'last_input_text', 'last_text_input']);
+  const text = unresolved(rawText) ? '' : rawText.trim().slice(0, 4000);
   // Optional: the reply ManyChat's AI produced, so we can mirror it too.
   const aiReply = String(body.reply ?? '').trim().slice(0, 4000);
 
