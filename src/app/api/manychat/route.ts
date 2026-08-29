@@ -78,10 +78,16 @@ export async function POST(req: Request) {
   const phone = (isPhone ? rawPhone : subscriberId).slice(0, 24);
   const rawText = deepFind(body, ['text', 'message', 'last_input_text', 'last_text_input']);
   const text = unresolved(rawText) ? '' : rawText.trim().slice(0, 4000);
+  // A photo of the iDrive screen decides the price, so accept it under any of
+  // the names ManyChat might use.
+  const rawImage = deepFind(body, [
+    'image_url', 'image', 'attachment_url', 'media_url', 'photo', 'file_url', 'last_attachment_url',
+  ]);
+  const imageUrl = /^https:\/\//.test(rawImage) && !unresolved(rawImage) ? rawImage : '';
   // Optional: the reply ManyChat's AI produced, so we can mirror it too.
   const aiReply = String(body.reply ?? '').trim().slice(0, 4000);
 
-  if (!phone || (!text && !aiReply)) {
+  if (!phone || (!text && !aiReply && !imageUrl)) {
     // Echo what actually arrived — guessing which ManyChat field is empty
     // from the other side is painful.
     return NextResponse.json(
@@ -106,12 +112,12 @@ export async function POST(req: Request) {
       .single();
     paused = Boolean(chat?.paused);
 
-    if (text) {
+    if (text || imageUrl) {
       await sb.from('wa_messages').insert({
         msg_id: `mc:${phone}:${Date.now()}`,
         wa_id: phone,
         role: 'user',
-        content: text,
+        content: imageUrl ? `[photo] ${text}`.trim() : text,
         via: 'customer',
       });
     }
@@ -130,7 +136,7 @@ export async function POST(req: Request) {
   // paused this chat or we hit the per-sender cost cap.
   let reply = aiReply;
   let aiError = '';
-  if (sb && text && !paused && !aiReply) {
+  if (sb && (text || imageUrl) && !paused && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
       reply = '';
     } else {
@@ -139,10 +145,11 @@ export async function POST(req: Request) {
         reply = await generateWaReply(
           sb,
           phone,
-          text,
+          text || 'Photo attached.',
           name || undefined,
           'claude-haiku-4-5-20251001',
           isPhone ? `+${phone}` : `ManyChat ${phone}`,
+          imageUrl || undefined,
         );
         await sb.from('wa_messages').insert({
           msg_id: `mc:${phone}:${Date.now()}:ai`,
@@ -165,6 +172,7 @@ export async function POST(req: Request) {
   const ruLine = text ? await translateToRussian(text).then((t) => (t && t !== text ? `\n🇷🇺 ${escapeHtml(t)}` : '')) : '';
   const who = isPhone ? `+${phone}` : `ManyChat id ${phone}`;
   const lines = [`💬 <b>WhatsApp (ManyChat)</b> · ${label}<code>${who}</code>`];
+  if (imageUrl) lines.push('📷 <i>sent a photo</i>');
   if (text) lines.push(`«${escapeHtml(text)}»${ruLine}`);
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
   if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
@@ -193,7 +201,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 5,
+    v: 6,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
