@@ -186,7 +186,7 @@ export function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 3,
+    v: 4,
     db: Boolean(getSupabaseAdmin()),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
   });
