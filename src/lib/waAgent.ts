@@ -37,6 +37,9 @@ export async function generateWaReply(
   profileName?: string,
   /** Fast model for transports that time out quickly (ManyChat waits seconds). */
   model = 'claude-opus-4-8',
+  /** How the customer is addressed in the CRM — a +number, or an id label
+   *  when the transport gives us no phone (then no client record is made). */
+  contact = `+${waId}`,
 ): Promise<string> {
   const { data: history } = await sb
     .from('wa_messages')
@@ -71,11 +74,12 @@ export async function generateWaReply(
     const bmw_model = String(inp.bmw_model ?? '').trim().slice(0, 160);
     const service = String(inp.service ?? '').trim().slice(0, 160);
     const note = String(inp.note ?? '').trim().slice(0, 1000);
+    const isPhone = contact.startsWith('+');
     const ins = await sb
       .from('bookings')
       .insert({
         name: leadName,
-        contact: `+${waId}`,
+        contact,
         bmw_model,
         service,
         message: note,
@@ -85,10 +89,10 @@ export async function generateWaReply(
       .select('id')
       .single();
     const id = (ins.data as { id: number } | null)?.id;
-    const cl = await ensureClient(sb, `+${waId}`, leadName).catch(() => null);
+    const cl = isPhone ? await ensureClient(sb, contact, leadName).catch(() => null) : null;
     await notifyTelegram({
       name: leadName,
-      contact: `+${waId}`,
+      contact,
       bmw_model,
       service,
       message: note,
