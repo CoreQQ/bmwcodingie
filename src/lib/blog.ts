@@ -306,7 +306,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Imports travel far and sit in compounds. A complete diagnostic scan across every control unit shows the honest state of the car — stored faults, battery registration state, anything the auction sheet did not mention. We include a written summary you can keep with the car\u2019s file.',
         ],
         bullets: [
-          'Full conversion (region, bands, nav FSC, EU maps) — €250 NBT Evo, €280 MGU',
+          'Full conversion (region, bands, nav FSC, EU maps) — €250 NBT Evo, €280 MGU with CarPlay included',
           'Navigation FSC + EU maps — quoted per system',
           'ISTA scan with written summary — from €80',
           'All demonstrated working before you pay',
