@@ -81,7 +81,8 @@ export async function POST(req: Request) {
   // A photo of the iDrive screen decides the price, so accept it under any of
   // the names ManyChat might use.
   const rawImage = deepFind(body, [
-    'image_url', 'image', 'attachment_url', 'media_url', 'photo', 'file_url', 'last_attachment_url',
+    'image_url', 'image', 'attachment_url', 'media_url', 'photo', 'photo_url', 'file_url',
+    'last_attachment_url', 'cf_photo_url', 'idrive_photo',
   ]);
   const imageUrl = /^https:\/\//.test(rawImage) && !unresolved(rawImage) ? rawImage : '';
   // Optional: the reply ManyChat's AI produced, so we can mirror it too.
@@ -201,7 +202,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 6,
+    v: 7,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
