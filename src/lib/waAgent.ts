@@ -12,6 +12,30 @@ import { windowsFor, windowsOverlap } from './hours';
 // capture, same Telegram notifications.
 
 
+
+/** Download a customer photo for the model to look at. Small, typed, and
+ *  never fatal — a broken link just means we answer without the picture. */
+async function fetchImage(
+  url: string,
+): Promise<{ media_type: 'image/jpeg' | 'image/png' | 'image/webp'; data: string } | null> {
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const type = (res.headers.get('content-type') || '').split(';')[0].trim();
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'] as const;
+    const media_type = allowed.find((t) => t === type);
+    if (!media_type) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.byteLength > 4_500_000) return null; // keep the request small
+    return { media_type, data: buf.toString('base64') };
+  } catch {
+    return null;
+  }
+}
+
 /** Today's date in Dublin as YYYY-MM-DD (the server clock runs UTC). */
 function dublinDay(offsetDays = 0): string {
   const d = new Date(Date.now() + offsetDays * 86400000);
@@ -119,6 +143,8 @@ export async function generateWaReply(
   /** How the customer is addressed in the CRM — a +number, or an id label
    *  when the transport gives us no phone (then no client record is made). */
   contact = `+${waId}`,
+  /** Photo the customer just sent (e.g. their iDrive home screen). */
+  imageUrl?: string,
 ): Promise<string> {
   const { data: history } = await sb
     .from('wa_messages')
@@ -136,6 +162,23 @@ export async function generateWaReply(
 
   const client = new Anthropic();
   const convo: Anthropic.MessageParam[] = messages.map((m) => ({ role: m.role, content: m.content }));
+
+  // A photo (usually the iDrive home screen) goes in with the latest message —
+  // identifying the head unit from the UI is what decides the price.
+  if (imageUrl) {
+    const img = await fetchImage(imageUrl);
+    if (img) {
+      const last = convo[convo.length - 1];
+      const caption = typeof last?.content === 'string' ? last.content : text;
+      convo[convo.length - 1] = {
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: img.media_type, data: img.data } },
+          { type: 'text', text: caption || 'Photo from the customer.' },
+        ],
+      };
+    }
+  }
 
   // Save a lead / book a slot / read the diary. The model may need two or
   // three turns (check availability → offer times → book), so loop instead of
