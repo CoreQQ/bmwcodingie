@@ -37,13 +37,32 @@ export async function POST(req: Request) {
   }
 
   const name = String(body.name ?? '').trim().slice(0, 120);
-  const phone = String(body.phone ?? body.whatsapp ?? '').replace(/[^\d]/g, '').slice(0, 20);
+  // ManyChat exposes the number under different system fields depending on
+  // channel and account age — accept every spelling, and fall back to the
+  // subscriber id so a chat without a phone still works.
+  const rawPhone = String(
+    body.phone ?? body.whatsapp ?? body.wa_id ?? body.whatsapp_phone ?? body.contact_phone ?? '',
+  ).replace(/[^\d]/g, '');
+  const subscriberId = String(body.user_id ?? body.subscriber_id ?? body.id ?? '')
+    .replace(/[^\d]/g, '')
+    .slice(0, 24);
+  const isPhone = rawPhone.length >= 8;
+  const phone = (isPhone ? rawPhone : subscriberId).slice(0, 24);
   const text = String(body.text ?? body.message ?? '').trim().slice(0, 4000);
   // Optional: the reply ManyChat's AI produced, so we can mirror it too.
   const aiReply = String(body.reply ?? '').trim().slice(0, 4000);
 
   if (!phone || (!text && !aiReply)) {
-    return NextResponse.json({ ok: false, error: 'phone and text required' }, { status: 400 });
+    // Echo what actually arrived — guessing which ManyChat field is empty
+    // from the other side is painful.
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'need a phone (or subscriber id) and a text',
+        received: { keys: Object.keys(body), phone: rawPhone || null, subscriberId: subscriberId || null, text: text || null },
+      },
+      { status: 400 },
+    );
   }
 
   const sb = getSupabaseAdmin();
@@ -87,8 +106,15 @@ export async function POST(req: Request) {
       reply = '';
     } else {
       try {
-        void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
-        reply = await generateWaReply(sb, phone, text, name || undefined, 'claude-haiku-4-5-20251001');
+        if (isPhone) void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
+        reply = await generateWaReply(
+          sb,
+          phone,
+          text,
+          name || undefined,
+          'claude-haiku-4-5-20251001',
+          isPhone ? `+${phone}` : `ManyChat ${phone}`,
+        );
         await sb.from('wa_messages').insert({
           msg_id: `mc:${phone}:${Date.now()}:ai`,
           wa_id: phone,
@@ -108,14 +134,15 @@ export async function POST(req: Request) {
   // Mirror to the owner's Telegram.
   const label = name ? `${escapeHtml(name)} · ` : '';
   const ruLine = text ? await translateToRussian(text).then((t) => (t && t !== text ? `\n🇷🇺 ${escapeHtml(t)}` : '')) : '';
-  const lines = [`💬 <b>WhatsApp (ManyChat)</b> · ${label}<code>+${phone}</code>`];
+  const who = isPhone ? `+${phone}` : `ManyChat id ${phone}`;
+  const lines = [`💬 <b>WhatsApp (ManyChat)</b> · ${label}<code>${who}</code>`];
   if (text) lines.push(`«${escapeHtml(text)}»${ruLine}`);
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
   if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
   await sendOwnerWithMarkup(lines.join('\n'), {
     inline_keyboard: [[
       { text: paused ? '▶️ Resume AI' : '⏸ Stop AI here', callback_data: `${paused ? 'war' : 'wap'}:${phone}` },
-      { text: '📋 Number', copy_text: { text: `+${phone}` } },
+      { text: '📋 Number', copy_text: { text: who } },
     ]],
   });
 
