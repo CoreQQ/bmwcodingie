@@ -21,7 +21,9 @@ Our services include:
 - Comfort Access & auto mirror folding (from €50)
 - Speed limit & traffic sign recognition (from €60)
 - Start/Stop memory & seatbelt reminders (from €40)
-- Japan → EU conversion / region change — €250 on NBT Evo, €280 on MGU (CarPlay included)
+- Japan → EU conversion / region change — €250 on NBT Evo, €280 on MGU
+  On MGU the €280 INCLUDES Apple CarPlay activation, which is €220 on its own —
+  say so, it is the best-value job we do for an import.
 - Full ISTA diagnostics with written report (from €80)
 - Hidden features & custom coding (price on request)
 - Stage 1 / Stage 2 ECU remap (price on request)
