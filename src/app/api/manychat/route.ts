@@ -81,6 +81,7 @@ export async function POST(req: Request) {
   // Generate our own reply (ManyChat just delivers it) unless the owner
   // paused this chat or we hit the per-sender cost cap.
   let reply = aiReply;
+  let aiError = '';
   if (sb && text && !paused && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
       reply = '';
@@ -95,8 +96,11 @@ export async function POST(req: Request) {
           content: reply,
           via: 'ai',
         });
-      } catch {
-        reply = ''; // fall through: owner still gets the message in Telegram
+      } catch (e) {
+        // Surface the reason in the (secret-protected) response — silent
+        // empty replies are impossible to debug from the ManyChat side.
+        aiError = e instanceof Error ? e.message : String(e);
+        reply = ''; // owner still gets the message in Telegram
       }
     }
   }
@@ -117,7 +121,7 @@ export async function POST(req: Request) {
 
   // ManyChat sends `reply` back to the customer; `paused` lets its flow
   // branch when the owner has taken the chat over.
-  return NextResponse.json({ ok: true, paused, ai_enabled: !paused, reply });
+  return NextResponse.json({ ok: true, paused, ai_enabled: !paused, reply, ...(aiError ? { error: aiError } : {}) });
 }
 
 export function GET() {
