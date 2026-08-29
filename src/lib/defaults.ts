@@ -27,7 +27,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     sort_order: 1,
     translations: {},
     services: [
-      svc(1, 1, 'Apple CarPlay activation', 'Wired or full wireless CarPlay enabled on NBT Evo and MGU head units.', '€150 NBT Evo · €200 MGU'),
+      svc(1, 1, 'Apple CarPlay activation', 'Wired or full wireless CarPlay enabled on NBT Evo and MGU head units.', '€150 NBT Evo · €220 MGU'),
       svc(2, 1, 'Android Auto activation', 'Enabled where supported — iDrive 7/8 (MGU) only; iDrive 6 / NBT Evo assessed per car.', '€200 MGU'),
       svc(3, 1, 'Video in Motion', 'Watch video and use full screen functions while the car is moving.', 'from €60'),
       svc(4, 1, 'BMW Apps & Remote Services', 'Activate connected apps, Remote Services and online features in the head unit.', 'from €80'),

@@ -119,7 +119,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Confirm your system', body: 'Send your model, year and VIN-derived build. We identify your head unit and tell you whether wired, wireless or both are possible.' },
       { title: 'Book in or go remote', body: 'We meet the car around Dublin, or you connect a laptop and ENET cable for remote activation across Ireland where supported.' },
       { title: 'Activate and pair', body: 'We code CarPlay on, pair your iPhone and confirm it works on your screen before anything else.' },
-      { title: 'Pay on completion', body: 'You only pay once CarPlay is running on your car. Activation is €150 on NBT Evo and €200 on MGU.' },
+      { title: 'Pay on completion', body: 'You only pay once CarPlay is running on your car. Activation is €150 on NBT Evo and €220 on MGU.' },
     ],
     faqs: [
       { q: 'Can you activate Apple CarPlay on my BMW?', a: 'On most NBT Evo and MGU systems, yes. Send your model, year and VIN-derived build and we will confirm whether wired, wireless or both are supported on your exact car.' },

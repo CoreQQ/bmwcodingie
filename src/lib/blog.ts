@@ -185,7 +185,9 @@ export const BLOG_POSTS: BlogPost[] = [
           'Most pure-software jobs have a known price because the work is predictable once we confirm your build supports the feature.',
         ],
         bullets: [
-          'Apple CarPlay activation — €150 on NBT Evo, €200 on MGU (no subscription)',
+          'Apple CarPlay activation — €150 on NBT Evo, €220 on MGU (no subscription)',
+          'Wi-Fi antenna fitted (for wireless CarPlay on some builds) — +€30',
+          'iDrive 4 → iDrive 6 upgrade — +€50',
           'Android Auto activation — €200 (iDrive 7 / 8, MGU builds)',
           'Full ISTA diagnostics with written summary — from €80',
           'Video in Motion — from €60',
