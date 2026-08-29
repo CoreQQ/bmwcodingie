@@ -203,7 +203,7 @@ function buildLocationPage(f: LocationFacts): ServicePage {
       },
       {
         q: `Can you activate Apple CarPlay on my BMW in ${f.name}?`,
-        a: 'On most NBT Evo and MGU systems, yes — including wireless CarPlay where supported. Send your model, year and VIN-derived build and we confirm before you book. Activation is €150 on NBT Evo and €200 on MGU.',
+        a: 'On most NBT Evo and MGU systems, yes — including wireless CarPlay where supported. Send your model, year and VIN-derived build and we confirm before you book. Activation is €150 on NBT Evo and €220 on MGU.',
       },
       {
         q: 'Will coding affect my BMW warranty?',

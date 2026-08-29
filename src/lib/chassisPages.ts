@@ -358,7 +358,7 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
       f.faq,
       {
         q: `How much does coding a ${f.short} cost?`,
-        a: 'It depends on the features: CarPlay activation is €150 on NBT Evo and €200 on MGU, diagnostics start from €80, and multi-feature sessions are priced as a bundle. We confirm the price up front from your build.',
+        a: 'It depends on the features: CarPlay activation is €150 on NBT Evo and €220 on MGU, diagnostics start from €80, and multi-feature sessions are priced as a bundle. We confirm the price up front from your build.',
       },
       {
         q: `Can my ${f.short} be coded remotely?`,
