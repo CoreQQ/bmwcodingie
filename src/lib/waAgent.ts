@@ -51,6 +51,10 @@ async function availabilityText(sb: SupabaseClient, day?: string): Promise<strin
     });
     lines.push(free.length ? `${label} (${d}): ${free.join(', ')}` : `${label} (${d}): fully booked`);
   }
+  const total = (
+    await Promise.all(days.map((d) => freeWindows(sb, d)))
+  ).reduce((n, w) => n + w.length, 0);
+  lines.push(`Total free windows in this range: ${total}.`);
   return lines.join('\n') || 'No bookable days found.';
 }
 
