@@ -128,6 +128,20 @@ const BOOK_TOOL: Anthropic.Tool = {
   },
 };
 
+
+const REMEMBER_TOOL: Anthropic.Tool = {
+  name: 'remember',
+  description:
+    "Store the durable facts about this customer so you still know them next time: name, car (model + year), head unit, what they want, anything agreed. Call this the moment you learn something new. Pass the COMPLETE up-to-date set of facts each time — it replaces what was stored. Keep it under 400 characters.",
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      facts: { type: 'string', description: 'e.g. "Alex, 2016 F30 NBT Evo, wants CarPlay (€150), prefers evenings"' },
+    },
+    required: ['facts'],
+  },
+};
+
 /**
  * Produce the agent's reply for an inbound WhatsApp message, persisting a
  * lead (booking + client + owner notification) when the model captures one.
@@ -145,7 +159,9 @@ export async function generateWaReply(
   contact = `+${waId}`,
   /** Photo the customer just sent (e.g. their iDrive home screen). */
   imageUrl?: string,
-): Promise<string> {
+  /** Facts remembered from earlier messages (survives even without a DB). */
+  priorMemory?: string,
+): Promise<{ reply: string; memory: string }> {
   const { data: history } = await sb
     .from('wa_messages')
     .select('role, content')
@@ -161,6 +177,10 @@ export async function generateWaReply(
   }
 
   const client = new Anthropic();
+  const system = priorMemory
+    ? `${WHATSAPP_PROMPT}\n\nWHAT YOU ALREADY KNOW ABOUT THIS CUSTOMER (do not ask again):\n${priorMemory}`
+    : WHATSAPP_PROMPT;
+  let memory = priorMemory ?? '';
   const convo: Anthropic.MessageParam[] = messages.map((m) => ({ role: m.role, content: m.content }));
 
   // A photo (usually the iDrive home screen) goes in with the latest message —
@@ -190,9 +210,9 @@ export async function generateWaReply(
     const response: Anthropic.Message = await client.messages.create({
       model,
       max_tokens: 600,
-      system: WHATSAPP_PROMPT,
+      system,
       messages: convo,
-      tools: [LEAD_TOOL, AVAILABILITY_TOOL, BOOK_TOOL],
+      tools: [LEAD_TOOL, AVAILABILITY_TOOL, BOOK_TOOL, REMEMBER_TOOL],
     });
 
     const text = response.content
@@ -281,6 +301,12 @@ export async function generateWaReply(
         }
       }
 
+      if (call.name === 'remember') {
+        const facts = String((call.input as { facts?: string }).facts ?? '').trim().slice(0, 400);
+        if (facts) memory = facts;
+        result = 'Noted.';
+      }
+
       if (call.name === 'save_lead') {
         const inp = call.input as { name?: string; bmw_model?: string; service?: string; note?: string };
         const leadName =
@@ -330,5 +356,5 @@ export async function generateWaReply(
     reply = "Perfect — I've passed your details to the team, we'll confirm shortly. 👍";
   }
   if (!reply) throw new Error('empty AI reply');
-  return reply;
+  return { reply, memory };
 }

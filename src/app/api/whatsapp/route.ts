@@ -157,7 +157,7 @@ async function handleMessage(
     return;
   }
 
-  const reply = await generateWaReply(sb, waId, text, name);
+  const { reply } = await generateWaReply(sb, waId, text, name);
 
   const sent = await sendWhatsAppText(waId, reply);
   if (!sent.ok) throw new Error(sent.error || 'send failed');
