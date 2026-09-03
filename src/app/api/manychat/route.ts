@@ -85,6 +85,10 @@ export async function POST(req: Request) {
     'last_attachment_url', 'cf_photo_url', 'idrive_photo',
   ]);
   const imageUrl = /^https:\/\//.test(rawImage) && !unresolved(rawImage) ? rawImage : '';
+  // Facts the agent stored last time. ManyChat holds them per contact, so the
+  // bot keeps its memory even before the conversation tables exist.
+  const rawMemory = deepFind(body, ['memory', 'bot_memory', 'cf_bot_memory', 'notes']);
+  const priorMemory = unresolved(rawMemory) ? '' : rawMemory.slice(0, 400);
   // Optional: the reply ManyChat's AI produced, so we can mirror it too.
   const aiReply = String(body.reply ?? '').trim().slice(0, 4000);
 
@@ -105,7 +109,7 @@ export async function POST(req: Request) {
         ]],
       },
     ).catch(() => undefined);
-    return NextResponse.json({ ok: true, paused: false, ai_enabled: true, reply: fallback });
+    return NextResponse.json({ ok: true, paused: false, ai_enabled: true, reply: fallback, memory: priorMemory });
   }
 
   if (!phone || (!text && !aiReply && !imageUrl)) {
@@ -156,6 +160,7 @@ export async function POST(req: Request) {
   // Generate our own reply (ManyChat just delivers it) unless the owner
   // paused this chat or we hit the per-sender cost cap.
   let reply = aiReply;
+  let memory = priorMemory;
   let aiError = '';
   if (sb && (text || imageUrl) && !paused && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
@@ -163,7 +168,7 @@ export async function POST(req: Request) {
     } else {
       try {
         if (isPhone) void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
-        reply = await generateWaReply(
+        const out = await generateWaReply(
           sb,
           phone,
           text || 'Photo attached.',
@@ -171,7 +176,10 @@ export async function POST(req: Request) {
           'claude-haiku-4-5-20251001',
           isPhone ? `+${phone}` : `ManyChat ${phone}`,
           imageUrl || undefined,
+          priorMemory || undefined,
         );
+        reply = out.reply;
+        memory = out.memory;
         await sb.from('wa_messages').insert({
           msg_id: `mc:${phone}:${Date.now()}:ai`,
           wa_id: phone,
@@ -206,7 +214,14 @@ export async function POST(req: Request) {
 
   // ManyChat sends `reply` back to the customer; `paused` lets its flow
   // branch when the owner has taken the chat over.
-  return NextResponse.json({ ok: true, paused, ai_enabled: !paused, reply, ...(aiError ? { error: aiError } : {}) });
+  return NextResponse.json({
+    ok: true,
+    paused,
+    ai_enabled: !paused,
+    reply,
+    memory,
+    ...(aiError ? { error: aiError } : {}),
+  });
 }
 
 export async function GET() {
@@ -222,7 +237,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 8,
+    v: 9,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
