@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
+import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
 
 // Uses the shared "short & friendly" template so /review and the daily nudge
 // stay consistent.
@@ -109,6 +110,72 @@ export async function GET(req: Request) {
         }
       : undefined;
     await sendOwnerWithMarkup(lines.join('\n'), keyboard);
+  }
+
+
+  // ── Appointment reminders ─────────────────────────────────────────
+  // Sent the morning before, so the customer always gets 12+ hours' notice and
+  // nobody is messaged between 20:00 and 08:00 Dublin time.
+  const dublinHour = Number(
+    new Date().toLocaleString('en-GB', { timeZone: 'Europe/Dublin', hour: '2-digit', hour12: false }),
+  );
+  const quietHours = dublinHour < 8 || dublinHour >= 20;
+
+  if (!quietHours) {
+    const { data: soon } = await sb
+      .from('bookings')
+      .select('id, name, contact, service, slot_date, slot_time, reminded_at')
+      .eq('slot_date', tomorrow)
+      .eq('status', 'confirmed');
+    const due = ((soon ?? []) as (Booking & { reminded_at?: string | null })[]).filter(
+      (b) => !b.reminded_at && b.contact,
+    );
+
+    const unsent: (Booking & { reminded_at?: string | null })[] = [];
+    for (const b of due) {
+      const first = (b.name || '').split(/\s+/)[0] || 'there';
+      const msg =
+        `Hi ${first} 👋 Reminder: your BMW is booked in tomorrow, ${b.slot_date} at ${b.slot_time}` +
+        `${b.service ? ` for ${b.service}` : ''}.\n\n` +
+        `We're at Grants View, Greenogue Business Park, Rathcoole — don't follow the sat-nav pin, ` +
+        `use ${SITE}/find-us (look for the big ORANGE GATES, drive through and keep RIGHT to the end).\n\n` +
+        `If anything changed, just reply here and we'll sort it.`;
+
+      const phone = b.contact.replace(/\D/g, '');
+      const sent = phone ? await sendManyChatText(phone, msg) : false;
+      if (sent) {
+        await sb.from('bookings').update({ reminded_at: new Date().toISOString() }).eq('id', b.id);
+      } else {
+        unsent.push(b);
+      }
+    }
+
+    if (unsent.length) {
+      // No ManyChat key (or the send failed): hand the owner a ready message
+      // to tap, copy and paste — the reminder still happens.
+      await sendOwnerWithMarkup(
+        `🔔 <b>Remind tomorrow's customers</b>${
+          isManyChatSendConfigured() ? ' (auto-send failed — do it by hand)' : ''
+        }\n${unsent
+          .map((b) => `  • ${b.name} · ${b.slot_time}${b.service ? ` · ${b.service}` : ''}`)
+          .join('\n')}`,
+        {
+          inline_keyboard: unsent.slice(0, 6).map((b) => [
+            {
+              text: `📋 Reminder for ${(b.name || '').split(/\s+/)[0]}`,
+              copy_text: {
+                text:
+                  `Hi ${(b.name || '').split(/\s+/)[0] || 'there'} 👋 Reminder: your BMW is booked in tomorrow, ` +
+                  `${b.slot_date} at ${b.slot_time}${b.service ? ` for ${b.service}` : ''}. ` +
+                  `We're at Grants View, Greenogue Business Park, Rathcoole — don't follow the sat-nav pin, use ` +
+                  `${SITE}/find-us (big ORANGE GATES, drive through, keep RIGHT to the end). ` +
+                  `If anything changed, just reply here.`,
+              },
+            },
+          ]),
+        },
+      );
+    }
   }
 
   // Review nudge: yesterday's confirmed jobs, one copy-button per client.

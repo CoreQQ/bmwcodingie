@@ -315,3 +315,7 @@ create table if not exists section_time (
   seconds numeric not null,
   created_at timestamptz not null default now()
 );
+
+-- Appointment reminders: stamped when the customer has been reminded, so a
+-- re-run of the cron never messages anyone twice.
+alter table bookings add column if not exists reminded_at timestamptz;
