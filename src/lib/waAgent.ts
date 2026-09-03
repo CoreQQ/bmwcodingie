@@ -6,6 +6,8 @@ import { notifyTelegram } from './telegram';
 import { getHours, getSlotDuration, getBlockedDates } from './stats';
 import { windowsFor, windowsOverlap } from './hours';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
+
 // Shared brain for the WhatsApp agent. Used by both transports: the direct
 // Meta Cloud API webhook (/api/whatsapp) and the ManyChat bridge
 // (/api/manychat), so both behave identically — same prompt, same lead
@@ -177,8 +179,14 @@ export async function generateWaReply(
   }
 
   const client = new Anthropic();
-  const system = priorMemory
-    ? `${WHATSAPP_PROMPT}\n\nWHAT YOU ALREADY KNOW ABOUT THIS CUSTOMER (do not ask again):\n${priorMemory}`
+  const known = [
+    profileName ? `WhatsApp profile name: ${profileName} (use it — do not ask their name unless it is clearly not a real one)` : '',
+    priorMemory ? priorMemory : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+  const system = known
+    ? `${WHATSAPP_PROMPT}\n\nWHAT YOU ALREADY KNOW ABOUT THIS CUSTOMER (do not ask again):\n${known}`
     : WHATSAPP_PROMPT;
   let memory = priorMemory ?? '';
   const convo: Anthropic.MessageParam[] = messages.map((m) => ({ role: m.role, content: m.content }));
@@ -276,9 +284,11 @@ export async function generateWaReply(
                 source: 'WhatsApp AI',
                 status: cl?.banned ? 'declined' : 'pending',
               })
-              .select('id')
+              .select('id, public_token')
               .single();
-            const id = (ins.data as { id: number } | null)?.id;
+            const row = ins.data as { id: number; public_token?: string } | null;
+            const id = row?.id;
+            const token = row?.public_token;
             await notifyTelegram({
               name: bookName,
               contact,
@@ -289,6 +299,7 @@ export async function generateWaReply(
               slot_time: time,
               source: '🤖 WhatsApp AI — slot requested',
               id,
+              public_token: token,
               persisted: Boolean(id),
               clientNote: cl?.banned
                 ? `⛔️ <b>BLACKLISTED</b> · ${clientCode(cl.id)} — auto-declined`
@@ -296,7 +307,10 @@ export async function generateWaReply(
                   ? `🆔 <b>Client:</b> ${clientCode(cl.id)}`
                   : undefined,
             }).catch(() => undefined);
-            result = `Booked provisionally: ${day} ${time}. Tell the customer it is pending until Alex confirms, and that he will message shortly.`;
+            const track = token ? ` Give them this live status link: ${SITE_URL}/b/${token}` : '';
+            result =
+              `Booked provisionally: ${day} ${time}. Tell the customer it is pending until Alex confirms, ` +
+              `and that he will message shortly.${track}`;
           }
         }
       }
