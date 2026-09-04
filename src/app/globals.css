@@ -131,7 +131,11 @@ html {
 
   /* Faint, static vignette behind hero-type sections — no motion, no bloom */
   .hero-glow {
-    background: radial-gradient(120% 60% at 85% 0%, rgba(23, 134, 212, 0.08) 0%, rgba(10, 11, 13, 0) 60%);
+    background: radial-gradient(
+      120% 60% at 85% 0%,
+      color-mix(in srgb, var(--page-accent, #1786D4) 12%, transparent) 0%,
+      rgba(10, 11, 13, 0) 60%
+    );
   }
 
   /* Blueprint grid background texture */

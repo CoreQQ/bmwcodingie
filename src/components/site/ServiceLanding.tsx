@@ -132,7 +132,7 @@ export async function ServiceLanding({
                 <div className="border border-white/10 bg-graphite-800">
                   <div className="m-stripe h-1 w-full" />
                   <div className="p-6">
-                    <h2 className="label mb-4">{p.includedHeading}</h2>
+                    <h2 className="label mb-4 border-l-2 border-[color:var(--page-accent)] pl-3">{p.includedHeading}</h2>
                     <ul className="space-y-2.5">
                       {p.included.map((it) => (
                         <li key={it} className="flex items-start gap-2.5 text-sm text-ink">
@@ -154,7 +154,7 @@ export async function ServiceLanding({
             <ul className="mt-8 grid gap-3 sm:grid-cols-2">
               {p.models.map((m) => (
                 <li key={m} className="flex items-start gap-3 border border-white/8 bg-graphite-800/40 p-4 text-sm text-muted">
-                  <span className="m-stripe mt-1 h-3 w-[3px] shrink-0" /> {m}
+                  <span className="mt-1 h-3 w-[3px] shrink-0 bg-[color:var(--page-accent)]" /> {m}
                 </li>
               ))}
             </ul>
@@ -168,7 +168,7 @@ export async function ServiceLanding({
             <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
               {p.process.map((step, i) => (
                 <div key={step.title} className="border border-white/8 bg-graphite-800/40 p-5">
-                  <span className="font-mono text-xs text-[color:var(--page-accent)]">0{i + 1}</span>
+                  <span className="inline-flex h-6 w-6 items-center justify-center border border-[color:var(--page-accent)] font-mono text-[10px] text-[color:var(--page-accent)]">0{i + 1}</span>
                   <h3 className="mt-2 text-base font-semibold text-ink">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted">{step.body}</p>
                 </div>
