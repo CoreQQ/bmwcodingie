@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { ArrowRight, Check, MapPin, MessageCircle } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { getSettings, waLink } from '@/lib/data';
@@ -10,7 +11,18 @@ import { MobileActionBar } from './MobileActionBar';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const DEFAULT_AREA = ['Dublin', 'Kildare', 'Wicklow', 'Meath', 'Ireland'];
 
-export async function ServiceLanding({ slug }: { slug: string }) {
+export async function ServiceLanding({
+  slug,
+  /** Page-scoped accent. Defaults to the BMW blue, so other landings are
+   *  untouched; pages with their own identity (e.g. Japan imports) pass a
+   *  colour that meets 4.5:1 on the graphite background. */
+  accent = '#1C69D4',
+  accentSoft = '#A1A6AD',
+}: {
+  slug: string;
+  accent?: string;
+  accentSoft?: string;
+}) {
   const p = ALL_LANDINGS[slug];
   if (!p) return null;
   const AREA = p.area ?? DEFAULT_AREA;
@@ -69,7 +81,10 @@ export async function ServiceLanding({ slug }: { slug: string }) {
   );
 
   return (
-    <div className="grain relative min-h-screen">
+    <div
+      className="grain relative min-h-screen"
+      style={{ '--page-accent': accent, '--page-accent-soft': accentSoft } as CSSProperties}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -93,13 +108,13 @@ export async function ServiceLanding({ slug }: { slug: string }) {
             </nav>
             <div className="mb-5 flex items-center gap-3">
               <span className="m-stripe h-[3px] w-12" />
-              <span className="label text-muted">{p.eyebrow}</span>
+              <span className="label text-[color:var(--page-accent-soft)]">{p.eyebrow}</span>
             </div>
             <h1 className="max-w-4xl font-display text-[clamp(2.1rem,6vw,4.2rem)] leading-[0.95]">{p.h1}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">{p.heroSub}</p>
             {ctaRow}
             <p className="mt-6 flex items-center gap-2 text-sm text-faint">
-              <MapPin size={15} className="text-bmw" /> In person across Dublin, Kildare, Wicklow &amp; Meath · remote across Ireland
+              <MapPin size={15} className="text-[color:var(--page-accent)]" /> In person across Dublin, Kildare, Wicklow &amp; Meath · remote across Ireland
             </p>
           </div>
         </section>
@@ -121,7 +136,7 @@ export async function ServiceLanding({ slug }: { slug: string }) {
                     <ul className="space-y-2.5">
                       {p.included.map((it) => (
                         <li key={it} className="flex items-start gap-2.5 text-sm text-ink">
-                          <Check size={16} className="mt-0.5 shrink-0 text-bmw" /> {it}
+                          <Check size={16} className="mt-0.5 shrink-0 text-[color:var(--page-accent)]" /> {it}
                         </li>
                       ))}
                     </ul>
@@ -153,7 +168,7 @@ export async function ServiceLanding({ slug }: { slug: string }) {
             <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
               {p.process.map((step, i) => (
                 <div key={step.title} className="border border-white/8 bg-graphite-800/40 p-5">
-                  <span className="font-mono text-xs text-bmw">0{i + 1}</span>
+                  <span className="font-mono text-xs text-[color:var(--page-accent)]">0{i + 1}</span>
                   <h3 className="mt-2 text-base font-semibold text-ink">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted">{step.body}</p>
                 </div>
@@ -188,7 +203,7 @@ export async function ServiceLanding({ slug }: { slug: string }) {
                 <Link
                   key={r.slug}
                   href={`/${r.slug}`}
-                  className="inline-flex items-center gap-2 border border-white/10 px-4 py-2.5 text-sm text-muted transition-colors hover:border-bmw hover:text-ink"
+                  className="inline-flex items-center gap-2 border border-white/10 px-4 py-2.5 text-sm text-muted transition-colors hover:border-[color:var(--page-accent)] hover:text-ink"
                 >
                   {r.label} <ArrowRight size={14} />
                 </Link>
