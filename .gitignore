@@ -8,3 +8,7 @@ out
 .vercel
 next-env.d.ts
 tsconfig.tsbuildinfo
+
+# Python bytecode from the vendored design skills
+__pycache__/
+*.pyc
