@@ -15,5 +15,8 @@ export function generateMetadata(): Metadata {
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ServiceLanding slug={SLUG} />;
+  // Palette from the ui-ux-pro-max data (automotive: premium dark + action
+  // red), softened to #F04A54 so it clears 4.5:1 on the graphite background —
+  // the brand M-red would only reach 3.98:1. Sand recalls the JDM auction sheet.
+  return <ServiceLanding slug={SLUG} accent="#F04A54" accentSoft="#E8C39E" />;
 }
