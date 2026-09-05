@@ -96,7 +96,7 @@ async function notifyOwnerHandover(
   await notifyOwnerRaw(
     `🙋 <b>Needs you</b> · ${name ? `${esc(name)} · ` : ''}<code>+${waId}</code>\n` +
       `«${esc(text.slice(0, 600))}»\n\n` +
-      `🤖 Stepped back: ${esc(reason)}\nThe assistant stays quiet here for 6 hours.`,
+      `🤖 Stepped back: ${esc(reason)}\nThe assistant is now OFF in this chat — turn it back on with /wa start +${waId}`,
   );
 }
 
@@ -363,9 +363,11 @@ export async function generateWaReply(
         const reason = String((call.input as { reason?: string }).reason ?? '').slice(0, 300);
         // Go quiet for six hours so Alex owns the conversation, and tell him
         // immediately — with the customer's own words, not our summary.
+        // Sticky, not a six-hour nap: these are exactly the chats where a
+        // later "helpful" message contradicts Alex. He reopens it explicitly.
         await sb
           .from('wa_chats')
-          .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() })
+          .upsert({ wa_id: waId, paused: true, owner_replied_at: new Date().toISOString() })
           .then(() => undefined, () => undefined);
         await notifyOwnerHandover(waId, profileName, text, reason).catch(() => undefined);
         handedOver = true;
