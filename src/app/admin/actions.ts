@@ -279,14 +279,16 @@ export async function updateSettingsTranslation(formData: FormData) {
 
 export async function createCarModel(formData: FormData) {
   const sb = getSupabaseAdmin();
-  if (!sb) return;
-  await sb.from('car_models').insert({
+  if (!sb) redirect('/admin/models?err=' + encodeURIComponent('Database is not configured.'));
+  const { error } = await sb.from('car_models').insert({
     chassis_code: String(formData.get('chassis_code') ?? '').trim().toUpperCase(),
     label: String(formData.get('label') ?? '').trim(),
     year_from: Number(formData.get('year_from') ?? 0) || 0,
     year_to: numOrNull(formData.get('year_to')),
     sort_order: Number(formData.get('sort_order') ?? 0) || 0,
   });
+  // Never fail silently: a swallowed error looks exactly like a saved model.
+  if (error) redirect('/admin/models?err=' + encodeURIComponent(error.message));
   revalidatePath('/admin/models');
   refreshSite();
 }
@@ -294,7 +296,7 @@ export async function createCarModel(formData: FormData) {
 export async function updateCarModel(formData: FormData) {
   const sb = getSupabaseAdmin();
   if (!sb) return;
-  await sb
+  const { error } = await sb
     .from('car_models')
     .update({
       chassis_code: String(formData.get('chassis_code') ?? '').trim().toUpperCase(),
@@ -304,6 +306,7 @@ export async function updateCarModel(formData: FormData) {
       sort_order: Number(formData.get('sort_order') ?? 0) || 0,
     })
     .eq('id', Number(formData.get('id')));
+  if (error) redirect('/admin/models?err=' + encodeURIComponent(error.message));
   revalidatePath('/admin/models');
   refreshSite();
 }
@@ -311,7 +314,8 @@ export async function updateCarModel(formData: FormData) {
 export async function deleteCarModel(formData: FormData) {
   const sb = getSupabaseAdmin();
   if (!sb) return;
-  await sb.from('car_models').delete().eq('id', Number(formData.get('id')));
+  const { error } = await sb.from('car_models').delete().eq('id', Number(formData.get('id')));
+  if (error) redirect('/admin/models?err=' + encodeURIComponent(error.message));
   revalidatePath('/admin/models');
   refreshSite();
 }

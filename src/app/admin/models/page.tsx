@@ -7,7 +7,12 @@ import { adminGetCarModels, adminGetCompatibility } from '@/lib/admin-data';
 import { createCarModel, updateCarModel, deleteCarModel } from '../actions';
 import type { CarModel } from '@/lib/types';
 
-export default async function ModelsAdmin() {
+export default async function ModelsAdmin({
+  searchParams,
+}: {
+  searchParams: Promise<{ err?: string }>;
+}) {
+  const { err } = await searchParams;
   const [models, compatibility] = await Promise.all([
     adminGetCarModels(),
     adminGetCompatibility(),
@@ -21,6 +26,16 @@ export default async function ModelsAdmin() {
         title="Models"
         sub="Exact chassis + year, used by the public model picker at /models. Set per-model compatibility from each model's page."
       />
+
+      {err && (
+        <div className="mb-6 border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+          <b>Could not save:</b> {err}
+          <p className="mt-2 text-red-200/80">
+            If it mentions a missing relation, the car_models migration has not been run in
+            Supabase yet — see RUNBOOK.md.
+          </p>
+        </div>
+      )}
 
       <Card className="mb-8 p-5">
         <h2 className="mb-4 flex items-center gap-2 font-medium text-ink">
