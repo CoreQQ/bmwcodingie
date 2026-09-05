@@ -150,7 +150,7 @@ export async function POST(req: Request) {
       //   /wa stop  +353…   pause the AI for that chat
       //   /wa start +353…   let the AI answer again
       //   /wa reset +353…   wipe the conversation so it starts fresh
-      const ctrl = /^\/wa(@\w+)?\s+(stop|start|pause|resume|reset|clear)\s+(\+?[\d\s()-]{6,})$/i.exec(text);
+      const ctrl = /^\/wa(@\w+)?\s+(stop|start|pause|resume|reset|clear|mine)\s+(\+?[\d\s()-]{6,})$/i.exec(text);
       if (ctrl) {
         const action = ctrl[2].toLowerCase();
         const waId = ctrl[3].replace(/\D/g, '');
@@ -159,8 +159,12 @@ export async function POST(req: Request) {
           await sendOwnerMessage(
             `🧹 Conversation with <code>+${waId}</code> wiped — the assistant starts fresh next message.`,
           );
+        } else if (action === 'mine') {
+          await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() });
+          await sendOwnerMessage(`✋ Assistant stands down on <code>+${waId}</code> for 6 hours.`);
         } else {
           const paused = action === 'stop' || action === 'pause';
+          if (!paused) await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: null });
           await sb.from('wa_chats').upsert({ wa_id: waId, paused });
           const { data: check } = await sb
             .from('wa_chats')
@@ -688,6 +692,17 @@ export async function POST(req: Request) {
   }
 
   // WhatsApp AI pause/resume per chat.
+  if (cq.data.startsWith('wamine:')) {
+    const waId = cq.data.slice(7);
+    await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() });
+    await answerCallback(cq.id, 'Yours for 6 hours');
+    await sendOwnerMessage(
+      `✋ You have this chat with <code>+${waId}</code>. The assistant will not reply for 6 hours; ` +
+        `after that it picks it back up. Hand it back sooner with <code>/wa start +${waId}</code>.`,
+    );
+    return ok();
+  }
+
   if (cq.data.startsWith('wap:') || cq.data.startsWith('war:')) {
     const waId = cq.data.slice(4);
     const paused = cq.data.startsWith('wap:');
