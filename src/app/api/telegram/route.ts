@@ -24,6 +24,7 @@ import { getBusinessStats, getHours, getBlockedDates, getSlotDuration } from '@/
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
 import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
 import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
@@ -181,9 +182,59 @@ export async function POST(req: Request) {
         return ok();
       }
 
-      // "/wa +353871234567 your reply" — manual WhatsApp reply from Telegram.
+      // "/wa said +353871234567 what I told them" — record a reply Alex sent
+      // from his own phone, so the assistant stops thinking it is unanswered.
+      const said = /^\/wa(@\w+)?\s+said\s+(\+?[\d\s()-]{6,})\s+([\s\S]+)$/i.exec(text);
+      if (said) {
+        const waId = said[2].replace(/\D/g, '');
+        const body = said[3].trim().slice(0, 4000);
+        const { error } = await sb.from('wa_messages').insert({
+          msg_id: `owner:${waId}:${Date.now()}`,
+          wa_id: waId,
+          role: 'assistant',
+          content: body,
+          via: 'owner',
+        });
+        await sendOwnerMessage(
+          error
+            ? `❌ Could not log it: ${escapeHtml(error.message)}`
+            : `📝 Logged for <code>+${waId}</code> — the assistant now knows you said:\n«${escapeHtml(body)}»`,
+        );
+        return ok();
+      }
+
+      // "/wa +353871234567 your reply" — send a reply from Telegram. Uses the
+      // Cloud API when connected, otherwise ManyChat, so what Alex writes is
+      // both delivered and visible to the assistant next time.
+      const rawSend = /^\/wa(@\w+)?\s+(\+?[\d\s()-]{7,})\s+([\s\S]+)$/.exec(text);
+      if (rawSend && !isWhatsAppConfigured() && isManyChatSendConfigured()) {
+        const waId = rawSend[2].replace(/\D/g, '');
+        const body = rawSend[3].trim();
+        const sent = await sendManyChatText(waId, body);
+        if (sent) {
+          await sb.from('wa_messages').insert({
+            msg_id: `owner:${waId}:${Date.now()}`,
+            wa_id: waId,
+            role: 'assistant',
+            content: body,
+            via: 'owner',
+          });
+          await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() });
+          await sendOwnerMessage(`✅ Sent to <code>+${waId}</code> via ManyChat — and the assistant has it in context.`);
+        } else {
+          await sendOwnerMessage(
+            `❌ ManyChat would not send to <code>+${waId}</code>. Check MANYCHAT_API_KEY and that the contact exists there.`,
+          );
+        }
+        return ok();
+      }
+
       if (!isWhatsAppConfigured()) {
-        await sendOwnerMessage('⚠️ WhatsApp is not connected yet (set WHATSAPP_TOKEN / WHATSAPP_PHONE_ID).');
+        await sendOwnerMessage(
+          'WhatsApp sending is not connected.\n' +
+            '• Reply from your phone as usual, then run <code>/wa said +353… what you told them</code> so the assistant knows.\n' +
+            '• Or add <code>MANYCHAT_API_KEY</code> in Vercel and send straight from here with <code>/wa +353… your message</code>.',
+        );
         return ok();
       }
       const rest = text.replace(/^\/wa(@\w+)?\s*/, '');
