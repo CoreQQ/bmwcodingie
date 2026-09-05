@@ -249,7 +249,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 12,
+    v: 13,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
