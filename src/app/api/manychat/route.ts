@@ -165,6 +165,37 @@ export async function POST(req: Request) {
     }
   }
 
+  // ManyChat sometimes re-sends the previous message text (its Last Text Input
+  // field does not always refresh), which made the assistant answer the same
+  // thing twice while the customer's real message went unanswered. If the text
+  // is identical to the last one we stored, do not answer at all — tell Alex.
+  let staleDuplicate = false;
+  if (sb && text) {
+    const { data: prev } = await sb
+      .from('wa_messages')
+      .select('content, created_at')
+      .eq('wa_id', phone)
+      .eq('role', 'user')
+      .order('created_at', { ascending: false })
+      .limit(2);
+    const rows = (prev ?? []) as { content: string; created_at: string }[];
+    const earlier = rows[1] ?? rows[0];
+    staleDuplicate =
+      Boolean(earlier) &&
+      earlier.content.trim() === text.trim() &&
+      Date.now() - new Date(earlier.created_at).getTime() < 12 * 60 * 60 * 1000;
+  }
+
+  if (staleDuplicate) {
+    await sendOwnerWithMarkup(
+      `⚠️ <b>WhatsApp (ManyChat)</b> · ${name ? `${escapeHtml(name)} · ` : ''}<code>${
+        isPhone ? `+${phone}` : phone
+      }</code>\nManyChat delivered the same text again — the customer's newest message did not reach us, so the assistant stayed silent. Open WhatsApp and read it yourself.`,
+      { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: isPhone ? `+${phone}` : phone } }]] },
+    ).catch(() => undefined);
+    return NextResponse.json({ ok: true, paused: true, ai_enabled: false, reply: '', memory: priorMemory });
+  }
+
   // Generate our own reply (ManyChat just delivers it) unless the owner
   // paused this chat or we hit the per-sender cost cap.
   let reply = aiReply;
@@ -249,7 +280,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 15,
+    v: 16,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
