@@ -128,14 +128,22 @@ export async function POST(req: Request) {
   const sb = getSupabaseAdmin();
   // Even without a DB we still mirror to Telegram.
   let paused = false;
+  let ownerHandling = false;
   if (sb) {
     // Track the chat + read the pause flag (owner may have taken over).
     const { data: chat } = await sb
       .from('wa_chats')
       .upsert({ wa_id: phone, name: name || null, last_at: new Date().toISOString() })
-      .select('paused')
+      .select('paused, owner_replied_at')
       .single();
-    paused = Boolean(chat?.paused);
+    const row = chat as { paused?: boolean; owner_replied_at?: string | null } | null;
+    // The owner is handling this one: stay out of it for six hours, then the
+    // assistant picks the conversation back up so nobody is left waiting.
+    const takenOver =
+      Boolean(row?.owner_replied_at) &&
+      Date.now() - new Date(row!.owner_replied_at as string).getTime() < 6 * 60 * 60 * 1000;
+    paused = Boolean(row?.paused) || takenOver;
+    ownerHandling = takenOver;
 
     if (text || imageUrl) {
       await sb.from('wa_messages').insert({
@@ -204,12 +212,16 @@ export async function POST(req: Request) {
   if (imageUrl) lines.push('📷 <i>sent a photo</i>');
   if (text) lines.push(`«${escapeHtml(text)}»${ruLine}`);
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
-  if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
+  if (ownerHandling) lines.push('✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.');
+  else if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
   await sendOwnerWithMarkup(lines.join('\n'), {
-    inline_keyboard: [[
-      { text: paused ? '▶️ Resume AI' : '⏸ Stop AI here', callback_data: `${paused ? 'war' : 'wap'}:${phone}` },
-      { text: '📋 Number', copy_text: { text: who } },
-    ]],
+    inline_keyboard: [
+      [
+        { text: paused ? '▶️ Resume AI' : '⏸ Stop AI here', callback_data: `${paused ? 'war' : 'wap'}:${phone}` },
+        { text: '✋ I\'ll reply (6h)', callback_data: `wamine:${phone}` },
+      ],
+      [{ text: '📋 Number', copy_text: { text: who } }],
+    ],
   });
 
   // ManyChat sends `reply` back to the customer; `paused` lets its flow
@@ -237,7 +249,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 11,
+    v: 12,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,

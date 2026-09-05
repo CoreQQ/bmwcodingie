@@ -319,3 +319,7 @@ create table if not exists section_time (
 -- Appointment reminders: stamped when the customer has been reminded, so a
 -- re-run of the cron never messages anyone twice.
 alter table bookings add column if not exists reminded_at timestamptz;
+
+-- When the owner takes a WhatsApp chat over: the assistant stays quiet for
+-- six hours from this stamp, then resumes if he has not replied.
+alter table wa_chats add column if not exists owner_replied_at timestamptz;

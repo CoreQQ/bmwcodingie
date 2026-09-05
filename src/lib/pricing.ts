@@ -35,7 +35,7 @@ export const PRICE_ITEMS: PriceItem[] = [
   {
     id: 'japan',
     label: 'Japan → EU conversion',
-    note: 'Region, radio bands, nav FSC, EU maps. On MGU this already includes CarPlay.',
+    note: 'Region, radio bands, nav FSC, EU maps. With CarPlay added: €250 on NBT Evo, €300 on MGU.',
     price: { 'nbt-evo': 250, mgu: 280 },
   },
   {
