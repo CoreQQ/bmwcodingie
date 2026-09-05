@@ -146,6 +146,37 @@ export async function POST(req: Request) {
       return ok();
     }
     if (/^\/wa(@\w+)?\b/.test(text)) {
+      // Chat controls that work on any transport (ManyChat included):
+      //   /wa stop  +353…   pause the AI for that chat
+      //   /wa start +353…   let the AI answer again
+      //   /wa reset +353…   wipe the conversation so it starts fresh
+      const ctrl = /^\/wa(@\w+)?\s+(stop|start|pause|resume|reset|clear)\s+(\+?[\d\s()-]{6,})$/i.exec(text);
+      if (ctrl) {
+        const action = ctrl[2].toLowerCase();
+        const waId = ctrl[3].replace(/\D/g, '');
+        if (action === 'reset' || action === 'clear') {
+          await sb.from('wa_messages').delete().eq('wa_id', waId);
+          await sendOwnerMessage(
+            `🧹 Conversation with <code>+${waId}</code> wiped — the assistant starts fresh next message.`,
+          );
+        } else {
+          const paused = action === 'stop' || action === 'pause';
+          await sb.from('wa_chats').upsert({ wa_id: waId, paused });
+          const { data: check } = await sb
+            .from('wa_chats')
+            .select('paused')
+            .eq('wa_id', waId)
+            .maybeSingle();
+          const now = (check as { paused?: boolean } | null)?.paused;
+          await sendOwnerMessage(
+            now === paused
+              ? `${paused ? '⏸ AI paused' : '▶️ AI resumed'} for <code>+${waId}</code> (confirmed in the database).`
+              : `⚠️ Could not change it — the chat now reads paused=${String(now)}. Check the number: it must match the id shown on the message (${waId}).`,
+          );
+        }
+        return ok();
+      }
+
       // "/wa +353871234567 your reply" — manual WhatsApp reply from Telegram.
       if (!isWhatsAppConfigured()) {
         await sendOwnerMessage('⚠️ WhatsApp is not connected yet (set WHATSAPP_TOKEN / WHATSAPP_PHONE_ID).');
@@ -660,8 +691,28 @@ export async function POST(req: Request) {
   if (cq.data.startsWith('wap:') || cq.data.startsWith('war:')) {
     const waId = cq.data.slice(4);
     const paused = cq.data.startsWith('wap:');
-    await sb.from('wa_chats').upsert({ wa_id: waId, paused });
-    await answerCallback(cq.id, paused ? 'AI paused for this chat' : 'AI resumed for this chat');
+    const { error } = await sb.from('wa_chats').upsert({ wa_id: waId, paused });
+    const { data: check } = await sb
+      .from('wa_chats')
+      .select('paused')
+      .eq('wa_id', waId)
+      .maybeSingle();
+    const applied = (check as { paused?: boolean } | null)?.paused === paused;
+    await answerCallback(
+      cq.id,
+      applied
+        ? paused
+          ? 'AI paused for this chat'
+          : 'AI resumed for this chat'
+        : `Failed: ${error?.message ?? 'not saved'}`,
+    );
+    if (!applied) {
+      await sendOwnerMessage(
+        `⚠️ Could not ${paused ? 'pause' : 'resume'} the AI for <code>${waId}</code>: ` +
+          `${escapeHtml(error?.message ?? 'the row did not change')}. Try <code>/wa ${paused ? 'stop' : 'start'} ${waId}</code>.`,
+      );
+      return ok();
+    }
     await sendOwnerMessage(
       paused
         ? `⏸ AI paused for <code>+${waId}</code> — reply with <code>/wa +${waId} your text</code>`
