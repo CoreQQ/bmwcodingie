@@ -178,6 +178,12 @@ export async function generateWaReply(
     messages.push({ role: 'user', content: text });
   }
 
+  // If the customer just repeated themselves, our previous reply missed the
+  // point — saying the same thing again is the worst possible response.
+  const priorUser = [...messages].reverse().find((m, i) => i > 0 && m.role === 'user');
+  const repeated = Boolean(priorUser && priorUser.content.trim() === text.trim());
+  const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant')?.content ?? '';
+
   const client = new Anthropic();
   const known = [
     profileName ? `WhatsApp profile name: ${profileName} (use it — do not ask their name unless it is clearly not a real one)` : '',
@@ -185,9 +191,16 @@ export async function generateWaReply(
   ]
     .filter(Boolean)
     .join('\n');
-  const system = known
-    ? `${WHATSAPP_PROMPT}\n\nWHAT YOU ALREADY KNOW ABOUT THIS CUSTOMER (do not ask again):\n${known}`
-    : WHATSAPP_PROMPT;
+  const notes = [
+    known ? `WHAT YOU ALREADY KNOW ABOUT THIS CUSTOMER (do not ask again):\n${known}` : '',
+    lastAssistant
+      ? `YOUR PREVIOUS MESSAGE (do not repeat it — say something new):\n${lastAssistant.slice(0, 600)}`
+      : '',
+    repeated
+      ? 'The customer has just sent the same message again, which means your last reply did not answer them. Read their message carefully, answer the actual question, and do not ask anything they have already told you.'
+      : '',
+  ].filter(Boolean);
+  const system = notes.length ? `${WHATSAPP_PROMPT}\n\n${notes.join('\n\n')}` : WHATSAPP_PROMPT;
   let memory = priorMemory ?? '';
   const convo: Anthropic.MessageParam[] = messages.map((m) => ({ role: m.role, content: m.content }));
 
