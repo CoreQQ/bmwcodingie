@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import { WHATSAPP_PROMPT } from './assistantPrompt';
 import { ensureClient, clientCode } from './crm';
-import { notifyTelegram } from './telegram';
+import { notifyTelegram, sendOwnerWithMarkup as notifyOwnerRaw } from './telegram';
 import { getHours, getSlotDuration, getBlockedDates } from './stats';
 import { windowsFor, windowsOverlap } from './hours';
 
@@ -84,6 +84,22 @@ async function availabilityText(sb: SupabaseClient, day?: string): Promise<strin
   return lines.join('\n') || 'No bookable days found.';
 }
 
+
+/** Tell the owner a conversation needs him, quoting the customer verbatim. */
+async function notifyOwnerHandover(
+  waId: string,
+  name: string | undefined,
+  text: string,
+  reason: string,
+): Promise<void> {
+  const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  await notifyOwnerRaw(
+    `🙋 <b>Needs you</b> · ${name ? `${esc(name)} · ` : ''}<code>+${waId}</code>\n` +
+      `«${esc(text.slice(0, 600))}»\n\n` +
+      `🤖 Stepped back: ${esc(reason)}\nThe assistant stays quiet here for 6 hours.`,
+  );
+}
+
 const LEAD_TOOL: Anthropic.Tool = {
   name: 'save_lead',
   description:
@@ -130,6 +146,20 @@ const BOOK_TOOL: Anthropic.Tool = {
   },
 };
 
+
+
+const HANDOVER_TOOL: Anthropic.Tool = {
+  name: 'hand_over',
+  description:
+    "Stop answering and pass this conversation to Alex. Use it whenever the message is outside BMW coding/diagnostics/retrofits/booking, refers to a conversation you cannot see, disputes something, or you are not certain. Calling this is always safer than improvising.",
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      reason: { type: 'string', description: 'Why this needs Alex, one short line' },
+    },
+    required: ['reason'],
+  },
+};
 
 const REMEMBER_TOOL: Anthropic.Tool = {
   name: 'remember',
@@ -226,6 +256,7 @@ export async function generateWaReply(
   // handling a single tool call.
   let reply = '';
   let usedTool = false;
+  let handedOver = false;
 
   for (let round = 0; round < 4; round++) {
     const response: Anthropic.Message = await client.messages.create({
@@ -233,7 +264,7 @@ export async function generateWaReply(
       max_tokens: 600,
       system,
       messages: convo,
-      tools: [LEAD_TOOL, AVAILABILITY_TOOL, BOOK_TOOL, REMEMBER_TOOL],
+      tools: [LEAD_TOOL, AVAILABILITY_TOOL, BOOK_TOOL, REMEMBER_TOOL, HANDOVER_TOOL],
     });
 
     const text = response.content
@@ -328,6 +359,19 @@ export async function generateWaReply(
         }
       }
 
+      if (call.name === 'hand_over') {
+        const reason = String((call.input as { reason?: string }).reason ?? '').slice(0, 300);
+        // Go quiet for six hours so Alex owns the conversation, and tell him
+        // immediately — with the customer's own words, not our summary.
+        await sb
+          .from('wa_chats')
+          .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() })
+          .then(() => undefined, () => undefined);
+        await notifyOwnerHandover(waId, profileName, text, reason).catch(() => undefined);
+        handedOver = true;
+        result = 'Handed to Alex. Say only the holding line and nothing else.';
+      }
+
       if (call.name === 'remember') {
         const facts = String((call.input as { facts?: string }).facts ?? '').trim().slice(0, 400);
         if (facts) memory = facts;
@@ -379,7 +423,10 @@ export async function generateWaReply(
     convo.push({ role: 'user', content: results });
   }
 
-  if (!reply && usedTool) {
+  if (handedOver) {
+    // One neutral line: never contradict the customer, never explain ourselves.
+    reply = "Thanks — let me get Alex to come back to you on this one directly. He'll be in touch shortly. 👍";
+  } else if (!reply && usedTool) {
     reply = "Perfect — I've passed your details to the team, we'll confirm shortly. 👍";
   }
   if (!reply) throw new Error('empty AI reply');
