@@ -358,16 +358,30 @@ async function handleStatus() {
   // the agent answers every message with no recollection of the last one.
   const sb = getSupabaseAdmin();
   let memory = false;
+  // Which migrations have actually been applied. Everything below degrades
+  // gracefully without them, but each `false` is a feature quietly not
+  // working, so it is worth being able to see them at a glance.
+  const schema: Record<string, boolean> = {};
   if (sb) {
-    const { error } = await sb.from('wa_messages').select('msg_id').limit(1);
-    memory = !error;
+    const [msgs, takeover, reminded, models] = await Promise.all([
+      sb.from('wa_messages').select('msg_id').limit(1),
+      sb.from('wa_chats').select('owner_replied_at').limit(1),
+      sb.from('bookings').select('reminded_at').limit(1),
+      sb.from('car_models').select('id').limit(1),
+    ]);
+    memory = !msgs.error;
+    schema.owner_takeover = !takeover.error;
+    schema.reminders = !reminded.error;
+    schema.car_models = !models.error;
   }
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 19,
+    v: 20,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
+    send: Boolean(process.env.MANYCHAT_API_KEY),
     memory,
+    schema,
   });
 }
