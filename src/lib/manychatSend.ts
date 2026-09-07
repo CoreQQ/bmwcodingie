@@ -85,6 +85,29 @@ export async function sendManyChatText(
     if (!found.id) return { ok: false, error: found.error };
     id = found.id;
   }
+  // ManyChat's sending API talks to Messenger, not WhatsApp: it refuses with
+  // "message tags are no longer supported for Facebook Messenger" and reports
+  // a last-interaction age from that channel, even seconds after the customer
+  // wrote on WhatsApp. The way through is ManyChat's own flow — park the text
+  // in a custom field, then run a one-step flow that sends it.
+  if (process.env.MANYCHAT_OWNER_FLOW_NS) {
+    const field = await mc<{ status?: string }>('/fb/subscriber/setCustomFieldByName', {
+      method: 'POST',
+      body: JSON.stringify({
+        subscriber_id: id,
+        field_name: process.env.MANYCHAT_OWNER_FIELD || 'owner_msg',
+        field_value: text,
+      }),
+    });
+    if (field.error) return { ok: false, error: `could not store the text: ${field.error}` };
+    const run = await mc<{ status?: string }>('/fb/sending/sendFlow', {
+      method: 'POST',
+      body: JSON.stringify({ subscriber_id: id, flow_ns: process.env.MANYCHAT_OWNER_FLOW_NS }),
+    });
+    if (run.data?.status === 'success') return { ok: true };
+    return { ok: false, error: run.error || `ManyChat replied: ${JSON.stringify(run.data).slice(0, 200)}` };
+  }
+
   const { data, error } = await mc<{ status?: string }>('/fb/sending/sendContent', {
     method: 'POST',
     body: JSON.stringify({
@@ -97,13 +120,13 @@ export async function sendManyChatText(
   // last one. Outside that window ManyChat refuses with code 3011, and no
   // wording of ours changes that — say so plainly instead of quoting an API.
   const hours = /over (\d+)h ago/.exec(error)?.[1];
-  if (/\b3011\b/.test(error) || hours) {
+  if (/\b3011\b/.test(error) || /Facebook Messenger/i.test(error) || hours) {
     return {
       ok: false,
       error:
-        `WhatsApp's 24-hour window is closed — they last wrote ${
-          hours ? `${hours}h` : 'more than 24h'
-        } ago, so only an approved template may be sent. Message them from your own phone.`,
+        "ManyChat's API only sends to Messenger, not WhatsApp" +
+        (hours ? ` (it is quoting a Messenger interaction ${hours}h old)` : '') +
+        '. Set MANYCHAT_OWNER_FLOW_NS to a one-step flow that sends owner_msg, and this works.',
     };
   }
   return { ok: false, error: error || `ManyChat replied: ${JSON.stringify(data).slice(0, 200)}` };
