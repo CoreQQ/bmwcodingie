@@ -85,14 +85,19 @@ export async function sendManyChatText(
     if (!found.id) return { ok: false, error: found.error };
     id = found.id;
   }
-  const { data, error } = await mc<{ status?: string }>('/fb/sending/sendContent', {
-    method: 'POST',
-    body: JSON.stringify({
-      subscriber_id: id,
-      data: { version: 'v2', content: { messages: [{ type: 'text', text }] } },
-      message_tag: 'ACCOUNT_UPDATE',
-    }),
+  // ManyChat dropped message tags, and routes WhatsApp through its own path on
+  // some accounts — try the shapes it accepts and keep every refusal, so a
+  // failure names what was actually wrong instead of the last thing tried.
+  const payload = JSON.stringify({
+    subscriber_id: id,
+    data: { version: 'v2', content: { messages: [{ type: 'text', text }] } },
   });
-  if (data?.status === 'success') return { ok: true };
-  return { ok: false, error: error || `ManyChat replied: ${JSON.stringify(data).slice(0, 200)}` };
+  const endpoints = ['/fb/sending/sendContent', '/whatsapp/sending/sendContent'];
+  const refusals: string[] = [];
+  for (const endpoint of endpoints) {
+    const { data, error } = await mc<{ status?: string }>(endpoint, { method: 'POST', body: payload });
+    if (data?.status === 'success') return { ok: true };
+    refusals.push(`${endpoint}: ${error || JSON.stringify(data).slice(0, 160)}`);
+  }
+  return { ok: false, error: refusals.join('\n') };
 }
