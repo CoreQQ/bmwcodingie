@@ -280,7 +280,35 @@ export async function POST(req: Request) {
   });
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Diagnostics: /api/manychat?key=<secret>&debug=<phone> shows exactly what
+  // we received and answered for that chat — the only way to tell a ManyChat
+  // delivery problem apart from a model problem.
+  const url = new URL(req.url);
+  const debug = url.searchParams.get('debug');
+  const provided = url.searchParams.get('key') || '';
+  if (debug && process.env.MANYCHAT_SECRET && provided === process.env.MANYCHAT_SECRET) {
+    const sb = getSupabaseAdmin();
+    if (!sb) return NextResponse.json({ ok: false, error: 'no db' });
+    const waId = debug.replace(/\D/g, '');
+    const { data } = await sb
+      .from('wa_messages')
+      .select('role, content, via, created_at')
+      .eq('wa_id', waId)
+      .order('created_at', { ascending: false })
+      .limit(12);
+    return NextResponse.json({
+      ok: true,
+      wa_id: waId,
+      note: 'newest first — compare with the real WhatsApp thread',
+      messages: (data ?? []) as unknown[],
+    });
+  }
+
+  return await handleStatus();
+}
+
+async function handleStatus() {
   // `db`/`ai` tell us whether this deployment can talk to Supabase and the
   // model; `memory` says whether the conversation tables exist — without them
   // the agent answers every message with no recollection of the last one.
@@ -293,7 +321,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 17,
+    v: 18,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
