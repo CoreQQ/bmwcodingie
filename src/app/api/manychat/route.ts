@@ -353,16 +353,22 @@ export async function GET(req: Request) {
     const sb = getSupabaseAdmin();
     if (!sb) return NextResponse.json({ ok: false, error: 'no db' });
     const waId = debug.replace(/\D/g, '');
-    const { data } = await sb
-      .from('wa_messages')
-      .select('role, content, via, created_at')
-      .eq('wa_id', waId)
-      .order('created_at', { ascending: false })
-      .limit(12);
+    const [{ data }, chat] = await Promise.all([
+      sb
+        .from('wa_messages')
+        .select('role, content, via, created_at')
+        .eq('wa_id', waId)
+        .order('created_at', { ascending: false })
+        .limit(12),
+      sb.from('wa_chats').select('mc_id, paused, owner_replied_at, last_at').eq('wa_id', waId).maybeSingle(),
+    ]);
     return NextResponse.json({
       ok: true,
       wa_id: waId,
       note: 'newest first — compare with the real WhatsApp thread',
+      // Which ManyChat contact we would reply to, and when we last heard from
+      // them — the two facts that decide whether an outbound send can work.
+      chat: chat.data ?? null,
       messages: (data ?? []) as unknown[],
     });
   }
@@ -397,7 +403,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 22,
+    v: 23,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
