@@ -43,13 +43,13 @@ async function mc<T>(path: string, init: RequestInit): Promise<{ data: T | null;
  * ManyChat might have stored, and report what it said when none match.
  */
 async function findSubscriber(phone: string): Promise<{ id: string; error: string }> {
-  const attempts = [
-    `phone=%2B${phone}`,
-    `whatsapp_phone=%2B${phone}`,
-    `phone=${phone}`,
-    `whatsapp_phone=${phone}`,
-  ];
-  let lastError = 'no subscriber matched';
+  // findBySystemField accepts only `phone` or `email`, so a WhatsApp contact
+  // with an empty Phone field simply cannot be found this way — try both
+  // number shapes, then say plainly that the id is what is missing.
+  const attempts = [`phone=%2B${phone}`, `phone=${phone}`];
+  let lastError =
+    'ManyChat has no contact with this phone number (WhatsApp contacts often have an empty Phone field). ' +
+    'Ask them to send one message first — we store their ManyChat id and reply straight to it.';
   for (const query of attempts) {
     const { data, error } = await mc<{ data?: { id?: string | number }[] | { id?: string | number } }>(
       `/fb/subscriber/findBySystemField?${query}`,
