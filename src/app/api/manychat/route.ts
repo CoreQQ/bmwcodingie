@@ -129,6 +129,7 @@ export async function POST(req: Request) {
   // Even without a DB we still mirror to Telegram.
   let paused = false;
   let ownerHandling = false;
+  let aiOff = false;
   if (sb) {
     // Track the chat + read the pause flag (owner may have taken over).
     const { data: chat } = await sb
@@ -163,6 +164,17 @@ export async function POST(req: Request) {
         via: 'ai',
       });
     }
+  }
+
+  // Global kill switch: /ai off in Telegram stops every automatic reply
+  // instantly, while the mirror to Telegram keeps working.
+  if (sb) {
+    const { data: cfg } = await sb
+      .from('app_config')
+      .select('value')
+      .eq('key', 'wa_ai_enabled')
+      .maybeSingle();
+    if ((cfg as { value?: string } | null)?.value === 'off') aiOff = true;
   }
 
   // ManyChat sometimes re-sends the previous message text (its Last Text Input
@@ -201,7 +213,7 @@ export async function POST(req: Request) {
   let reply = aiReply;
   let memory = priorMemory;
   let aiError = '';
-  if (sb && (text || imageUrl) && !paused && !aiReply) {
+  if (sb && (text || imageUrl) && !paused && !aiOff && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
       reply = '';
     } else {
@@ -243,7 +255,8 @@ export async function POST(req: Request) {
   if (imageUrl) lines.push('📷 <i>sent a photo</i>');
   if (text) lines.push(`«${escapeHtml(text)}»${ruLine}`);
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
-  if (ownerHandling) lines.push('✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.');
+  if (aiOff) lines.push('🔇 Auto-replies are OFF (/ai on to re-enable) — answer this one yourself.');
+  else if (ownerHandling) lines.push('✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.');
   else if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
   await sendOwnerWithMarkup(lines.join('\n'), {
     inline_keyboard: [
@@ -280,7 +293,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 16,
+    v: 17,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
