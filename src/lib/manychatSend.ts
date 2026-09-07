@@ -85,19 +85,26 @@ export async function sendManyChatText(
     if (!found.id) return { ok: false, error: found.error };
     id = found.id;
   }
-  // ManyChat dropped message tags, and routes WhatsApp through its own path on
-  // some accounts — try the shapes it accepts and keep every refusal, so a
-  // failure names what was actually wrong instead of the last thing tried.
-  const payload = JSON.stringify({
-    subscriber_id: id,
-    data: { version: 'v2', content: { messages: [{ type: 'text', text }] } },
+  const { data, error } = await mc<{ status?: string }>('/fb/sending/sendContent', {
+    method: 'POST',
+    body: JSON.stringify({
+      subscriber_id: id,
+      data: { version: 'v2', content: { messages: [{ type: 'text', text }] } },
+    }),
   });
-  const endpoints = ['/fb/sending/sendContent', '/whatsapp/sending/sendContent'];
-  const refusals: string[] = [];
-  for (const endpoint of endpoints) {
-    const { data, error } = await mc<{ status?: string }>(endpoint, { method: 'POST', body: payload });
-    if (data?.status === 'success') return { ok: true };
-    refusals.push(`${endpoint}: ${error || JSON.stringify(data).slice(0, 160)}`);
+  if (data?.status === 'success') return { ok: true };
+  // WhatsApp only allows free-form messages for 24 hours after the customer's
+  // last one. Outside that window ManyChat refuses with code 3011, and no
+  // wording of ours changes that — say so plainly instead of quoting an API.
+  const hours = /over (\d+)h ago/.exec(error)?.[1];
+  if (/\b3011\b/.test(error) || hours) {
+    return {
+      ok: false,
+      error:
+        `WhatsApp's 24-hour window is closed — they last wrote ${
+          hours ? `${hours}h` : 'more than 24h'
+        } ago, so only an approved template may be sent. Message them from your own phone.`,
+    };
   }
-  return { ok: false, error: refusals.join('\n') };
+  return { ok: false, error: error || `ManyChat replied: ${JSON.stringify(data).slice(0, 200)}` };
 }
