@@ -151,6 +151,39 @@ export async function POST(req: Request) {
       //   /wa stop  +353…   pause the AI for that chat
       //   /wa start +353…   let the AI answer again
       //   /wa reset +353…   wipe the conversation so it starts fresh
+      // "/wa log +353…" — what WE stored for that chat. Compare it with the
+      // real WhatsApp thread: same texts means the assistant is fine and the
+      // delivery layer is at fault, different texts means the model is.
+      const logCmd = /^\/wa(@\w+)?\s+log\s+(\+?[\d\s()-]{6,})$/i.exec(text);
+      if (logCmd) {
+        const waId = logCmd[2].replace(/\D/g, '');
+        const { data } = await sb
+          .from('wa_messages')
+          .select('role, content, via, created_at')
+          .eq('wa_id', waId)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        const rows = (data ?? []) as { role: string; content: string; via: string | null; created_at: string }[];
+        const body = rows
+          .reverse()
+          .map((r) => {
+            const time = new Date(r.created_at).toLocaleTimeString('en-IE', {
+              timeZone: 'Europe/Dublin',
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+            const who = r.role === 'user' ? '👤' : r.via === 'owner' ? '✋' : '🤖';
+            return `${who} <code>${time}</code> ${escapeHtml(r.content.slice(0, 300))}`;
+          })
+          .join('\n\n');
+        await sendOwnerMessage(
+          body
+            ? `🗂 <b>What we stored for +${waId}</b> (Irish time, oldest first)\n\n${body}`
+            : `Nothing stored for <code>+${waId}</code> yet.`,
+        );
+        return ok();
+      }
+
       const ctrl = /^\/wa(@\w+)?\s+(stop|start|pause|resume|reset|clear|mine)\s+(\+?[\d\s()-]{6,})$/i.exec(text);
       if (ctrl) {
         const action = ctrl[2].toLowerCase();
