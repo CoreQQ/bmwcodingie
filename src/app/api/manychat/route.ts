@@ -10,6 +10,13 @@ export const runtime = 'nodejs';
 // ManyChat's External Request gives up quickly — keep the whole turn short.
 export const maxDuration = 30;
 
+// ManyChat allows an External Request about ten seconds. Answer later than
+// that and it drops our response: the `ai_reply` custom field keeps the
+// PREVIOUS run's text and the customer is sent that old message again — the
+// "bot repeats itself" bug. So the whole turn runs against a hard budget, and
+// we would rather return nothing (and ping Alex) than overshoot it.
+const TURN_BUDGET_MS = 9000;
+
 // Bridge for a ManyChat WhatsApp bot: ManyChat calls this via an "External
 // Request" on each inbound message. We mirror the chat to the owner's Telegram
 // (with RU translation), store it in wa_messages, and report whether the owner
@@ -51,6 +58,8 @@ function deepFind(body: unknown, keys: string[], depth = 0): string {
 const unresolved = (s: string) => /\{\{|⟦|⟧/.test(s);
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
+  const left = () => TURN_BUDGET_MS - (Date.now() - startedAt);
   const secret = process.env.MANYCHAT_SECRET;
   const url = new URL(req.url);
   const provided = req.headers.get('x-manychat-secret') || url.searchParams.get('key') || '';
@@ -109,7 +118,7 @@ export async function POST(req: Request) {
         ]],
       },
     ).catch(() => undefined);
-    return NextResponse.json({ ok: true, paused: false, ai_enabled: true, reply: fallback, memory: priorMemory });
+    return NextResponse.json({ ok: true, paused: false, ai_enabled: true, reply: fallback, has_reply: true, memory: priorMemory });
   }
 
   if (!phone || (!text && !aiReply && !imageUrl)) {
@@ -131,12 +140,20 @@ export async function POST(req: Request) {
   let ownerHandling = false;
   let aiOff = false;
   if (sb) {
-    // Track the chat + read the pause flag (owner may have taken over).
-    const { data: chat } = await sb
-      .from('wa_chats')
-      .upsert({ wa_id: phone, name: name || null, last_at: new Date().toISOString() })
-      .select('paused, owner_replied_at')
-      .single();
+    // Track the chat, read the pause flag (owner may have taken over) and the
+    // global kill switch in one go — every millisecond spent before the model
+    // starts is a millisecond closer to ManyChat's timeout.
+    const [{ data: chat }, { data: cfg }] = await Promise.all([
+      sb
+        .from('wa_chats')
+        .upsert({ wa_id: phone, name: name || null, last_at: new Date().toISOString() })
+        .select('paused, owner_replied_at')
+        .single(),
+      sb.from('app_config').select('value').eq('key', 'wa_ai_enabled').maybeSingle(),
+    ]);
+    // Global kill switch: /ai off in Telegram stops every automatic reply
+    // instantly, while the mirror to Telegram keeps working.
+    if ((cfg as { value?: string } | null)?.value === 'off') aiOff = true;
     const row = chat as { paused?: boolean; owner_replied_at?: string | null } | null;
     // The owner is handling this one: stay out of it for six hours, then the
     // assistant picks the conversation back up so nobody is left waiting.
@@ -166,33 +183,29 @@ export async function POST(req: Request) {
     }
   }
 
-  // Global kill switch: /ai off in Telegram stops every automatic reply
-  // instantly, while the mirror to Telegram keeps working.
-  if (sb) {
-    const { data: cfg } = await sb
-      .from('app_config')
-      .select('value')
-      .eq('key', 'wa_ai_enabled')
-      .maybeSingle();
-    if ((cfg as { value?: string } | null)?.value === 'off') aiOff = true;
-  }
-
   // ManyChat sometimes re-sends the previous message text (its Last Text Input
   // field does not always refresh), which made the assistant answer the same
   // thing twice while the customer's real message went unanswered. If the text
   // is identical to the last one we stored, do not answer at all — tell Alex.
   let staleDuplicate = false;
-  if (sb && text) {
+  // The last thing we told this customer — used both to spot ManyChat
+  // re-sending an old inbound text and to make sure we never hand it back a
+  // reply identical to the one it already delivered.
+  let lastAssistant = '';
+  if (sb) {
     const { data: prev } = await sb
       .from('wa_messages')
-      .select('content, created_at')
+      .select('role, content, created_at')
       .eq('wa_id', phone)
-      .eq('role', 'user')
       .order('created_at', { ascending: false })
-      .limit(2);
-    const rows = (prev ?? []) as { content: string; created_at: string }[];
-    const earlier = rows[1] ?? rows[0];
+      .limit(8);
+    const rows = (prev ?? []) as { role: string; content: string; created_at: string }[];
+    lastAssistant = rows.find((r) => r.role === 'assistant')?.content?.trim() ?? '';
+    const users = rows.filter((r) => r.role === 'user');
+    // rows[0] is the message we just stored, so compare against the one before.
+    const earlier = users[1] ?? users[0];
     staleDuplicate =
+      Boolean(text) &&
       Boolean(earlier) &&
       earlier.content.trim() === text.trim() &&
       Date.now() - new Date(earlier.created_at).getTime() < 12 * 60 * 60 * 1000;
@@ -205,7 +218,7 @@ export async function POST(req: Request) {
       }</code>\nManyChat delivered the same text again — the customer's newest message did not reach us, so the assistant stayed silent. Open WhatsApp and read it yourself.`,
       { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: isPhone ? `+${phone}` : phone } }]] },
     ).catch(() => undefined);
-    return NextResponse.json({ ok: true, paused: true, ai_enabled: false, reply: '', memory: priorMemory });
+    return NextResponse.json({ ok: true, paused: true, ai_enabled: false, reply: '', has_reply: false, memory: priorMemory });
   }
 
   // Generate our own reply (ManyChat just delivers it) unless the owner
@@ -213,31 +226,49 @@ export async function POST(req: Request) {
   let reply = aiReply;
   let memory = priorMemory;
   let aiError = '';
+  let tooSlow = false;
   if (sb && (text || imageUrl) && !paused && !aiOff && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
       reply = '';
     } else {
       try {
         if (isPhone) void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
-        const out = await generateWaReply(
-          sb,
-          phone,
-          text || 'Photo attached.',
-          name || undefined,
-          'claude-haiku-4-5-20251001',
-          isPhone ? `+${phone}` : `ManyChat ${phone}`,
-          imageUrl || undefined,
-          priorMemory || undefined,
-        );
-        reply = out.reply;
-        memory = out.memory;
-        await sb.from('wa_messages').insert({
-          msg_id: `mc:${phone}:${Date.now()}:ai`,
-          wa_id: phone,
-          role: 'assistant',
-          content: reply,
-          via: 'ai',
-        });
+        // Leave room for the Telegram mirror after this — going over budget
+        // is what makes ManyChat resend the previous answer.
+        const budget = Math.max(1000, left() - 2500);
+        const out = await Promise.race([
+          generateWaReply(
+            sb,
+            phone,
+            text || 'Photo attached.',
+            name || undefined,
+            'claude-haiku-4-5-20251001',
+            isPhone ? `+${phone}` : `ManyChat ${phone}`,
+            imageUrl || undefined,
+            priorMemory || undefined,
+          ),
+          new Promise<null>((r) => setTimeout(() => r(null), budget)),
+        ]);
+        if (!out) {
+          // Answering late is worse than not answering: ManyChat would send
+          // the customer our previous message again.
+          tooSlow = true;
+          reply = '';
+        } else {
+          reply = out.reply;
+          memory = out.memory;
+        }
+        // Never hand back the exact text the customer already received.
+        if (reply && reply.trim() === lastAssistant) reply = '';
+        if (reply) {
+          await sb.from('wa_messages').insert({
+            msg_id: `mc:${phone}:${Date.now()}:ai`,
+            wa_id: phone,
+            role: 'assistant',
+            content: reply,
+            via: 'ai',
+          });
+        }
       } catch (e) {
         // Surface the reason in the (secret-protected) response — silent
         // empty replies are impossible to debug from the ManyChat side.
@@ -249,12 +280,19 @@ export async function POST(req: Request) {
 
   // Mirror to the owner's Telegram.
   const label = name ? `${escapeHtml(name)} · ` : '';
-  const ruLine = text ? await translateToRussian(text).then((t) => (t && t !== text ? `\n🇷🇺 ${escapeHtml(t)}` : '')) : '';
+  const ruLine =
+    text && left() > 2000
+      ? await translateToRussian(text).then((t) => (t && t !== text ? `\n🇷🇺 ${escapeHtml(t)}` : ''))
+      : '';
   const who = isPhone ? `+${phone}` : `ManyChat id ${phone}`;
   const lines = [`💬 <b>WhatsApp (ManyChat)</b> · ${label}<code>${who}</code>`];
   if (imageUrl) lines.push('📷 <i>sent a photo</i>');
   if (text) lines.push(`«${escapeHtml(text)}»${ruLine}`);
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
+  if (tooSlow)
+    lines.push(
+      '🐢 The assistant did not finish in time, so nothing was sent to the customer — reply yourself.',
+    );
   if (aiOff) lines.push('🔇 Auto-replies are OFF (/ai on to re-enable) — answer this one yourself.');
   else if (ownerHandling) lines.push('✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.');
   else if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
@@ -275,7 +313,13 @@ export async function POST(req: Request) {
     paused,
     ai_enabled: !paused,
     reply,
+    // `has_reply` lets the ManyChat flow branch: send the message only when it
+    // is "true", so an empty answer can never fall through to the stale value
+    // still sitting in the ai_reply field.
+    has_reply: Boolean(reply),
     memory,
+    ms: Date.now() - startedAt,
+    ...(tooSlow ? { timeout: true } : {}),
     ...(aiError ? { error: aiError } : {}),
   });
 }
@@ -321,7 +365,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 18,
+    v: 19,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     memory,
