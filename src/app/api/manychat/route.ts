@@ -143,12 +143,21 @@ export async function POST(req: Request) {
     // Track the chat, read the pause flag (owner may have taken over) and the
     // global kill switch in one go — every millisecond spent before the model
     // starts is a millisecond closer to ManyChat's timeout.
-    const [{ data: chat }, { data: cfg }] = await Promise.all([
-      sb
+    // Remember ManyChat's own subscriber id so replying from Telegram never
+    // has to guess it back from a phone field WhatsApp contacts often lack.
+    // The column may not exist yet — fall back rather than lose the chat row.
+    const chatRow = { wa_id: phone, name: name || null, last_at: new Date().toISOString() };
+    const upsertChat = async () => {
+      const withId = await sb
         .from('wa_chats')
-        .upsert({ wa_id: phone, name: name || null, last_at: new Date().toISOString() })
+        .upsert({ ...chatRow, ...(subscriberId ? { mc_id: subscriberId } : {}) })
         .select('paused, owner_replied_at')
-        .single(),
+        .single();
+      if (!withId.error) return withId;
+      return sb.from('wa_chats').upsert(chatRow).select('paused, owner_replied_at').single();
+    };
+    const [{ data: chat }, { data: cfg }] = await Promise.all([
+      upsertChat(),
       sb.from('app_config').select('value').eq('key', 'wa_ai_enabled').maybeSingle(),
     ]);
     // Global kill switch: /ai off in Telegram stops every automatic reply
@@ -363,21 +372,23 @@ async function handleStatus() {
   // working, so it is worth being able to see them at a glance.
   const schema: Record<string, boolean> = {};
   if (sb) {
-    const [msgs, takeover, reminded, models] = await Promise.all([
+    const [msgs, takeover, reminded, models, mcId] = await Promise.all([
       sb.from('wa_messages').select('msg_id').limit(1),
       sb.from('wa_chats').select('owner_replied_at').limit(1),
       sb.from('bookings').select('reminded_at').limit(1),
       sb.from('car_models').select('id').limit(1),
+      sb.from('wa_chats').select('mc_id').limit(1),
     ]);
     memory = !msgs.error;
     schema.owner_takeover = !takeover.error;
     schema.reminders = !reminded.error;
     schema.car_models = !models.error;
+    schema.manychat_id = !mcId.error;
   }
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 20,
+    v: 21,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),

@@ -142,7 +142,7 @@ export async function GET(req: Request) {
         `If anything changed, just reply here and we'll sort it.`;
 
       const phone = b.contact.replace(/\D/g, '');
-      const sent = phone ? await sendManyChatText(phone, msg) : false;
+      const sent = phone ? (await sendManyChatText(phone, msg)).ok : false;
       if (sent) {
         await sb.from('bookings').update({ reminded_at: new Date().toISOString() }).eq('id', b.id);
       } else {

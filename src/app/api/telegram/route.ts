@@ -243,8 +243,15 @@ export async function POST(req: Request) {
       if (rawSend && !isWhatsAppConfigured() && isManyChatSendConfigured()) {
         const waId = rawSend[2].replace(/\D/g, '');
         const body = rawSend[3].trim();
-        const sent = await sendManyChatText(waId, body);
-        if (sent) {
+        // ManyChat's own subscriber id, captured when the customer wrote in,
+        // beats looking them up by a phone field that is often empty.
+        let mcId = '';
+        {
+          const { data } = await sb.from('wa_chats').select('mc_id').eq('wa_id', waId).maybeSingle();
+          mcId = (data as { mc_id?: string } | null)?.mc_id ?? '';
+        }
+        const sent = await sendManyChatText(waId, body, mcId);
+        if (sent.ok) {
           await sb.from('wa_messages').insert({
             msg_id: `owner:${waId}:${Date.now()}`,
             wa_id: waId,
@@ -256,7 +263,9 @@ export async function POST(req: Request) {
           await sendOwnerMessage(`✅ Sent to <code>+${waId}</code> via ManyChat — and the assistant has it in context.`);
         } else {
           await sendOwnerMessage(
-            `❌ ManyChat would not send to <code>+${waId}</code>. Check MANYCHAT_API_KEY and that the contact exists there.`,
+            `❌ ManyChat would not send to <code>+${waId}</code>.\n<code>${escapeHtml(
+              sent.error ?? 'unknown error',
+            )}</code>`,
           );
         }
         return ok();
