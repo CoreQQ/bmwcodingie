@@ -210,9 +210,10 @@ export async function POST(req: Request) {
       .limit(8);
     const rows = (prev ?? []) as { role: string; content: string; created_at: string }[];
     lastAssistant = rows.find((r) => r.role === 'assistant')?.content?.trim() ?? '';
-    const users = rows.filter((r) => r.role === 'user');
-    // rows[0] is the message we just stored, so compare against the one before.
-    const earlier = users[1] ?? users[0];
+    // users[0] is the message we just stored, so the comparison is strictly
+    // against the one BEFORE it — falling back to users[0] would compare the
+    // message with itself and silence every first message of a new chat.
+    const earlier = rows.filter((r) => r.role === 'user')[1];
     staleDuplicate =
       Boolean(text) &&
       Boolean(earlier) &&
@@ -227,7 +228,15 @@ export async function POST(req: Request) {
       }</code>\nManyChat delivered the same text again — the customer's newest message did not reach us, so the assistant stayed silent. Open WhatsApp and read it yourself.`,
       { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: isPhone ? `+${phone}` : phone } }]] },
     ).catch(() => undefined);
-    return NextResponse.json({ ok: true, paused: true, ai_enabled: false, reply: '', has_reply: false, memory: priorMemory });
+    return NextResponse.json({
+      ok: true,
+      duplicate: true,
+      paused: true,
+      ai_enabled: false,
+      reply: '',
+      has_reply: false,
+      memory: priorMemory,
+    });
   }
 
   // Generate our own reply (ManyChat just delivers it) unless the owner
@@ -388,7 +397,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 21,
+    v: 22,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
