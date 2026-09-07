@@ -323,3 +323,8 @@ alter table bookings add column if not exists reminded_at timestamptz;
 -- When the owner takes a WhatsApp chat over: the assistant stays quiet for
 -- six hours from this stamp, then resumes if he has not replied.
 alter table wa_chats add column if not exists owner_replied_at timestamptz;
+
+-- ManyChat's own subscriber id, captured on every inbound message. Replying
+-- from Telegram uses it directly, because WhatsApp contacts frequently have
+-- an empty Phone field and cannot be looked up by number.
+alter table wa_chats add column if not exists mc_id text;
