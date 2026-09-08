@@ -5,6 +5,7 @@ import { translateToRussian } from '@/lib/translate';
 import { generateWaReply } from '@/lib/waAgent';
 import { ensureClient } from '@/lib/crm';
 import { isRateLimited } from '@/lib/rateLimit';
+import { sendManyChatText } from '@/lib/manychatSend';
 
 export const runtime = 'nodejs';
 // ManyChat's External Request gives up quickly — keep the whole turn short.
@@ -245,6 +246,8 @@ export async function POST(req: Request) {
   let memory = priorMemory;
   let aiError = '';
   let tooSlow = false;
+  /** Set when a slow turn is being delivered out-of-band; awaited at the end. */
+  let late: Promise<boolean> | null = null;
   if (sb && (text || imageUrl) && !paused && !aiOff && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
       reply = '';
@@ -253,25 +256,43 @@ export async function POST(req: Request) {
         if (isPhone) void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
         // Leave room for the Telegram mirror after this — going over budget
         // is what makes ManyChat resend the previous answer.
-        const budget = Math.max(1000, left() - 2500);
+        const budget = Math.max(1000, left() - 1500);
+        const work = generateWaReply(
+          sb,
+          phone,
+          text || 'Photo attached.',
+          name || undefined,
+          'claude-haiku-4-5-20251001',
+          isPhone ? `+${phone}` : `ManyChat ${phone}`,
+          imageUrl || undefined,
+          priorMemory || undefined,
+        );
         const out = await Promise.race([
-          generateWaReply(
-            sb,
-            phone,
-            text || 'Photo attached.',
-            name || undefined,
-            'claude-haiku-4-5-20251001',
-            isPhone ? `+${phone}` : `ManyChat ${phone}`,
-            imageUrl || undefined,
-            priorMemory || undefined,
-          ),
+          work,
           new Promise<null>((r) => setTimeout(() => r(null), budget)),
         ]);
         if (!out) {
-          // Answering late is worse than not answering: ManyChat would send
-          // the customer our previous message again.
+          // Too slow for ManyChat to deliver: handing it a late answer makes
+          // it resend the previous one. Finish the thought anyway and send it
+          // ourselves through the owner flow — a reply a few seconds late
+          // beats a real customer sitting in silence.
           tooSlow = true;
           reply = '';
+          late = work
+            .then(async (done) => {
+              if (!done.reply || done.reply.trim() === lastAssistant) return false;
+              const sent = await sendManyChatText(phone, done.reply, subscriberId || undefined);
+              if (!sent.ok) return false;
+              await sb.from('wa_messages').insert({
+                msg_id: `mc:${phone}:${Date.now()}:late`,
+                wa_id: phone,
+                role: 'assistant',
+                content: done.reply,
+                via: 'ai',
+              });
+              return true;
+            })
+            .catch(() => false);
         } else {
           reply = out.reply;
           memory = out.memory;
@@ -309,7 +330,8 @@ export async function POST(req: Request) {
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
   if (tooSlow)
     lines.push(
-      '🐢 The assistant did not finish in time, so nothing was sent to the customer — reply yourself.',
+      '🐢 The assistant was too slow for ManyChat — finishing the answer and sending it separately. ' +
+        'Keep an eye on the chat in case it does not land.',
     );
   if (aiOff) lines.push('🔇 Auto-replies are OFF (/ai on to re-enable) — answer this one yourself.');
   else if (ownerHandling) lines.push('✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.');
@@ -324,6 +346,17 @@ export async function POST(req: Request) {
     ],
   });
 
+  // A slow turn is still being written. Stay in the handler until it has been
+  // delivered — ManyChat has already given up on this response, but the
+  // customer has not given up on an answer.
+  const lateSent = late ? await late : null;
+  if (late && !lateSent) {
+    await sendOwnerWithMarkup(
+      `🐢 <b>Could not deliver the late answer</b> · <code>${who}</code>\nReply to them yourself.`,
+      { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: who } }]] },
+    ).catch(() => undefined);
+  }
+
   // ManyChat sends `reply` back to the customer; `paused` lets its flow
   // branch when the owner has taken the chat over.
   return NextResponse.json({
@@ -337,7 +370,7 @@ export async function POST(req: Request) {
     has_reply: Boolean(reply),
     memory,
     ms: Date.now() - startedAt,
-    ...(tooSlow ? { timeout: true } : {}),
+    ...(tooSlow ? { timeout: true, late_sent: Boolean(lateSent) } : {}),
     ...(aiError ? { error: aiError } : {}),
   });
 }
@@ -403,7 +436,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 23,
+    v: 24,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
