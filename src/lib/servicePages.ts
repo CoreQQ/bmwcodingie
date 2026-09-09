@@ -119,7 +119,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Confirm your system', body: 'Send your model, year and VIN-derived build. We identify your head unit and tell you whether wired, wireless or both are possible.' },
       { title: 'Book in or go remote', body: 'We meet the car around Dublin, or you connect a laptop and ENET cable for remote activation across Ireland where supported.' },
       { title: 'Activate and pair', body: 'We code CarPlay on, pair your iPhone and confirm it works on your screen before anything else.' },
-      { title: 'Pay on completion', body: 'You only pay once CarPlay is running on your car. Activation is €170 on NBT Evo and €200 on MGU.' },
+      { title: 'Pay on completion', body: 'You only pay once CarPlay is running on your car. Activation is €150 on NBT Evo and €220 on MGU.' },
     ],
     faqs: [
       { q: 'Can you activate Apple CarPlay on my BMW?', a: 'On most NBT Evo and MGU systems, yes. Send your model, year and VIN-derived build and we will confirm whether wired, wireless or both are supported on your exact car.' },
@@ -322,7 +322,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Send import details', body: 'Give us the model, year and VIN-derived build. We confirm what your JDM import needs and quote the conversion before starting.' },
       { title: 'Convert the car', body: 'We change the region, generate the FSC, load EU maps and address the import-specific modules around Dublin.' },
       { title: 'Verify and scan', body: 'We confirm navigation, radio and convenience features work, and run a diagnostic scan to check the car is clean.' },
-      { title: 'Pay on completion', body: 'Conversions are €280 on NBT Evo and €330 on MGU with CarPlay included, agreed up front and paid once the work is shown done.' },
+      { title: 'Pay on completion', body: 'Conversions are €250 on NBT Evo and €280 on MGU (CarPlay included), agreed up front and paid once the work is shown done.' },
     ],
     faqs: [
       { q: 'Can you code Japanese import BMWs for Ireland?', a: 'Yes. Japan to EU conversion is a regular job — region change, navigation FSC, European maps, ETC mirror handling and TCB checks. Send the details and we will tell you exactly what your car needs.' },
