@@ -89,7 +89,7 @@
     "q6": "Mój samochód to import ze specyfikacją japońską — można go przekonwertować?",
     "a6": "Konwersje Japonia→UE to dla nas standardowe zlecenie: zmiana regionu, FSC, obsługa lusterek ETC i kwestie TCB. Wyślij szczegóły, a powiemy, czego potrzebuje konkretnie Twój samochód.",
     "q7": "Czy dojazd do samochodu jest płatny?",
-    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszego warsztatu w Greenogue Business Park, Rathcoole. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy wizycie w warsztacie lub kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
+    "a7": "Tak — za dojazd pobieramy opłatę: €30 w Dublinie i okolicach, a poza nim €1.50 za kilometr, liczone od naszego warsztatu w Greenogue Business Park, Rathcoole. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy wizycie w warsztacie lub kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
   },
   "Contact": {
     "eyebrow": "07 / Rezerwacja",
@@ -248,5 +248,14 @@
     "text": "Poleć nas znajomemu. Gdy jego zlecenie wyniesie €80 lub więcej, dostajesz 10% jego rachunku w gotówce — bez kuponów i gwiazdek. Wystarczy powiedzieć, kto go przysłał.",
     "badge": "rachunku · gotówką",
     "terms": "Dotyczy zrealizowanych zleceń od €80. Polecającego podaje się przy rezerwacji lub na miejscu. Wypłata gotówką lub przelewem po zakończeniu pracy. Bez limitu — trzech znajomych, trzy wypłaty."
+  },
+  "CallHours": {
+    "title": "Teraz jesteśmy zamknięci",
+    "body": "Poza godzinami otwarcia nikt nie odbierze telefonu. Napisz na WhatsAppie — odpowiemy, gdy tylko wrócimy.",
+    "opensToday": "Otwieramy dziś o {time}",
+    "opensOn": "Otwieramy w {day} o {time}",
+    "whatsapp": "Napisz na WhatsAppie",
+    "callAnyway": "Zadzwoń mimo to",
+    "close": "Zamknij"
   }
 }

@@ -102,13 +102,12 @@ export async function POST(req: Request) {
   // Optional: the reply ManyChat's AI produced, so we can mirror it too.
   const aiReply = String(body.reply ?? '').trim().slice(0, 4000);
 
-  // A message we cannot read (photo, voice note, sticker) must never end in
-  // silence: answer helpfully and make sure the owner sees it.
+  // A photo, voice note or sticker is Alex's to answer — guessing from an
+  // attachment we cannot even open is how customers get told the wrong price.
   if (phone && !text && !aiReply && !imageUrl) {
     const fallback =
-      "Got that 👍 I can't open attachments here — could you type it out for me? " +
-      'If it is your iDrive screen: tell me the model and year and I will confirm ' +
-      'which system you have and the exact price.';
+      "Got that 👍 I can't open attachments here, so I'm passing it straight to Alex — " +
+      'he will look at it himself and come back to you shortly.';
     await sendOwnerWithMarkup(
       `💬 <b>WhatsApp (ManyChat)</b> · ${name ? `${escapeHtml(name)} · ` : ''}<code>${
         isPhone ? `+${phone}` : `ManyChat id ${phone}`
@@ -119,6 +118,15 @@ export async function POST(req: Request) {
         ]],
       },
     ).catch(() => undefined);
+    // The customer has been told Alex is looking, so the assistant must not
+    // keep chatting over him until he has had his say.
+    const db = getSupabaseAdmin();
+    if (db) {
+      await db
+        .from('wa_chats')
+        .upsert({ wa_id: phone, owner_replied_at: new Date().toISOString() })
+        .then(() => undefined, () => undefined);
+    }
     return NextResponse.json({ ok: true, paused: false, ai_enabled: true, reply: fallback, has_reply: true, memory: priorMemory });
   }
 
@@ -436,7 +444,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 24,
+    v: 25,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),

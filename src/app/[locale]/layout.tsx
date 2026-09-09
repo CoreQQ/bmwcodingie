@@ -5,6 +5,7 @@ import { routing } from '@/i18n/routing';
 import { getCatalog, getReviews, getSettings } from '@/lib/data';
 import { CookieConsent } from '@/components/site/CookieConsent';
 import { SectionTime } from '@/components/site/SectionTime';
+import { CallHours } from '@/components/site/CallHours';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -154,6 +155,7 @@ export default async function LocaleLayout({
       />
       {children}
       <SectionTime />
+      <CallHours whatsapp={settings.whatsapp} />
       <CookieConsent
         text={tCookie('text')}
         necessaryOnly={tCookie('necessaryOnly')}

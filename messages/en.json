@@ -89,7 +89,7 @@
     "q6": "My import is Japanese spec — can you convert it?",
     "a6": "Japan→EU conversions are a regular job: region change, FSC, ETC mirror handling and TCB considerations. Send the details and we will tell you what your specific car needs.",
     "q7": "Do you charge for coming to my car?",
-    "a7": "Yes — a call-out fee applies to in-person visits: €20 around Dublin, then €1.25 per km beyond, measured from our workshop at Greenogue Business Park, Rathcoole. You are always told the exact travel cost before you book. There is no call-out fee if you come to the workshop, or for remote coding over ENET."
+    "a7": "Yes — a call-out fee applies to in-person visits: €30 around Dublin, then €1.50 per km beyond, measured from our workshop at Greenogue Business Park, Rathcoole. You are always told the exact travel cost before you book. There is no call-out fee if you come to the workshop, or for remote coding over ENET."
   },
   "Contact": {
     "eyebrow": "07 / Book",
@@ -248,5 +248,14 @@
     "text": "Recommend us to a friend. When their job is €80 or more, you get 10% of their bill in cash — no coupons, no fine print. Just tell us who sent them.",
     "badge": "of their bill · cash",
     "terms": "Applies to completed jobs of €80+. The referrer is named at booking or drop-off. Paid in cash or by transfer once the friend’s job is done. No limit — three friends, three payouts."
+  },
+  "CallHours": {
+    "title": "We're closed right now",
+    "body": "Nobody can pick up the phone outside opening hours. Message us on WhatsApp instead — we reply as soon as we're back.",
+    "opensToday": "Opens again today at {time}",
+    "opensOn": "Opens again on {day} at {time}",
+    "whatsapp": "Message on WhatsApp",
+    "callAnyway": "Call anyway",
+    "close": "Close"
   }
 }
