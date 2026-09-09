@@ -7,7 +7,6 @@ import {
   CALL_OUT,
   HEAD_UNITS,
   PRICE_ITEMS,
-  bundledPrice,
   isBundledOut,
   type HeadUnit,
 } from '@/lib/pricing';
@@ -42,11 +41,8 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
         lines.push({ label: item.label, amount: 0, bundled: true });
         continue;
       }
-      // Some items are cheaper (or carry a flashing surcharge) alongside a
-      // conversion — quote the bundled figure, not the standalone one.
-      const effective = bundledPrice(picked, item.id, priceUnit) ?? amount;
-      lines.push({ label: item.label, amount: effective });
-      total += effective;
+      lines.push({ label: item.label, amount });
+      total += amount;
       if (item.from) anyFrom = true;
     }
     for (const a of ADD_ONS) {
