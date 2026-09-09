@@ -89,7 +89,7 @@
     "q6": "Mano importuotas automobilis yra Japonijos specifikacijos — galite jį konvertuoti?",
     "a6": "Konversija iš Japonijos į ES specifikaciją — dažnas darbas: regiono pakeitimas, FSC, ETC veidrodžių valdymas ir TCB aspektai. Atsiųskite informaciją, ir pasakysime, ko konkrečiai reikia jūsų automobiliui.",
     "q7": "Ar atvykimas pas automobilį yra mokamas?",
-    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų dirbtuvių Greenogue Business Park, Rathcoole. Tikslią kelionės kainą sužinosite prieš registraciją. Atvykus į dirbtuves arba dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
+    "a7": "Taip — už atvykimą taikomas mokestis: €30 Dubline ir apylinkėse, toliau €1.50 už kilometrą, skaičiuojant nuo mūsų dirbtuvių Greenogue Business Park, Rathcoole. Tikslią kelionės kainą sužinosite prieš registraciją. Atvykus į dirbtuves arba dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
   },
   "Contact": {
     "eyebrow": "07 / Rezervacija",
@@ -248,5 +248,14 @@
     "text": "Rekomenduok mus draugui. Jei jo užsakymas nuo €80, gauni 10% jo sąskaitos grynaisiais — jokių kuponų ar smulkaus šrifto. Tiesiog pasakykite, kas atvedė.",
     "badge": "nuo sąskaitos · grynais",
     "terms": "Galioja atliktiems darbams nuo €80. Rekomendavusysis nurodomas registruojantis arba vietoje. Išmokama grynaisiais ar pavedimu užbaigus darbą. Be limito — trys draugai, trys išmokos."
+  },
+  "CallHours": {
+    "title": "Šiuo metu esame uždaryti",
+    "body": "Ne darbo metu telefono niekas neatsilieps. Parašykite per WhatsApp — atsakysime, kai tik grįšime.",
+    "opensToday": "Dirbsime šiandien nuo {time}",
+    "opensOn": "Dirbsime {day} nuo {time}",
+    "whatsapp": "Rašyti per WhatsApp",
+    "callAnyway": "Vis tiek skambinti",
+    "close": "Uždaryti"
   }
 }

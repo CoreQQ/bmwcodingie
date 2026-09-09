@@ -89,7 +89,7 @@
     "q6": "Maşina mea este import din Japonia — o puteți converti?",
     "a6": "Conversiile Japonia→UE sunt o lucrare obișnuită pentru noi: schimbarea regiunii, FSC, gestionarea oglinzilor pentru ETC și aspectele legate de TCB. Trimite-ne detaliile și îți spunem exact de ce are nevoie maşina ta.",
     "q7": "Deplasarea la mașină este cu plată?",
-    "a7": "Da — pentru deplasare se percepe o taxă: €20 în Dublin și împrejurimi, apoi €1.25 pe kilometru dincolo, calculat de la atelierul nostru din Greenogue Business Park, Rathcoole. Costul exact al deplasării îți este comunicat înainte de programare. Dacă vii la atelier sau lucrarea se face remote prin ENET, nu există taxă de deplasare."
+    "a7": "Da — pentru deplasare se percepe o taxă: €30 în Dublin și împrejurimi, apoi €1.50 pe kilometru dincolo, calculat de la atelierul nostru din Greenogue Business Park, Rathcoole. Costul exact al deplasării îți este comunicat înainte de programare. Dacă vii la atelier sau lucrarea se face remote prin ENET, nu există taxă de deplasare."
   },
   "Contact": {
     "eyebrow": "07 / Programare",
@@ -248,5 +248,14 @@
     "text": "Recomandă-ne unui prieten. Când lucrarea lui e de €80 sau mai mult, primești 10% din nota lui, cash — fără cupoane, fără text mărunt. Doar spuneți cine v-a trimis.",
     "badge": "din notă · cash",
     "terms": "Valabil pentru lucrări finalizate de €80+. Cel care recomandă e menționat la programare sau la fața locului. Plata cash sau prin transfer după finalizarea lucrării. Fără limită — trei prieteni, trei plăți."
+  },
+  "CallHours": {
+    "title": "Momentan suntem închiși",
+    "body": "În afara programului nu are cine să răspundă la telefon. Scrieți-ne pe WhatsApp — răspundem imediat ce revenim.",
+    "opensToday": "Deschidem astăzi la {time}",
+    "opensOn": "Deschidem {day} la {time}",
+    "whatsapp": "Scrie pe WhatsApp",
+    "callAnyway": "Sună oricum",
+    "close": "Închide"
   }
 }
