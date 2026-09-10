@@ -25,6 +25,7 @@ import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
+import { buildAgenda, buildLeadCard, type AgendaLead } from '@/lib/agenda';
 import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
 import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
@@ -121,6 +122,16 @@ export async function POST(req: Request) {
     }
     if (text === '✖️ Cancel' || /^\/cancel(@\w+)?\b/.test(text)) {
       await cancelInvoice(sb, msg.chat.id);
+      return ok();
+    }
+    // The same morning screen, on demand — waiting for 07:00 to see who is
+    // still owed a reply is no way to run the day.
+    if (/^\/agenda(@\w+)?\b/.test(text)) {
+      const agenda = await buildAgenda(sb);
+      await sendOwnerWithMarkup(
+        agenda.empty ? '⏰ <b>Daily agenda</b>\n\nNothing booked and nobody waiting.' : agenda.text,
+        agenda.keyboard,
+      );
       return ok();
     }
     if (/^\/bookings(@\w+)?\b/.test(text)) {
@@ -881,6 +892,70 @@ export async function POST(req: Request) {
 
   // Free a slot: marks it cancelled (frees availability) but keeps the
   // customer record. Re-renders the day so the slot drops off the list.
+  // The morning agenda is a list of people, and each one opens into a card with
+  // everything needed to answer them — a name you cannot tap is just a reminder
+  // that you are late.
+  if (cq.data === 'agenda') {
+    const agenda = await buildAgenda(sb);
+    await editMessage(chatId, messageId, agenda.text, agenda.keyboard);
+    await answerCallback(cq.id);
+    return ok();
+  }
+
+  const leadOpen = /^lead:(\d+)$/.exec(cq.data);
+  if (leadOpen) {
+    const { data } = await sb
+      .from('bookings')
+      .select('id, name, contact, service, bmw_model, message, slot_date, slot_time, status, created_at')
+      .eq('id', Number(leadOpen[1]))
+      .maybeSingle();
+    const lead = data as AgendaLead | null;
+    if (!lead) {
+      await answerCallback(cq.id, 'That enquiry is gone.');
+      return ok();
+    }
+    const card = buildLeadCard(lead);
+    await editMessage(chatId, messageId, card.text, card.keyboard);
+    await answerCallback(cq.id);
+    return ok();
+  }
+
+  const leadLog = /^leadlog:(\d+)$/.exec(cq.data);
+  if (leadLog) {
+    const { data } = await sb
+      .from('bookings')
+      .select('contact')
+      .eq('id', Number(leadLog[1]))
+      .maybeSingle();
+    const waId = ((data as { contact?: string } | null)?.contact ?? '').replace(/\D/g, '');
+    const { data: msgs } = waId
+      ? await sb
+          .from('wa_messages')
+          .select('role, content, via, created_at')
+          .eq('wa_id', waId)
+          .order('created_at', { ascending: false })
+          .limit(10)
+      : { data: [] };
+    const rows = (msgs ?? []) as { role: string; content: string; via: string | null; created_at: string }[];
+    const body = rows
+      .reverse()
+      .map((r) => {
+        const time = new Date(r.created_at).toLocaleTimeString('en-IE', {
+          timeZone: 'Europe/Dublin',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+        const who = r.role === 'user' ? '👤' : r.via === 'owner' ? '✋' : '🤖';
+        return `${who} <code>${time}</code> ${escapeHtml(r.content.slice(0, 280))}`;
+      })
+      .join('\n\n');
+    await sendOwnerMessage(
+      body ? `📖 <b>Chat with +${waId}</b>\n\n${body}` : 'No stored messages for this contact.',
+    );
+    await answerCallback(cq.id);
+    return ok();
+  }
+
   const free = /^bkfree:(\d+)$/.exec(cq.data);
   if (free) {
     const id = Number(free[1]);
@@ -901,6 +976,11 @@ export async function POST(req: Request) {
     }
     await answerCallback(cq.id, 'Slot freed ✓');
     const date = (row?.slot_date as string | null) ?? null;
+    if (!date) {
+      const agenda = await buildAgenda(sb);
+      await editMessage(chatId, messageId, agenda.text, agenda.keyboard);
+      return ok();
+    }
     if (date) {
       const [rows, freeWins] = await Promise.all([upcomingBookings(sb), freeWindowsFor(sb, date)]);
       const { text, keyboard } = buildBookingsDay(date, rows, freeWins);
