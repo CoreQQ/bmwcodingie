@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
+import { buildAgenda } from '@/lib/agenda';
 import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
 
 // Uses the shared "short & friendly" template so /review and the daily nudge
@@ -53,81 +54,14 @@ export async function GET(req: Request) {
   const sb = getSupabaseAdmin();
   if (!sb) return NextResponse.json({ ok: true, skipped: 'no-db' });
 
-  const dayKey = (offset: number) => {
-    const d = new Date(Date.now() + offset * 86400000);
-    return d.toISOString().slice(0, 10);
-  };
-  const today = dayKey(0);
+  const dayKey = (offset: number) =>
+    new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
   const tomorrow = dayKey(1);
 
-  const { data } = await sb
-    .from('bookings')
-    .select('*')
-    .in('slot_date', [today, tomorrow])
-    .in('status', ['pending', 'confirmed'])
-    .order('slot_time', { ascending: true });
-  const rows = (data ?? []) as Booking[];
-
-  // Stale requests: pending for over 24h — easy to lose, costly to ignore.
-  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { data: staleData } = await sb
-    .from('bookings')
-    .select('id, name, contact, service, slot_date, slot_time, created_at')
-    .eq('status', 'pending')
-    .lt('created_at', dayAgo)
-    .order('created_at', { ascending: true })
-    .limit(40);
-  // One line per person, not per row. A single conversation could leave several
-  // enquiries behind, and the same name listed four times reads as noise and
-  // gets skimmed past — which is the opposite of what this list is for.
-  const seen = new Map<string, Booking>();
-  const extras = new Map<string, number>();
-  for (const b of (staleData ?? []) as Booking[]) {
-    const key = (b.contact || b.name || String(b.id)).trim().toLowerCase();
-    if (seen.has(key)) extras.set(key, (extras.get(key) ?? 0) + 1);
-    seen.set(key, b); // keep the most recent — it knows the most
-  }
-  const stale = [...seen.values()].slice(0, 10);
-  const extraFor = (b: Booking) =>
-    extras.get((b.contact || b.name || String(b.id)).trim().toLowerCase()) ?? 0;
-
-  const icon = (s: string) => (s === 'confirmed' ? '✅' : '⏳');
-  const fmt = (list: Booking[]) =>
-    list.map((b) => `  ${icon(b.status)} ${b.slot_time} — ${b.name}${b.service ? ` · ${b.service}` : ''}`);
-
-  const todays = rows.filter((b) => b.slot_date === today);
-  const tomorrows = rows.filter((b) => b.slot_date === tomorrow);
-
-  if (rows.length || stale.length) {
-    const lines = ['⏰ <b>Daily agenda</b>', '━━━━━━━━━━━━━━━━━━━'];
-    lines.push(`<b>Today</b> (${today}):`);
-    lines.push(...(todays.length ? fmt(todays) : ['  —']));
-    lines.push('', `<b>Tomorrow</b> (${tomorrow}):`);
-    lines.push(...(tomorrows.length ? fmt(tomorrows) : ['  —']));
-    if (stale.length) {
-      lines.push('', `⚠️ <b>Waiting for your reply over 24h:</b>`);
-      for (const b of stale) {
-        const slot = b.slot_date ? ` · ${b.slot_date} ${b.slot_time ?? ''}`.trimEnd() : '';
-        const more = extraFor(b);
-        lines.push(
-          `  ⏳ ${b.name}${b.service ? ` — ${b.service}` : ''}${slot}` +
-            (more ? ` <i>(+${more} earlier ${more === 1 ? 'message' : 'messages'})</i>` : ''),
-        );
-      }
-      lines.push('  Slot requests: /bookings · No-slot enquiries: buttons below');
-    }
-    // Dismiss buttons work for ANY stale booking — including no-slot enquiries
-    // that /bookings (upcoming slots only) never shows.
-    const keyboard = stale.length
-      ? {
-          inline_keyboard: stale.slice(0, 10).map((b) => [
-            { text: `✖️ Dismiss ${b.name.slice(0, 24)}`, callback_data: `bkfree:${b.id}` },
-          ]),
-        }
-      : undefined;
-    await sendOwnerWithMarkup(lines.join('\n'), keyboard);
-  }
-
+  // The morning view lives in lib/agenda so the bot can rebuild the same
+  // screen when the owner navigates back out of an enquiry.
+  const agenda = await buildAgenda(sb);
+  if (!agenda.empty) await sendOwnerWithMarkup(agenda.text, agenda.keyboard);
 
   // ── Appointment reminders ─────────────────────────────────────────
   // Sent the morning before, so the customer always gets 12+ hours' notice and

@@ -12,11 +12,11 @@ function esc(s: string): string {
 }
 
 // ─── Inline keyboard types (subset of the Telegram Bot API we use) ───
-type InlineButton =
+export type InlineButton =
   | { text: string; callback_data: string }
   | { text: string; copy_text: { text: string } }
   | { text: string; url: string };
-type InlineKeyboard = { inline_keyboard: InlineButton[][] };
+export type InlineKeyboard = { inline_keyboard: InlineButton[][] };
 
 /** Low-level call to a Bot API method. Never throws; returns the parsed JSON or null. */
 async function tgCall(method: string, payload: Record<string, unknown>): Promise<unknown | null> {
@@ -423,7 +423,8 @@ export async function editMessage(
   chatId: number | string,
   messageId: number,
   text: string,
-  keyboard: InlineKeyboard,
+  /** Omit to strip the keyboard — a screen with nothing left to tap. */
+  keyboard?: InlineKeyboard,
 ): Promise<void> {
   await tgCall('editMessageText', {
     chat_id: chatId,
