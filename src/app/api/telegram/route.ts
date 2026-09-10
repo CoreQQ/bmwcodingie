@@ -884,8 +884,21 @@ export async function POST(req: Request) {
   const free = /^bkfree:(\d+)$/.exec(cq.data);
   if (free) {
     const id = Number(free[1]);
-    const { data: row } = await sb.from('bookings').select('slot_date').eq('id', id).single();
+    const { data: row } = await sb.from('bookings').select('slot_date, contact').eq('id', id).single();
     await sb.from('bookings').update({ status: 'cancelled' }).eq('id', id);
+    // One tap clears the whole person. Older duplicate enquiries from the same
+    // chat would otherwise resurface in tomorrow's agenda, and Alex would be
+    // dismissing the same name every morning.
+    const contact = (row as { contact?: string } | null)?.contact;
+    if (contact) {
+      await sb
+        .from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('contact', contact)
+        .eq('status', 'pending')
+        .is('slot_date', null)
+        .then(() => undefined, () => undefined);
+    }
     await answerCallback(cq.id, 'Slot freed ✓');
     const date = (row?.slot_date as string | null) ?? null;
     if (date) {

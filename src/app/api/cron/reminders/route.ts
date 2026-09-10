@@ -72,12 +72,24 @@ export async function GET(req: Request) {
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const { data: staleData } = await sb
     .from('bookings')
-    .select('id, name, service, slot_date, slot_time, created_at')
+    .select('id, name, contact, service, slot_date, slot_time, created_at')
     .eq('status', 'pending')
     .lt('created_at', dayAgo)
     .order('created_at', { ascending: true })
-    .limit(10);
-  const stale = (staleData ?? []) as Booking[];
+    .limit(40);
+  // One line per person, not per row. A single conversation could leave several
+  // enquiries behind, and the same name listed four times reads as noise and
+  // gets skimmed past — which is the opposite of what this list is for.
+  const seen = new Map<string, Booking>();
+  const extras = new Map<string, number>();
+  for (const b of (staleData ?? []) as Booking[]) {
+    const key = (b.contact || b.name || String(b.id)).trim().toLowerCase();
+    if (seen.has(key)) extras.set(key, (extras.get(key) ?? 0) + 1);
+    seen.set(key, b); // keep the most recent — it knows the most
+  }
+  const stale = [...seen.values()].slice(0, 10);
+  const extraFor = (b: Booking) =>
+    extras.get((b.contact || b.name || String(b.id)).trim().toLowerCase()) ?? 0;
 
   const icon = (s: string) => (s === 'confirmed' ? '✅' : '⏳');
   const fmt = (list: Booking[]) =>
@@ -96,7 +108,11 @@ export async function GET(req: Request) {
       lines.push('', `⚠️ <b>Waiting for your reply over 24h:</b>`);
       for (const b of stale) {
         const slot = b.slot_date ? ` · ${b.slot_date} ${b.slot_time ?? ''}`.trimEnd() : '';
-        lines.push(`  ⏳ ${b.name}${b.service ? ` — ${b.service}` : ''}${slot}`);
+        const more = extraFor(b);
+        lines.push(
+          `  ⏳ ${b.name}${b.service ? ` — ${b.service}` : ''}${slot}` +
+            (more ? ` <i>(+${more} earlier ${more === 1 ? 'message' : 'messages'})</i>` : ''),
+        );
       }
       lines.push('  Slot requests: /bookings · No-slot enquiries: buttons below');
     }
