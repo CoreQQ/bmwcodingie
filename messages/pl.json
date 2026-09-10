@@ -89,7 +89,7 @@
     "q6": "Mój samochód to import ze specyfikacją japońską — można go przekonwertować?",
     "a6": "Konwersje Japonia→UE to dla nas standardowe zlecenie: zmiana regionu, FSC, obsługa lusterek ETC i kwestie TCB. Wyślij szczegóły, a powiemy, czego potrzebuje konkretnie Twój samochód.",
     "q7": "Czy dojazd do samochodu jest płatny?",
-    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszego warsztatu w Greenogue Business Park, Rathcoole. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy wizycie w warsztacie lub kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
+    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszego warsztatu w Greenogue Business Park, Rathcoole. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
   },
   "Contact": {
     "eyebrow": "07 / Rezerwacja",
@@ -257,5 +257,13 @@
     "whatsapp": "Napisz na WhatsAppie",
     "callAnyway": "Zadzwoń mimo to",
     "close": "Zamknij"
+  },
+  "Announcement": {
+    "beforeTitle": "Od 1 października przyjeżdżamy do Ciebie",
+    "beforeBody": "Nasz warsztat w Rathcoole kończy działalność z końcem września. Od tego czasu każdą pracę wykonujemy u Ciebie w domu lub w pracy w Dublinie i okolicznych hrabstwach, albo zdalnie przez ENET. Ta sama praca, te same ceny, bez dojazdu.",
+    "afterTitle": "Przyjeżdżamy do Ciebie",
+    "afterBody": "BMW Coding działa teraz w pełni mobilnie. Pracujemy u Ciebie w domu lub w pracy w Dublinie, Kildare, Wicklow i Meath, albo zdalnie przez ENET w całej Irlandii.",
+    "cta": "Jak to działa",
+    "dismiss": "Zamknij"
   }
 }

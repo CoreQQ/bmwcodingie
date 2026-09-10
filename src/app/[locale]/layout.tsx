@@ -6,6 +6,8 @@ import { getCatalog, getReviews, getSettings } from '@/lib/data';
 import { CookieConsent } from '@/components/site/CookieConsent';
 import { SectionTime } from '@/components/site/SectionTime';
 import { CallHours } from '@/components/site/CallHours';
+import { Announcement } from '@/components/site/Announcement';
+import { isMobileOnly } from '@/lib/transition';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -30,12 +32,17 @@ export default async function LocaleLayout({
   // instead of request headers, so the pages can be prerendered and cached.
   setRequestLocale(locale);
 
-  const [settings, catalog, reviews, tCookie] = await Promise.all([
+  const [settings, catalog, reviews, tCookie, tNotice] = await Promise.all([
     getSettings(),
     getCatalog(),
     getReviews(),
     getTranslations('CookieConsent'),
+    getTranslations('Announcement'),
   ]);
+
+  // The workshop lease ends on 30 September: before that the notice warns, after
+  // it simply states what the service is.
+  const mobileOnly = isMobileOnly();
 
   const sameAs = [
     settings.instagram ? `https://instagram.com/${settings.instagram.replace(/^@/, '')}` : null,
@@ -100,14 +107,21 @@ export default async function LocaleLayout({
           { '@type': 'AdministrativeArea', name: 'Meath' },
           { '@type': 'Country', name: 'Ireland' },
         ],
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: 'Grants View, Greenogue Business Park',
-          addressLocality: 'Rathcoole',
-          addressRegion: 'Co. Dublin',
-          addressCountry: 'IE',
-        },
-        geo: { '@type': 'GeoCoordinates', latitude: 53.3000625, longitude: -6.4818572 },
+        // A service-area business must not publish premises it no longer has —
+        // Google suspends profiles for it, and customers turn up at a stranger's
+        // unit. Only the town and country remain.
+        address: mobileOnly
+          ? { '@type': 'PostalAddress', addressLocality: 'Dublin', addressCountry: 'IE' }
+          : {
+              '@type': 'PostalAddress',
+              streetAddress: 'Grants View, Greenogue Business Park',
+              addressLocality: 'Rathcoole',
+              addressRegion: 'Co. Dublin',
+              addressCountry: 'IE',
+            },
+        ...(mobileOnly
+          ? {}
+          : { geo: { '@type': 'GeoCoordinates', latitude: 53.3000625, longitude: -6.4818572 } }),
         openingHoursSpecification: [
           {
             '@type': 'OpeningHoursSpecification',
@@ -152,6 +166,13 @@ export default async function LocaleLayout({
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e'),
         }}
+      />
+      <Announcement
+        title={mobileOnly ? tNotice('afterTitle') : tNotice('beforeTitle')}
+        body={mobileOnly ? tNotice('afterBody') : tNotice('beforeBody')}
+        cta={tNotice('cta')}
+        href="/find-us"
+        dismissLabel={tNotice('dismiss')}
       />
       {children}
       <SectionTime />

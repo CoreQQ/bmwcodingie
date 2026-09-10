@@ -89,7 +89,7 @@
     "q6": "Mano importuotas automobilis yra Japonijos specifikacijos — galite jį konvertuoti?",
     "a6": "Konversija iš Japonijos į ES specifikaciją — dažnas darbas: regiono pakeitimas, FSC, ETC veidrodžių valdymas ir TCB aspektai. Atsiųskite informaciją, ir pasakysime, ko konkrečiai reikia jūsų automobiliui.",
     "q7": "Ar atvykimas pas automobilį yra mokamas?",
-    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų dirbtuvių Greenogue Business Park, Rathcoole. Tikslią kelionės kainą sužinosite prieš registraciją. Atvykus į dirbtuves arba dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
+    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų dirbtuvių Greenogue Business Park, Rathcoole. Tikslią kelionės kainą sužinosite prieš registraciją. Dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
   },
   "Contact": {
     "eyebrow": "07 / Rezervacija",
@@ -257,5 +257,13 @@
     "whatsapp": "Rašyti per WhatsApp",
     "callAnyway": "Vis tiek skambinti",
     "close": "Uždaryti"
+  },
+  "Announcement": {
+    "beforeTitle": "Nuo spalio 1 d. atvykstame pas jus",
+    "beforeBody": "Mūsų dirbtuvės Rathcoole užsidaro rugsėjo pabaigoje. Nuo tada visus darbus atliekame pas jus namuose ar darbe Dubline ir aplinkinėse grafystėse arba nuotoliniu būdu per ENET. Tie patys darbai, tos pačios kainos, ir jums niekur nereikia važiuoti.",
+    "afterTitle": "Atvykstame pas jus",
+    "afterBody": "BMW Coding dabar yra visiškai mobili paslauga. Dirbame pas jus namuose ar darbe Dubline, Kildare, Wicklow ir Meath arba nuotoliniu būdu per ENET visoje Airijoje.",
+    "cta": "Kaip tai veikia",
+    "dismiss": "Uždaryti"
   }
 }
