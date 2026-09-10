@@ -89,7 +89,7 @@
     "q6": "Maşina mea este import din Japonia — o puteți converti?",
     "a6": "Conversiile Japonia→UE sunt o lucrare obișnuită pentru noi: schimbarea regiunii, FSC, gestionarea oglinzilor pentru ETC și aspectele legate de TCB. Trimite-ne detaliile și îți spunem exact de ce are nevoie maşina ta.",
     "q7": "Deplasarea la mașină este cu plată?",
-    "a7": "Da — pentru deplasare se percepe o taxă: €20 în Dublin și împrejurimi, apoi €1.25 pe kilometru dincolo, calculat de la atelierul nostru din Greenogue Business Park, Rathcoole. Costul exact al deplasării îți este comunicat înainte de programare. Dacă vii la atelier sau lucrarea se face remote prin ENET, nu există taxă de deplasare."
+    "a7": "Da — pentru deplasare se percepe o taxă: €20 în Dublin și împrejurimi, apoi €1.25 pe kilometru dincolo, calculat de la atelierul nostru din Greenogue Business Park, Rathcoole. Costul exact al deplasării îți este comunicat înainte de programare. Dacă lucrarea se face remote prin ENET, nu există taxă de deplasare."
   },
   "Contact": {
     "eyebrow": "07 / Programare",
@@ -257,5 +257,13 @@
     "whatsapp": "Scrie pe WhatsApp",
     "callAnyway": "Sună oricum",
     "close": "Închide"
+  },
+  "Announcement": {
+    "beforeTitle": "De la 1 octombrie venim noi la tine",
+    "beforeBody": "Atelierul nostru din Rathcoole se închide la sfârșitul lui septembrie. De atunci lucrăm la tine acasă sau la serviciu, în Dublin și în comitatele din jur, ori remote prin ENET. Aceeași muncă, aceleași prețuri, fără drum până la noi.",
+    "afterTitle": "Venim noi la tine",
+    "afterBody": "BMW Coding este acum un serviciu complet mobil. Lucrăm la tine acasă sau la serviciu în Dublin, Kildare, Wicklow și Meath, ori remote prin ENET oriunde în Irlanda.",
+    "cta": "Cum funcționează",
+    "dismiss": "Închide"
   }
 }
