@@ -175,6 +175,33 @@ const REMEMBER_TOOL: Anthropic.Tool = {
 };
 
 /**
+ * The open, slot-less enquiry we already have for this customer, if any.
+ *
+ * The model calls save_lead again whenever it learns something new, which used
+ * to mean a fresh row each time and the same person listed three times in the
+ * daily agenda. One conversation is one enquiry until Alex closes it.
+ */
+async function openLeadFor(
+  sb: SupabaseClient,
+  contact: string,
+): Promise<{ id: number; public_token?: string; service?: string; bmw_model?: string; message?: string } | null> {
+  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await sb
+    .from('bookings')
+    .select('id, public_token, service, bmw_model, message')
+    .eq('contact', contact)
+    .eq('status', 'pending')
+    .is('slot_date', null)
+    .gt('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(1);
+  const row = (data ?? [])[0] as
+    | { id: number; public_token?: string; service?: string; bmw_model?: string; message?: string }
+    | undefined;
+  return row ?? null;
+}
+
+/**
  * Produce the agent's reply for an inbound WhatsApp message, persisting a
  * lead (booking + client + owner notification) when the model captures one.
  * `text` is the message just received; history is read from wa_messages.
@@ -315,22 +342,47 @@ export async function generateWaReply(
             const bmw_model = String(inp.bmw_model ?? '').trim().slice(0, 160);
             const isPhone = contact.startsWith('+');
             const cl = isPhone ? await ensureClient(sb, contact, bookName).catch(() => null) : null;
-            const ins = await sb
-              .from('bookings')
-              .insert({
-                name: bookName,
-                contact,
-                bmw_model,
-                service,
-                message: '',
-                slot_date: day,
-                slot_time: time,
-                source: 'WhatsApp AI',
-                status: cl?.banned ? 'declined' : 'pending',
-              })
-              .select('id, public_token')
-              .single();
-            const row = ins.data as { id: number; public_token?: string } | null;
+            const status = cl?.banned ? 'declined' : 'pending';
+            // The enquiry this customer already has becomes the booking, rather
+            // than sitting beside it as a second entry in the agenda.
+            const open = await openLeadFor(sb, contact).catch(() => null);
+            let row: { id: number; public_token?: string } | null = null;
+            if (open) {
+              const upd = await sb
+                .from('bookings')
+                .update({
+                  name: bookName,
+                  bmw_model: bmw_model || open.bmw_model || '',
+                  service: service || open.service || '',
+                  slot_date: day,
+                  slot_time: time,
+                  status,
+                })
+                .eq('id', open.id)
+                .select('id, public_token')
+                .single();
+              row = (upd.data as { id: number; public_token?: string } | null) ?? {
+                id: open.id,
+                public_token: open.public_token,
+              };
+            } else {
+              const ins = await sb
+                .from('bookings')
+                .insert({
+                  name: bookName,
+                  contact,
+                  bmw_model,
+                  service,
+                  message: '',
+                  slot_date: day,
+                  slot_time: time,
+                  source: 'WhatsApp AI',
+                  status,
+                })
+                .select('id, public_token')
+                .single();
+              row = ins.data as { id: number; public_token?: string } | null;
+            }
             const id = row?.id;
             const token = row?.public_token;
             await notifyTelegram({
@@ -388,35 +440,51 @@ export async function generateWaReply(
         const service = String(inp.service ?? '').trim().slice(0, 160);
         const note = String(inp.note ?? '').trim().slice(0, 1000);
         const isPhone = contact.startsWith('+');
-        const ins = await sb
-          .from('bookings')
-          .insert({
+        const open = await openLeadFor(sb, contact).catch(() => null);
+        if (open) {
+          // Keep whatever we learned, drop nothing we already knew.
+          await sb
+            .from('bookings')
+            .update({
+              name: leadName,
+              bmw_model: bmw_model || open.bmw_model || '',
+              service: service || open.service || '',
+              message: note || open.message || '',
+            })
+            .eq('id', open.id)
+            .then(() => undefined, () => undefined);
+          result = 'Already saved earlier in this chat — details updated. Do not mention it again.';
+        } else {
+          const ins = await sb
+            .from('bookings')
+            .insert({
+              name: leadName,
+              contact,
+              bmw_model,
+              service,
+              message: note,
+              source: 'WhatsApp AI',
+              status: 'pending',
+            })
+            .select('id')
+            .single();
+          const id = (ins.data as { id: number } | null)?.id;
+          const cl = isPhone ? await ensureClient(sb, contact, leadName).catch(() => null) : null;
+          await notifyTelegram({
             name: leadName,
             contact,
             bmw_model,
             service,
             message: note,
-            source: 'WhatsApp AI',
-            status: 'pending',
-          })
-          .select('id')
-          .single();
-        const id = (ins.data as { id: number } | null)?.id;
-        const cl = isPhone ? await ensureClient(sb, contact, leadName).catch(() => null) : null;
-        await notifyTelegram({
-          name: leadName,
-          contact,
-          bmw_model,
-          service,
-          message: note,
-          slot_date: null,
-          slot_time: '',
-          source: '🤖 WhatsApp AI',
-          id,
-          persisted: Boolean(id),
-          clientNote: cl ? `🆔 <b>Client:</b> ${clientCode(cl.id)}` : undefined,
-        }).catch(() => undefined);
-        result = 'Lead saved — the team has the details.';
+            slot_date: null,
+            slot_time: '',
+            source: '🤖 WhatsApp AI',
+            id,
+            persisted: Boolean(id),
+            clientNote: cl ? `🆔 <b>Client:</b> ${clientCode(cl.id)}` : undefined,
+          }).catch(() => undefined);
+          result = 'Lead saved — the team has the details.';
+        }
       }
 
       results.push({ type: 'tool_result', tool_use_id: call.id, content: result });
