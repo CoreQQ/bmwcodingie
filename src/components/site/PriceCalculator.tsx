@@ -20,7 +20,11 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
   const [addOns, setAddOns] = useState<string[]>([]);
   const [mobile, setMobile] = useState(false);
 
-  const priceUnit: Exclude<HeadUnit, 'unknown'> = unit === 'mgu' ? 'mgu' : 'nbt-evo';
+  const priceUnit: Exclude<HeadUnit, 'unknown'> =
+    unit === 'mgu' ? 'mgu' : unit === 'mgu-id8' ? 'mgu-id8' : 'nbt-evo';
+  // iDrive 8 is too build-dependent to publish a number for: what is codable
+  // varies with the software version, so every job is quoted from the VIN.
+  const quoteOnly = unit === 'mgu-id8';
 
   const toggle = (list: string[], set: (v: string[]) => void, id: string) =>
     set(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -191,7 +195,13 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
         <div className="border border-white/10 bg-graphite-800/60 p-5">
           <p className="label mb-4">Your estimate</p>
 
-          {lines.length === 0 ? (
+          {quoteOnly ? (
+            <p className="text-sm leading-relaxed text-muted">
+              <span className="font-semibold text-ink">iDrive 8 is quoted per car.</span> What can be
+              coded depends on the exact software version, so we confirm the price from your VIN before
+              anything is booked. Tell us the model, year and what you want and you get a firm number back.
+            </p>
+          ) : lines.length === 0 ? (
             <p className="text-sm text-muted">Pick what you need and the price appears here.</p>
           ) : (
             <ul className="space-y-2 border-b border-white/10 pb-4">
@@ -206,12 +216,14 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
             </ul>
           )}
 
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="font-mono text-[11px] uppercase tracking-widest text-faint">Total</span>
-            <span className="font-display text-4xl leading-none">
-              {anyFrom && total > 0 ? 'from ' : ''}€{total}
-            </span>
-          </div>
+          {!quoteOnly && (
+            <div className="mt-4 flex items-baseline justify-between">
+              <span className="font-mono text-[11px] uppercase tracking-widest text-faint">Total</span>
+              <span className="font-display text-4xl leading-none">
+                {anyFrom && total > 0 ? 'from ' : ''}€{total}
+              </span>
+            </div>
+          )}
 
           <p className="mt-3 text-[11px] leading-relaxed text-faint">
             An estimate, not a quote. The exact price is confirmed from your model, year and VIN

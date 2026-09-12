@@ -1,11 +1,12 @@
 // Single source of truth for the published price list. The calculator, the
 // AI prompts and the pricing guide must never drift apart — change it here.
 
-export type HeadUnit = 'nbt-evo' | 'mgu' | 'unknown';
+export type HeadUnit = 'nbt-evo' | 'mgu' | 'mgu-id8' | 'unknown';
 
 export const HEAD_UNITS: { id: HeadUnit; label: string; hint: string }[] = [
   { id: 'nbt-evo', label: 'NBT Evo — iDrive 5 / 6', hint: 'Roughly 2013–2018 cars' },
-  { id: 'mgu', label: 'MGU — iDrive 7 / 8', hint: 'Roughly 2018 onwards' },
+  { id: 'mgu', label: 'MGU — iDrive 7', hint: 'Roughly 2018–2021' },
+  { id: 'mgu-id8', label: 'MGU — iDrive 8', hint: 'Roughly 2021 onwards — priced per car' },
   { id: 'unknown', label: "I'm not sure", hint: 'We confirm it from your VIN' },
 ];
 
@@ -24,46 +25,46 @@ export const PRICE_ITEMS: PriceItem[] = [
     id: 'carplay',
     label: 'Apple CarPlay activation',
     note: 'One-off, no subscription',
-    price: { 'nbt-evo': 150, mgu: 220 },
+    price: { 'nbt-evo': 150, mgu: 220, 'mgu-id8': null },
   },
   {
     id: 'android-auto',
     label: 'Android Auto activation',
-    note: 'iDrive 7 / 8 only',
-    price: { 'nbt-evo': null, mgu: 200 },
+    note: 'iDrive 7 only — iDrive 8 is quoted per car',
+    price: { 'nbt-evo': null, mgu: 200, 'mgu-id8': null },
   },
   {
     id: 'japan',
     label: 'Japan → EU conversion',
     note: 'Region, radio bands, nav FSC, EU maps. With CarPlay added: €250 on NBT Evo, €300 on MGU.',
-    price: { 'nbt-evo': 250, mgu: 280 },
+    price: { 'nbt-evo': 250, mgu: 280, 'mgu-id8': null },
   },
   {
     id: 'vim',
     label: 'Video in Motion',
     note: 'Full menus while driving',
-    price: { 'nbt-evo': 60, mgu: 60 },
+    price: { 'nbt-evo': 60, mgu: 60, 'mgu-id8': null },
     from: true,
   },
   {
     id: 'hidden',
     label: 'Hidden features session',
     note: 'Digital speed, sport displays, welcome lights, mirror & window comfort…',
-    price: { 'nbt-evo': 50, mgu: 50 },
+    price: { 'nbt-evo': 50, mgu: 50, 'mgu-id8': null },
     from: true,
   },
   {
     id: 'comfort',
     label: 'Single comfort tweak',
     note: 'One specific setting',
-    price: { 'nbt-evo': 40, mgu: 40 },
+    price: { 'nbt-evo': 40, mgu: 40, 'mgu-id8': null },
     from: true,
   },
   {
     id: 'diagnostics',
     label: 'Full ISTA diagnostics',
     note: 'Dealer-level scan with written summary',
-    price: { 'nbt-evo': 80, mgu: 80 },
+    price: { 'nbt-evo': 80, mgu: 80, 'mgu-id8': null },
     from: true,
   },
 ];

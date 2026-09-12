@@ -169,7 +169,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Compatibility check', body: 'Send your model, year and VIN-derived build. We confirm whether your iDrive supports Android Auto before anything is booked.' },
       { title: 'In person or remote', body: 'We come to the car around Dublin, or you connect a laptop and ENET cable for remote activation across Ireland where supported.' },
       { title: 'Activate and pair', body: 'We code Android Auto on, pair your phone and confirm it works on the iDrive screen.' },
-      { title: 'Pay on completion', body: 'You pay once it is shown working. Android Auto is €200 on MGU (iDrive 7/8) builds.' },
+      { title: 'Pay on completion', body: 'You pay once it is shown working. Android Auto is €200 on MGU iDrive 7 builds; iDrive 8 is quoted per car from your VIN.' },
     ],
     faqs: [
       { q: 'Can you activate Android Auto on BMW iDrive?', a: 'On iDrive 7 (MGU) it is supported on most builds. On other head units it is limited and assessed per car — send your build and we will confirm before booking.' },
