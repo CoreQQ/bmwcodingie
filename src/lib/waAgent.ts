@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import { WHATSAPP_PROMPT } from './assistantPrompt';
 import { ensureClient, clientCode } from './crm';
-import { notifyTelegram, sendOwnerWithMarkup as notifyOwnerRaw } from './telegram';
+import { notifyTelegram, sendOwnerAlert } from './telegram';
 import { getHours, getSlotDuration, getBlockedDates } from './stats';
 import { windowsFor, windowsOverlap } from './hours';
 
@@ -93,10 +93,18 @@ async function notifyOwnerHandover(
   reason: string,
 ): Promise<void> {
   const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  await notifyOwnerRaw(
-    `🙋 <b>Needs you</b> · ${name ? `${esc(name)} · ` : ''}<code>+${waId}</code>\n` +
+  await sendOwnerAlert(
+    `${name ? `<b>${esc(name)}</b> · ` : ''}<code>+${waId}</code>\n\n` +
       `«${esc(text.slice(0, 600))}»\n\n` +
-      `🤖 Stepped back: ${esc(reason)}\nThe assistant is now OFF in this chat — turn it back on with /wa start +${waId}`,
+      `🤖 Why I stepped back: ${esc(reason)}\n` +
+      `The assistant is now OFF in this chat. Turn it back on with <code>/wa start +${waId}</code>`,
+    {
+      inline_keyboard: [
+        [{ text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` }],
+        [{ text: '📋 Number', copy_text: { text: `+${waId}` } }],
+        [{ text: '▶️ Resume AI here', callback_data: `war:${waId}` }],
+      ],
+    },
   );
 }
 

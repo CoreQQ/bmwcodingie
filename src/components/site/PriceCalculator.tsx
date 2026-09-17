@@ -6,6 +6,7 @@ import {
   ADD_ONS,
   CALL_OUT,
   HEAD_UNITS,
+  isFromUnit,
   PRICE_ITEMS,
   isBundledOut,
   type HeadUnit,
@@ -21,7 +22,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
   const [mobile, setMobile] = useState(false);
 
   const priceUnit: Exclude<HeadUnit, 'unknown'> =
-    unit === 'mgu' ? 'mgu' : unit === 'mgu-id8' ? 'mgu-id8' : 'nbt-evo';
+    unit === 'unknown' ? 'nbt-evo' : unit;
   // iDrive 8 is too build-dependent to publish a number for: what is codable
   // varies with the software version, so every job is quoted from the VIN.
   const quoteOnly = unit === 'mgu-id8';
@@ -32,7 +33,9 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
   const { total, anyFrom, lines } = useMemo(() => {
     const lines: { label: string; amount: number | null; bundled?: boolean }[] = [];
     let total = 0;
-    let anyFrom = false;
+    // On iDrive 8.5 nothing is a fixed figure, so the whole estimate is a
+    // starting point rather than a quote.
+    let anyFrom = isFromUnit(unit);
 
     for (const item of PRICE_ITEMS) {
       if (!picked.includes(item.id)) continue;

@@ -124,6 +124,67 @@ export async function POST(req: Request) {
       await cancelInvoice(sb, msg.chat.id);
       return ok();
     }
+    // One box to search everything. Remembering whether a name is a client, a
+    // booking or just a WhatsApp chat is not a thing anyone should have to do.
+    if (/^\/find(@\w+)?\b/.test(text)) {
+      const q = text.replace(/^\/find(@\w+)?\s*/, '').trim();
+      if (q.length < 2) {
+        await sendOwnerMessage(
+          'Search everything: <code>/find miranda</code>, <code>/find 8770</code>, <code>/find japan</code>.',
+        );
+        return ok();
+      }
+      const digits = q.replace(/\D/g, '');
+      const like = `%${q}%`;
+      const [byName, byService, byPhone] = await Promise.all([
+        sb
+          .from('bookings')
+          .select('id, name, contact, service, bmw_model, message, slot_date, slot_time, status, created_at')
+          .ilike('name', like)
+          .order('created_at', { ascending: false })
+          .limit(8),
+        sb
+          .from('bookings')
+          .select('id, name, contact, service, bmw_model, message, slot_date, slot_time, status, created_at')
+          .ilike('service', like)
+          .order('created_at', { ascending: false })
+          .limit(8),
+        digits.length >= 3
+          ? sb
+              .from('bookings')
+              .select('id, name, contact, service, bmw_model, message, slot_date, slot_time, status, created_at')
+              .ilike('contact', `%${digits}%`)
+              .order('created_at', { ascending: false })
+              .limit(8)
+          : Promise.resolve({ data: [] as unknown[] }),
+      ]);
+      const merged = new Map<number, AgendaLead>();
+      for (const set of [byName.data, byService.data, byPhone.data]) {
+        for (const row of (set ?? []) as AgendaLead[]) merged.set(row.id, row);
+      }
+      const hits = [...merged.values()]
+        .sort((a, b) => String(b.created_at ?? '').localeCompare(String(a.created_at ?? '')))
+        .slice(0, 8);
+
+      if (!hits.length) {
+        await sendOwnerMessage(`Nothing found for <b>${escapeHtml(q)}</b>.`);
+        return ok();
+      }
+      const icon = (st?: string) =>
+        st === 'confirmed' ? '✅' : st === 'cancelled' ? '✖️' : st === 'declined' ? '⛔️' : '⏳';
+      const lines = [`🔎 <b>${hits.length} result${hits.length === 1 ? '' : 's'} for “${escapeHtml(q)}”</b>`, ''];
+      for (const h of hits) {
+        const slot = h.slot_date ? ` · ${h.slot_date} ${h.slot_time ?? ''}`.trimEnd() : '';
+        lines.push(`${icon(h.status)} ${escapeHtml(h.name)}${h.service ? ` — ${escapeHtml(h.service)}` : ''}${slot}`);
+      }
+      await sendOwnerWithMarkup(lines.join('\n'), {
+        inline_keyboard: hits.map((h) => [
+          { text: `${icon(h.status)} ${h.name.slice(0, 26)}`, callback_data: `lead:${h.id}` },
+        ]),
+      });
+      return ok();
+    }
+
     // The same morning screen, on demand — waiting for 07:00 to see who is
     // still owed a reply is no way to run the day.
     if (/^\/agenda(@\w+)?\b/.test(text)) {
