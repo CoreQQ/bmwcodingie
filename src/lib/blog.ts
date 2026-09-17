@@ -193,7 +193,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Video in Motion — from €60',
           'Sport displays / digital cluster layouts — from €60',
           'Comfort pack (mirrors, windows, chimes, lighting) — from €40–50 per item, bundled cheaper',
-          'Japan → EU conversion — €250 NBT Evo, €280 MGU (CarPlay included)',
+          'Japan → EU conversion — €250 NBT Evo, €280 MGU, CarPlay included on both (Android Auto separate, MGU only)',
         ],
       },
       {
