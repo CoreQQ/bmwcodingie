@@ -48,6 +48,8 @@ async function tgCall(method: string, payload: Record<string, unknown>): Promise
  */
 export async function registerBotCommands(): Promise<boolean> {
   const commands = [
+    { command: 'find', description: '🔎 Найти всё: /find miranda, /find 8770, /find japan' },
+    { command: 'agenda', description: '⏰ Сегодня, завтра и кто ждёт ответа' },
     { command: 'bookings', description: '📋 Заявки: подтвердить / отклонить / освободить' },
     { command: 'stats', description: '📊 Статистика: заявки, топ услуг, записи' },
     { command: 'invoice', description: '🧾 Создать PDF-инвойс' },
@@ -389,6 +391,35 @@ export async function sendOwnerWithMarkup(text: string, replyMarkup?: object): P
     ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
   });
   return ok !== null;
+}
+
+/**
+ * A message the owner must not scroll past: loud banner, notification forced
+ * on, and pinned in the group so it sits at the top until he deals with it.
+ * Used when the assistant gives up and calls him in.
+ */
+export async function sendOwnerAlert(body: string, replyMarkup?: object): Promise<void> {
+  if (!telegramConfigured) return;
+  const banner = '🚨🚨🚨 <b>ALEX — THIS ONE NEEDS YOU</b> 🚨🚨🚨';
+  const res = (await tgCall('sendMessage', {
+    chat_id: TG_CHAT_ID,
+    text: `${banner}\n${'─'.repeat(18)}\n${body}`,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
+    disable_notification: false,
+    ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+  })) as { result?: { message_id?: number } } | null;
+
+  // Pinning needs admin rights in the group. If it is not allowed the message
+  // is still sent and still loud — never let a failed pin swallow the alert.
+  const messageId = res?.result?.message_id;
+  if (messageId) {
+    await tgCall('pinChatMessage', {
+      chat_id: TG_CHAT_ID,
+      message_id: messageId,
+      disable_notification: false,
+    }).catch(() => null);
+  }
 }
 
 /** Upload a generated PDF (or any bytes) to the owner chat. */
