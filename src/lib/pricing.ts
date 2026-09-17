@@ -38,7 +38,7 @@ export const PRICE_ITEMS: PriceItem[] = [
     id: 'japan',
     label: 'Japan → EU conversion',
     note:
-      'Region, radio bands, nav FSC, EU maps. With CarPlay added: €250 on NBT Evo, €300 on MGU. ' +
+      'Region, radio bands, nav FSC, EU maps — CarPlay activation is included at no extra cost. ' +
       'On iDrive 8.5 this covers the language and radio change only.',
     price: { 'nbt-evo': 250, mgu: 280, 'mgu-id8': null, 'mgu-id85': 200 },
   },
@@ -93,7 +93,7 @@ export const CALL_OUT = { base: 20, perKm: 1.25 };
 export const FROM_UNITS: HeadUnit[] = ['mgu-id85'];
 export const isFromUnit = (unit: HeadUnit) => FROM_UNITS.includes(unit);
 
-/** Japan on MGU bundles CarPlay — never charge for both. */
-export function isBundledOut(selected: string[], itemId: string, unit: HeadUnit): boolean {
-  return unit === 'mgu' && itemId === 'carplay' && selected.includes('japan');
+/** The conversion price already contains CarPlay — never charge for both. */
+export function isBundledOut(selected: string[], itemId: string, _unit: HeadUnit): boolean {
+  return itemId === 'carplay' && selected.includes('japan');
 }
