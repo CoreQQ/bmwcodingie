@@ -160,7 +160,7 @@ export function confirmReply(name: string, slot: string, token?: string, visitTy
     visitType === 'mobile'
       ? " I'll come to you — just confirm the address and where the car will be parked."
       : visitType === 'meet'
-        ? " I'll send you the spot to meet shortly."
+        ? ' I\'ll send you the exact spot to meet — no call-out fee on this one.'
         : '';
   return `Hi ${shortName(name)}! Your BMW coding slot${s} is confirmed ✅${where}${link}`;
 }
@@ -205,7 +205,7 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.visitType === 'mobile') {
     lines.push(`📍 <b>Wants us to come to them</b>${lead.visitAddress ? `: ${esc(lead.visitAddress)}` : ' — no address given, ask'}`);
   } else if (lead.visitType === 'meet') {
-    lines.push('📍 <b>Happy to meet where suits you</b> — tell them the place when you confirm');
+    lines.push('📍 <b>They will travel to you</b> — send them the spot when you confirm (no call-out fee)');
   }
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);

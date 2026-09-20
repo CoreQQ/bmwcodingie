@@ -108,7 +108,7 @@ export default async function BookingStatus({
             {visitType === 'mobile' && (
               <Row icon={MapPin} k="Where" v={visitAddress ? `We come to you · ${visitAddress}` : 'We come to you'} />
             )}
-            {visitType === 'meet' && <Row icon={MapPin} k="Where" v="We'll send you the spot to meet" />}
+            {visitType === 'meet' && <Row icon={MapPin} k="Where" v="We'll send you the spot to meet — no call-out fee" />}
             {b.service && <Row icon={Wrench} k="Service" v={b.service} />}
             {b.bmw_model && <Row icon={Car} k="Car" v={b.bmw_model} />}
           </div>
