@@ -46,6 +46,13 @@ export async function POST(req: Request) {
   const acceptLang = (req.headers.get('accept-language') || '').split(',')[0].trim().slice(0, 20);
   const language = String(body.language ?? '').trim().slice(0, 20) || acceptLang || undefined;
 
+  // Where the job happens. Without this the customer and Alex each assumed the
+  // other was travelling, which is exactly how a booking turns into "what
+  // arrival?" the day before.
+  const rawVisit = String(body.visit_type ?? '').trim().toLowerCase();
+  const visit_type = rawVisit === 'mobile' || rawVisit === 'meet' ? rawVisit : null;
+  const visit_address = String(body.visit_address ?? '').trim().slice(0, 300) || null;
+
   // Requested slot — optional. slot_date must be a plain YYYY-MM-DD date.
   const rawDate = String(body.slot_date ?? '').trim().slice(0, 10);
   const slot_date = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : null;
@@ -56,7 +63,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Name and contact required' }, { status: 400 });
   }
 
-  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, source: source ?? undefined, howHeard: how_heard ?? undefined, contactPref: contact_pref ?? undefined, landing: landing ?? undefined, device: foreign && device ? `${device} · 🌍 ${country} — outside service area` : device, language, dwell };
+  const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, visitType: visit_type ?? undefined, visitAddress: visit_address ?? undefined, source: source ?? undefined, howHeard: how_heard ?? undefined, contactPref: contact_pref ?? undefined, landing: landing ?? undefined, device: foreign && device ? `${device} · 🌍 ${country} — outside service area` : device, language, dwell };
   const sb = getSupabaseAdmin();
 
   // No DB configured yet — accept the lead so the form still works in preview,
@@ -73,6 +80,7 @@ export async function POST(req: Request) {
   // drop the offending column and retry rather than lose a lead.
   const row: Record<string, unknown> = {
     name, contact, bmw_model, service, message, slot_date, slot_time,
+    visit_type, visit_address,
     source, how_heard, contact_pref, landing, status: 'pending',
   };
   let data: { id: number; public_token: string } | null = null;

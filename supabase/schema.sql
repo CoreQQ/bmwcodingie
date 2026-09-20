@@ -328,3 +328,9 @@ alter table wa_chats add column if not exists owner_replied_at timestamptz;
 -- from Telegram uses it directly, because WhatsApp contacts frequently have
 -- an empty Phone field and cannot be looked up by number.
 alter table wa_chats add column if not exists mc_id text;
+
+-- Where the job happens: 'mobile' (we travel to the customer) or 'meet' (the
+-- owner names a place that suits him). Without it a confirmed booking left both
+-- sides assuming the other was travelling.
+alter table bookings add column if not exists visit_type text;
+alter table bookings add column if not exists visit_address text;
