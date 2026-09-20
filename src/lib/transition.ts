@@ -1,11 +1,10 @@
-// The workshop lease at Greenogue ends on 30 September 2026. From the 1st the
-// business is mobile-first: we come to the customer, or work remotely over
-// ENET. Everything that mentions an address or a "come to us" option checks
-// here, so the switch happens on its own rather than needing a deploy on the
-// day.
+// The Greenogue workshop is gone: the business is mobile now. We come to the
+// customer, or work remotely over ENET. Everything that mentions an address or
+// a "come to us" option checks here, so there is one place to change if a unit
+// is ever taken again.
 
 /** First day with no workshop. Dublin date, ISO. */
-export const MOBILE_ONLY_FROM = '2026-10-01';
+export const MOBILE_ONLY_FROM = '2026-09-20';
 
 /** Today in Dublin as YYYY-MM-DD (server-side only — never in a client render). */
 export function dublinToday(): string {

@@ -40,8 +40,6 @@ export default async function LocaleLayout({
     getTranslations('Announcement'),
   ]);
 
-  // The workshop lease ends on 30 September: before that the notice warns, after
-  // it simply states what the service is.
   const mobileOnly = isMobileOnly();
 
   const sameAs = [
@@ -168,8 +166,8 @@ export default async function LocaleLayout({
         }}
       />
       <Announcement
-        title={mobileOnly ? tNotice('afterTitle') : tNotice('beforeTitle')}
-        body={mobileOnly ? tNotice('afterBody') : tNotice('beforeBody')}
+        title={tNotice('title')}
+        body={tNotice('body')}
         cta={tNotice('cta')}
         href="/find-us"
         dismissLabel={tNotice('dismiss')}
