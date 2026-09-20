@@ -134,7 +134,15 @@
     "contactPrefPlaceholder": "e.g. WhatsApp after 6pm",
     "slotRequiredMark": "required",
     "slotMissing": "Please pick a date and time above — or use the consultation button below if you just have a question.",
-    "consultButton": "💬 Just a question / consultation"
+    "consultButton": "💬 Just a question / consultation",
+    "visitLabel": "Where should we do the work?",
+    "visitMobile": "Come to me",
+    "visitMobileHint": "Home, work, wherever the car is parked. Call-out fee applies.",
+    "visitMeet": "Wherever suits you",
+    "visitMeetHint": "We pick a spot nearby and send it to you when we confirm.",
+    "visitAddressLabel": "Your address or area",
+    "visitAddressPlaceholder": "e.g. Tallaght, D24 — driveway",
+    "visitMissing": "Please choose where we should do the work."
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",

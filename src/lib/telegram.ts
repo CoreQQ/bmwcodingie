@@ -117,6 +117,10 @@ export type Lead = {
   source?: string;
   /** "How did you hear about us" — customer-selected. */
   howHeard?: string;
+  /** Where the job happens: 'mobile' (we travel) or 'meet' (Alex names a spot). */
+  visitType?: string;
+  /** The customer's address or area, when they asked us to come to them. */
+  visitAddress?: string;
   /** Preferred contact channel/time, free text. */
   contactPref?: string;
   /** First page the visitor landed on (intent signal). */
@@ -148,10 +152,17 @@ function shortName(name: string): string {
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
 /** Ready-to-paste reply confirming the slot (owner copies → sends to customer). */
-export function confirmReply(name: string, slot: string, token?: string): string {
+export function confirmReply(name: string, slot: string, token?: string, visitType?: string): string {
   const s = slot ? ` — ${slot}` : '';
   const link = token ? ` Track it here: ${SITE}/b/${token}` : '';
-  return `Hi ${shortName(name)}! Your BMW coding slot${s} is confirmed ✅${link}`;
+  // "Confirmed" alone left customers asking "what arrival?" — say who travels.
+  const where =
+    visitType === 'mobile'
+      ? " I'll come to you — just confirm the address and where the car will be parked."
+      : visitType === 'meet'
+        ? " I'll send you the spot to meet shortly."
+        : '';
+  return `Hi ${shortName(name)}! Your BMW coding slot${s} is confirmed ✅${where}${link}`;
 }
 
 /** Ready-to-paste reply offering alternatives when the slot is taken. */
@@ -161,14 +172,20 @@ export function declineReply(name: string, slot: string, _token?: string): strin
 }
 
 /** Build the inline keyboard for a slot booking notification. */
-function bookingKeyboard(id: number, name: string, slot: string, token?: string): InlineKeyboard {
+function bookingKeyboard(
+  id: number,
+  name: string,
+  slot: string,
+  token?: string,
+  visitType?: string,
+): InlineKeyboard {
   return {
     inline_keyboard: [
       [
         { text: '✅ Confirm', callback_data: `bk:confirm:${id}` },
         { text: '❌ Slot taken', callback_data: `bk:decline:${id}` },
       ],
-      [{ text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(name, slot, token) } }],
+      [{ text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(name, slot, token, visitType) } }],
       [{ text: '📋 Copy "offer other times" reply', copy_text: { text: declineReply(name, slot) } }],
     ],
   };
@@ -184,6 +201,12 @@ export function bookingLines(lead: Lead): string[] {
     `☎️ <b>Contact:</b> ${esc(lead.contact)}`,
   ];
   if (slot) lines.push(`🕒 <b>Requested slot:</b> ${esc(slot)}`);
+  // Where matters as much as when: without it nobody knows who is travelling.
+  if (lead.visitType === 'mobile') {
+    lines.push(`📍 <b>Wants us to come to them</b>${lead.visitAddress ? `: ${esc(lead.visitAddress)}` : ' — no address given, ask'}`);
+  } else if (lead.visitType === 'meet') {
+    lines.push('📍 <b>Happy to meet where suits you</b> — tell them the place when you confirm');
+  }
   if (lead.bmw_model) lines.push(`🚙 <b>BMW:</b> ${esc(lead.bmw_model)}`);
   if (lead.service) lines.push(`🔧 <b>Service:</b> ${esc(lead.service)}`);
   if (lead.message) lines.push(`💬 <b>Description:</b> ${esc(lead.message)}`);
@@ -220,7 +243,9 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
   const slot = formatSlot(lead.slot_date, lead.slot_time);
   // Confirm/decline buttons only make sense for a saved slot booking.
   const keyboard =
-    lead.id && slot ? bookingKeyboard(lead.id, lead.name, slot, lead.public_token) : undefined;
+    lead.id && slot
+      ? bookingKeyboard(lead.id, lead.name, slot, lead.public_token, lead.visitType)
+      : undefined;
   return sendTelegramMessage(lines.join('\n'), keyboard);
 }
 

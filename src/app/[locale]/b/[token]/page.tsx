@@ -8,6 +8,7 @@ import { Logo } from '@/components/site/Logo';
 import { AutoRefresh } from '@/components/site/AutoRefresh';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getSettings, waLink } from '@/lib/data';
+import { isMobileOnly } from '@/lib/transition';
 import { googleDirectionsUrl } from '@/lib/directions';
 import type { Booking } from '@/lib/types';
 
@@ -72,6 +73,10 @@ export default async function BookingStatus({
   const b = data as Booking | null;
   if (!b) notFound();
 
+  const visit = b as unknown as { visit_type?: string | null; visit_address?: string | null };
+  const visitType = visit.visit_type ?? '';
+  const visitAddress = visit.visit_address ?? '';
+
   const settings = await getSettings();
   const ui = STATUS_UI[b.status] ?? STATUS_UI.pending;
   const Icon = ui.icon;
@@ -100,6 +105,10 @@ export default async function BookingStatus({
             {b.slot_date && (
               <Row icon={CalendarCheck} k="Slot" v={`${fmtDay(b.slot_date)}${b.slot_time ? ` · ${b.slot_time}` : ''}`} />
             )}
+            {visitType === 'mobile' && (
+              <Row icon={MapPin} k="Where" v={visitAddress ? `We come to you · ${visitAddress}` : 'We come to you'} />
+            )}
+            {visitType === 'meet' && <Row icon={MapPin} k="Where" v="We'll send you the spot to meet" />}
             {b.service && <Row icon={Wrench} k="Service" v={b.service} />}
             {b.bmw_model && <Row icon={Car} k="Car" v={b.bmw_model} />}
           </div>
@@ -114,7 +123,8 @@ export default async function BookingStatus({
           </a>
         </div>
 
-        {b.status === 'confirmed' && (
+        {/* Directions only make sense when the customer is the one travelling. */}
+        {b.status === 'confirmed' && !visitType && !isMobileOnly() && (
           <a
             href={googleDirectionsUrl()}
             target="_blank"

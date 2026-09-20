@@ -134,7 +134,15 @@
     "contactPrefPlaceholder": "pvz. WhatsApp po 18:00",
     "slotRequiredMark": "privaloma",
     "slotMissing": "Pasirinkite datą ir laiką aukščiau — arba spauskite konsultacijos mygtuką žemiau, jei turite tik klausimą.",
-    "consultButton": "💬 Tik klausimas / konsultacija"
+    "consultButton": "💬 Tik klausimas / konsultacija",
+    "visitLabel": "Kur atliksime darbą?",
+    "visitMobile": "Atvykite pas mane",
+    "visitMobileHint": "Namai, darbas, kur stovi automobilis. Taikomas atvykimo mokestis.",
+    "visitMeet": "Kur jums patogu",
+    "visitMeetHint": "Parinksime vietą netoliese ir atsiųsime ją patvirtindami.",
+    "visitAddressLabel": "Jūsų adresas ar rajonas",
+    "visitAddressPlaceholder": "pvz., Tallaght, D24 — kiemas",
+    "visitMissing": "Pasirinkite, kur atlikti darbą."
   },
   "Footer": {
     "pitch": "Nepriklausomas BMW kodavimas, diagnostika ir retrofitai visame Dubline ir Airijoje — gyvai arba nuotoliniu būdu per ENET.",

@@ -30,6 +30,8 @@ export function Contact({
     how_heard: '',
     contact_pref: '',
     message: '',
+    visit_type: '',
+    visit_address: '',
     slot_date: '',
     slot_time: '',
   });
@@ -63,7 +65,13 @@ export function Contact({
       setErrorMsg(t('validationError'));
       return;
     }
-    // Bookings need a slot; the consultation path below skips it.
+    // Bookings need a slot AND a place. Leaving the place out is what made a
+    // confirmed booking read as "what arrival?" to the customer.
+    if (!consult && !form.visit_type) {
+      setStatus('error');
+      setErrorMsg(t('visitMissing'));
+      return;
+    }
     if (!consult && (!form.slot_date || !form.slot_time)) {
       setStatus('error');
       setErrorMsg(t('slotMissing'));
@@ -89,7 +97,7 @@ export function Contact({
       setStatus('sent');
       trackMetaEvent('Lead', { content_name: form.service || 'General enquiry' });
       trackGoogleConversion();
-      setForm({ name: '', contact: '', bmw_model: '', service: '', how_heard: '', contact_pref: '', message: '', slot_date: '', slot_time: '' });
+      setForm({ name: '', contact: '', bmw_model: '', service: '', how_heard: '', contact_pref: '', message: '', visit_type: '', visit_address: '', slot_date: '', slot_time: '' });
     } catch {
       setStatus('error');
       setErrorMsg(t('submitError'));
@@ -247,6 +255,53 @@ export function Contact({
                       className={inputCls}
                     />
                   </Field>
+                </div>
+
+                {/* Where, before when — the answer changes who travels. */}
+                <div className="border border-white/10 bg-graphite-900/60 p-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-bmw" />
+                    <span className="label">{t('visitLabel')}</span>
+                    <span className="text-[11px] text-bmw">· {t('slotRequiredMark')}</span>
+                  </div>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {(
+                      [
+                        ['mobile', t('visitMobile'), t('visitMobileHint')],
+                        ['meet', t('visitMeet'), t('visitMeetHint')],
+                      ] as const
+                    ).map(([id, label, hint]) => {
+                      const active = form.visit_type === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => setForm((f) => ({ ...f, visit_type: id }))}
+                          className={`border p-3 text-left transition-colors ${
+                            active
+                              ? 'border-bmw bg-bmw/10'
+                              : 'border-white/10 bg-graphite-800/40 hover:border-white/25'
+                          }`}
+                        >
+                          <span className="block text-sm text-ink">{label}</span>
+                          <span className="mt-1 block text-[11px] leading-relaxed text-faint">{hint}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {form.visit_type === 'mobile' && (
+                    <div className="mt-3">
+                      <Field label={t('visitAddressLabel')}>
+                        <input
+                          value={form.visit_address}
+                          onChange={update('visit_address')}
+                          placeholder={t('visitAddressPlaceholder')}
+                          className={inputCls}
+                        />
+                      </Field>
+                    </div>
+                  )}
                 </div>
 
                 <SlotPicker

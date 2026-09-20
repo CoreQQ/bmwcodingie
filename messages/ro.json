@@ -134,7 +134,15 @@
     "contactPrefPlaceholder": "ex. WhatsApp după 18:00",
     "slotRequiredMark": "obligatoriu",
     "slotMissing": "Alege data și ora mai sus — sau folosește butonul de consultanță de mai jos dacă ai doar o întrebare.",
-    "consultButton": "💬 Doar o întrebare / consultanță"
+    "consultButton": "💬 Doar o întrebare / consultanță",
+    "visitLabel": "Unde facem lucrarea?",
+    "visitMobile": "Veniți la mine",
+    "visitMobileHint": "Acasă, la serviciu, oriunde e parcată mașina. Se percepe taxă de deplasare.",
+    "visitMeet": "Unde vă convine",
+    "visitMeetHint": "Alegem un loc în apropiere și vi-l trimitem la confirmare.",
+    "visitAddressLabel": "Adresa sau zona ta",
+    "visitAddressPlaceholder": "ex. Tallaght, D24 — curte",
+    "visitMissing": "Alegeți unde să facem lucrarea."
   },
   "Footer": {
     "pitch": "Coding, diagnostic și retrofit BMW independent, în Dublin și în toată Irlanda — la fața locului sau la distanță prin ENET.",
