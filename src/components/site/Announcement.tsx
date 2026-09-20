@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Truck, X } from 'lucide-react';
 
 // Bump when the wording changes so a dismissal never hides a newer notice.
-const KEY = 'bmw-notice-mobile-2026-10';
+const KEY = 'bmw-notice-mobile-live';
 
 /**
  * Site-wide notice about the move to a mobile-first service. Sits under the

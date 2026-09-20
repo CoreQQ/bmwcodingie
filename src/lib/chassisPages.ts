@@ -334,10 +334,10 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
     serviceName: `BMW ${f.title} Coding`,
     eyebrow: `${f.codes} · ${f.years}`,
     h1: `BMW ${f.title} Coding — Hidden Features, CarPlay & More`,
-    heroSub: `Independent coding for the BMW ${f.title} (${f.years}) in Dublin and across Ireland. ${f.headUnits}. In person at the car or our workshop off the N7, or remotely over ENET.`,
+    heroSub: `Independent coding for the BMW ${f.title} (${f.years}) in Dublin and across Ireland. ${f.headUnits}. In person at the car, wherever it is parked, or remotely over ENET.`,
     intro: [
       f.genNote,
-      `Every job starts with your exact build: send the model year and VIN and we confirm which features your ${f.short} supports before anything is booked. Work is done in person around Dublin and the surrounding counties, at our workshop at Greenogue Business Park (Rathcoole, off the N7), or remotely over ENET anywhere in Ireland. Everything is reversible and you pay on completion, once you have seen it working.`,
+      `Every job starts with your exact build: send the model year and VIN and we confirm which features your ${f.short} supports before anything is booked. Work is done in person around Dublin and the surrounding counties, at your home or workplace, or remotely over ENET anywhere in Ireland. Everything is reversible and you pay on completion, once you have seen it working.`,
     ],
     includedHeading: `Most-requested coding on the ${f.short}`,
     included: f.popular,
@@ -350,7 +350,7 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
     ],
     process: [
       { title: 'Send your build', body: `Message the year, spec and VIN of your ${f.short} plus what you want enabled. We reply with what is possible and a price.` },
-      { title: 'In person or remote', body: 'We come to the car around Dublin, you visit the workshop off the N7, or we connect remotely over ENET anywhere in Ireland.' },
+      { title: 'In person or remote', body: 'We come to the car around Dublin, or we connect remotely over ENET anywhere in Ireland.' },
       { title: 'Code and verify', body: 'We apply the coding and demonstrate each feature working on your car.' },
       { title: 'Pay on completion', body: 'Card or cash once you have seen the result — no deposit.' },
     ],

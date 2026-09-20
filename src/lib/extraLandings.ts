@@ -11,7 +11,7 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
     eyebrow: 'Coding · All F & G series',
     h1: 'BMW Hidden Features — What Your Car Can Already Do',
     heroSub:
-      'Your BMW left the factory with dozens of features switched off in software. We enable them in Dublin — at your car, at our workshop off the N7, or remotely anywhere in Ireland.',
+      'Your BMW left the factory with dozens of features switched off in software. We enable them in Dublin — at your car, wherever it is parked, or remotely anywhere in Ireland.',
     intro: [
       'Every BMW ships with one software image and the options are simply toggled per market and spec. Hidden features coding turns on what is already in the car: no parts, no cutting, fully reversible. A typical session enables a personalised mix in under an hour.',
       'Send your model, year and VIN and we reply with the exact list your build supports — then you pick. You watch each feature demonstrated on the car before you pay.',

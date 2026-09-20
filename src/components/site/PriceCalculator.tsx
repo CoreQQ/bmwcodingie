@@ -184,7 +184,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-ink">Come to my car (around Dublin)</span>
                 <span className="mt-0.5 block text-[11px] text-faint">
-                  Outside Dublin it is €{CALL_OUT.perKm.toFixed(2)}/km from the workshop
+                  Outside Dublin it is €{CALL_OUT.perKm.toFixed(2)}/km from our base in Rathcoole
                 </span>
               </span>
               <span className="shrink-0 font-mono text-xs text-muted">+€{CALL_OUT.base}</span>

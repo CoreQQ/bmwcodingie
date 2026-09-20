@@ -50,7 +50,7 @@ const LOCATIONS: LocationFacts[] = [
     towns: ['Limerick city', 'Castletroy', 'Raheen', 'Newcastle West', 'Annacotty'],
     inPerson: false,
     localLine:
-      'Limerick owners usually book a remote session — with the laptop and ENET cable set up, your car in Castletroy or Raheen is coded exactly as if it were parked outside our Dublin workshop.',
+      'Limerick owners usually book a remote session — with the laptop and ENET cable set up, your car in Castletroy or Raheen is coded exactly as if we were sitting in it.',
     nearby: ['bmw-coding-cork', 'bmw-coding-galway', 'bmw-coding-waterford'],
   },
   {
@@ -70,7 +70,7 @@ const LOCATIONS: LocationFacts[] = [
     towns: ['Kilkenny city', 'Callan', 'Castlecomer', 'Thomastown'],
     inPerson: false,
     localLine:
-      'Kilkenny sits an easy remote session away — and if you are ever up the M9 towards Dublin, you are welcome to call into the workshop at Greenogue instead.',
+      'Kilkenny sits an easy remote session away, and if a job needs hands on the car we can arrange to travel up the M9 for it.',
     nearby: ['bmw-coding-waterford', 'bmw-coding-wexford', 'bmw-coding-kildare'],
   },
   {
@@ -80,7 +80,7 @@ const LOCATIONS: LocationFacts[] = [
     towns: ['Naas', 'Newbridge', 'Celbridge', 'Maynooth', 'Leixlip', 'Kilcock'],
     inPerson: true,
     localLine:
-      'Our workshop at Greenogue Business Park sits right on the Dublin–Kildare border off the N7, so Naas, Newbridge, Celbridge and Maynooth are some of our most regular postcodes — often same-week slots.',
+      'We are based right on the Dublin–Kildare border off the N7, so Naas, Newbridge, Celbridge and Maynooth are some of our most regular postcodes — we come to the car, often same-week.',
     nearby: ['bmw-coding-wicklow', 'bmw-coding-meath', 'bmw-coding-kilkenny'],
   },
   {
@@ -90,7 +90,7 @@ const LOCATIONS: LocationFacts[] = [
     towns: ['Bray', 'Greystones', 'Wicklow town', 'Arklow', 'Blessington'],
     inPerson: true,
     localLine:
-      'Bray, Greystones and Blessington are a short hop from our Rathcoole workshop, and we regularly come to the car anywhere in north Wicklow — Arklow and south Wicklow can choose in-person or remote.',
+      'Bray, Greystones and Blessington are a short hop from our Rathcoole base, and we regularly come to the car anywhere in north Wicklow — Arklow and south Wicklow can choose a visit or remote.',
     nearby: ['bmw-coding-kildare', 'bmw-coding-wexford', 'bmw-coding-meath'],
   },
   {
@@ -100,7 +100,7 @@ const LOCATIONS: LocationFacts[] = [
     towns: ['Navan', 'Ashbourne', 'Dunboyne', 'Trim', 'Kells'],
     inPerson: true,
     localLine:
-      'Ashbourne, Dunboyne and Navan are inside our regular in-person area — we come to your home or workplace with the full kit, or you can drop into the workshop at Greenogue off the N7.',
+      'Ashbourne, Dunboyne and Navan are inside our regular in-person area — we come to your home or workplace with the full kit.',
     nearby: ['bmw-coding-louth', 'bmw-coding-kildare', 'bmw-coding-westmeath'],
   },
   {
@@ -140,8 +140,8 @@ function buildLocationPage(f: LocationFacts): ServicePage {
   const townList = f.towns.join(', ');
 
   const formatLine = f.inPerson
-    ? `We cover ${f.name} in person — we come to your home or workplace, or you call into our workshop at Greenogue Business Park, Rathcoole (just off the N7) — and remote ENET coding is there when it suits you better.`
-    : `${f.name} is covered by remote ENET coding: you plug a laptop and an inexpensive ENET cable into the car's OBD port, we connect over a screen-share session and code the car exactly as if we were sitting in it. You are also always welcome at our Dublin workshop at Greenogue Business Park, just off the N7.`;
+    ? `We cover ${f.name} in person — we come to your home or workplace, wherever the car is parked — and remote ENET coding is there when it suits you better.`
+    : `${f.name} is covered by remote ENET coding: you plug a laptop and an inexpensive ENET cable into the car's OBD port, we connect over a screen-share session and code the car exactly as if we were sitting in it. No travel for either of us.`;
 
   return {
     slug: f.slug,
@@ -154,8 +154,8 @@ function buildLocationPage(f: LocationFacts): ServicePage {
     h1: `BMW Coding ${f.name} — CarPlay, Hidden Features & Diagnostics`,
     heroSub: `Independent BMW coding for owners in ${where} — ${townList}. ${
       f.inPerson
-        ? 'In person at the car or at our Dublin workshop, or remotely over ENET.'
-        : 'Remote ENET sessions from your own driveway, or at our Dublin workshop if you are passing.'
+        ? 'In person at the car, wherever it is parked, or remotely over ENET.'
+        : 'Remote ENET sessions from your own driveway, at a time that suits you.'
     }`,
     intro: [
       `BMW coding unlocks features your car already has the hardware for — Apple CarPlay, Video in Motion, sport displays, comfort functions and dozens more — by adjusting software parameters that are dormant from the factory. Everything is reversible, compatibility is confirmed from your model, year and VIN before anything is booked, and you pay on completion once you have seen it working.`,
@@ -180,7 +180,7 @@ function buildLocationPage(f: LocationFacts): ServicePage {
     process: f.inPerson
       ? [
           { title: 'Send your details', body: `Message your model, year and what you want enabled. We confirm what is possible on your exact car and offer the next slots for ${f.name}.` },
-          { title: 'Pick the format', body: 'We come to the car anywhere in the county, you call into the workshop at Greenogue off the N7, or we set up a remote ENET session — whichever suits.' },
+          { title: 'Pick the format', body: 'We come to the car anywhere in the county, or we set up a remote ENET session — whichever suits.' },
           { title: 'Code and verify', body: 'We apply the coding and show each feature working on your car before anything else.' },
           { title: 'Pay on completion', body: 'Card or cash once you have seen the result. No deposit, no dealer queue.' },
         ]
@@ -195,7 +195,7 @@ function buildLocationPage(f: LocationFacts): ServicePage {
         q: `Do you do BMW coding in ${f.name}?`,
         a: f.inPerson
           ? `Yes — ${f.name} is inside our regular in-person area (${townList}), and remote ENET coding is available too. Send your model and year and we will offer the next slots.`
-          : `Yes — owners across ${where} (${townList}) are covered by remote ENET coding, and you are welcome at our Dublin workshop at Greenogue Business Park if you prefer in person.`,
+          : `Yes — owners across ${where} (${townList}) are covered by remote ENET coding, and a visit can be arranged when a job needs hands on the car.`,
       },
       {
         q: 'What do I need for a remote coding session?',
