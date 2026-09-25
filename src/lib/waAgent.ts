@@ -299,7 +299,11 @@ export async function generateWaReply(
       max_tokens: 600,
       system,
       messages: convo,
-      tools: [LEAD_TOOL, AVAILABILITY_TOOL, BOOK_TOOL, REMEMBER_TOOL, HANDOVER_TOOL],
+      // No diary tools. Given a calendar, the model did date arithmetic in its
+      // head and got it wrong in front of customers ("tonight is Friday, we're
+      // open" then "we're not open Friday evenings"). The live slots are on the
+      // website; its only job is to send people there.
+      tools: [LEAD_TOOL, REMEMBER_TOOL, HANDOVER_TOOL],
     });
 
     const text = response.content
