@@ -374,15 +374,14 @@ export async function POST(req: Request) {
       }
       return ok();
     }
-    // Who answers customers on WhatsApp: WhatsApp's own AI (the default — the
-    // owner found it far steadier) or ours. Stored under its own key so the
-    // switch took effect on deploy, whatever the old on/off flag held.
+    // Who answers customers on WhatsApp: ours (the default) or WhatsApp's own
+    // AI. Stored under its own key, separate from the old on/off flag.
     const ai = /^\/ai(@\w+)?\s*(on|off)?$/i.exec(text);
     if (ai) {
       const want = ai[2]?.toLowerCase();
       if (!want) {
         const { data } = await sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle();
-        const ours = (data as { value?: string } | null)?.value === 'ours';
+        const ours = (data as { value?: string } | null)?.value !== 'meta';
         await sendOwnerMessage(
           ours
             ? "🤖 <b>Our</b> assistant answers WhatsApp. <code>/ai off</code> hands it back to WhatsApp's own AI."

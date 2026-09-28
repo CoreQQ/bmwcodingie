@@ -146,59 +146,39 @@ const WANTS_HUMAN =
  * before the model is called; when one matches, the customer gets one fixed,
  * friendly line and Alex gets the alert.
  */
-function handoverTrigger(
-  text: string,
-  recent: { role: string; content: string; via?: string | null; created_at?: string }[],
-): { reason: string; line: string } | null {
-  const t = text.trim();
-
-  if (WANTS_HUMAN.test(t)) {
+function handoverTrigger(text: string): { reason: string; line: string } | null {
+  // The one case that is always Alex's: they asked for him, or they are fed up
+  // with talking to a bot. Anything else the assistant keeps helping with —
+  // going silent on a customer mid-conversation felt worse than the bot.
+  if (WANTS_HUMAN.test(text.trim())) {
     return {
       reason: 'Customer asked for a person or is frustrated with the assistant',
-      line: "Sorry about that — I've passed this straight to Alex and he'll reply here shortly. 👍",
+      line: "Sorry about that — I've let Alex know and he'll reply here shortly. 👍",
     };
   }
-
-  if (TIME_WORDS.test(t)) {
-    // Quote only the time they asked for ("tonight 7-9"), not a truncated
-    // half of their whole message.
-    const found = t.match(new RegExp(TIME_WORDS.source, 'gi')) ?? [];
-    const quote = [...new Set(found.map((f) => f.trim()))].join(' ').slice(0, 40) || 'that time';
-    return {
-      reason: `Customer asked for a specific time: "${quote}"`,
-      line:
-        `Passing "${quote}" to Alex now — he sorts times himself and will reply here shortly. ` +
-        `If it's easier, every free slot is also here: ${BOOKING_LINK}`,
-    };
-  }
-
-  // Three assistant replies in the last day and still talking: the chat is not
-  // converging, and a fourth reply is how it becomes a loop.
-  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
-  const botTurns = recent.filter(
-    (m) =>
-      m.role === 'assistant' &&
-      m.via !== 'owner' &&
-      (!m.created_at || new Date(m.created_at).getTime() > dayAgo),
-  ).length;
-  if (botTurns >= 3) {
-    return {
-      reason: 'Assistant has replied 3 times without the customer booking — handing over before it loops',
-      line: "Let me get Alex to finish this with you directly — he'll reply here shortly. 👍",
-    };
-  }
-
-  // They sent the same thing again: the last answer did not help them.
-  const lastUser = [...recent].reverse().find((m) => m.role === 'user' && m.content.trim() !== t);
-  const prevSame = recent.filter((m) => m.role === 'user' && m.content.trim().toLowerCase() === t.toLowerCase());
-  if (prevSame.length >= 2 && lastUser) {
-    return {
-      reason: 'Customer repeated the same message — the assistant did not help',
-      line: "Sorry — passing this to Alex now, he'll reply here shortly. 👍",
-    };
-  }
-
   return null;
+}
+
+/** The time words the customer used, e.g. "tonight 7-9pm", or '' if none. */
+function requestedTime(text: string): string {
+  const found = text.match(new RegExp(TIME_WORDS.source, 'gi')) ?? [];
+  return [...new Set(found.map((f) => f.trim()))].join(' ').slice(0, 40);
+}
+
+/** Tell Alex someone wants a particular time, without taking the chat off the assistant. */
+async function notifyOwnerTime(waId: string, name: string | undefined, text: string, when: string): Promise<void> {
+  const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  await sendOwnerAlert(
+    `⏰ <b>Wants a specific time: ${esc(when)}</b>\n` +
+      `${name ? `<b>${esc(name)}</b> · ` : ''}<code>+${waId}</code>\n\n«${esc(text.slice(0, 600))}»\n\n` +
+      'The assistant is still chatting with them and has told them you confirm times personally.',
+    {
+      inline_keyboard: [
+        [{ text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` }],
+        [{ text: '📋 Number', copy_text: { text: `+${waId}` } }],
+      ],
+    },
+  );
 }
 
 const LEAD_TOOL: Anthropic.Tool = {
@@ -339,11 +319,17 @@ export async function generateWaReply(
   // Decided in code, before any model call: the situations where a model
   // reply has already cost customers. A handover here is instant, identical
   // every time, and cannot be talked out of.
-  const trigger = handoverTrigger(text, recent);
+  const trigger = handoverTrigger(text);
   if (trigger) {
     await handOverNow(sb, waId, profileName, text, trigger.reason);
     return { reply: trigger.line, memory: priorMemory ?? '' };
   }
+
+  // A specific time is Alex's to confirm, but the rest of their message still
+  // deserves an answer — so he is alerted and the assistant carries on, told
+  // exactly how to handle the time part.
+  const when = requestedTime(text);
+  if (when) await notifyOwnerTime(waId, profileName, text, when).catch(() => undefined);
 
   const messages = recent
     .filter((m) => m.content?.trim())
@@ -372,6 +358,9 @@ export async function generateWaReply(
       : '',
     repeated
       ? 'The customer has just sent the same message again, which means your last reply did not answer them. Read their message carefully, answer the actual question, and do not ask anything they have already told you.'
+      : '',
+    when
+      ? `The customer asked for a specific time ("${when}"). You cannot see the diary, so do not confirm, reject or suggest any time. Say Alex confirms times personally and has already been told they asked for ${when}, and give the booking link. Answer the rest of their message normally.`
       : '',
   ].filter(Boolean);
   const system = notes.length ? `${WHATSAPP_PROMPT}\n\n${notes.join('\n\n')}` : WHATSAPP_PROMPT;
