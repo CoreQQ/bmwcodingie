@@ -135,7 +135,7 @@ async function handOverNow(
  * ask about), no "sun" and no "now" ("how much now?").
  */
 const TIME_WORDS =
-  /\b(tonight|today|tomorrow|this (?:evening|morning|afternoon|weekend)|monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thu|thur|thurs|fri|weekend|asap)\b|\b\d{1,2}\s*(?:am|pm)\b|\b\d{1,2}[:.]\d{2}\b|\b\d{1,2}\s*(?:-|–|to|till|until)\s*\d{1,2}\b/i;
+  /\b(tonight|today|tomorrow|this (?:evening|morning|afternoon|weekend)|monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thu|thur|thurs|fri|weekend|asap)\b|\b\d{1,2}(?:[:.]\d{2})?\s*(?:-|–|to|till|until)\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?\b|\b\d{1,2}\s*(?:am|pm)\b|\b\d{1,2}[:.]\d{2}\b/i;
 
 /** Asking for a person, or plainly fed up with the bot. */
 const WANTS_HUMAN =
