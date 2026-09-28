@@ -396,9 +396,10 @@ export async function generateWaReply(
   for (let round = 0; round < 4; round++) {
     const response: Anthropic.Message = await client.messages.create({
       model,
-      // WhatsApp replies are two or three sentences. A lower ceiling keeps the
-      // larger model inside ManyChat's window instead of writing an essay.
-      max_tokens: 320,
+      // Room for the tool calls AND the text: the model writes its notes
+      // (remember / save_lead) before the reply, and a tight ceiling spent on
+      // them cut a customer's answer off mid-word.
+      max_tokens: 700,
       system,
       messages: convo,
       // No diary tools. Given a calendar, the model did date arithmetic in its
@@ -408,11 +409,17 @@ export async function generateWaReply(
       tools: [LEAD_TOOL, REMEMBER_TOOL, HANDOVER_TOOL],
     });
 
-    const text = response.content
+    let text = response.content
       .filter((b): b is Anthropic.TextBlock => b.type === 'text')
       .map((b) => b.text)
       .join('')
       .trim();
+    // Never send half a sentence. If the ceiling was hit, keep what ends
+    // cleanly; if nothing does, ask again rather than send a fragment.
+    if (text && response.stop_reason === 'max_tokens') {
+      const cut = Math.max(text.lastIndexOf('. '), text.lastIndexOf('! '), text.lastIndexOf('? '));
+      text = cut > 40 ? text.slice(0, cut + 1).trim() : '';
+    }
     if (text) reply = text;
 
     const calls = response.content.filter(
@@ -601,6 +608,11 @@ export async function generateWaReply(
     }
 
     convo.push({ role: 'user', content: results });
+    // The tools are notes and alerts — their results never change what the
+    // customer should read. Once there is a reply, stop: a second model call
+    // just to "acknowledge" a note doubled the wait and pushed replies past
+    // ManyChat's window.
+    if (reply) break;
   }
 
   if (handedOver) {
