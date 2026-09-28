@@ -406,7 +406,10 @@ export async function generateWaReply(
       // head and got it wrong in front of customers ("tonight is Friday, we're
       // open" then "we're not open Friday evenings"). The live slots are on the
       // website; its only job is to send people there.
-      tools: [LEAD_TOOL, REMEMBER_TOOL, HANDOVER_TOOL],
+      // No "remember" tool any more: it made the model write a paragraph of
+      // notes before every reply, which on the larger model doubled the wait.
+      // It now reads the newest messages directly, so the notes were redundant.
+      tools: [LEAD_TOOL, HANDOVER_TOOL],
     });
 
     let text = response.content
