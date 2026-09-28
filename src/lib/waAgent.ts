@@ -329,7 +329,9 @@ export async function generateWaReply(
   // deserves an answer — so he is alerted and the assistant carries on, told
   // exactly how to handle the time part.
   const when = requestedTime(text);
-  if (when) await notifyOwnerTime(waId, profileName, text, when).catch(() => undefined);
+  // Not awaited: the alert runs while the model writes, instead of adding a
+  // second of Telegram round-trips before it even starts.
+  const timeAlert = when ? notifyOwnerTime(waId, profileName, text, when).catch(() => undefined) : null;
 
   const messages = recent
     .filter((m) => m.content?.trim())
@@ -394,7 +396,9 @@ export async function generateWaReply(
   for (let round = 0; round < 4; round++) {
     const response: Anthropic.Message = await client.messages.create({
       model,
-      max_tokens: 600,
+      // WhatsApp replies are two or three sentences. A lower ceiling keeps the
+      // larger model inside ManyChat's window instead of writing an essay.
+      max_tokens: 320,
       system,
       messages: convo,
       // No diary tools. Given a calendar, the model did date arithmetic in its
@@ -605,6 +609,7 @@ export async function generateWaReply(
   } else if (!reply && usedTool) {
     reply = `Got it — Alex will confirm with you shortly. You can also pick a time here: ${BOOKING_LINK}`;
   }
+  if (timeAlert) await timeAlert;
   if (!reply) throw new Error('empty AI reply');
   return { reply, memory };
 }
