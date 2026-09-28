@@ -293,7 +293,7 @@ export async function generateWaReply(
   text: string,
   profileName?: string,
   /** Fast model for transports that time out quickly (ManyChat waits seconds). */
-  model = 'claude-opus-4-8',
+  model = 'claude-opus-5',
   /** How the customer is addressed in the CRM — a +number, or an id label
    *  when the transport gives us no phone (then no client record is made). */
   contact = `+${waId}`,

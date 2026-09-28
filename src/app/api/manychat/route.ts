@@ -9,7 +9,9 @@ import { sendManyChatText } from '@/lib/manychatSend';
 
 export const runtime = 'nodejs';
 // ManyChat's External Request gives up quickly — keep the whole turn short.
-export const maxDuration = 30;
+// The strongest model can take well over ManyChat's window; the late
+// delivery needs the function to stay alive until it has finished.
+export const maxDuration = 60;
 
 // ManyChat allows an External Request about ten seconds. Answer later than
 // that and it drops our response: the `ai_reply` custom field keeps the
@@ -285,10 +287,11 @@ export async function POST(req: Request) {
           phone,
           text || 'Photo attached.',
           name || undefined,
-          // A larger model is what makes the chat feel like a person rather
-          // than a form. It is slower, so if it overruns ManyChat's window the
-          // answer is finished and delivered through the owner flow instead.
-          'claude-sonnet-5',
+          // The owner's call: accuracy and quality over speed. The strongest
+          // model follows the honesty rules most reliably; it rarely fits
+          // ManyChat's window, so its answer is normally finished here and
+          // delivered through the owner flow a few seconds later.
+          'claude-opus-5',
           isPhone ? `+${phone}` : `ManyChat ${phone}`,
           imageUrl || undefined,
           priorMemory || undefined,
@@ -462,7 +465,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 45,
+    v: 46,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
