@@ -111,7 +111,7 @@ export async function POST(req: Request) {
     const { data: cfg } = db
       ? await db.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle()
       : { data: null };
-    const off = (cfg as { value?: string } | null)?.value !== 'ours';
+    const off = (cfg as { value?: string } | null)?.value === 'meta';
     const fallback = off
       ? ''
       : "Got that 👍 I can't open attachments here, so I'm passing it straight to Alex — " +
@@ -185,8 +185,8 @@ export async function POST(req: Request) {
     ]);
     // Global kill switch: /ai off in Telegram stops every automatic reply
     // instantly, while the mirror to Telegram keeps working.
-    // WhatsApp's own AI answers unless ours has been chosen with /ai on.
-    if ((cfg as { value?: string } | null)?.value !== 'ours') aiOff = true;
+    // Ours answers unless the owner handed WhatsApp to its own AI with /ai off.
+    if ((cfg as { value?: string } | null)?.value === 'meta') aiOff = true;
     const row = chat as { paused?: boolean; owner_replied_at?: string | null } | null;
     // The owner is handling this one: stay out of it for six hours, then the
     // assistant picks the conversation back up so nobody is left waiting.
@@ -285,7 +285,10 @@ export async function POST(req: Request) {
           phone,
           text || 'Photo attached.',
           name || undefined,
-          'claude-haiku-4-5-20251001',
+          // A larger model is what makes the chat feel like a person rather
+          // than a form. It is slower, so if it overruns ManyChat's window the
+          // answer is finished and delivered through the owner flow instead.
+          'claude-sonnet-5',
           isPhone ? `+${phone}` : `ManyChat ${phone}`,
           imageUrl || undefined,
           priorMemory || undefined,
@@ -459,7 +462,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 40,
+    v: 41,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
