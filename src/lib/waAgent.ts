@@ -108,6 +108,96 @@ async function notifyOwnerHandover(
   );
 }
 
+const BOOKING_LINK = 'https://www.bmwcoding.ie/#contact';
+
+/**
+ * Hand the chat to Alex: stand the assistant down in this chat (sticky — he
+ * turns it back on) and send him the loud, pinned alert with the customer's
+ * own words.
+ */
+async function handOverNow(
+  sb: SupabaseClient,
+  waId: string,
+  name: string | undefined,
+  text: string,
+  reason: string,
+): Promise<void> {
+  await sb
+    .from('wa_chats')
+    .upsert({ wa_id: waId, paused: true, owner_replied_at: new Date().toISOString() })
+    .then(() => undefined, () => undefined);
+  await notifyOwnerHandover(waId, name, text, reason).catch(() => undefined);
+}
+
+/**
+ * Days, times and "tonight"-style words: a request only Alex can answer.
+ * Deliberately no "sat" (sat nav is one of the commonest things BMW owners
+ * ask about), no "sun" and no "now" ("how much now?").
+ */
+const TIME_WORDS =
+  /\b(tonight|today|tomorrow|this (?:evening|morning|afternoon|weekend)|monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thu|thur|thurs|fri|weekend|asap)\b|\b\d{1,2}\s*(?:am|pm)\b|\b\d{1,2}[:.]\d{2}\b|\b\d{1,2}\s*(?:-|–|to|till|until)\s*\d{1,2}\b/i;
+
+/** Asking for a person, or plainly fed up with the bot. */
+const WANTS_HUMAN =
+  /\b(human|real person|actual person|someone real|speak to|talk to|call me|ring me|phone me|give me a call|alex|owner|manager|bot|robot|ai\b|a\.i|yoke|useless|stupid|annoying|ridiculous|going (?:round|around) in circles|doing my head|not helpful|pointless|forget it|nevermind|never mind|wtf|ffs)\b/i;
+
+/**
+ * The cases a model reply has already got wrong in front of customers. Checked
+ * before the model is called; when one matches, the customer gets one fixed,
+ * friendly line and Alex gets the alert.
+ */
+function handoverTrigger(
+  text: string,
+  recent: { role: string; content: string; via?: string | null; created_at?: string }[],
+): { reason: string; line: string } | null {
+  const t = text.trim();
+
+  if (WANTS_HUMAN.test(t)) {
+    return {
+      reason: 'Customer asked for a person or is frustrated with the assistant',
+      line: "Sorry about that — I've passed this straight to Alex and he'll reply here shortly. 👍",
+    };
+  }
+
+  if (TIME_WORDS.test(t)) {
+    const quote = t.length > 60 ? `${t.slice(0, 57)}…` : t;
+    return {
+      reason: `Customer asked for a specific time: "${quote}"`,
+      line:
+        `Passing "${quote}" to Alex now — he sorts times himself and will reply here shortly. ` +
+        `If it's easier, every free slot is also here: ${BOOKING_LINK}`,
+    };
+  }
+
+  // Three assistant replies in the last day and still talking: the chat is not
+  // converging, and a fourth reply is how it becomes a loop.
+  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  const botTurns = recent.filter(
+    (m) =>
+      m.role === 'assistant' &&
+      m.via !== 'owner' &&
+      (!m.created_at || new Date(m.created_at).getTime() > dayAgo),
+  ).length;
+  if (botTurns >= 3) {
+    return {
+      reason: 'Assistant has replied 3 times without the customer booking — handing over before it loops',
+      line: "Let me get Alex to finish this with you directly — he'll reply here shortly. 👍",
+    };
+  }
+
+  // They sent the same thing again: the last answer did not help them.
+  const lastUser = [...recent].reverse().find((m) => m.role === 'user' && m.content.trim() !== t);
+  const prevSame = recent.filter((m) => m.role === 'user' && m.content.trim().toLowerCase() === t.toLowerCase());
+  if (prevSame.length >= 2 && lastUser) {
+    return {
+      reason: 'Customer repeated the same message — the assistant did not help',
+      line: "Sorry — passing this to Alex now, he'll reply here shortly. 👍",
+    };
+  }
+
+  return null;
+}
+
 const LEAD_TOOL: Anthropic.Tool = {
   name: 'save_lead',
   description:
@@ -229,14 +319,30 @@ export async function generateWaReply(
   /** Facts remembered from earlier messages (survives even without a DB). */
   priorMemory?: string,
 ): Promise<{ reply: string; memory: string }> {
+  // Newest 16, then put back in order. This used to read the OLDEST 14, so in
+  // any longer chat the model never saw what the customer had just said — it
+  // kept answering the start of the conversation, which is exactly what
+  // "going round in circles" looks like from the other side.
   const { data: history } = await sb
     .from('wa_messages')
-    .select('role, content')
+    .select('role, content, via, created_at')
     .eq('wa_id', waId)
-    .order('created_at', { ascending: true })
-    .limit(14);
+    .order('created_at', { ascending: false })
+    .limit(16);
+  const recent = ((history ?? []) as { role: string; content: string; via?: string | null; created_at?: string }[])
+    .slice()
+    .reverse();
 
-  const messages = ((history ?? []) as { role: string; content: string }[])
+  // Decided in code, before any model call: the situations where a model
+  // reply has already cost customers. A handover here is instant, identical
+  // every time, and cannot be talked out of.
+  const trigger = handoverTrigger(text, recent);
+  if (trigger) {
+    await handOverNow(sb, waId, profileName, text, trigger.reason);
+    return { reply: trigger.line, memory: priorMemory ?? '' };
+  }
+
+  const messages = recent
     .filter((m) => m.content?.trim())
     .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
   if (!messages.length || messages[messages.length - 1].role !== 'user') {
@@ -429,11 +535,7 @@ export async function generateWaReply(
         // immediately — with the customer's own words, not our summary.
         // Sticky, not a six-hour nap: these are exactly the chats where a
         // later "helpful" message contradicts Alex. He reopens it explicitly.
-        await sb
-          .from('wa_chats')
-          .upsert({ wa_id: waId, paused: true, owner_replied_at: new Date().toISOString() })
-          .then(() => undefined, () => undefined);
-        await notifyOwnerHandover(waId, profileName, text, reason).catch(() => undefined);
+        await handOverNow(sb, waId, profileName, text, reason);
         handedOver = true;
         result = 'Handed to Alex. Say only the holding line and nothing else.';
       }
@@ -507,9 +609,9 @@ export async function generateWaReply(
 
   if (handedOver) {
     // One neutral line: never contradict the customer, never explain ourselves.
-    reply = "Thanks — let me get Alex to come back to you on this one directly. He'll be in touch shortly. 👍";
+    reply = "Passing this to Alex now — he'll reply here shortly. 👍";
   } else if (!reply && usedTool) {
-    reply = "Perfect — I've passed your details to the team, we'll confirm shortly. 👍";
+    reply = `Got it — Alex will confirm with you shortly. You can also pick a time here: ${BOOKING_LINK}`;
   }
   if (!reply) throw new Error('empty AI reply');
   return { reply, memory };
