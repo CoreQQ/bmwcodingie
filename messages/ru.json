@@ -9,12 +9,12 @@
     "language": "Язык"
   },
   "Hero": {
-    "eyebrow": "Независимая команда BMW Coding · Основана в Dublin",
+    "eyebrow": "Независимый мастер по кодированию BMW · Дублин",
     "headline1": "BMW CODING",
     "headline2": "& RETROFITS",
     "headline3": "DUBLIN · ЛИЧНО И УДАЛЁННО",
     "bookNow": "Записаться",
-    "viewServices": "Смотреть услуги кодирования",
+    "viewServices": "Все цены",
     "scroll": "Прокрутить",
     "specFormat": "Формат",
     "specFormatValue": "Лично или удалённо",
@@ -26,7 +26,13 @@
     "specPlatformsValue": "F · G серии",
     "specPayment": "Оплата",
     "specPaymentValue": "После выполнения",
-    "whatsappCta": "Быстрый вопрос в WhatsApp →"
+    "whatsappCta": "Быстрый вопрос в WhatsApp →",
+    "priceCarplay": "Apple CarPlay",
+    "priceJapan": "Конверсия Japan → EU",
+    "priceDiag": "Диагностика ISTA",
+    "priceFrom": "от",
+    "specWhere": "Где",
+    "specWhereValue": "Приезжаем к вам — или встречаемся, где удобно"
   },
   "Services": {
     "eyebrow": "01 / Услуги",
@@ -111,6 +117,7 @@
     "messageLabel": "Что-то ещё",
     "messagePlaceholder": "Расскажите, что вам нужно…",
     "sentMessage": "Принято — мы скоро свяжемся с вами. Если что-то срочное, напишите нам в WhatsApp.",
+    "referralAfter": "Есть знакомый с BMW? Отправьте его к нам — если его работа от €80, вы получите 10% от неё наличными.",
     "sendButton": "Отправить запрос",
     "sendingButton": "Отправка…",
     "validationError": "Пожалуйста, укажите хотя бы имя и контактный номер.",

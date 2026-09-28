@@ -4,15 +4,9 @@ import { Header } from '@/components/site/Header';
 import { Preloader } from '@/components/site/Preloader';
 import { ScrollProgress } from '@/components/site/ScrollProgress';
 import { Hero } from '@/components/site/Hero';
-import { Marquee } from '@/components/site/Marquee';
-import { StatsBand } from '@/components/site/StatsBand';
 import { Services } from '@/components/site/Services';
-import { CodingDemo } from '@/components/site/CodingDemo';
-import { HowItWorks } from '@/components/site/HowItWorks';
 import { Gallery } from '@/components/site/Gallery';
-import { WhyUs } from '@/components/site/WhyUs';
 import { Reviews } from '@/components/site/Reviews';
-import { ReferralBanner } from '@/components/site/ReferralBanner';
 import { Faq } from '@/components/site/Faq';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
@@ -58,18 +52,16 @@ export default async function HomePage({
       <ScrollProgress />
       <Header />
       <main>
+        {/* Built from what visitors actually do: nearly every enquiry starts
+            here, and four in five used to drop between the first screen and
+            the form. So: what it costs, proof it's real, book, then answers.
+            Blocks people scrolled past in under ten seconds are gone. */}
         <Hero settings={settings} />
-        <Marquee />
         <Services catalog={catalog} />
-        <CodingDemo />
-        <HowItWorks />
-        <StatsBand />
         <Gallery items={gallery} />
-        <WhyUs settings={settings} />
         <Reviews reviews={reviews} />
-        <ReferralBanner />
-        <Faq />
         <Contact settings={settings} serviceOptions={serviceOptions} />
+        <Faq />
       </main>
       <Footer settings={settings} />
       <ChatWidget />

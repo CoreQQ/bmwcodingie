@@ -109,9 +109,9 @@ export async function POST(req: Request) {
     // replying here as well would send the customer two answers.
     const db = getSupabaseAdmin();
     const { data: cfg } = db
-      ? await db.from('app_config').select('value').eq('key', 'wa_ai_enabled').maybeSingle()
+      ? await db.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle()
       : { data: null };
-    const off = (cfg as { value?: string } | null)?.value === 'off';
+    const off = (cfg as { value?: string } | null)?.value !== 'ours';
     const fallback = off
       ? ''
       : "Got that 👍 I can't open attachments here, so I'm passing it straight to Alex — " +
@@ -181,11 +181,12 @@ export async function POST(req: Request) {
     };
     const [{ data: chat }, { data: cfg }] = await Promise.all([
       upsertChat(),
-      sb.from('app_config').select('value').eq('key', 'wa_ai_enabled').maybeSingle(),
+      sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle(),
     ]);
     // Global kill switch: /ai off in Telegram stops every automatic reply
     // instantly, while the mirror to Telegram keeps working.
-    if ((cfg as { value?: string } | null)?.value === 'off') aiOff = true;
+    // WhatsApp's own AI answers unless ours has been chosen with /ai on.
+    if ((cfg as { value?: string } | null)?.value !== 'ours') aiOff = true;
     const row = chat as { paused?: boolean; owner_replied_at?: string | null } | null;
     // The owner is handling this one: stay out of it for six hours, then the
     // assistant picks the conversation back up so nobody is left waiting.
@@ -458,7 +459,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 39,
+    v: 40,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),

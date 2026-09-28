@@ -86,7 +86,7 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
             <h4 className="label mb-4">{t('navigateHeading')}</h4>
             <ul className="space-y-2 text-sm text-muted">
               <li><a href="#services" className="hover:text-ink">{t('navServices')}</a></li>
-              <li><a href="#process" className="hover:text-ink">{t('navHowItWorks')}</a></li>
+              <li><a href="/find-us" className="hover:text-ink">{t('navHowItWorks')}</a></li>
               <li><a href="#work" className="hover:text-ink">{t('navWork')}</a></li>
               <li><a href="#about" className="hover:text-ink">{t('navAbout')}</a></li>
               <li><a href="#contact" className="hover:text-ink">{t('navBook')}</a></li>

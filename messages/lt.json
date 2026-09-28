@@ -9,12 +9,12 @@
     "language": "Kalba"
   },
   "Hero": {
-    "eyebrow": "Nepriklausoma BMW kodavimo komanda · Įsikūrę Dubline",
+    "eyebrow": "Nepriklausomas BMW kodavimo specialistas · Dublinas",
     "headline1": "BMW KODAVIMAS",
     "headline2": "IR RETROFITAI",
     "headline3": "DUBLINAS · GYVAI IR NUOTOLINIU BŪDU",
     "bookNow": "Rezervuoti",
-    "viewServices": "Žiūrėti kodavimo paslaugas",
+    "viewServices": "Visos kainos",
     "scroll": "Slinkti",
     "specFormat": "Formatas",
     "specFormatValue": "Gyvai arba nuotoliniu būdu",
@@ -26,7 +26,13 @@
     "specPlatformsValue": "F · G serija",
     "specPayment": "Apmokėjimas",
     "specPaymentValue": "Atlikus darbą",
-    "whatsappCta": "Trumpas klausimas per WhatsApp →"
+    "whatsappCta": "Trumpas klausimas per WhatsApp →",
+    "priceCarplay": "Apple CarPlay",
+    "priceJapan": "Japan → EU konversija",
+    "priceDiag": "ISTA diagnostika",
+    "priceFrom": "nuo",
+    "specWhere": "Kur",
+    "specWhereValue": "Atvykstame pas jus — arba susitinkame, kur patogu"
   },
   "Services": {
     "eyebrow": "01 / Paslaugos",
@@ -111,6 +117,7 @@
     "messageLabel": "Kita informacija",
     "messagePlaceholder": "Papasakokite, ko ieškote…",
     "sentMessage": "Gavome — susisieksime su jumis artimiausiu metu. Jei skubu, rašykite mums per WhatsApp.",
+    "referralAfter": "Pažįstate ką nors su BMW? Nukreipkite pas mus — jei jo darbas kainuos €80 ar daugiau, gausite 10% grynaisiais.",
     "sendButton": "Siųsti užklausą",
     "sendingButton": "Siunčiama…",
     "validationError": "Įveskite bent vardą ir kontaktinį numerį.",

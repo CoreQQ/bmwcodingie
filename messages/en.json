@@ -9,12 +9,12 @@
     "language": "Language"
   },
   "Hero": {
-    "eyebrow": "Independent BMW Coding Team · Est. Dublin",
+    "eyebrow": "Independent BMW coding specialist · Dublin",
     "headline1": "BMW CODING",
     "headline2": "DUBLIN & IRELAND",
     "headline3": "DIAGNOSTICS & RETROFITS",
     "bookNow": "Book BMW Coding",
-    "viewServices": "View Services",
+    "viewServices": "See all prices",
     "scroll": "Scroll",
     "specFormat": "Format",
     "specFormatValue": "In-person or remote",
@@ -26,7 +26,13 @@
     "specPlatformsValue": "F · G series",
     "specPayment": "Payment",
     "specPaymentValue": "On completion",
-    "whatsappCta": "WhatsApp a quick question →"
+    "whatsappCta": "WhatsApp a quick question →",
+    "priceCarplay": "Apple CarPlay",
+    "priceJapan": "Japan → EU conversion",
+    "priceDiag": "ISTA diagnostics",
+    "priceFrom": "from",
+    "specWhere": "Where",
+    "specWhereValue": "We come to you — or meet where suits"
   },
   "Services": {
     "eyebrow": "01 / Services",
@@ -111,6 +117,7 @@
     "messageLabel": "Anything else",
     "messagePlaceholder": "Tell us what you’re after…",
     "sentMessage": "Got it — we’ll be in touch shortly. For anything urgent, message us on WhatsApp.",
+    "referralAfter": "Know someone with a BMW? Send them our way — when their job is €80 or more, you get 10% of it in cash.",
     "sendButton": "Send request",
     "sendingButton": "Sending…",
     "validationError": "Please add at least your name and a contact number.",

@@ -45,7 +45,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       'Independent BMW coding in Dublin for F-Series and G-Series cars. We enable hidden features, fine-tune iDrive and comfort functions, and back it with ISTA diagnostics — in person around Dublin or remotely across Ireland where supported.',
     intro: [
       'BMW coding changes software parameters that already live inside your car. Instead of swapping parts, we adjust how the existing control units behave — enabling features that are dormant from the factory, tidying up convenience functions, and tailoring the car to how you actually drive it. Everything we change is reversible, and we can return any setting to factory before a dealer visit.',
-      'We are an independent BMW coding team based in Dublin. Most work is done in person across Dublin, Kildare, Wicklow and Meath, and remote BMW coding is available across Ireland when your car and connection support it. You pay on completion, once the feature has been shown working on your car.',
+      'BMW Coding is an independent BMW coding specialist based in Dublin. Most work is done in person across Dublin, Kildare, Wicklow and Meath, and remote BMW coding is available across Ireland when your car and connection support it. You pay on completion, once the feature has been shown working on your car.',
     ],
     includedHeading: 'What BMW coding can enable',
     included: [

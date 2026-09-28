@@ -9,12 +9,12 @@
     "language": "Мова"
   },
   "Hero": {
-    "eyebrow": "Незалежна команда BMW Coding · Заснована в Дубліні",
+    "eyebrow": "Незалежний майстер з кодування BMW · Дублін",
     "headline1": "BMW CODING",
     "headline2": "& RETROFITS",
     "headline3": "ДУБЛІН · ОСОБИСТО ТА ВІДДАЛЕНО",
     "bookNow": "Забронювати",
-    "viewServices": "Переглянути послуги кодування",
+    "viewServices": "Усі ціни",
     "scroll": "Прокрутити",
     "specFormat": "Формат",
     "specFormatValue": "Особисто або віддалено",
@@ -26,7 +26,13 @@
     "specPlatformsValue": "Серії F · G",
     "specPayment": "Оплата",
     "specPaymentValue": "Після завершення",
-    "whatsappCta": "Швидке запитання у WhatsApp →"
+    "whatsappCta": "Швидке запитання у WhatsApp →",
+    "priceCarplay": "Apple CarPlay",
+    "priceJapan": "Конверсія Japan → EU",
+    "priceDiag": "Діагностика ISTA",
+    "priceFrom": "від",
+    "specWhere": "Де",
+    "specWhereValue": "Приїжджаємо до вас — або зустрічаємось, де зручно"
   },
   "Services": {
     "eyebrow": "01 / Послуги",
@@ -111,6 +117,7 @@
     "messageLabel": "Щось ще",
     "messagePlaceholder": "Розкажіть, що вам потрібно…",
     "sentMessage": "Отримано — ми зв'яжемося з вами найближчим часом. Якщо щось термінове, напишіть нам у WhatsApp.",
+    "referralAfter": "Є знайомий з BMW? Надішліть його до нас — якщо його робота від €80, ви отримаєте 10% від неї готівкою.",
     "sendButton": "Надіслати запит",
     "sendingButton": "Надсилання…",
     "validationError": "Будь ласка, вкажіть принаймні ваше ім'я та контактний номер.",

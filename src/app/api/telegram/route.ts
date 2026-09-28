@@ -374,27 +374,31 @@ export async function POST(req: Request) {
       }
       return ok();
     }
-    // Emergency switch for the WhatsApp assistant.
+    // Who answers customers on WhatsApp: WhatsApp's own AI (the default — the
+    // owner found it far steadier) or ours. Stored under its own key so the
+    // switch took effect on deploy, whatever the old on/off flag held.
     const ai = /^\/ai(@\w+)?\s*(on|off)?$/i.exec(text);
     if (ai) {
       const want = ai[2]?.toLowerCase();
       if (!want) {
-        const { data } = await sb.from('app_config').select('value').eq('key', 'wa_ai_enabled').maybeSingle();
-        const off = (data as { value?: string } | null)?.value === 'off';
+        const { data } = await sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle();
+        const ours = (data as { value?: string } | null)?.value === 'ours';
         await sendOwnerMessage(
-          `🤖 WhatsApp assistant is <b>${off ? 'OFF' : 'ON'}</b>.\nUse <code>/ai off</code> to silence it everywhere, <code>/ai on</code> to bring it back.`,
+          ours
+            ? "🤖 <b>Our</b> assistant answers WhatsApp. <code>/ai off</code> hands it back to WhatsApp's own AI."
+            : "🤖 <b>WhatsApp's own AI</b> answers customers; ours is silent and only mirrors messages here. <code>/ai on</code> switches ours back.",
         );
         return ok();
       }
       const { error } = await sb
         .from('app_config')
-        .upsert({ key: 'wa_ai_enabled', value: want === 'off' ? 'off' : 'on' });
+        .upsert({ key: 'wa_ai_owner', value: want === 'on' ? 'ours' : 'meta' });
       await sendOwnerMessage(
         error
           ? `❌ Could not change it: ${escapeHtml(error.message)}`
           : want === 'off'
-            ? '🔇 Assistant silenced. Customer messages still reach you here — you reply yourself. Turn it back on with <code>/ai on</code>.'
-            : '🔊 Assistant is answering again.',
+            ? "🔇 Ours is silent — WhatsApp's own AI answers. Messages still arrive here. <code>/ai on</code> switches back."
+            : "🔊 Our assistant answers WhatsApp again. Make sure WhatsApp's own AI is off, or customers get two replies.",
       );
       return ok();
     }
