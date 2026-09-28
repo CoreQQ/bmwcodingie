@@ -160,7 +160,10 @@ function handoverTrigger(
   }
 
   if (TIME_WORDS.test(t)) {
-    const quote = t.length > 60 ? `${t.slice(0, 57)}…` : t;
+    // Quote only the time they asked for ("tonight 7-9"), not a truncated
+    // half of their whole message.
+    const found = t.match(new RegExp(TIME_WORDS.source, 'gi')) ?? [];
+    const quote = [...new Set(found.map((f) => f.trim()))].join(' ').slice(0, 40) || 'that time';
     return {
       reason: `Customer asked for a specific time: "${quote}"`,
       line:
