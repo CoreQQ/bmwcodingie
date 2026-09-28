@@ -32,7 +32,7 @@ export function Header() {
   const t = useTranslations('Header');
   const NAV = [
     { href: '#services', label: t('navServices') },
-    { href: '#process', label: t('navHowItWorks') },
+    { href: '/find-us', label: t('navHowItWorks') },
     { href: '#work', label: t('navWork') },
     { href: '/models', label: t('navCheckModel') },
     { href: '#contact', label: t('navContact') },

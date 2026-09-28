@@ -312,6 +312,9 @@ export function Contact({
                 {status === 'sent' ? (
                   <div role="alert" className="border border-bmw/40 bg-bmw/10 p-4 text-sm text-ink">
                     {t('sentMessage')}
+                    {/* The referral deal belongs here, to someone who just chose us —
+                        as a banner before that it was scrolled past in six seconds. */}
+                    <span className="mt-3 block text-[13px] text-muted">{t('referralAfter')}</span>
                     {trackToken && (
                       <a
                         href={`/b/${trackToken}`}

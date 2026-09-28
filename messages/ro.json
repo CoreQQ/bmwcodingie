@@ -9,12 +9,12 @@
     "language": "Limbă"
   },
   "Hero": {
-    "eyebrow": "Echipă independentă de coding BMW · Înființată în Dublin",
+    "eyebrow": "Specialist independent în coding BMW · Dublin",
     "headline1": "BMW CODING",
     "headline2": "& RETROFIT",
     "headline3": "DUBLIN · LA FAȚA LOCULUI ȘI LA DISTANȚĂ",
     "bookNow": "Programează-te",
-    "viewServices": "Vezi serviciile de coding",
+    "viewServices": "Toate prețurile",
     "scroll": "Derulează",
     "specFormat": "Format",
     "specFormatValue": "La fața locului sau la distanță",
@@ -26,7 +26,13 @@
     "specPlatformsValue": "Seriile F · G",
     "specPayment": "Plată",
     "specPaymentValue": "La finalizare",
-    "whatsappCta": "Trimite-ne o întrebare rapidă pe WhatsApp →"
+    "whatsappCta": "Trimite-ne o întrebare rapidă pe WhatsApp →",
+    "priceCarplay": "Apple CarPlay",
+    "priceJapan": "Conversie Japan → EU",
+    "priceDiag": "Diagnoză ISTA",
+    "priceFrom": "de la",
+    "specWhere": "Unde",
+    "specWhereValue": "Venim la tine — sau ne întâlnim unde îți convine"
   },
   "Services": {
     "eyebrow": "01 / Servicii",
@@ -111,6 +117,7 @@
     "messageLabel": "Alte detalii",
     "messagePlaceholder": "Spune-ne de ce ai nevoie…",
     "sentMessage": "Recepționat — te contactăm în scurt timp. Pentru orice urgent, scrie-ne pe WhatsApp.",
+    "referralAfter": "Cunoști pe cineva cu BMW? Trimite-l la noi — dacă lucrarea lui e de €80 sau mai mult, primești 10% din ea cash.",
     "sendButton": "Trimite cererea",
     "sendingButton": "Se trimite…",
     "validationError": "Te rugăm să completezi cel puțin numele și un număr de contact.",

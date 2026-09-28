@@ -9,12 +9,12 @@
     "language": "Język"
   },
   "Hero": {
-    "eyebrow": "Niezależny zespół kodowania BMW · Dublin",
+    "eyebrow": "Niezależny specjalista od kodowania BMW · Dublin",
     "headline1": "KODOWANIE BMW",
     "headline2": "I RETROFITY",
     "headline3": "DUBLIN · NA MIEJSCU I ZDALNIE",
     "bookNow": "Zarezerwuj termin",
-    "viewServices": "Zobacz usługi kodowania",
+    "viewServices": "Wszystkie ceny",
     "scroll": "Przewiń",
     "specFormat": "Forma",
     "specFormatValue": "Na miejscu lub zdalnie",
@@ -26,7 +26,13 @@
     "specPlatformsValue": "Seria F · G",
     "specPayment": "Płatność",
     "specPaymentValue": "Po wykonaniu usługi",
-    "whatsappCta": "Szybkie pytanie na WhatsApp →"
+    "whatsappCta": "Szybkie pytanie na WhatsApp →",
+    "priceCarplay": "Apple CarPlay",
+    "priceJapan": "Konwersja Japan → EU",
+    "priceDiag": "Diagnostyka ISTA",
+    "priceFrom": "od",
+    "specWhere": "Gdzie",
+    "specWhereValue": "Przyjeżdżamy do Ciebie — albo spotykamy się, gdzie wygodnie"
   },
   "Services": {
     "eyebrow": "01 / Usługi",
@@ -111,6 +117,7 @@
     "messageLabel": "Coś jeszcze",
     "messagePlaceholder": "Napisz, o co chodzi…",
     "sentMessage": "Otrzymaliśmy zapytanie — wkrótce się odezwiemy. W nagłych sprawach napisz do nas na WhatsApp.",
+    "referralAfter": "Znasz kogoś z BMW? Poleć nas — gdy jego zlecenie wyniesie €80 lub więcej, dostaniesz 10% gotówką.",
     "sendButton": "Wyślij zapytanie",
     "sendingButton": "Wysyłanie…",
     "validationError": "Podaj przynajmniej imię i numer kontaktowy.",

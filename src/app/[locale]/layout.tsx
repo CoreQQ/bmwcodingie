@@ -87,7 +87,7 @@ export default async function LocaleLayout({
         name: 'BMW Coding',
         alternateName: ['BMW Coding IE', 'BMW Coding Dublin'],
         description:
-          'BMW coding, diagnostics and retrofit team — in person around Dublin and surrounding counties, or remotely anywhere in Ireland over ENET.',
+          'Independent BMW coding, diagnostics and retrofit specialist — mobile around Dublin and surrounding counties, or remotely anywhere in Ireland over ENET.',
         slogan: 'Dealer-level BMW coding, diagnostics and retrofits — Dublin and across Ireland',
         url: SITE_URL,
         telephone: settings.phone,

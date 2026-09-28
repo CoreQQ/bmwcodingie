@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   hero_subtitle:
     'Independent BMW coding, diagnostics and retrofit service based in Dublin. In-person coding across Dublin, Kildare, Wicklow and Meath, with remote BMW coding available across Ireland where supported.',
   about_text:
-    'Independent BMW coding team based in Dublin. ISTA/Rheingold, E-Sys and BimmerCode across F and G series — done in person or remotely over ENET, paid on completion.',
+    'Independent BMW coding specialist based in Dublin. ISTA/Rheingold, E-Sys and BimmerCode across F and G series — done in person or remotely over ENET, paid on completion.',
   service_area:
     'In person across Dublin, Kildare, Wicklow and Meath. Remote coding available anywhere — you just need a laptop and an ENET cable.',
   phone: '+353 00 000 0000',

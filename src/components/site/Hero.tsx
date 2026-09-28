@@ -2,6 +2,7 @@ import { ArrowDown, MapPin } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
+import { PRICE_ITEMS } from '@/lib/pricing';
 import { HeroSpotlight } from './HeroSpotlight';
 import { Parallax } from './Parallax';
 import { GlowCard } from './GlowCard';
@@ -92,11 +93,13 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
           <div className="col-span-12 lg:col-span-4 lg:pt-24">
             <GlowCard className="border border-white/10 bg-graphite-800">
               <div className="m-stripe h-1 w-full" />
+              {/* "How much?" is the first question and used to be answered
+                  several screens down. Real figures from the price list, up top. */}
               <div className="space-y-0 divide-y divide-white/5">
-                <SpecRow k={t('specFormat')} v={t('specFormatValue')} />
-                <SpecRow k={t('specCoverage')} v={t('specCoverageValue')} />
-                <SpecRow k={t('specTooling')} v={t('specToolingValue')} />
-                <SpecRow k={t('specPlatforms')} v={t('specPlatformsValue')} />
+                <SpecRow k={t('priceCarplay')} v={`${t('priceFrom')} €${carplayFrom}`} strong />
+                <SpecRow k={t('priceJapan')} v={`${t('priceFrom')} €${japanFrom}`} strong />
+                <SpecRow k={t('priceDiag')} v={`${t('priceFrom')} €${diagFrom}`} strong />
+                <SpecRow k={t('specWhere')} v={t('specWhereValue')} />
                 <SpecRow k={t('specPayment')} v={t('specPaymentValue')} />
               </div>
               <div className="flex items-start gap-2 border-t border-white/10 px-5 py-4 text-sm text-muted">
@@ -120,11 +123,28 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
   );
 }
 
-function SpecRow({ k, v }: { k: string; v: string }) {
+function SpecRow({ k, v, strong = false }: { k: string; v: string; strong?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-4 px-5 py-3.5">
       <span className="label">{k}</span>
-      <span className="text-right text-sm text-ink">{v}</span>
+      <span className={`text-right ${strong ? 'font-mono text-base text-ink' : 'text-sm text-ink'}`}>{v}</span>
     </div>
   );
 }
+
+/**
+ * Lowest published price for an item on the everyday systems (NBT Evo and
+ * iDrive 7). iDrive 8.5 is left out on purpose: its "Japan" line is a
+ * language/radio change at €200, and quoting that as the conversion price
+ * would be the cheapest-looking number and the wrong one.
+ */
+function lowest(id: string): number {
+  const item = PRICE_ITEMS.find((i) => i.id === id);
+  const values = item
+    ? [item.price['nbt-evo'], item.price.mgu].filter((v): v is number => typeof v === 'number')
+    : [];
+  return values.length ? Math.min(...values) : 0;
+}
+const carplayFrom = lowest('carplay');
+const japanFrom = lowest('japan');
+const diagFrom = lowest('diagnostics');
