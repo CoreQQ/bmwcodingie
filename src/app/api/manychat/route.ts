@@ -281,7 +281,10 @@ export async function POST(req: Request) {
         if (isPhone) void ensureClient(sb, `+${phone}`, name || undefined).catch(() => null);
         // Leave room for the Telegram mirror after this — going over budget
         // is what makes ManyChat resend the previous answer.
-        const budget = Math.max(1000, left() - 1500);
+        // test_wait (only reachable with the secret) waits for the full answer
+        // in the response, so the owner's price and honesty checks can be
+        // read back without a real WhatsApp contact to deliver to.
+        const budget = body.test_wait === true ? 55000 : Math.max(1000, left() - 1500);
         const work = generateWaReply(
           sb,
           phone,
@@ -465,7 +468,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 46,
+    v: 47,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
