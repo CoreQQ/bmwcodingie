@@ -105,9 +105,17 @@ export async function POST(req: Request) {
   // A photo, voice note or sticker is Alex's to answer — guessing from an
   // attachment we cannot even open is how customers get told the wrong price.
   if (phone && !text && !aiReply && !imageUrl) {
-    const fallback =
-      "Got that 👍 I can't open attachments here, so I'm passing it straight to Alex — " +
-      'he will look at it himself and come back to you shortly.';
+    // With our assistant switched off, WhatsApp's own AI is the one answering:
+    // replying here as well would send the customer two answers.
+    const db = getSupabaseAdmin();
+    const { data: cfg } = db
+      ? await db.from('app_config').select('value').eq('key', 'wa_ai_enabled').maybeSingle()
+      : { data: null };
+    const off = (cfg as { value?: string } | null)?.value === 'off';
+    const fallback = off
+      ? ''
+      : "Got that 👍 I can't open attachments here, so I'm passing it straight to Alex — " +
+        'he will look at it himself and come back to you shortly.';
     await sendOwnerWithMarkup(
       `💬 <b>WhatsApp (ManyChat)</b> · ${name ? `${escapeHtml(name)} · ` : ''}<code>${
         isPhone ? `+${phone}` : `ManyChat id ${phone}`
@@ -120,14 +128,20 @@ export async function POST(req: Request) {
     ).catch(() => undefined);
     // The customer has been told Alex is looking, so the assistant must not
     // keep chatting over him until he has had his say.
-    const db = getSupabaseAdmin();
-    if (db) {
+    if (db && !off) {
       await db
         .from('wa_chats')
         .upsert({ wa_id: phone, owner_replied_at: new Date().toISOString() })
         .then(() => undefined, () => undefined);
     }
-    return NextResponse.json({ ok: true, paused: false, ai_enabled: true, reply: fallback, has_reply: true, memory: priorMemory });
+    return NextResponse.json({
+      ok: true,
+      paused: off,
+      ai_enabled: !off,
+      reply: fallback,
+      has_reply: Boolean(fallback),
+      memory: priorMemory,
+    });
   }
 
   if (!phone || (!text && !aiReply && !imageUrl)) {
@@ -341,7 +355,7 @@ export async function POST(req: Request) {
       '🐢 The assistant was too slow for ManyChat — finishing the answer and sending it separately. ' +
         'Keep an eye on the chat in case it does not land.',
     );
-  if (aiOff) lines.push('🔇 Auto-replies are OFF (/ai on to re-enable) — answer this one yourself.');
+  if (aiOff) lines.push("🔇 Our assistant is off — WhatsApp's own AI answers. /ai on switches ours back.");
   else if (ownerHandling) lines.push('✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.');
   else if (paused) lines.push('⏸ AI paused for this chat — replies handled by you.');
   await sendOwnerWithMarkup(lines.join('\n'), {
@@ -444,7 +458,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 38,
+    v: 39,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
