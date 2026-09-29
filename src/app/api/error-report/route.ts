@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { notifyEvent } from '@/lib/telegram';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
+import { isServiceArea, requestCountry } from '@/lib/geo';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +22,19 @@ export async function POST(req: Request) {
   const message = String(body.message ?? 'Unknown error').slice(0, 400);
   const path = String(body.path ?? '').slice(0, 200);
   const digest = body.digest ? String(body.digest).slice(0, 80) : '';
+  const ua = (req.headers.get('user-agent') || '').slice(0, 160);
+
+  // Crawlers and scrapers — mostly from overseas data centres — run odd or
+  // headless browsers that rewrite a page's <head> before it loads, and React
+  // then fails to hydrate it ("reading 'itemProp'" from a Tencent Cloud IP was
+  // the first to ping Alex). The page works for real visitors, so those
+  // reports are logged and dropped instead of waking him. Anything from the
+  // service area, or from a normal browser, still comes through.
+  const botLike = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|python|curl|wget|go-http|java\//i.test(ua) || !ua;
+  if (botLike || !isServiceArea(req)) {
+    console.warn('[error-report] dropped non-customer error', { path, message, country: requestCountry(req), ua });
+    return NextResponse.json({ ok: true, skipped: 'non-customer' });
+  }
 
   await notifyEvent({
     emoji: '🛑',
@@ -30,6 +44,8 @@ export async function POST(req: Request) {
       ['Error', message],
       ['Digest', digest],
       ['IP', clientIp(req)],
+      ['Country', requestCountry(req) || '—'],
+      ['Browser', ua || '—'],
     ],
   });
 
