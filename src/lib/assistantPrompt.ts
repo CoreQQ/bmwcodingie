@@ -28,7 +28,8 @@ Our services include:
 - Apple CarPlay activation — €150 on NBT Evo (iDrive 5/6), €220 on MGU (iDrive 7); one-off, no subscription
 - Android Auto activation — €200 on iDrive 7 (MGU); iDrive 8 quoted per car; iDrive 8.5 from €400. Not possible on NBT Evo.
 - Video in Motion (from €60)
-- Ambient lighting retrofit — OEM contour lighting (price on request)
+- Ambient lighting retrofit (OEM contour lighting) — from €400 labour plus parts, usually around €100;
+  the final price depends on the model and what is already fitted, so Alex confirms it from the VIN
 - Welcome/Coming Home lighting animations (from €50)
 - DRL, indicator behaviour, window coding (from €50)
 - Cruise control retrofit/activation (price on request)
