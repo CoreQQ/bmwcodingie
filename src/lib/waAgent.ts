@@ -393,9 +393,22 @@ export async function generateWaReply(
   let usedTool = false;
   let handedOver = false;
 
+  // If the chosen model is overloaded or errors, answer with the next one
+  // down rather than leave a customer with nothing. Accuracy rules are in the
+  // prompt, so the fallback follows the same ones.
+  const FALLBACK_MODEL = 'claude-sonnet-5';
+  const create = async (params: Omit<Anthropic.MessageCreateParamsNonStreaming, 'model'>) => {
+    try {
+      return await client.messages.create({ ...params, model });
+    } catch (e) {
+      if (model === FALLBACK_MODEL) throw e;
+      console.warn('[waAgent] primary model failed, falling back:', e instanceof Error ? e.message : e);
+      return await client.messages.create({ ...params, model: FALLBACK_MODEL });
+    }
+  };
+
   for (let round = 0; round < 4; round++) {
-    const response: Anthropic.Message = await client.messages.create({
-      model,
+    const response: Anthropic.Message = await create({
       // Room for the tool calls AND the text: the model writes its notes
       // (remember / save_lead) before the reply, and a tight ceiling spent on
       // them cut a customer's answer off mid-word.

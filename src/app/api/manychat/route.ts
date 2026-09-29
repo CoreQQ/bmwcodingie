@@ -360,6 +360,10 @@ export async function POST(req: Request) {
   if (imageUrl) lines.push('📷 <i>sent a photo</i>');
   if (text) lines.push(`«${escapeHtml(text)}»${ruLine}`);
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
+  // A failed answer must never be silent: the customer got nothing, so the
+  // owner has to know to reply himself.
+  if (aiError)
+    lines.push('⚠️ <b>The assistant could not answer this one</b> — the customer got no reply. Answer them yourself.');
   if (tooSlow)
     lines.push(
       '🐢 The assistant was too slow for ManyChat — finishing the answer and sending it separately. ' +
@@ -468,7 +472,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 50,
+    v: 51,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
