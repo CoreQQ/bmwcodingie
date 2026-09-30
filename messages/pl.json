@@ -278,5 +278,10 @@
     "body": "BMW Coding działa teraz w pełni mobilnie. Pracujemy u Ciebie w domu lub w pracy w Dublinie, Kildare, Wicklow i Meath, albo zdalnie przez ENET w całej Irlandii.",
     "cta": "Jak to działa",
     "dismiss": "Zamknij"
+  },
+  "GoogleReviews": {
+    "count": "{count} opinii w Google",
+    "seeAll": "Wszystkie opinie w Google",
+    "attribution": "Na żywo z Google Maps"
   }
 }

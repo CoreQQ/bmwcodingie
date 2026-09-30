@@ -278,5 +278,10 @@
     "body": "BMW Coding теперь полностью выездной сервис. Работаем у вас дома или на работе по Дублину, Kildare, Wicklow и Meath, либо удалённо через ENET по всей Ирландии.",
     "cta": "Как это работает",
     "dismiss": "Закрыть"
+  },
+  "GoogleReviews": {
+    "count": "{count} отзывов в Google",
+    "seeAll": "Все отзывы в Google",
+    "attribution": "В реальном времени с Google Maps"
   }
 }

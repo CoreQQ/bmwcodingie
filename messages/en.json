@@ -278,5 +278,10 @@
     "body": "BMW Coding is now a fully mobile service. We work at your home or workplace across Dublin, Kildare, Wicklow and Meath, or remotely over ENET anywhere in Ireland.",
     "cta": "How it works",
     "dismiss": "Dismiss"
+  },
+  "GoogleReviews": {
+    "count": "{count} reviews on Google",
+    "seeAll": "See all reviews on Google",
+    "attribution": "Live from Google Maps"
   }
 }
