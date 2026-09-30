@@ -362,6 +362,8 @@ export async function POST(req: Request) {
   if (reply) lines.push(`🤖 ${escapeHtml(reply)}`);
   // A failed answer must never be silent: the customer got nothing, so the
   // owner has to know to reply himself.
+  if (text && /\balex\b/i.test(text) && !reply && !aiError)
+    lines.push("👋 They're talking to you by name — the assistant stayed quiet and stands down for 6h.");
   if (aiError)
     lines.push('⚠️ <b>The assistant could not answer this one</b> — the customer got no reply. Answer them yourself.');
   if (tooSlow)
@@ -472,7 +474,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 51,
+    v: 52,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
