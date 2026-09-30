@@ -139,7 +139,7 @@ const TIME_WORDS =
 
 /** Asking for a person, or plainly fed up with the bot. */
 const WANTS_HUMAN =
-  /\b(human|real person|actual person|someone real|speak to|talk to|call me|ring me|phone me|give me a call|alex|owner|manager|bot|robot|ai\b|a\.i|yoke|useless|stupid|annoying|ridiculous|going (?:round|around) in circles|doing my head|not helpful|pointless|forget it|nevermind|never mind|wtf|ffs)\b/i;
+  /\b(human|real person|actual person|someone real|speak to|talk to|call me|ring me|phone me|give me a call|manager|bot|robot|ai\b|a\.i|yoke|useless|stupid|annoying|ridiculous|going (?:round|around) in circles|doing my head|not helpful|pointless|forget it|nevermind|never mind|wtf|ffs)\b/i;
 
 /**
  * The cases a model reply has already got wrong in front of customers. Checked
@@ -153,7 +153,7 @@ function handoverTrigger(text: string): { reason: string; line: string } | null 
   if (WANTS_HUMAN.test(text.trim())) {
     return {
       reason: 'Customer asked for a person or is frustrated with the assistant',
-      line: "Sorry about that — I've let Alex know and he'll reply here shortly. 👍",
+      line: "No problem — I've let Alex know and he'll reply here shortly. 👍",
     };
   }
   return null;
@@ -319,6 +319,18 @@ export async function generateWaReply(
   // Decided in code, before any model call: the situations where a model
   // reply has already cost customers. A handover here is instant, identical
   // every time, and cannot be talked out of.
+  // "Hi Alex", "thanks Alex": they are talking to him, usually because he has
+  // already replied from his phone (which never reaches us). Butting in there
+  // is exactly what he asked the assistant never to do, so stay silent, and
+  // stand down for six hours as if he had pressed "I'll reply".
+  if (/\balex\b/i.test(text)) {
+    await sb
+      .from('wa_chats')
+      .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() })
+      .then(() => undefined, () => undefined);
+    return { reply: '', memory: priorMemory ?? '' };
+  }
+
   const trigger = handoverTrigger(text);
   if (trigger) {
     await handOverNow(sb, waId, profileName, text, trigger.reason);
@@ -397,13 +409,17 @@ export async function generateWaReply(
   // down rather than leave a customer with nothing. Accuracy rules are in the
   // prompt, so the fallback follows the same ones.
   const FALLBACK_MODEL = 'claude-sonnet-5';
+  // Each attempt is capped. Uncapped, a slow answer simply ran until the
+  // platform killed the function at 60 seconds — no reply, no error, no
+  // warning to Alex. Capped, a slow primary falls back in time, and if both
+  // fail the caller gets an error it can report.
   const create = async (params: Omit<Anthropic.MessageCreateParamsNonStreaming, 'model'>) => {
     try {
-      return await client.messages.create({ ...params, model });
+      return await client.messages.create({ ...params, model }, { timeout: 25_000, maxRetries: 0 });
     } catch (e) {
       if (model === FALLBACK_MODEL) throw e;
-      console.warn('[waAgent] primary model failed, falling back:', e instanceof Error ? e.message : e);
-      return await client.messages.create({ ...params, model: FALLBACK_MODEL });
+      console.warn('[waAgent] primary model failed or too slow, falling back:', e instanceof Error ? e.message : e);
+      return await client.messages.create({ ...params, model: FALLBACK_MODEL }, { timeout: 20_000, maxRetries: 1 });
     }
   };
 
