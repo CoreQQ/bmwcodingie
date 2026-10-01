@@ -420,6 +420,20 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const debug = url.searchParams.get('debug');
   const provided = url.searchParams.get('key') || '';
+  // ?key=…&recent=1 — every chat from the last 48h with its newest messages,
+  // so "it's not answering people" can be checked against what happened.
+  if (url.searchParams.get('recent') && process.env.MANYCHAT_SECRET && provided === process.env.MANYCHAT_SECRET) {
+    const sb = getSupabaseAdmin();
+    if (!sb) return NextResponse.json({ ok: false, error: 'no db' });
+    const since = new Date(Date.now() - 48 * 3600 * 1000).toISOString();
+    const [msgs, chats, cfg] = await Promise.all([
+      sb.from('wa_messages').select('wa_id, role, via, content, created_at').gt('created_at', since).order('created_at', { ascending: true }).limit(500),
+      sb.from('wa_chats').select('wa_id, name, paused, owner_replied_at, mc_id').gt('last_at', since).limit(200),
+      sb.from('app_config').select('key, value').in('key', ['wa_ai_owner', 'wa_ai_enabled']),
+    ]);
+    return NextResponse.json({ ok: true, config: cfg.data, chats: chats.data, messages: msgs.data });
+  }
+
   if (debug && process.env.MANYCHAT_SECRET && provided === process.env.MANYCHAT_SECRET) {
     const sb = getSupabaseAdmin();
     if (!sb) return NextResponse.json({ ok: false, error: 'no db' });
@@ -474,7 +488,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 52,
+    v: 53,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
