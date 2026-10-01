@@ -274,6 +274,7 @@ export async function POST(req: Request) {
   /** Set when a slow turn is being delivered out-of-band; awaited at the end. */
   let late: Promise<boolean> | null = null;
   let lateError = '';
+  let lateReply = '';
   if (sb && (text || imageUrl) && !paused && !aiOff && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
       reply = '';
@@ -324,6 +325,7 @@ export async function POST(req: Request) {
               }
               if (!sent.ok) {
                 lateError = sent.error ?? 'unknown';
+                lateReply = done.reply;
                 return false;
               }
               await sb.from('wa_messages').insert({
@@ -401,7 +403,11 @@ export async function POST(req: Request) {
   const lateSent = late ? await late : null;
   if (late && !lateSent) {
     await sendOwnerWithMarkup(
-      `🐢 <b>Could not deliver the late answer</b> · <code>${who}</code>\nReply to them yourself.${
+      `🐢 <b>Could not deliver the late answer</b> · <code>${who}</code>\n${
+        lateReply
+          ? `Here it is — tap to copy and send it yourself:\n<pre>${escapeHtml(lateReply.slice(0, 3000))}</pre>`
+          : 'Reply to them yourself.'
+      }${
         lateError ? `\n<code>${escapeHtml(lateError.slice(0, 300))}</code>` : ''
       }`,
       { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: who } }]] },
@@ -501,7 +507,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 54,
+    v: 55,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),

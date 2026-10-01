@@ -94,24 +94,29 @@ export async function sendManyChatText(
     const field = await mc<{ status?: string }>('/fb/subscriber/setCustomFieldByName', {
       method: 'POST',
       body: JSON.stringify({
-        subscriber_id: id,
+        subscriber_id: Number(id),
         field_name: process.env.MANYCHAT_OWNER_FIELD || 'owner_msg',
         field_value: text,
       }),
     });
     if (field.error) return { ok: false, error: `could not store the text: ${field.error}` };
+    // A 200 can still carry {"status":"error"} — sending the flow then would
+    // deliver whatever text was left in the field from last time.
+    if (field.data?.status && field.data.status !== 'success') {
+      return { ok: false, error: `could not store the text: ${JSON.stringify(field.data).slice(0, 200)}` };
+    }
     const run = await mc<{ status?: string }>('/fb/sending/sendFlow', {
       method: 'POST',
-      body: JSON.stringify({ subscriber_id: id, flow_ns: process.env.MANYCHAT_OWNER_FLOW_NS }),
+      body: JSON.stringify({ subscriber_id: Number(id), flow_ns: process.env.MANYCHAT_OWNER_FLOW_NS }),
     });
     if (run.data?.status === 'success') return { ok: true };
-    return { ok: false, error: run.error || `ManyChat replied: ${JSON.stringify(run.data).slice(0, 200)}` };
+    return { ok: false, error: `sendFlow: ${run.error || `ManyChat replied: ${JSON.stringify(run.data).slice(0, 200)}`}` };
   }
 
   const { data, error } = await mc<{ status?: string }>('/fb/sending/sendContent', {
     method: 'POST',
     body: JSON.stringify({
-      subscriber_id: id,
+      subscriber_id: Number(id),
       data: { version: 'v2', content: { messages: [{ type: 'text', text }] } },
     }),
   });
