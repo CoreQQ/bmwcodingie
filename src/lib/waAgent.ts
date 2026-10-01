@@ -97,7 +97,7 @@ async function notifyOwnerHandover(
     `${name ? `<b>${esc(name)}</b> · ` : ''}<code>+${waId}</code>\n\n` +
       `«${esc(text.slice(0, 600))}»\n\n` +
       `🤖 Why I stepped back: ${esc(reason)}\n` +
-      `The assistant is now OFF in this chat. Turn it back on with <code>/wa start +${waId}</code>`,
+      `The assistant stands down here for 6 hours, then answers again if you haven't. <code>/wa stop +${waId}</code> keeps it off for good.`,
     {
       inline_keyboard: [
         [{ text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` }],
@@ -122,9 +122,14 @@ async function handOverNow(
   text: string,
   reason: string,
 ): Promise<void> {
+  // Stand down for six hours, then pick the chat back up if he has not — the
+  // owner's own rule. This used to set a permanent pause, so every handover
+  // silenced a customer for good: five of six real chats in two days were
+  // stuck that way, one with eleven unanswered questions. A permanent stop is
+  // now only ever Alex's own "Stop AI here".
   await sb
     .from('wa_chats')
-    .upsert({ wa_id: waId, paused: true, owner_replied_at: new Date().toISOString() })
+    .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() })
     .then(() => undefined, () => undefined);
   await notifyOwnerHandover(waId, name, text, reason).catch(() => undefined);
 }

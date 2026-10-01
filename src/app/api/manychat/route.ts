@@ -273,6 +273,7 @@ export async function POST(req: Request) {
   let tooSlow = false;
   /** Set when a slow turn is being delivered out-of-band; awaited at the end. */
   let late: Promise<boolean> | null = null;
+  let lateError = '';
   if (sb && (text || imageUrl) && !paused && !aiOff && !aiReply) {
     if (isRateLimited(`wa-ai:${phone}`, 20, 60 * 60 * 1000)) {
       reply = '';
@@ -313,8 +314,18 @@ export async function POST(req: Request) {
           late = work
             .then(async (done) => {
               if (!done.reply || done.reply.trim() === lastAssistant) return false;
-              const sent = await sendManyChatText(phone, done.reply, subscriberId || undefined);
-              if (!sent.ok) return false;
+              // One retry: the customer often sends their next message while
+              // this one is still being delivered, and ManyChat can refuse the
+              // first attempt. Keep the reason — it was being thrown away.
+              let sent = await sendManyChatText(phone, done.reply, subscriberId || undefined);
+              if (!sent.ok) {
+                await new Promise((r) => setTimeout(r, 3000));
+                sent = await sendManyChatText(phone, done.reply, subscriberId || undefined);
+              }
+              if (!sent.ok) {
+                lateError = sent.error ?? 'unknown';
+                return false;
+              }
               await sb.from('wa_messages').insert({
                 msg_id: `mc:${phone}:${Date.now()}:late`,
                 wa_id: phone,
@@ -390,7 +401,9 @@ export async function POST(req: Request) {
   const lateSent = late ? await late : null;
   if (late && !lateSent) {
     await sendOwnerWithMarkup(
-      `🐢 <b>Could not deliver the late answer</b> · <code>${who}</code>\nReply to them yourself.`,
+      `🐢 <b>Could not deliver the late answer</b> · <code>${who}</code>\nReply to them yourself.${
+        lateError ? `\n<code>${escapeHtml(lateError.slice(0, 300))}</code>` : ''
+      }`,
       { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: who } }]] },
     ).catch(() => undefined);
   }
@@ -488,7 +501,7 @@ async function handleStatus() {
   return NextResponse.json({
     ok: true,
     hint: 'ManyChat External Request endpoint — POST only.',
-    v: 53,
+    v: 54,
     db: Boolean(sb),
     ai: Boolean(process.env.ANTHROPIC_API_KEY),
     send: Boolean(process.env.MANYCHAT_API_KEY),
