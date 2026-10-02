@@ -22,7 +22,7 @@ export async function GoogleReviews() {
   const g = await getGoogleRating();
   if (!g) return null;
   const t = await getTranslations('GoogleReviews');
-  const shown = g.reviews.slice(0, 3);
+  const shown = g.reviews.slice(0, 6);
 
   return (
     <section id="google-reviews" className="relative border-t border-white/5 py-14 md:py-20">

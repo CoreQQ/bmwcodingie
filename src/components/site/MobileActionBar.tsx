@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Phone, MessageCircle, CalendarCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { usePathname } from 'next/navigation';
+import { waHref, waMessageFor } from '@/lib/waMessage';
 
 // App-style sticky action bar for phones: Book / WhatsApp / Call always within
 // thumb reach. Slides in after the hero (its own CTAs come first) and slides
@@ -46,8 +48,8 @@ export function MobileActionBar({ phone, whatsapp }: { phone: string; whatsapp: 
     };
   }, []);
 
-  const digits = whatsapp.replace(/[^\d]/g, '');
-  const wa = digits ? `https://wa.me/${digits}?text=${encodeURIComponent('Hi — I have a BMW and I need coding.')}` : '#';
+  const path = usePathname() || '/';
+  const wa = waHref(whatsapp, waMessageFor(path));
 
   return (
     <div

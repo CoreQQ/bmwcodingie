@@ -1,18 +1,19 @@
-import { ArrowDown, MapPin } from 'lucide-react';
+import { Check, MessageCircle, ScanSearch } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
-import { waLink } from '@/lib/data';
-import { PRICE_ITEMS } from '@/lib/pricing';
+import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
 import { HeroSpotlight } from './HeroSpotlight';
 import { Parallax } from './Parallax';
-import { GlowCard } from './GlowCard';
 
+// First screen per the owner's brief: what we do, the services in one line,
+// two actions (check your BMW, or WhatsApp), and four reasons to trust it.
+// Prices start two blocks down, on the service cards.
 export async function Hero({ settings }: { settings: SiteSettings }) {
   const t = await getTranslations('Hero');
+  const benefits = [t('benefit1'), t('benefit2'), t('benefit3'), t('benefit4')];
+
   return (
     <section id="top" className="relative overflow-hidden">
-      {/* Background: real workshop shot (duotone-dimmed) + blueprint grid +
-          atmospheric blue glow + pointer spotlight. */}
       <div className="absolute inset-0 -z-10">
         <Parallax speed={0.24} className="absolute -inset-y-[14%] inset-x-0">
           <picture>
@@ -27,124 +28,54 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
             />
           </picture>
         </Parallax>
-        <div className="absolute inset-0 bg-gradient-to-r from-graphite-900/95 via-graphite-900/70 to-graphite-900/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-graphite-900/95 via-graphite-900/75 to-graphite-900/40" />
         <div className="blueprint absolute inset-0 opacity-40" />
         <div className="absolute inset-0 hero-glow" />
         <HeroSpotlight />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-graphite-900 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-graphite-900/80 to-transparent" />
       </div>
 
-      <div className="mx-auto max-w-edge px-5 pb-16 pt-20 sm:pt-28 md:px-8 md:pb-28 md:pt-44">
-        <div className="grid grid-cols-12 gap-y-12 md:gap-x-10">
-          {/* Headline block */}
-          <div className="col-span-12 lg:col-span-8">
-            <div className="mb-7 flex items-center gap-3 reveal is-in">
-              <span className="m-stripe h-[3px] w-12" />
-              <span className="label text-muted">{t('eyebrow')}</span>
-            </div>
-
-            <h1 className="font-display text-[clamp(2.2rem,10vw,6.5rem)] leading-[0.86] tracking-tight">
-              <span className="block animate-fade-up opacity-0" style={{ animationDelay: '0.05s' }}>
-                {t('headline1')}
-              </span>
-              <span
-                className="block animate-fade-up opacity-0"
-                style={{ animationDelay: '0.13s' }}
-              >
-                <span className="text-bmw">{t('headline2')}</span>
-              </span>
-              <span
-                className="block text-muted animate-fade-up opacity-0"
-                style={{ animationDelay: '0.21s' }}
-              >
-                {t('headline3')}
-              </span>
-            </h1>
-
-            <p
-              className="mt-8 max-w-xl text-lg leading-relaxed text-muted animate-fade-up opacity-0"
-              style={{ animationDelay: '0.3s' }}
-            >
-              {settings.hero_subtitle}
-            </p>
-
-            <div
-              className="mt-10 flex flex-wrap items-center gap-4 animate-fade-up opacity-0"
-              style={{ animationDelay: '0.38s' }}
-            >
-              <a href="#contact" className="btn-primary">
-                {t('bookNow')}
-              </a>
-              <a href="#services" className="btn-ghost">
-                {t('viewServices')}
-              </a>
-            </div>
-
-            <a
-              href="#services"
-              className="mt-8 sm:mt-14 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-faint transition-colors hover:text-ink"
-            >
-              <ArrowDown size={14} className="animate-bounce" /> {t('scroll')}
-            </a>
+      <div className="mx-auto max-w-edge px-5 pb-14 pt-24 sm:pt-28 md:px-8 md:pb-24 md:pt-40">
+        <div className="max-w-3xl">
+          <div className="mb-6 flex items-center gap-3">
+            <span className="m-stripe h-[3px] w-12" />
+            <span className="label text-muted">{t('eyebrow')}</span>
           </div>
 
-          {/* Spec readout card — offset right */}
-          <div className="col-span-12 lg:col-span-4 lg:pt-24">
-            <GlowCard className="border border-white/10 bg-graphite-800">
-              <div className="m-stripe h-1 w-full" />
-              {/* "How much?" is the first question and used to be answered
-                  several screens down. Real figures from the price list, up top. */}
-              <div className="space-y-0 divide-y divide-white/5">
-                <SpecRow k={t('priceCarplay')} v={`${t('priceFrom')} €${carplayFrom}`} strong />
-                <SpecRow k={t('priceJapan')} v={`${t('priceFrom')} €${japanFrom}`} strong />
-                <SpecRow k={t('priceDiag')} v={`${t('priceFrom')} €${diagFrom}`} strong />
-                <SpecRow k={t('specWhere')} v={t('specWhereValue')} />
-                <SpecRow k={t('specPayment')} v={t('specPaymentValue')} />
-              </div>
-              <div className="flex items-start gap-2 border-t border-white/10 px-5 py-4 text-sm text-muted">
-                <MapPin size={15} className="mt-0.5 shrink-0 text-bmw" />
-                <span>{settings.service_area}</span>
-              </div>
-            </GlowCard>
+          <h1 className="font-display text-[clamp(2.4rem,9vw,5.8rem)] leading-[0.9] tracking-tight">
+            <span className="block">{t('title1')}</span>
+            <span className="block text-bmw">{t('title2')}</span>
+          </h1>
 
+          <p className="mt-5 font-mono text-[12px] uppercase tracking-[0.18em] text-ink sm:text-sm">
+            {t('servicesLine')}
+          </p>
+
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">{t('lead')}</p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a href="#vin-check" className="btn-primary inline-flex items-center gap-2">
+              <ScanSearch size={16} /> {t('ctaCheck')}
+            </a>
             <a
-              href={waLink(settings.whatsapp, 'Hi — I have a BMW and I need coding.')}
+              href={waHref(settings.whatsapp, WA_DEFAULT_MESSAGE)}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 block border border-white/10 px-5 py-3 text-center font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:border-bmw hover:text-ink"
+              className="btn-ghost inline-flex items-center gap-2"
             >
-              {t('whatsappCta')}
+              <MessageCircle size={16} /> {t('ctaWhatsapp')}
             </a>
           </div>
+
+          <ul className="mt-8 grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap">
+            {benefits.map((b) => (
+              <li key={b} className="flex items-center gap-2 text-sm text-ink">
+                <Check size={15} className="shrink-0 text-bmw" /> {b}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
   );
 }
-
-function SpecRow({ k, v, strong = false }: { k: string; v: string; strong?: boolean }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 px-5 py-3.5">
-      <span className="label">{k}</span>
-      <span className={`text-right ${strong ? 'font-mono text-base text-ink' : 'text-sm text-ink'}`}>{v}</span>
-    </div>
-  );
-}
-
-/**
- * Lowest published price for an item on the everyday systems (NBT Evo and
- * iDrive 7). iDrive 8.5 is left out on purpose: its "Japan" line is a
- * language/radio change at €200, and quoting that as the conversion price
- * would be the cheapest-looking number and the wrong one.
- */
-function lowest(id: string): number {
-  const item = PRICE_ITEMS.find((i) => i.id === id);
-  const values = item
-    ? [item.price['nbt-evo'], item.price.mgu].filter((v): v is number => typeof v === 'number')
-    : [];
-  return values.length ? Math.min(...values) : 0;
-}
-const carplayFrom = lowest('carplay');
-const japanFrom = lowest('japan');
-const diagFrom = lowest('diagnostics');

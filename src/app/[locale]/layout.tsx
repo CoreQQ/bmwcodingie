@@ -6,6 +6,7 @@ import { getCatalog, getReviews, getSettings } from '@/lib/data';
 import { CookieConsent } from '@/components/site/CookieConsent';
 import { SectionTime } from '@/components/site/SectionTime';
 import { CallHours } from '@/components/site/CallHours';
+import { WhatsAppFloat } from '@/components/site/WhatsAppFloat';
 import { Announcement } from '@/components/site/Announcement';
 import { isMobileOnly } from '@/lib/transition';
 
@@ -175,6 +176,7 @@ export default async function LocaleLayout({
       {children}
       <SectionTime />
       <CallHours whatsapp={settings.whatsapp} />
+      <WhatsAppFloat whatsapp={settings.whatsapp} />
       <CookieConsent
         text={tCookie('text')}
         necessaryOnly={tCookie('necessaryOnly')}

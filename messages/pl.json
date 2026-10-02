@@ -9,7 +9,7 @@
     "language": "Język"
   },
   "Hero": {
-    "eyebrow": "Niezależny specjalista od kodowania BMW · Dublin",
+    "eyebrow": "Mobilne kodowanie i retrofity BMW",
     "headline1": "KODOWANIE BMW",
     "headline2": "I RETROFITY",
     "headline3": "DUBLIN · NA MIEJSCU I ZDALNIE",
@@ -32,7 +32,17 @@
     "priceDiag": "Diagnostyka ISTA",
     "priceFrom": "od",
     "specWhere": "Gdzie",
-    "specWhereValue": "Przyjeżdżamy do Ciebie — albo spotykamy się, gdzie wygodnie"
+    "specWhereValue": "Przyjeżdżamy do Ciebie — albo spotykamy się, gdzie wygodnie",
+    "title1": "Kodowanie i retrofity BMW",
+    "title2": "w Irlandii",
+    "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnostyka · Retrofity",
+    "lead": "Profesjonalne kodowanie i retrofity BMW w Dublinie i całej Irlandii. Dojazd do klienta i kodowanie zdalne.",
+    "ctaCheck": "Sprawdź swoje BMW",
+    "ctaWhatsapp": "Napisz na WhatsApp",
+    "benefit1": "Specjalista BMW",
+    "benefit2": "Dojazd do klienta",
+    "benefit3": "Kodowanie zdalne",
+    "benefit4": "Rozwiązania na poziomie OEM"
   },
   "Services": {
     "eyebrow": "01 / Usługi",
@@ -41,7 +51,10 @@
     "remoteOk": "Możliwe zdalnie",
     "footnote": "Nie widzisz swojej dokładnej potrzeby na liście? Odblokowywanie ukrytych funkcji i niestandardowe kodowanie to nasza codzienność — napisz, jaki masz samochód i czego potrzebujesz, a powiemy wprost, czy jest to możliwe.",
     "showAll": "Pokaż wszystkie {n}",
-    "showLess": "Zwiń"
+    "showLess": "Zwiń",
+    "deliveryRemote": "Zdalnie",
+    "deliveryMobile": "Dojazd",
+    "deliveryBoth": "Zdalnie / Dojazd"
   },
   "HowItWorks": {
     "eyebrow": "02 / Proces",
@@ -107,16 +120,16 @@
     "call": "Zadzwoń",
     "nameLabel": "Imię *",
     "namePlaceholder": "Twoje imię",
-    "contactLabel": "Telefon / WhatsApp *",
+    "contactLabel": "Telefon / WhatsApp",
     "contactPlaceholder": "+353 …",
-    "modelLabel": "Model BMW i rok",
+    "modelLabel": "Model / rok BMW",
     "modelPlaceholder": "np. G30 530e, 2019",
     "serviceLabel": "Potrzebna usługa",
     "serviceSelectPlaceholder": "Wybierz…",
     "serviceOther": "Inna / nie jestem pewien",
-    "messageLabel": "Coś jeszcze",
+    "messageLabel": "Dodatkowe informacje (opcjonalnie)",
     "messagePlaceholder": "Napisz, o co chodzi…",
-    "sentMessage": "Otrzymaliśmy zapytanie — wkrótce się odezwiemy. W nagłych sprawach napisz do nas na WhatsApp.",
+    "sentMessage": "Dziękujemy. Sprawdzimy Twoje BMW i wkrótce się odezwiemy.",
     "referralAfter": "Znasz kogoś z BMW? Poleć nas — gdy jego zlecenie wyniesie €80 lub więcej, dostaniesz 10% gotówką.",
     "sendButton": "Wyślij zapytanie",
     "sendingButton": "Wysyłanie…",
@@ -149,7 +162,11 @@
     "visitMeetHint": "Wybierzemy miejsce w Dublinie i podamy je przy potwierdzeniu. Bez opłaty za dojazd.",
     "visitAddressLabel": "Twój adres lub okolica",
     "visitAddressPlaceholder": "np. Tallaght, D24 — podjazd",
-    "visitMissing": "Wybierz, gdzie mamy wykonać pracę."
+    "visitMissing": "Wybierz, gdzie mamy wykonać pracę.",
+    "nameOptionalLabel": "Imię (opcjonalnie)",
+    "vinOptionalLabel": "Ostatnie 7 znaków VIN (opcjonalnie)",
+    "carServiceMissing": "Podaj model / rok BMW i potrzebną usługę.",
+    "addressMissing": "Podaj adres lub okolicę, żebyśmy wiedzieli, dokąd przyjechać."
   },
   "Footer": {
     "pitch": "Niezależne kodowanie, diagnostyka i retrofity BMW na terenie Dublina i całej Irlandii — na miejscu lub zdalnie przez ENET.",
@@ -283,5 +300,82 @@
     "count": "{count} opinii w Google",
     "seeAll": "Wszystkie opinie w Google",
     "attribution": "Na żywo z Google Maps"
+  },
+  "VinCheck": {
+    "eyebrow": "Sprawdzenie zgodności",
+    "heading": "Nie wiesz, co obsługuje Twoje BMW?",
+    "body": "Wyślij ostatnie 7 znaków VIN i napisz, co chcesz aktywować lub doposażyć. Sprawdzimy zgodność dla Twojego BMW.",
+    "vinLabel": "Ostatnie 7 znaków VIN",
+    "modelLabel": "Model / rok (opcjonalnie)",
+    "serviceLabel": "Co Cię interesuje?",
+    "phoneLabel": "Telefon / WhatsApp (opcjonalnie)",
+    "cta": "Sprawdź moje BMW",
+    "hint": "Zostaw numer, a odpiszemy. Albo zostaw puste i dokończ w WhatsApp.",
+    "vinError": "Wpisz ostatnie 7 znaków VIN (litery i cyfry).",
+    "sent": "Dziękujemy. Sprawdzimy Twoje BMW i wkrótce się odezwiemy."
+  },
+  "Popular": {
+    "eyebrow": "Popularne usługi BMW",
+    "heading": "Najczęściej zamawiane",
+    "moreInfo": "Więcej",
+    "allPrices": "Wszystkie ceny dla Twojego systemu:",
+    "calculator": "kalkulator cen",
+    "carplayTitle": "Aktywacja Apple CarPlay",
+    "carplayDesc": "Pełny ekran / bezprzewodowo",
+    "carplayPrice": "Od €150",
+    "japanTitle": "Konwersja Japan → EU",
+    "japanDesc": "Radio · Nawigacja · Język · Mapy",
+    "japanPrice": "Od €250",
+    "codingTitle": "Kodowanie BMW",
+    "codingDesc": "Funkcje fabryczne i personalizacja",
+    "codingPrice": "Od €80",
+    "idriveTitle": "iDrive ID4 → ID6",
+    "idriveDesc": "Aktualizacja oprogramowania i nowy interfejs",
+    "clusterTitle": "Retrofit 6WA → 6WB",
+    "clusterDesc": "Montaż cyfrowych zegarów",
+    "diagnosticsTitle": "Diagnostyka BMW",
+    "diagnosticsDesc": "Diagnostyka ISTA i programowanie"
+  },
+  "Japan": {
+    "eyebrow": "BMW z Japonii?",
+    "heading": "Pełna konwersja BMW Japan → EU",
+    "i1": "Europejskie częstotliwości radiowe",
+    "i2": "Język angielski",
+    "i3": "Nawigacja EU",
+    "i4": "Najnowsze mapy EU",
+    "i5": "Sprawdzenie zgodności Apple CarPlay",
+    "i6": "Sprawdzenie ConnectedDrive / telematyki",
+    "i7": "Pełna diagnostyka pojazdu",
+    "price": "Od €250",
+    "ctaCheck": "Sprawdź swoje BMW",
+    "ctaBook": "Zarezerwuj Japan → EU"
+  },
+  "Steps": {
+    "eyebrow": "Jak to działa",
+    "heading": "Cztery kroki, bez kolejki u dealera",
+    "s1": "Wyślij dane BMW lub VIN",
+    "s2": "Sprawdzamy zgodność",
+    "s3": "Rezerwujesz dojazd lub usługę zdalną",
+    "s4": "Kodowanie / montaż gotowe"
+  },
+  "Why": {
+    "eyebrow": "Dlaczego BMWCODINGIE",
+    "heading": "Tylko BMW, porządnie",
+    "p1Title": "Specjalista BMW",
+    "p1Body": "Tylko BMW, codziennie — kodowanie, retrofity i diagnostyka serii F i G.",
+    "p2Title": "Narzędzia dealerskie",
+    "p2Body": "ISTA, E-Sys i oryginalne oprogramowanie BMW, a nie tani adapter OBD.",
+    "p3Title": "Sprawdzone przed rezerwacją",
+    "p3Body": "Z VIN potwierdzamy, co obsługuje Twoje auto, zanim cokolwiek zarezerwujesz lub zapłacisz.",
+    "p4Title": "Przyjeżdżamy do Ciebie",
+    "p4Body": "Dojazd w Dublinie i okolicznych hrabstwach lub zdalnie w całej Irlandii.",
+    "p5Title": "Płatność po wykonaniu",
+    "p5Body": "Najpierw widzisz efekt na swoim aucie. Bez zaliczek."
+  },
+  "Guides": {
+    "eyebrow": "Poradniki BMW",
+    "heading": "Poznaj swoje BMW przed rezerwacją",
+    "read": "Czytaj",
+    "all": "Wszystkie poradniki"
   }
 }

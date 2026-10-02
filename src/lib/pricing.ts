@@ -51,7 +51,7 @@ export const PRICE_ITEMS: PriceItem[] = [
   {
     id: 'vim',
     label: 'Video in Motion',
-    note: 'Full menus while driving',
+    note: 'Passenger media and full iDrive menus on the move — passenger use only',
     price: { 'nbt-evo': 60, mgu: 60, 'mgu-id8': null, 'mgu-id85': null },
     from: true,
   },

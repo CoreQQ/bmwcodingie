@@ -164,7 +164,7 @@ function buildLocationPage(f: LocationFacts): ServicePage {
     includedHeading: `Popular coding in ${f.name}`,
     included: [
       'Apple CarPlay and Android Auto activation (supported systems)',
-      'Video in Motion and full-screen functions while moving',
+      'Video in Motion — passenger media on the move (passenger use only)',
       'Sport / M digital displays and digital speed readout',
       'Ambient lighting, Welcome lights and comfort coding',
       'Auto-folding mirrors, one-touch windows, Comfort Access tweaks',

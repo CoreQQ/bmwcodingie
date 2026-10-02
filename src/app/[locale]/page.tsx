@@ -4,11 +4,12 @@ import { Header } from '@/components/site/Header';
 import { Preloader } from '@/components/site/Preloader';
 import { ScrollProgress } from '@/components/site/ScrollProgress';
 import { Hero } from '@/components/site/Hero';
-import { Services } from '@/components/site/Services';
 import { Gallery } from '@/components/site/Gallery';
 import { Reviews } from '@/components/site/Reviews';
 import { GoogleReviews } from '@/components/site/GoogleReviews';
 import { Faq } from '@/components/site/Faq';
+import { VinCheck } from '@/components/site/VinCheck';
+import { Guides, HowItWorksSteps, JapanSection, PopularServices, WhyUs } from '@/components/site/HomeSections';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
 import { ChatWidgetLazy as ChatWidget } from '@/components/site/ChatWidgetLazy';
@@ -53,17 +54,20 @@ export default async function HomePage({
       <ScrollProgress />
       <Header />
       <main>
-        {/* Built from what visitors actually do: nearly every enquiry starts
-            here, and four in five used to drop between the first screen and
-            the form. So: what it costs, proof it's real, book, then answers.
-            Blocks people scrolled past in under ten seconds are gone. */}
+        {/* The owner's brief: every block leads to one of three actions —
+            WhatsApp, the VIN check or booking. Order as specified. */}
         <Hero settings={settings} />
-        <Services catalog={catalog} />
+        <VinCheck whatsapp={settings.whatsapp} />
+        <PopularServices whatsapp={settings.whatsapp} />
+        <JapanSection />
         <Gallery items={gallery} />
         <Reviews reviews={reviews} />
         <GoogleReviews />
-        <Contact settings={settings} serviceOptions={serviceOptions} />
+        <HowItWorksSteps />
+        <WhyUs />
         <Faq />
+        <Contact settings={settings} serviceOptions={serviceOptions} />
+        <Guides />
       </main>
       <Footer settings={settings} />
       <ChatWidget />

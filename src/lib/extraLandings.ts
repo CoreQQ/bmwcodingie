@@ -18,7 +18,7 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
     ],
     includedHeading: 'Favourite hidden features',
     included: [
-      'Video in Motion — full menus while driving',
+      'Video in Motion — passenger media and full menus on the move (passenger use only)',
       'Digital speed readout and sport displays in the cluster',
       'Auto-folding mirrors on lock · one-touch comfort windows',
       'Welcome light show and ambient lighting behaviour',
@@ -62,7 +62,7 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
       'Factory-style rear-view camera retrofits for F and G series BMWs in Dublin: proper camera, proper wiring, coded into iDrive so it works exactly like it left the factory that way.',
     intro: [
       'A camera retrofit has two halves: the hardware (camera, trunk-lid wiring, harness to the head unit) and the software (coding the car so iDrive shows guidance lines and switches automatically in reverse). We do both — no aftermarket screens, no taped-on modules.',
-      'Done at our workshop off the N7 (Greenogue, Rathcoole). Most retrofits are same-day; you see it working and pay on completion.',
+      'Fitted at a covered spot arranged with you when you book — usually one visit. You see it working and pay on completion.',
     ],
     includedHeading: 'What the retrofit includes',
     included: [
@@ -81,14 +81,14 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
     ],
     process: [
       { title: 'Confirm the build', body: 'Model, year, head unit — we confirm the right camera kit and quote parts + labour.' },
-      { title: 'Book the workshop slot', body: 'Camera retrofits are done at Greenogue (off the N7) — usually one visit.' },
+      { title: 'Book a slot', body: 'Camera retrofits need the car for a few hours — we agree a covered place to do it when you book.' },
       { title: 'Fit, wire, code', body: 'Hardware in, then the car is coded so iDrive behaves exactly like factory.' },
       { title: 'Demo and pay', body: 'Reverse in, see the lines move, pay on completion.' },
     ],
     faqs: [
       { q: 'How much does a reverse camera retrofit cost?', a: 'Depends on the chassis and head unit — parts plus fitting and coding are quoted as one price up front from your build. Send the year and VIN for an exact figure.' },
       { q: 'Will it look factory?', a: 'Yes — the camera sits in the factory position in the trunk-handle strip and iDrive switches views automatically, with guidance lines, exactly like an original-equipment car.' },
-      { q: 'Can you do it remotely?', a: 'The coding half, yes — but a camera retrofit needs hardware fitted, so this one is an in-person job at the workshop.' },
+      { q: 'Can you do it remotely?', a: 'The coding half, yes — but a camera retrofit needs hardware fitted, so this one is always an in-person job.' },
     ],
     related: [
       { slug: 'bmw-retrofits-dublin', label: 'all BMW retrofits' },
@@ -128,7 +128,7 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
     process: [
       { title: 'VIN check', body: 'We read the option list from your VIN and tell you if coding alone will do it.' },
       { title: 'Parts if needed', body: 'Genuine buttons or stalk sourced and quoted before you commit.' },
-      { title: 'Fit and code', body: 'At the car, at the workshop off the N7, or coding-only jobs remotely.' },
+      { title: 'Fit and code', body: 'At your car, or coding-only jobs remotely.' },
       { title: 'Road test', body: 'You test cruise working before you pay.' },
     ],
     faqs: [

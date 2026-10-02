@@ -334,3 +334,8 @@ alter table wa_chats add column if not exists mc_id text;
 -- sides assuming the other was travelling.
 alter table bookings add column if not exists visit_type text;
 alter table bookings add column if not exists visit_address text;
+
+-- How each service is delivered: 'remote', 'mobile' or 'both'. Optional —
+-- without it the site infers it from the wording, never showing a hardware
+-- retrofit as remote.
+alter table services add column if not exists delivery text;
