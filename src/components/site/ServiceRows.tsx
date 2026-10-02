@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import type { Service } from '@/lib/types';
+import { deliveryFor, type Delivery } from '@/lib/delivery';
 
 // Collapsible service list: the top rows show immediately, the rest expand on
 // demand — keeps the homepage compact without hiding anything.
@@ -10,12 +11,12 @@ const VISIBLE = 3;
 
 export function ServiceRows({
   services,
-  remoteOkLabel,
+  deliveryLabels,
   showAllLabel,
   showLessLabel,
 }: {
   services: Service[];
-  remoteOkLabel: string;
+  deliveryLabels: Record<Delivery, string>;
   showAllLabel: string;
   showLessLabel: string;
 }) {
@@ -36,11 +37,9 @@ export function ServiceRows({
               <div className="col-span-12 sm:col-span-8">
                 <div className="flex items-center gap-3">
                   <h4 className="text-lg font-semibold text-ink">{s.title}</h4>
-                  {s.mobile_available && (
-                    <span className="inline-flex items-center gap-1 border border-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-faint">
-                      <Check size={10} className="text-bmw" /> {remoteOkLabel}
-                    </span>
-                  )}
+                  <span className="inline-flex items-center gap-1 border border-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-faint">
+                    <Check size={10} className="text-bmw" /> {deliveryLabels[deliveryFor(s)]}
+                  </span>
                 </div>
                 <p className="mt-1.5 max-w-md text-sm leading-relaxed text-muted">{s.description}</p>
               </div>

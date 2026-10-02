@@ -36,7 +36,7 @@ const CHASSIS: ChassisFacts[] = [
       'The F30 is the most-coded BMW in Ireland. Pre-LCI cars on NBT take hidden features, Video in Motion and comfort coding; LCI cars with NBT Evo add full Apple CarPlay — including wireless on most ID6 builds. Digital speed, sport displays and folding-mirror coding work across the whole run.',
     popular: [
       'Apple CarPlay activation on NBT Evo (2015+ LCI cars)',
-      'Video in Motion and full menus while driving',
+      'Video in Motion — passenger media on the move (passenger use only)',
       'Sport displays and digital speed in the cluster',
       'Auto-folding mirrors on lock and one-touch windows',
       'Welcome lights, ambient light behaviour and DRL tweaks',
@@ -289,7 +289,7 @@ const CHASSIS: ChassisFacts[] = [
     headUnits: 'CIC and Business on early cars, NBT from ~2013, NBT Evo (ID5/ID6) on LCI builds',
     popular: [
       'Apple CarPlay activation on NBT Evo builds',
-      'Video in Motion and full menus while driving',
+      'Video in Motion — passenger media on the move (passenger use only)',
       'Digital speed and sport displays in the cluster',
       'Auto-folding mirrors, one-touch windows, comfort access tweaks',
       'Welcome lights, ambient lighting and DRL behaviour',

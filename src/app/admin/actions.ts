@@ -52,15 +52,34 @@ export async function logout() {
 
 // ─────────────────────────── Services ───────────────────────────
 
+/** Delivery type from the form, or null to let the site infer it. */
+function deliveryOf(formData: FormData): string | null {
+  const d = String(formData.get('delivery') ?? '');
+  return d === 'remote' || d === 'mobile' || d === 'both' ? d : null;
+}
+
+/** Writes a service row; drops `delivery` and retries if that migration has not run. */
+async function writeService(
+  run: (row: Record<string, unknown>) => PromiseLike<{ error: { message: string } | null }>,
+  row: Record<string, unknown>,
+) {
+  const first = await run(row);
+  if (first.error && /delivery/.test(first.error.message)) {
+    const { delivery: _drop, ...rest } = row;
+    await run(rest);
+  }
+}
+
 export async function createService(formData: FormData) {
   const sb = getSupabaseAdmin();
   if (!sb) return;
-  await sb.from('services').insert({
+  await writeService((row) => sb.from('services').insert(row), {
     title: String(formData.get('title') ?? '').trim(),
     description: String(formData.get('description') ?? '').trim(),
     price_label: String(formData.get('price_label') ?? 'On request').trim(),
     category_id: numOrNull(formData.get('category_id')),
     mobile_available: formData.get('mobile_available') === 'on',
+    delivery: deliveryOf(formData),
     visible: true,
     sort_order: Number(formData.get('sort_order') ?? 0) || 0,
   });
@@ -72,18 +91,16 @@ export async function updateService(formData: FormData) {
   const sb = getSupabaseAdmin();
   if (!sb) return;
   const id = Number(formData.get('id'));
-  await sb
-    .from('services')
-    .update({
-      title: String(formData.get('title') ?? '').trim(),
-      description: String(formData.get('description') ?? '').trim(),
-      price_label: String(formData.get('price_label') ?? 'On request').trim(),
-      category_id: numOrNull(formData.get('category_id')),
-      mobile_available: formData.get('mobile_available') === 'on',
-      visible: formData.get('visible') === 'on',
-      sort_order: Number(formData.get('sort_order') ?? 0) || 0,
-    })
-    .eq('id', id);
+  await writeService((row) => sb.from('services').update(row).eq('id', id), {
+    title: String(formData.get('title') ?? '').trim(),
+    description: String(formData.get('description') ?? '').trim(),
+    price_label: String(formData.get('price_label') ?? 'On request').trim(),
+    category_id: numOrNull(formData.get('category_id')),
+    mobile_available: formData.get('mobile_available') === 'on',
+    delivery: deliveryOf(formData),
+    visible: formData.get('visible') === 'on',
+    sort_order: Number(formData.get('sort_order') ?? 0) || 0,
+  });
   revalidatePath('/admin/services');
   refreshSite();
 }

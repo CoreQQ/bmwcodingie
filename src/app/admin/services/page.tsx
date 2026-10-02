@@ -41,8 +41,13 @@ export default async function ServicesAdmin() {
             <input name="sort_order" type="number" defaultValue={0} className={aInput} />
           </Field>
           <label className="flex items-center gap-2 text-sm text-muted">
-            <input type="checkbox" name="mobile_available" defaultChecked className="accent-bmw" />
-            Remote available
+            Delivery
+            <select name="delivery" defaultValue={''} className={aInput}>
+              <option value="">Auto (from wording)</option>
+              <option value="remote">Remote only</option>
+              <option value="mobile">Mobile visit only</option>
+              <option value="both">Remote / Mobile</option>
+            </select>
           </label>
           <div className="flex items-end">
             <button type="submit" className={aBtn}>
@@ -125,8 +130,13 @@ function ServiceEditor({ service, categories }: { service: Service; categories: 
             Visible on site
           </label>
           <label className="flex items-center gap-2 text-sm text-muted">
-            <input type="checkbox" name="mobile_available" defaultChecked={service.mobile_available} className="accent-bmw" />
-            Remote available
+            Delivery
+            <select name="delivery" defaultValue={(service as { delivery?: string | null }).delivery ?? ''} className={aInput}>
+              <option value="">Auto (from wording)</option>
+              <option value="remote">Remote only</option>
+              <option value="mobile">Mobile visit only</option>
+              <option value="both">Remote / Mobile</option>
+            </select>
           </label>
         </div>
         <div className="flex justify-end gap-2 md:col-span-4">

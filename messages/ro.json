@@ -9,7 +9,7 @@
     "language": "Limbă"
   },
   "Hero": {
-    "eyebrow": "Specialist independent în coding BMW · Dublin",
+    "eyebrow": "Coding și retrofit BMW la domiciliu",
     "headline1": "BMW CODING",
     "headline2": "& RETROFIT",
     "headline3": "DUBLIN · LA FAȚA LOCULUI ȘI LA DISTANȚĂ",
@@ -32,7 +32,17 @@
     "priceDiag": "Diagnoză ISTA",
     "priceFrom": "de la",
     "specWhere": "Unde",
-    "specWhereValue": "Venim la tine — sau ne întâlnim unde îți convine"
+    "specWhereValue": "Venim la tine — sau ne întâlnim unde îți convine",
+    "title1": "Coding și retrofit BMW",
+    "title2": "în Irlanda",
+    "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnoză · Retrofit",
+    "lead": "Servicii profesionale de coding și retrofit BMW în Dublin și în toată Irlanda. Venim la tine sau lucrăm remote.",
+    "ctaCheck": "Verifică-ți BMW-ul",
+    "ctaWhatsapp": "Scrie pe WhatsApp",
+    "benefit1": "Specialist BMW",
+    "benefit2": "Venim la tine",
+    "benefit3": "Coding remote",
+    "benefit4": "Soluții la nivel OEM"
   },
   "Services": {
     "eyebrow": "01 / Servicii",
@@ -41,7 +51,10 @@
     "remoteOk": "Disponibil la distanță",
     "footnote": "Nu vezi exact ce ai nevoie? Funcțiile ascunse și codarea personalizată fac parte din meseria noastră — scrie-ne ce maşină ai și ce vrei, iar noi îți spunem direct dacă e posibil.",
     "showAll": "Arată toate {n}",
-    "showLess": "Restrânge"
+    "showLess": "Restrânge",
+    "deliveryRemote": "Remote",
+    "deliveryMobile": "Deplasare",
+    "deliveryBoth": "Remote / Deplasare"
   },
   "HowItWorks": {
     "eyebrow": "02 / Proces",
@@ -107,16 +120,16 @@
     "call": "Apel",
     "nameLabel": "Nume *",
     "namePlaceholder": "Numele tău",
-    "contactLabel": "Telefon / WhatsApp *",
+    "contactLabel": "Telefon / WhatsApp",
     "contactPlaceholder": "+353 …",
-    "modelLabel": "Model și an BMW",
+    "modelLabel": "Model / an BMW",
     "modelPlaceholder": "ex. G30 530e, 2019",
-    "serviceLabel": "Serviciu necesar",
+    "serviceLabel": "Serviciu dorit",
     "serviceSelectPlaceholder": "Selectează…",
     "serviceOther": "Altceva / nu sunt sigur",
-    "messageLabel": "Alte detalii",
+    "messageLabel": "Informații suplimentare (opțional)",
     "messagePlaceholder": "Spune-ne de ce ai nevoie…",
-    "sentMessage": "Recepționat — te contactăm în scurt timp. Pentru orice urgent, scrie-ne pe WhatsApp.",
+    "sentMessage": "Mulțumim. Verificăm BMW-ul tău și te contactăm în curând.",
     "referralAfter": "Cunoști pe cineva cu BMW? Trimite-l la noi — dacă lucrarea lui e de €80 sau mai mult, primești 10% din ea cash.",
     "sendButton": "Trimite cererea",
     "sendingButton": "Se trimite…",
@@ -149,7 +162,11 @@
     "visitMeetHint": "Alegem un loc în Dublin și vi-l trimitem la confirmare. Fără taxă de deplasare.",
     "visitAddressLabel": "Adresa sau zona ta",
     "visitAddressPlaceholder": "ex. Tallaght, D24 — curte",
-    "visitMissing": "Alegeți unde să facem lucrarea."
+    "visitMissing": "Alegeți unde să facem lucrarea.",
+    "nameOptionalLabel": "Nume (opțional)",
+    "vinOptionalLabel": "Ultimele 7 caractere din VIN (opțional)",
+    "carServiceMissing": "Spune-ne modelul / anul BMW și serviciul de care ai nevoie.",
+    "addressMissing": "Adaugă adresa sau zona, ca să știm unde venim."
   },
   "Footer": {
     "pitch": "Coding, diagnostic și retrofit BMW independent, în Dublin și în toată Irlanda — la fața locului sau la distanță prin ENET.",
@@ -283,5 +300,82 @@
     "count": "{count} recenzii pe Google",
     "seeAll": "Toate recenziile pe Google",
     "attribution": "Live de pe Google Maps"
+  },
+  "VinCheck": {
+    "eyebrow": "Verificare compatibilitate",
+    "heading": "Nu știi ce suportă BMW-ul tău?",
+    "body": "Trimite ultimele 7 caractere din VIN și spune-ne ce vrei să activezi sau să montezi. Verificăm compatibilitatea pentru BMW-ul tău.",
+    "vinLabel": "Ultimele 7 caractere din VIN",
+    "modelLabel": "Model / an (opțional)",
+    "serviceLabel": "Ce te interesează?",
+    "phoneLabel": "Telefon / WhatsApp (opțional)",
+    "cta": "Verifică BMW-ul meu",
+    "hint": "Lasă numărul și îți scriem noi. Sau lasă gol și continui pe WhatsApp.",
+    "vinError": "Introdu ultimele 7 caractere din VIN (litere și cifre).",
+    "sent": "Mulțumim. Verificăm BMW-ul tău și te contactăm în curând."
+  },
+  "Popular": {
+    "eyebrow": "Servicii BMW populare",
+    "heading": "Ce se comandă cel mai des",
+    "moreInfo": "Detalii",
+    "allPrices": "Toate prețurile pentru sistemul tău:",
+    "calculator": "calculator de prețuri",
+    "carplayTitle": "Activare Apple CarPlay",
+    "carplayDesc": "Ecran complet / wireless",
+    "carplayPrice": "De la €150",
+    "japanTitle": "Conversie Japan → EU",
+    "japanDesc": "Radio · Navigație · Limbă · Hărți",
+    "japanPrice": "De la €250",
+    "codingTitle": "Coding BMW",
+    "codingDesc": "Funcții din fabrică și personalizare",
+    "codingPrice": "De la €80",
+    "idriveTitle": "iDrive ID4 → ID6",
+    "idriveDesc": "Actualizare software și interfață modernă",
+    "clusterTitle": "Retrofit 6WA → 6WB",
+    "clusterDesc": "Montaj bord digital",
+    "diagnosticsTitle": "Diagnoză BMW",
+    "diagnosticsDesc": "Diagnoză ISTA și programare"
+  },
+  "Japan": {
+    "eyebrow": "BMW din Japonia?",
+    "heading": "Conversie completă BMW Japan → EU",
+    "i1": "Frecvențe radio europene",
+    "i2": "Limba engleză",
+    "i3": "Navigație EU",
+    "i4": "Cele mai noi hărți EU",
+    "i5": "Verificare compatibilitate Apple CarPlay",
+    "i6": "Verificare ConnectedDrive / telematică",
+    "i7": "Diagnoză completă a mașinii",
+    "price": "De la €250",
+    "ctaCheck": "Verifică-ți BMW-ul",
+    "ctaBook": "Programează Japan → EU"
+  },
+  "Steps": {
+    "eyebrow": "Cum funcționează",
+    "heading": "Patru pași, fără coadă la dealer",
+    "s1": "Trimite datele BMW sau VIN-ul",
+    "s2": "Verificăm compatibilitatea",
+    "s3": "Programezi la domiciliu sau remote",
+    "s4": "Coding / montaj finalizat"
+  },
+  "Why": {
+    "eyebrow": "De ce BMWCODINGIE",
+    "heading": "Doar BMW, făcut cum trebuie",
+    "p1Title": "Specialist BMW",
+    "p1Body": "Doar BMW, zilnic — coding, retrofit și diagnoză pentru seriile F și G.",
+    "p2Title": "Unelte de dealer",
+    "p2Body": "ISTA, E-Sys și software BMW original, nu un adaptor OBD ieftin.",
+    "p3Title": "Verificat înainte de programare",
+    "p3Body": "Confirmăm din VIN ce suportă mașina ta înainte să programezi sau să plătești.",
+    "p4Title": "Venim la tine",
+    "p4Body": "Deplasare în Dublin și comitatele din jur sau remote în toată Irlanda.",
+    "p5Title": "Plata la final",
+    "p5Body": "Vezi mai întâi rezultatul pe mașina ta. Fără avans."
+  },
+  "Guides": {
+    "eyebrow": "Ghiduri BMW",
+    "heading": "Cunoaște-ți BMW-ul înainte de programare",
+    "read": "Citește",
+    "all": "Toate ghidurile"
   }
 }

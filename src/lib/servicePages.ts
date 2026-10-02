@@ -50,7 +50,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     includedHeading: 'What BMW coding can enable',
     included: [
       'Apple CarPlay and, where supported, Android Auto activation',
-      'Video in Motion and full screen functions while moving',
+      'Video in Motion — passenger media on the move (passenger use only)',
       'Comfort Access tweaks, auto-folding mirrors and one-touch windows',
       'Welcome / Coming Home lighting and ambient lighting coding',
       'Sport displays, M View instrument layouts and digital gauges',

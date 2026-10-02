@@ -27,7 +27,7 @@ export const CODING_LIST: CodingCategory[] = [
     key: 'media',
     title: 'Media & video',
     items: [
-      'Video in Motion — watch video while driving',
+      'Video in Motion — passenger media on the move (passenger use only)',
       'Full menu & navigation input while moving',
       'USB / media playback tweaks',
       'DVD / TV tuner activation (where equipped)',

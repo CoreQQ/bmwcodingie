@@ -164,9 +164,9 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
               BMW Coding Ireland — Every County, Every Model
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
-              Independent BMW coding, diagnostics and retrofits the length of the country. In person
-              around Dublin and the surrounding counties from our workshop off the N7, and remotely
-              over ENET anywhere in Ireland. Find your county or your model below.
+              Independent BMW coding, diagnostics and retrofits the length of the country. A mobile
+              service around Dublin and the surrounding counties — we come to your car — and remote
+              coding over ENET anywhere in Ireland. Find your county or your model below.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link href="/#contact" className="btn-primary">Book BMW Coding</Link>
@@ -175,7 +175,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
               </a>
             </div>
             <p className="mt-6 flex items-center gap-2 text-sm text-faint">
-              <MapPin size={15} className="text-bmw" /> Greenogue Business Park, Rathcoole, Co. Dublin · off the N7
+              <MapPin size={15} className="text-bmw" /> Mobile across Dublin, Kildare, Wicklow &amp; Meath · remote anywhere in Ireland
             </p>
           </div>
         </section>

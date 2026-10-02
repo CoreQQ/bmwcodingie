@@ -44,7 +44,7 @@ export async function Services({ catalog }: { catalog: CategoryWithServices[] })
                 <Reveal>
                   <ServiceRows
                     services={cat.services}
-                    remoteOkLabel={t('remoteOk')}
+                    deliveryLabels={{ remote: t('deliveryRemote'), mobile: t('deliveryMobile'), both: t('deliveryBoth') }}
                     showAllLabel={t('showAll')}
                     showLessLabel={t('showLess')}
                   />

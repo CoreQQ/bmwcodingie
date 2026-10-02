@@ -1,4 +1,4 @@
-import { ADDRESS_LINE, googleDirectionsUrl } from './directions';
+// (no address import: there is no workshop to direct anyone to)
 
 // Canned replies the owner sends customers many times a day. Shown by the
 // /reply command as tap-to-copy blocks. Plain text — they go into WhatsApp.
@@ -10,8 +10,10 @@ export type CannedReply = { key: string; label: string; text: string };
 export const CANNED_REPLIES: CannedReply[] = [
   {
     key: 'directions',
-    label: '📍 How to find us',
-    text: `We're at ${ADDRESS_LINE}. Don't follow the sat-nav pin — it leads to a dead end! Use this route instead: ${googleDirectionsUrl()} — you'll see large ORANGE GATES, drive straight through them and keep RIGHT to the very end of the yard. Full guide with photos: ${SITE}/find-us — stuck? Just call and we'll guide you in.`,
+    label: '📍 Where we work',
+    // There is no workshop to send anyone to any more: this reply used to give
+    // the old Greenogue address and route, one tap away from going to a customer.
+    text: `We're a mobile service — I come to your car anywhere around Dublin (€20 call-out, €1.25/km beyond), or we meet at a spot that suits, with no call-out fee. Remote coding works anywhere in Ireland. How it works: ${SITE}/find-us`,
   },
   {
     key: 'remote',

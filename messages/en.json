@@ -9,7 +9,7 @@
     "language": "Language"
   },
   "Hero": {
-    "eyebrow": "Independent BMW coding specialist · Dublin",
+    "eyebrow": "Mobile BMW Coding & Retrofit Service",
     "headline1": "BMW CODING",
     "headline2": "DUBLIN & IRELAND",
     "headline3": "DIAGNOSTICS & RETROFITS",
@@ -32,7 +32,17 @@
     "priceDiag": "ISTA diagnostics",
     "priceFrom": "from",
     "specWhere": "Where",
-    "specWhereValue": "We come to you — or meet where suits"
+    "specWhereValue": "We come to you — or meet where suits",
+    "title1": "BMW Coding & Retrofits",
+    "title2": "in Ireland",
+    "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnostics · Retrofits",
+    "lead": "Professional BMW coding and retrofit services across Dublin & Ireland. Mobile service and remote coding available.",
+    "ctaCheck": "Check your BMW",
+    "ctaWhatsapp": "WhatsApp us",
+    "benefit1": "BMW Specialist",
+    "benefit2": "Mobile Service",
+    "benefit3": "Remote Coding Available",
+    "benefit4": "OEM-Level Solutions"
   },
   "Services": {
     "eyebrow": "01 / Services",
@@ -41,7 +51,10 @@
     "remoteOk": "Remote OK",
     "footnote": "Don’t see your exact request? Hidden features and bespoke coding are part of the job — message us the car and what you want, and we’ll tell you straight whether it’s possible.",
     "showAll": "Show all {n} options",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "deliveryRemote": "Remote",
+    "deliveryMobile": "Mobile visit",
+    "deliveryBoth": "Remote / Mobile"
   },
   "HowItWorks": {
     "eyebrow": "02 / Process",
@@ -107,16 +120,16 @@
     "call": "Call",
     "nameLabel": "Name *",
     "namePlaceholder": "Your name",
-    "contactLabel": "Phone / WhatsApp *",
+    "contactLabel": "Phone / WhatsApp",
     "contactPlaceholder": "+353 …",
-    "modelLabel": "BMW model & year",
+    "modelLabel": "BMW model / year",
     "modelPlaceholder": "e.g. G30 530e, 2019",
-    "serviceLabel": "Service needed",
+    "serviceLabel": "Service required",
     "serviceSelectPlaceholder": "Select…",
     "serviceOther": "Other / not sure",
-    "messageLabel": "Anything else",
+    "messageLabel": "Additional information (optional)",
     "messagePlaceholder": "Tell us what you’re after…",
-    "sentMessage": "Got it — we’ll be in touch shortly. For anything urgent, message us on WhatsApp.",
+    "sentMessage": "Thank you. We'll check your BMW and contact you shortly.",
     "referralAfter": "Know someone with a BMW? Send them our way — when their job is €80 or more, you get 10% of it in cash.",
     "sendButton": "Send request",
     "sendingButton": "Sending…",
@@ -149,7 +162,11 @@
     "visitMeetHint": "We pick a spot around Dublin and send it to you when we confirm. No call-out fee.",
     "visitAddressLabel": "Your address or area",
     "visitAddressPlaceholder": "e.g. Tallaght, D24 — driveway",
-    "visitMissing": "Please choose where we should do the work."
+    "visitMissing": "Please choose where we should do the work.",
+    "nameOptionalLabel": "Name (optional)",
+    "vinOptionalLabel": "Last 7 digits of VIN (optional)",
+    "carServiceMissing": "Please tell us your BMW model / year and the service you need.",
+    "addressMissing": "Please add your address or area so we know where to come."
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",
@@ -235,7 +252,7 @@
   },
   "Reviews": {
     "eyebrow": "Reviews",
-    "heading": "WHAT DRIVERS SAY",
+    "heading": "What our customers say",
     "count": "{n} verified reviews"
   },
   "StatsBand": {
@@ -281,7 +298,84 @@
   },
   "GoogleReviews": {
     "count": "{count} reviews on Google",
-    "seeAll": "See all reviews on Google",
+    "seeAll": "See all Google reviews",
     "attribution": "Live from Google Maps"
+  },
+  "VinCheck": {
+    "eyebrow": "Compatibility check",
+    "heading": "Not sure what your BMW supports?",
+    "body": "Send us the last 7 digits of your VIN and tell us what you would like to activate or retrofit. We'll check compatibility for your BMW.",
+    "vinLabel": "Last 7 digits of VIN",
+    "modelLabel": "Model / year (optional)",
+    "serviceLabel": "What would you like?",
+    "phoneLabel": "Phone / WhatsApp (optional)",
+    "cta": "Check my BMW",
+    "hint": "Leave your number and we'll text you back — or leave it empty and the check continues in WhatsApp.",
+    "vinError": "Please enter the last 7 characters of your VIN (letters and numbers).",
+    "sent": "Thank you. We'll check your BMW and contact you shortly."
+  },
+  "Popular": {
+    "eyebrow": "Popular BMW services",
+    "heading": "What most owners book",
+    "moreInfo": "More info",
+    "allPrices": "Every price, for your exact system:",
+    "calculator": "price calculator",
+    "carplayTitle": "Apple CarPlay Activation",
+    "carplayDesc": "Fullscreen / Wireless",
+    "carplayPrice": "From €150",
+    "japanTitle": "Japan → EU Conversion",
+    "japanDesc": "Radio · Navigation · Language · Maps",
+    "japanPrice": "From €250",
+    "codingTitle": "BMW Coding",
+    "codingDesc": "OEM features & customisation",
+    "codingPrice": "From €80",
+    "idriveTitle": "iDrive ID4 → ID6",
+    "idriveDesc": "Software upgrade & modern interface",
+    "clusterTitle": "6WA → 6WB Retrofit",
+    "clusterDesc": "Digital instrument cluster retrofit",
+    "diagnosticsTitle": "BMW Diagnostics",
+    "diagnosticsDesc": "ISTA diagnostics & programming"
+  },
+  "Japan": {
+    "eyebrow": "Japanese import BMW?",
+    "heading": "Complete BMW Japan → EU Conversion",
+    "i1": "European radio frequencies",
+    "i2": "English language",
+    "i3": "EU navigation",
+    "i4": "Latest EU maps",
+    "i5": "Apple CarPlay compatibility check",
+    "i6": "ConnectedDrive / telematics check",
+    "i7": "Full vehicle diagnostics",
+    "price": "From €250",
+    "ctaCheck": "Check your BMW",
+    "ctaBook": "Book Japan → EU"
+  },
+  "Steps": {
+    "eyebrow": "How it works",
+    "heading": "Four steps, no dealer queue",
+    "s1": "Send your BMW details or VIN",
+    "s2": "We check compatibility",
+    "s3": "Book a mobile or remote service",
+    "s4": "Coding / installation completed"
+  },
+  "Why": {
+    "eyebrow": "Why BMWCODINGIE",
+    "heading": "BMW only, done properly",
+    "p1Title": "BMW specialist",
+    "p1Body": "Only BMW, every day — F and G series coding, retrofits and diagnostics.",
+    "p2Title": "Dealer-level tools",
+    "p2Body": "ISTA, E-Sys and genuine BMW software, not a generic OBD dongle.",
+    "p3Title": "Checked before booking",
+    "p3Body": "We confirm from your VIN what your car supports before anything is booked or paid.",
+    "p4Title": "We come to you",
+    "p4Body": "Mobile service across Dublin and nearby counties, or remote coding anywhere in Ireland.",
+    "p5Title": "Pay on completion",
+    "p5Body": "You see it working on your car first. No deposits."
+  },
+  "Guides": {
+    "eyebrow": "BMW guides",
+    "heading": "Know your BMW before you book",
+    "read": "Read",
+    "all": "All guides"
   }
 }

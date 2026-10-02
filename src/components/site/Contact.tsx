@@ -32,6 +32,7 @@ export function Contact({
     message: '',
     visit_type: '',
     visit_address: '',
+    vin: '',
     slot_date: '',
     slot_time: '',
   });
@@ -60,9 +61,21 @@ export function Contact({
 
   async function submit(e: React.FormEvent, consult = false) {
     e.preventDefault();
-    if (!form.name.trim() || !form.contact.trim()) {
+    // Only what is needed to book: the car, the job, where, when, and a number.
+    // Everything else is cheaper to ask once we are talking.
+    if (!form.contact.trim()) {
       setStatus('error');
       setErrorMsg(t('validationError'));
+      return;
+    }
+    if (!consult && (!form.bmw_model.trim() || !form.service)) {
+      setStatus('error');
+      setErrorMsg(t('carServiceMissing'));
+      return;
+    }
+    if (!consult && form.visit_type === 'mobile' && !form.visit_address.trim()) {
+      setStatus('error');
+      setErrorMsg(t('addressMissing'));
       return;
     }
     // Bookings need a slot AND a place. Leaving the place out is what made a
@@ -84,6 +97,10 @@ export function Contact({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          name: form.name.trim() || 'Website customer',
+          message: [form.vin.trim() ? `VIN (last 7): ${form.vin.trim().toUpperCase()}` : '', form.message.trim()]
+            .filter(Boolean)
+            .join('\n'),
           ...(consult ? { slot_date: '', slot_time: '', consultation: true } : {}),
           source: getAttribution(),
           landing: getLanding(),
@@ -97,7 +114,7 @@ export function Contact({
       setStatus('sent');
       trackMetaEvent('Lead', { content_name: form.service || 'General enquiry' });
       trackGoogleConversion();
-      setForm({ name: '', contact: '', bmw_model: '', service: '', how_heard: '', contact_pref: '', message: '', visit_type: '', visit_address: '', slot_date: '', slot_time: '' });
+      setForm({ name: '', contact: '', bmw_model: '', service: '', how_heard: '', contact_pref: '', message: '', visit_type: '', visit_address: '', vin: '', slot_date: '', slot_time: '' });
     } catch {
       setStatus('error');
       setErrorMsg(t('submitError'));
@@ -172,13 +189,11 @@ export function Contact({
               <div className="m-stripe h-1 w-full" />
               <form onSubmit={submit} className="space-y-5 p-6 md:p-8">
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label={t('nameLabel')}>
+                  <Field label={t('nameOptionalLabel')}>
                     <input
                       value={form.name}
                       onChange={update('name')}
                       placeholder={t('namePlaceholder')}
-                      required
-                      aria-required="true"
                       className={inputCls}
                     />
                   </Field>
@@ -235,27 +250,16 @@ export function Contact({
                   />
                 </Field>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label={t('heardLabel')}>
-                    <select value={form.how_heard} onChange={update('how_heard')} className={inputCls}>
-                      <option value="">{t('heardPlaceholder')}</option>
-                      <option value="Google" className="bg-graphite-800">{t('heardGoogle')}</option>
-                      <option value="Instagram" className="bg-graphite-800">{t('heardInstagram')}</option>
-                      <option value="Friend / word of mouth" className="bg-graphite-800">{t('heardFriend')}</option>
-                      <option value="BMW group / forum" className="bg-graphite-800">{t('heardGroup')}</option>
-                      <option value="Returning customer" className="bg-graphite-800">{t('heardReturning')}</option>
-                      <option value="Other" className="bg-graphite-800">{t('heardOther')}</option>
-                    </select>
-                  </Field>
-                  <Field label={t('contactPrefLabel')}>
-                    <input
-                      value={form.contact_pref}
-                      onChange={update('contact_pref')}
-                      placeholder={t('contactPrefPlaceholder')}
-                      className={inputCls}
-                    />
-                  </Field>
-                </div>
+                <Field label={t('vinOptionalLabel')}>
+                  <input
+                    value={form.vin}
+                    onChange={update('vin')}
+                    maxLength={9}
+                    autoCapitalize="characters"
+                    placeholder="e.g. FK41749"
+                    className={`${inputCls} font-mono uppercase tracking-widest`}
+                  />
+                </Field>
 
                 {/* Where, before when — the answer changes who travels. */}
                 <div className="border border-white/10 bg-graphite-900/60 p-4">

@@ -224,7 +224,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'video-in-motion-bmw-explained',
     title: 'Video in Motion on a BMW: What It Is and How It Works',
-    metaTitle: 'BMW Video in Motion Explained | Unlock Video While Driving | BMW Coding',
+    metaTitle: 'BMW Video in Motion Explained | Passenger Media on the Move | BMW Coding',
     description:
       'What Video in Motion coding actually unlocks on a BMW, which screens and head units it works on, the passenger-safety angle, and what it costs in Ireland.',
     date: '2026-07-05',
@@ -242,7 +242,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: 'The honest safety point',
         paragraphs: [
-          'VIM exists for passengers. The driver watching video on the move is illegal and dangerous in Ireland as anywhere else — nothing about coding changes that. Where VIM shines is the passenger seat and the back row: kids on a long drive to Cork, a partner following the match, navigation input on the move. Treat it like the passenger feature it is.',
+          'For passenger use only. The driver must always comply with local road safety laws. VIM exists for passengers. The driver watching video on the move is illegal and dangerous in Ireland as anywhere else — nothing about coding changes that. Where VIM shines is the passenger seat and the back row: kids on a long drive to Cork, a partner following the match, navigation input on the move. Treat it like the passenger feature it is.',
         ],
       },
       {

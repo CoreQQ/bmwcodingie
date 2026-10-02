@@ -9,7 +9,7 @@
     "language": "Kalba"
   },
   "Hero": {
-    "eyebrow": "Nepriklausomas BMW kodavimo specialistas · Dublinas",
+    "eyebrow": "Mobilus BMW kodavimas ir modernizavimas",
     "headline1": "BMW KODAVIMAS",
     "headline2": "IR RETROFITAI",
     "headline3": "DUBLINAS · GYVAI IR NUOTOLINIU BŪDU",
@@ -32,7 +32,17 @@
     "priceDiag": "ISTA diagnostika",
     "priceFrom": "nuo",
     "specWhere": "Kur",
-    "specWhereValue": "Atvykstame pas jus — arba susitinkame, kur patogu"
+    "specWhereValue": "Atvykstame pas jus — arba susitinkame, kur patogu",
+    "title1": "BMW kodavimas ir modernizavimas",
+    "title2": "Airijoje",
+    "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnostika · Modernizavimas",
+    "lead": "Profesionalus BMW kodavimas ir modernizavimas Dubline ir visoje Airijoje. Atvykstame pas jus arba koduojame nuotoliniu būdu.",
+    "ctaCheck": "Patikrinti savo BMW",
+    "ctaWhatsapp": "Rašyti per WhatsApp",
+    "benefit1": "BMW specialistas",
+    "benefit2": "Atvykstame pas jus",
+    "benefit3": "Nuotolinis kodavimas",
+    "benefit4": "OEM lygio sprendimai"
   },
   "Services": {
     "eyebrow": "01 / Paslaugos",
@@ -41,7 +51,10 @@
     "remoteOk": "Galima nuotoliniu būdu",
     "footnote": "Nematote tiksliai to, ko reikia? Paslėptų funkcijų aktyvavimas ir individualus kodavimas — tai dalis mūsų darbo. Parašykite, koks automobilis ir ko norite, ir mes tiesiai pasakysime, ar tai įmanoma.",
     "showAll": "Rodyti visas {n}",
-    "showLess": "Sutraukti"
+    "showLess": "Sutraukti",
+    "deliveryRemote": "Nuotoliu",
+    "deliveryMobile": "Atvykimas",
+    "deliveryBoth": "Nuotoliu / Atvykimas"
   },
   "HowItWorks": {
     "eyebrow": "02 / Procesas",
@@ -107,16 +120,16 @@
     "call": "Skambinti",
     "nameLabel": "Vardas *",
     "namePlaceholder": "Jūsų vardas",
-    "contactLabel": "Telefonas / WhatsApp *",
+    "contactLabel": "Telefonas / WhatsApp",
     "contactPlaceholder": "+353 …",
-    "modelLabel": "BMW modelis ir metai",
+    "modelLabel": "BMW modelis / metai",
     "modelPlaceholder": "pvz. G30 530e, 2019",
-    "serviceLabel": "Reikalinga paslauga",
+    "serviceLabel": "Reikiama paslauga",
     "serviceSelectPlaceholder": "Pasirinkite…",
     "serviceOther": "Kita / nesu tikras",
-    "messageLabel": "Kita informacija",
+    "messageLabel": "Papildoma informacija (nebūtina)",
     "messagePlaceholder": "Papasakokite, ko ieškote…",
-    "sentMessage": "Gavome — susisieksime su jumis artimiausiu metu. Jei skubu, rašykite mums per WhatsApp.",
+    "sentMessage": "Ačiū. Patikrinsime jūsų BMW ir netrukus susisieksime.",
     "referralAfter": "Pažįstate ką nors su BMW? Nukreipkite pas mus — jei jo darbas kainuos €80 ar daugiau, gausite 10% grynaisiais.",
     "sendButton": "Siųsti užklausą",
     "sendingButton": "Siunčiama…",
@@ -149,7 +162,11 @@
     "visitMeetHint": "Parinksime vietą Dubline ir atsiųsime ją patvirtindami. Be atvykimo mokesčio.",
     "visitAddressLabel": "Jūsų adresas ar rajonas",
     "visitAddressPlaceholder": "pvz., Tallaght, D24 — kiemas",
-    "visitMissing": "Pasirinkite, kur atlikti darbą."
+    "visitMissing": "Pasirinkite, kur atlikti darbą.",
+    "nameOptionalLabel": "Vardas (nebūtina)",
+    "vinOptionalLabel": "Paskutiniai 7 VIN simboliai (nebūtina)",
+    "carServiceMissing": "Nurodykite BMW modelį / metus ir reikiamą paslaugą.",
+    "addressMissing": "Nurodykite adresą ar rajoną, kad žinotume, kur atvykti."
   },
   "Footer": {
     "pitch": "Nepriklausomas BMW kodavimas, diagnostika ir retrofitai visame Dubline ir Airijoje — gyvai arba nuotoliniu būdu per ENET.",
@@ -283,5 +300,82 @@
     "count": "{count} atsiliepimai Google",
     "seeAll": "Visi atsiliepimai Google",
     "attribution": "Tiesiogiai iš Google Maps"
+  },
+  "VinCheck": {
+    "eyebrow": "Suderinamumo patikra",
+    "heading": "Nežinote, ką palaiko jūsų BMW?",
+    "body": "Atsiųskite paskutinius 7 VIN simbolius ir ką norite aktyvuoti ar sumontuoti. Patikrinsime suderinamumą jūsų BMW.",
+    "vinLabel": "Paskutiniai 7 VIN simboliai",
+    "modelLabel": "Modelis / metai (nebūtina)",
+    "serviceLabel": "Kas jus domina?",
+    "phoneLabel": "Telefonas / WhatsApp (nebūtina)",
+    "cta": "Patikrinti mano BMW",
+    "hint": "Palikite numerį ir mes parašysime. Arba palikite tuščią ir tęskite per WhatsApp.",
+    "vinError": "Įveskite paskutinius 7 VIN simbolius (raides ir skaičius).",
+    "sent": "Ačiū. Patikrinsime jūsų BMW ir netrukus susisieksime."
+  },
+  "Popular": {
+    "eyebrow": "Populiarios BMW paslaugos",
+    "heading": "Ką užsakoma dažniausiai",
+    "moreInfo": "Daugiau",
+    "allPrices": "Visos kainos jūsų sistemai:",
+    "calculator": "kainų skaičiuoklė",
+    "carplayTitle": "Apple CarPlay aktyvavimas",
+    "carplayDesc": "Visas ekranas / belaidis",
+    "carplayPrice": "Nuo €150",
+    "japanTitle": "Japan → EU konversija",
+    "japanDesc": "Radijas · Navigacija · Kalba · Žemėlapiai",
+    "japanPrice": "Nuo €250",
+    "codingTitle": "BMW kodavimas",
+    "codingDesc": "Gamykliniai funkcijos ir nustatymai",
+    "codingPrice": "Nuo €80",
+    "idriveTitle": "iDrive ID4 → ID6",
+    "idriveDesc": "Programinės įrangos atnaujinimas ir naujas vaizdas",
+    "clusterTitle": "6WA → 6WB modernizavimas",
+    "clusterDesc": "Skaitmeninio prietaisų skydelio montavimas",
+    "diagnosticsTitle": "BMW diagnostika",
+    "diagnosticsDesc": "ISTA diagnostika ir programavimas"
+  },
+  "Japan": {
+    "eyebrow": "BMW iš Japonijos?",
+    "heading": "Pilna BMW Japan → EU konversija",
+    "i1": "Europos radijo dažniai",
+    "i2": "Anglų kalba",
+    "i3": "ES navigacija",
+    "i4": "Naujausi ES žemėlapiai",
+    "i5": "Apple CarPlay suderinamumo patikra",
+    "i6": "ConnectedDrive / telematikos patikra",
+    "i7": "Pilna automobilio diagnostika",
+    "price": "Nuo €250",
+    "ctaCheck": "Patikrinti savo BMW",
+    "ctaBook": "Užsisakyti Japan → EU"
+  },
+  "Steps": {
+    "eyebrow": "Kaip tai veikia",
+    "heading": "Keturi žingsniai, be eilės pas dilerį",
+    "s1": "Atsiųskite BMW duomenis arba VIN",
+    "s2": "Patikriname suderinamumą",
+    "s3": "Užsisakote atvykimą arba nuotolinę paslaugą",
+    "s4": "Kodavimas / montavimas atlikti"
+  },
+  "Why": {
+    "eyebrow": "Kodėl BMWCODINGIE",
+    "heading": "Tik BMW ir kokybiškai",
+    "p1Title": "BMW specialistas",
+    "p1Body": "Tik BMW, kiekvieną dieną — F ir G serijų kodavimas, modernizavimas ir diagnostika.",
+    "p2Title": "Dilerio lygio įrankiai",
+    "p2Body": "ISTA, E-Sys ir originali BMW programinė įranga, o ne pigus OBD adapteris.",
+    "p3Title": "Patikrinta prieš registraciją",
+    "p3Body": "Pagal VIN patvirtiname, ką palaiko jūsų automobilis, prieš registraciją ir mokėjimą.",
+    "p4Title": "Atvykstame pas jus",
+    "p4Body": "Atvykstame Dubline ir aplinkinėse grafystėse arba nuotoliniu būdu visoje Airijoje.",
+    "p5Title": "Mokėjimas po darbo",
+    "p5Body": "Pirmiausia pamatote rezultatą savo automobilyje. Be avanso."
+  },
+  "Guides": {
+    "eyebrow": "BMW gidai",
+    "heading": "Pažinkite savo BMW prieš registraciją",
+    "read": "Skaityti",
+    "all": "Visi gidai"
   }
 }
