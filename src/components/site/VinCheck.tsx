@@ -8,15 +8,42 @@ import { waHref } from '@/lib/waMessage';
 import { trackGoogleConversion } from './GoogleAdsTag';
 import { trackMetaEvent } from './MetaPixel';
 
-const SERVICES = [
-  'Apple CarPlay',
-  'Japan → EU conversion',
-  'BMW coding / hidden features',
-  'iDrive ID4 → ID6',
-  '6WA → 6WB cluster retrofit',
-  'Diagnostics',
-  'Other',
+// Grouped so a long list still reads quickly in the phone's picker.
+const SERVICE_GROUPS: { label: string; items: string[] }[] = [
+  {
+    label: 'Phone & screen',
+    items: ['Apple CarPlay', 'Fullscreen CarPlay', 'Android Auto', 'Video in Motion (passenger use)'],
+  },
+  {
+    label: 'Import & navigation',
+    items: ['Japan → EU conversion', 'Navigation map update / FSC code', 'Language / radio region change'],
+  },
+  {
+    label: 'Coding',
+    items: [
+      'Hidden features / custom coding',
+      'Folding mirrors / Comfort Access',
+      'Lighting (welcome, DRL, indicators)',
+      'Sport displays / digital speed',
+      'Start/Stop, seatbelt & reminders',
+    ],
+  },
+  {
+    label: 'Upgrades & retrofits',
+    items: [
+      'iDrive ID4 → ID6',
+      '6WA → 6WB digital cluster',
+      'Reverse camera retrofit',
+      'Ambient lighting retrofit',
+      'Cruise control',
+    ],
+  },
+  {
+    label: 'Diagnostics & other',
+    items: ['Diagnostics / warning light', 'Stage 1 / Stage 2 remap', 'Not sure — advise me', 'Other'],
+  },
 ];
+const SERVICES = SERVICE_GROUPS.flatMap((g) => g.items);
 
 /**
  * Compatibility check: last 7 of the VIN plus what they want. With a number
@@ -101,8 +128,12 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
                   <label className="block">
                     <span className="label mb-2 block">{t('serviceLabel')}</span>
                     <select value={service} onChange={(e) => setService(e.target.value)} className={input}>
-                      {SERVICES.map((s) => (
-                        <option key={s} value={s} className="bg-graphite-800">{s}</option>
+                      {SERVICE_GROUPS.map((g) => (
+                        <optgroup key={g.label} label={g.label} className="bg-graphite-800">
+                          {g.items.map((s) => (
+                            <option key={s} value={s} className="bg-graphite-800">{s}</option>
+                          ))}
+                        </optgroup>
                       ))}
                     </select>
                   </label>
