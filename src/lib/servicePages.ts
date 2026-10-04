@@ -29,6 +29,8 @@ export type ServicePage = {
   price?: { amount?: number; text: string };
   /** Model pages: upgrade paths for this chassis, each linking to its service page. */
   upgrades?: { title: string; body: string; slug: string }[];
+  /** Case-insensitive words; gallery photos whose caption contains one are shown as real work. */
+  galleryMatch?: string[];
 };
 
 // Reusable honest closing note shown on every page.
@@ -90,6 +92,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'apple-carplay-activation-dublin': {
     slug: 'apple-carplay-activation-dublin',
+    galleryMatch: ['carplay'],
     metaTitle: 'BMW Apple CarPlay Activation Dublin | Wireless CarPlay Coding',
     metaDescription:
       'Activate BMW Apple CarPlay in Dublin. Wireless CarPlay, NBT Evo, MGU and supported iDrive systems. Remote and in-person activation available.',
@@ -142,6 +145,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-android-auto-activation': {
     slug: 'bmw-android-auto-activation',
+    galleryMatch: ['android'],
     metaTitle: 'BMW Android Auto Activation Ireland | iDrive 7 & MGU Coding',
     metaDescription:
       'BMW Android Auto activation for supported iDrive systems. Available in Dublin and remotely across Ireland where compatible.',
@@ -192,6 +196,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-diagnostics-dublin': {
     slug: 'bmw-diagnostics-dublin',
+    galleryMatch: ['diagnos','ista'],
     metaTitle: 'BMW Diagnostics Dublin | ISTA Fault Scan & Coding Checks',
     metaDescription:
       'BMW diagnostics in Dublin using ISTA. Fault scan, control unit check, coding issues, warning lights and written summary of findings.',
@@ -243,6 +248,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-retrofits-dublin': {
     slug: 'bmw-retrofits-dublin',
+    galleryMatch: ['6wb','cluster','screen upgrade','retrofit'],
     metaTitle: 'BMW Retrofits Dublin | Ambient Lighting, Cruise Control & Comfort Features',
     metaDescription:
       'BMW retrofit services in Dublin including ambient lighting, cruise control, folding mirrors, Comfort Access and coding support for F and G Series models.',
@@ -295,6 +301,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'japan-import-bmw-conversion-ireland': {
     slug: 'japan-import-bmw-conversion-ireland',
+    galleryMatch: ['japan'],
     metaTitle: 'Japan Import BMW Conversion Ireland | BMW Region Change & Map Updates',
     metaDescription:
       'BMW Japan to EU conversion in Ireland. Region change, navigation FSC, map updates, ETC mirror and TCB checks for Japanese import BMW models.',
@@ -346,6 +353,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-map-updates-fsc-codes': {
     slug: 'bmw-map-updates-fsc-codes',
+    galleryMatch: ['map'],
     metaTitle: 'BMW Map Updates & FSC Codes Ireland | Navigation Activation',
     metaDescription:
       'BMW navigation map updates and FSC codes in Ireland. Activation and map support for compatible NBT, NBT Evo and MGU systems.',

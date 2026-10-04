@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { ArrowRight, Check, MapPin, MessageCircle } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
-import { getSettings, waLink } from '@/lib/data';
+import { getGallery, getSettings, waLink } from '@/lib/data';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { HONEST_COMPATIBILITY_NOTE } from '@/lib/servicePages';
@@ -27,6 +27,15 @@ export async function ServiceLanding({
   if (!p) return null;
   const AREA = p.area ?? DEFAULT_AREA;
   const settings = await getSettings();
+  // Real jobs from the owner's gallery whose caption mentions this service
+  // or chassis — the brief asks for genuine photos on every landing.
+  const words = (p.galleryMatch ?? []).map((w) => w.toLowerCase());
+  const work = words.length
+    ? (await getGallery()).filter((g) => {
+        const c = g.caption.toLowerCase();
+        return words.some((w) => (/^[a-z]\d{2}$/.test(w) ? new RegExp(`\\b${w}\\b`).test(c) : c.includes(w)));
+      }).slice(0, 4)
+    : [];
 
   const wa = waLink(settings.whatsapp, p.waMessage);
   const url = `${SITE_URL}/${p.slug}`;
@@ -197,6 +206,28 @@ export async function ServiceLanding({
                   </Link>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* Real work */}
+        {work.length > 0 && (
+          <section className="border-b border-white/5 py-16 md:py-20">
+            <div className="mx-auto max-w-edge px-5 md:px-8">
+              <h2 className="font-display text-[clamp(1.8rem,4vw,3rem)] leading-tight">Real work, real cars</h2>
+              <p className="mt-3 max-w-2xl text-sm text-muted">Photos from jobs we have completed — not stock images.</p>
+              <ul className={`mt-8 grid gap-4 ${work.length === 1 ? 'max-w-md' : 'sm:grid-cols-2'} ${work.length > 2 ? 'lg:grid-cols-4' : ''}`}>
+                {work.map((g) => (
+                  <li key={g.id} className="overflow-hidden border border-white/8 bg-graphite-800/40">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={g.image_url} alt={g.caption} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
+                    <p className="p-3 text-sm text-muted">{g.caption}</p>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/#work" className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--page-accent)] hover:underline">
+                See all our work <ArrowRight size={14} />
+              </Link>
             </div>
           </section>
         )}
