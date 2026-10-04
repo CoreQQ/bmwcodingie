@@ -28,6 +28,8 @@ export type ServicePage = {
   area?: string[];
   /** Shown in the hero; `amount` (EUR, lowest real price) also feeds the schema offer. */
   price?: { amount?: number; text: string };
+  /** Model pages: upgrade paths for this chassis, each linking to its service page. */
+  upgrades?: { title: string; body: string; slug: string }[];
 };
 
 // Reusable honest closing note shown on every page.

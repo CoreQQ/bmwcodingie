@@ -42,7 +42,7 @@ const BODY = `# BMW Coding (bmwcoding.ie)
 ## Reference
 - [Full coding list](${SITE_URL}/bmw-coding-list): every codeable feature by category
 - [Model checker](${SITE_URL}/models): what's possible per chassis and year
-- [Guides](${SITE_URL}/blog): CarPlay NBT Evo vs MGU, F30 hidden features, remote coding prep
+- [Guides](${SITE_URL}/blog): CarPlay NBT Evo vs MGU, 6WA vs 6WB, ID4 to ID6, G20 coding, fullscreen CarPlay, remote coding prep
 
 ## Booking
 - Book online with a preferred time slot: ${SITE_URL}/#contact

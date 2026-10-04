@@ -411,6 +411,217 @@ export const BLOG_POSTS: BlogPost[] = [
       { slug: 'japan-import-bmw-conversion-ireland', label: 'Japan import checks' },
     ],
   },
+  {
+    slug: 'bmw-6wa-vs-6wb-digital-cluster',
+    title: 'BMW 6WA vs 6WB: What the Digital Cluster Retrofit Actually Changes',
+    metaTitle: 'BMW 6WA vs 6WB Explained | Digital Cluster Retrofit Guide',
+    description:
+      'What the BMW option codes 6WA and 6WB mean, which F-series cars can take the full digital cluster, how mileage is handled, and what a retrofit involves.',
+    date: '2026-10-04',
+    readMinutes: 5,
+    intro: [
+      'Owners ask us about “the digital dash” more than almost any other retrofit. The two option codes behind it are 6WA and 6WB, and the difference is bigger than it looks in photos. This guide explains what each one is, which cars can be converted, and the questions we ask before quoting.',
+    ],
+    sections: [
+      {
+        heading: 'What 6WA and 6WB mean',
+        paragraphs: [
+          '6WA is the “Extended Instrument Cluster” most F-series cars left the factory with: real needles for speed and revs, with a small display between them for trip data, navigation arrows and media. 6WB is the “Multifunctional Instrument Display” — a full TFT screen behind the same hood, drawn entirely in software.',
+          'On 6WB the layout changes with the drive mode: a blue-accented Comfort theme, a red Sport theme with a larger rev counter, and an Eco Pro theme that shows efficiency instead of revs. Navigation and media information get far more room than the little 6WA window allows.',
+        ],
+      },
+      {
+        heading: 'Which cars can take 6WB',
+        paragraphs: [
+          'The retrofit is most common on the F-series 1, 2, 3 and 4 Series — F20/F21, F22, F30/F31/F34, F32/F33/F36 — and the M3/M4 built on them. Whether a specific car qualifies depends on its build date and what else is fitted, so the first thing we do is read the VIN rather than promise anything from the model name.',
+          'Some other F-series models can be done with extra parts or wiring, and some are simply not worth it. If your car is one of those, we tell you up front.',
+        ],
+      },
+      {
+        heading: 'Mileage — the question everyone should ask',
+        paragraphs: [
+          'A replacement cluster carries a mileage value, and your car’s mileage is also stored elsewhere in the vehicle. The two must agree, and the cluster must not show more than the car has done. Anyone who tells you the odometer can be “set to whatever you like” is describing something illegal and we do not do it.',
+          'In practice this means sourcing a cluster with less mileage than your car, or a new one, and letting the car’s own value take over. We help you choose a suitable unit before anything is ordered.',
+        ],
+      },
+      {
+        heading: 'What the retrofit involves',
+        paragraphs: [
+          'It is physical work plus coding: the 6WB cluster is fitted, the vehicle order is updated so the car knows it has a digital display, the cluster is coded, and the rest of the system is checked for faults. It is done as a mobile visit — there is no remote version of this job.',
+        ],
+        bullets: [
+          'Fitting the 6WB cluster in place of the 6WA unit',
+          'Vehicle order and cluster coding',
+          'Comfort / Sport / Eco Pro layouts working',
+          'Fault memory checked and cleared afterwards',
+        ],
+      },
+      {
+        heading: 'How much it costs',
+        paragraphs: [
+          'The cluster itself is the biggest variable, and prices for used and new units move around. That is why we quote per car after a VIN check rather than printing one number: you get a fixed price for the work before anything is bought.',
+        ],
+      },
+    ],
+    related: [
+      { slug: 'bmw-6wa-to-6wb-retrofit', label: '6WA → 6WB retrofit service' },
+      { slug: 'bmw-f30-coding', label: 'F30 coding & upgrades' },
+      { slug: 'bmw-retrofits-dublin', label: 'All BMW retrofits' },
+    ],
+  },
+  {
+    slug: 'bmw-id4-to-id6-upgrade-explained',
+    title: 'BMW ID4 to ID6 Upgrade Explained',
+    metaTitle: 'BMW ID4 to ID6 Upgrade Explained | NBT Evo Software Guide',
+    description:
+      'ID4, ID5 and ID6 are software versions of the same NBT Evo head unit. How to tell which one you have, what the ID6 update changes, why it matters for CarPlay, and which cars cannot be updated.',
+    date: '2026-10-04',
+    readMinutes: 4,
+    intro: [
+      'If your BMW has the older list-style iDrive menu but a 2016-or-later build date, there is a good chance it is an NBT Evo car running ID4 or ID5 software. The same hardware can run ID6 — the tile-based interface most people picture when they think of a modern iDrive — and the update is often what stands between you and CarPlay.',
+    ],
+    sections: [
+      {
+        heading: 'ID4, ID5, ID6: versions, not head units',
+        paragraphs: [
+          'BMW’s NBT Evo head unit shipped with several software generations. ID4 looks like the older NBT system: a vertical list menu and a plain layout. ID5 added a cleaner design, and ID6 brought the home screen of live tiles that you can rearrange. All three run on NBT Evo hardware — which is exactly why the update is possible.',
+          'The confusion comes from the original NBT (non-Evo) unit, fitted to many 2013–2016 cars. It also runs ID4-style menus but it is different hardware, and it cannot be updated to ID6. The VIN settles which one you have.',
+        ],
+      },
+      {
+        heading: 'What the update changes',
+        paragraphs: [
+          'Visually, you get the ID6 tile home screen and the newer menus. Functionally, the update brings the software level that CarPlay activation needs on most NBT Evo cars: ID4 cars generally cannot have CarPlay enabled until they are on ID6, and some ID5 cars need it too.',
+        ],
+        bullets: [
+          'ID6 live-tile home screen and newer menus',
+          'The software level needed for CarPlay on most NBT Evo cars',
+          'Done on your existing head unit — no new hardware',
+          'Settings and existing coding checked afterwards',
+        ],
+      },
+      {
+        heading: 'How it is done',
+        paragraphs: [
+          'The update is applied with dealer-level tools over an ENET connection, either remotely with your own Windows laptop or at your car around Dublin. It takes a while, so the car needs a stable battery supply during the session — we send a short checklist beforehand.',
+          'The update itself is €50, and most owners do it in the same session as CarPlay activation (€150 on NBT Evo).',
+        ],
+      },
+      {
+        heading: 'Cars that cannot be updated',
+        paragraphs: [
+          'NBT (non-Evo), CIC and EntryNav units are different hardware. They can still have hidden features, navigation maps and diagnostics done, but ID6 and native CarPlay are not available without a head unit change — which is a much bigger job and not always worth it. We would rather say that clearly than book work that will not deliver.',
+        ],
+      },
+    ],
+    related: [
+      { slug: 'bmw-id4-to-id6-upgrade', label: 'ID4 → ID6 upgrade service' },
+      { slug: 'bmw-carplay-activation-ireland', label: 'CarPlay activation across Ireland' },
+      { slug: 'bmw-idrive-upgrade-ireland', label: 'All iDrive upgrade options' },
+    ],
+  },
+  {
+    slug: 'what-can-be-coded-on-bmw-g20',
+    title: 'What Can Be Coded on a BMW G20 3 Series?',
+    metaTitle: 'BMW G20 Coding: What Can Be Enabled | 3 Series 2019+ Guide',
+    description:
+      'A practical list of what coding can enable on the G20/G21 3 Series: CarPlay and Android Auto, iDrive 7 display tweaks, comfort functions, lighting — and what iDrive 8 changes.',
+    date: '2026-10-04',
+    readMinutes: 5,
+    intro: [
+      'The G20 is the first 3 Series built around iDrive 7, and it responds well to coding: a lot of what the car can do is simply switched off for the Irish market or tied to an option it never had. Here is what we are asked for most on G20 and G21 cars, and what is realistic.',
+    ],
+    sections: [
+      {
+        heading: 'Phone integration',
+        paragraphs: [
+          'Most G20s have the hardware for both Apple CarPlay and Android Auto. Where CarPlay is missing or ran out as a trial, activation is €220 on iDrive 7 and permanent. Android Auto is €200 on the same system and is only possible on iDrive 7 and later — it does not exist on the older NBT Evo units.',
+          'Late G20 LCI cars moved to iDrive 8, where the software version decides what can be done; those are checked and priced per car.',
+        ],
+      },
+      {
+        heading: 'Display and iDrive tweaks',
+        paragraphs: [
+          'Popular on iDrive 7: the Sport display layouts in the digital cluster, digital speed readout, the M-style start-up animation, and video playback for passengers while moving (passenger use only — the driver must always comply with road safety law). Most of these are coded in minutes.',
+        ],
+        bullets: [
+          'Sport and M display layouts in the Live Cockpit cluster',
+          'Video in motion for passengers (passenger use only)',
+          'Start-up animation and menu tweaks',
+          'Speed-limit display behaviour where the car has the camera',
+        ],
+      },
+      {
+        heading: 'Comfort and lighting',
+        paragraphs: [
+          'Auto-folding mirrors on lock, one-touch comfort closing of the windows and sunroof from the key, welcome light behaviour, ambient lighting options, and auto Start/Stop memory so the car remembers your last choice. Daytime running light and indicator behaviour can be adjusted within what the lighting module supports.',
+        ],
+      },
+      {
+        heading: 'What coding cannot do',
+        paragraphs: [
+          'Coding switches on functions the car already has the hardware for. It will not add a head-up display, a camera or a cluster the car was never built with — those are retrofits with parts and wiring. Options that depend on a server subscription are also outside what coding changes.',
+          'Japanese-import G20s are a separate case: the radio band, language and navigation region need a proper conversion (from €280 on iDrive 7, CarPlay included).',
+        ],
+      },
+      {
+        heading: 'Remote or in person',
+        paragraphs: [
+          'Nearly all of the above can be done remotely anywhere in Ireland with a Windows laptop and an ENET cable, or at your car around Dublin. Everything is reversible and shown working before you pay.',
+        ],
+      },
+    ],
+    related: [
+      { slug: 'bmw-g20-coding', label: 'G20 coding & upgrades' },
+      { slug: 'bmw-android-auto-activation', label: 'Android Auto activation' },
+      { slug: 'bmw-coding-list', label: 'Full coding list' },
+    ],
+  },
+  {
+    slug: 'bmw-fullscreen-carplay-explained',
+    title: 'BMW Fullscreen CarPlay Explained',
+    metaTitle: 'BMW Fullscreen CarPlay Explained | Widescreen iDrive Guide',
+    description:
+      'Why CarPlay runs in a small window on many BMW widescreen displays, which NBT Evo cars can switch it to fullscreen, what iDrive 7 does differently, and how it is enabled.',
+    date: '2026-10-04',
+    readMinutes: 4,
+    intro: [
+      'A common complaint from owners of F-series cars with the 10.25" display: CarPlay works, but it sits in a box with a strip of BMW information beside it, and the map looks small on a big screen. On many of these cars the layout can be changed so CarPlay uses the full width. Here is how it works and where it applies.',
+    ],
+    sections: [
+      {
+        heading: 'Why CarPlay is boxed in',
+        paragraphs: [
+          'BMW’s widescreen displays are wide and short. On NBT Evo the default CarPlay view keeps a BMW panel at the side, so CarPlay is drawn in a near-square window. It was a design choice, not a hardware limit — the screen can show CarPlay edge to edge.',
+        ],
+      },
+      {
+        heading: 'Where fullscreen is possible',
+        paragraphs: [
+          'The fullscreen layout applies to NBT Evo cars with the 10.25" widescreen — typically F-series models from around 2016 to 2019 and the earliest G-series cars with iDrive 6. The software level matters: some ID5 cars need the ID6 update (€50) before the layout can be enabled.',
+          'Cars with the 6.5" or 8.8" screens already give most of the display to CarPlay, so there is little to gain. On iDrive 7 (MGU) CarPlay is already shown large and the split-screen options vary by software version.',
+        ],
+        bullets: [
+          'NBT Evo with the 10.25" widescreen — yes, on supported software',
+          'ID5 software may need the ID6 update first',
+          'Smaller 6.5" / 8.8" screens — little benefit',
+          'iDrive 7 — already large; checked per version',
+        ],
+      },
+      {
+        heading: 'How it is enabled',
+        paragraphs: [
+          'It is coding, done either together with CarPlay activation (from €150 on NBT Evo) or on a car that already has CarPlay. Remote over ENET anywhere in Ireland, or at your car around Dublin. We test it with your iPhone before the session ends.',
+          'The only thing we need first is the last 7 characters of your VIN, which tells us the head unit, the screen and the software level — and whether fullscreen is possible on your build at all.',
+        ],
+      },
+    ],
+    related: [
+      { slug: 'bmw-fullscreen-carplay', label: 'Fullscreen CarPlay service' },
+      { slug: 'bmw-carplay-activation-ireland', label: 'CarPlay activation across Ireland' },
+      { slug: 'bmw-id4-to-id6-upgrade', label: 'ID4 → ID6 update' },
+    ],
+  },
 ];
 
 

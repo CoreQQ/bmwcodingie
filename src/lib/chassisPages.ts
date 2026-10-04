@@ -22,7 +22,41 @@ type ChassisFacts = {
   /** One chassis-specific FAQ. */
   faq: { q: string; a: string };
   related: string[];
+  /** Upgrade paths worth showing for this chassis (see UPGRADE below). */
+  upgrades: UpgradeKey[];
 };
+
+// Shared upgrade cards; the wording stays generic so each model page only
+// says what applies to it. Prices match pricing.ts and the agent's facts.
+type UpgradeKey =
+  | 'carplayEvo'
+  | 'carplayMgu'
+  | 'carplayLate'
+  | 'androidAuto'
+  | 'id6'
+  | 'fullscreen'
+  | 'cluster6wb'
+  | 'clusterAsk'
+  | 'maps'
+  | 'camera'
+  | 'japan'
+  | 'hidden';
+
+const UPGRADE: Record<UpgradeKey, { title: string; body: string; slug: string }> = {
+  carplayEvo: { title: 'Apple CarPlay — €150', body: 'Activated by coding on NBT Evo (ID5/ID6) cars, wireless on most ID6 builds. Early ID4 software needs the ID6 update first.', slug: 'apple-carplay-activation-dublin' },
+  carplayMgu: { title: 'Apple CarPlay — €220', body: 'Activated on iDrive 7 (MGU) cars, wireless as standard. iDrive 8 and 8.5 are priced per car after a VIN check.', slug: 'apple-carplay-activation-dublin' },
+  carplayLate: { title: 'Apple CarPlay — from €150', body: 'Possible on cars fitted with NBT Evo; earlier NBT and CIC units need different hardware. Your VIN tells us which you have.', slug: 'bmw-carplay-activation-ireland' },
+  androidAuto: { title: 'Android Auto — €200', body: 'On iDrive 7 (MGU) builds only; iDrive 8 per car. Not possible on NBT Evo.', slug: 'bmw-android-auto-activation' },
+  id6: { title: 'iDrive ID4 → ID6 — €50', body: 'Software update for NBT Evo cars still on the older list-style menu. Often the step that makes CarPlay possible.', slug: 'bmw-id4-to-id6-upgrade' },
+  fullscreen: { title: 'Fullscreen CarPlay', body: 'CarPlay across the whole 10.25" widescreen instead of a window, where the software supports it.', slug: 'bmw-fullscreen-carplay' },
+  cluster6wb: { title: '6WA → 6WB digital cluster', body: 'Full digital instrument cluster fitted and coded, with Sport and Eco Pro layouts. Mobile visit; quoted after a VIN check.', slug: 'bmw-6wa-to-6wb-retrofit' },
+  clusterAsk: { title: 'Digital cluster (6WB)', body: 'Possible on some builds of this chassis — depends on the car. We check the VIN and tell you honestly before anything is ordered.', slug: 'bmw-6wa-to-6wb-retrofit' },
+  maps: { title: 'Navigation map update', body: 'Latest maps for your region, with the activation code where one is needed.', slug: 'bmw-map-updates-fsc-codes' },
+  camera: { title: 'Reverse camera retrofit', body: 'OEM-style camera, wired and coded into iDrive with guidance lines. Mobile visit.', slug: 'bmw-reverse-camera-retrofit' },
+  japan: { title: 'Japan → EU conversion — from €250', body: 'EU radio, English language and EU navigation for Japanese imports, CarPlay included where the head unit supports it.', slug: 'japan-import-bmw-conversion-ireland' },
+  hidden: { title: 'Hidden features coding', body: 'Video in motion (passenger use only), digital speed, folding mirrors, welcome lights and more — reversible.', slug: 'bmw-hidden-features' },
+};
+
 
 const CHASSIS: ChassisFacts[] = [
   {
@@ -47,6 +81,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'If it is a 2015+ LCI car with NBT Evo (ID5/ID6), usually yes — including wireless on most ID6 builds. Pre-LCI NBT cars do not support native CarPlay, but plenty of other coding still applies. Send your year and VIN-derived build and we confirm.',
     },
     related: ['bmw-g20-coding', 'bmw-f32-coding', 'bmw-f10-coding'],
+    upgrades: ['carplayEvo','id6','fullscreen','cluster6wb','maps','camera','japan','hidden'],
   },
   {
     slug: 'bmw-f10-coding',
@@ -70,6 +105,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Yes — Japan-to-EU conversion is a regular F10 job: region change, radio bands, navigation FSC generation and European maps, plus the ETC mirror handling imports need. Send the year and build and we quote the full conversion.',
     },
     related: ['bmw-g30-coding', 'bmw-f30-coding', 'bmw-x5-coding'],
+    upgrades: ['carplayLate','id6','clusterAsk','maps','camera','japan','hidden'],
   },
   {
     slug: 'bmw-f20-coding',
@@ -93,6 +129,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Yes — the comfort and lighting coding (mirrors, windows, welcome lights, chime removal) lives in the body modules, not the head unit, so it works regardless of the radio spec. CarPlay needs NBT Evo, which we confirm from your build.',
     },
     related: ['bmw-f30-coding', 'bmw-f32-coding', 'bmw-x1-coding'],
+    upgrades: ['carplayEvo','id6','cluster6wb','maps','camera','hidden'],
   },
   {
     slug: 'bmw-f32-coding',
@@ -116,6 +153,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Yes — the cluster startup animation and sport display layouts are classic F32 coding, on both analogue and 6WB digital clusters. We enable them alongside digital speed in the same session.',
     },
     related: ['bmw-f30-coding', 'bmw-m3-m4-coding', 'bmw-g20-coding'],
+    upgrades: ['carplayEvo','id6','fullscreen','cluster6wb','maps','camera','japan','hidden'],
   },
   {
     slug: 'bmw-g20-coding',
@@ -139,6 +177,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Plenty: Video in Motion, extended cluster layouts, Start/Stop memory, disclaimer removal, lighting behaviour and more. On cars where CarPlay shipped as a trial we also make it permanent. iDrive 7/8 coding is done with current-generation tooling.',
     },
     related: ['bmw-g30-coding', 'bmw-f30-coding', 'bmw-x3-coding'],
+    upgrades: ['carplayMgu','androidAuto','maps','japan','hidden'],
   },
   {
     slug: 'bmw-g30-coding',
@@ -162,6 +201,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Yes. On NBT Evo cars we activate full CarPlay through coding — no trial, no annual ConnectedDrive fee. It survives normal use; we show it working before you pay.',
     },
     related: ['bmw-f10-coding', 'bmw-g20-coding', 'bmw-7-series-coding'],
+    upgrades: ['carplayEvo','carplayMgu','androidAuto','clusterAsk','maps','japan','hidden'],
   },
   {
     slug: 'bmw-x3-coding',
@@ -185,6 +225,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Yes — tailgate opening behaviour, auto-folding mirrors on lock and Comfort Access tweaks are the bread-and-butter X3 jobs on both F25 and G01. Done in one session with anything else you want enabled.',
     },
     related: ['bmw-x5-coding', 'bmw-g20-coding', 'bmw-x1-coding'],
+    upgrades: ['carplayLate','id6','maps','camera','hidden'],
   },
   {
     slug: 'bmw-x5-coding',
@@ -208,6 +249,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Yes — Video in Motion unlocks playback on the move, including rear-seat entertainment where fitted. It is one of the most-requested X5 codings; we show it working before you pay.',
     },
     related: ['bmw-x3-coding', 'bmw-g30-coding', 'bmw-7-series-coding'],
+    upgrades: ['carplayLate','carplayMgu','id6','clusterAsk','maps','camera','hidden'],
   },
   {
     slug: 'bmw-x1-coding',
@@ -231,6 +273,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'F48s with NBT Evo (ID5/ID6) — typically higher-spec and LCI cars. The base Business radio does not support CarPlay, but comfort and lighting coding still applies. Send your year and build and we confirm in minutes.',
     },
     related: ['bmw-x3-coding', 'bmw-f20-coding', 'bmw-g20-coding'],
+    upgrades: ['carplayEvo','id6','maps','camera','hidden'],
   },
   {
     slug: 'bmw-m3-m4-coding',
@@ -254,6 +297,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'On F8x and G8x cars the flap behaviour can be adjusted through coding so the car holds the character you want per drive mode. We explain exactly what changes and it is fully reversible.',
     },
     related: ['bmw-f32-coding', 'bmw-g20-coding', 'bmw-f30-coding'],
+    upgrades: ['carplayLate','carplayMgu','id6','cluster6wb','maps','hidden'],
   },
   {
     slug: 'bmw-7-series-coding',
@@ -277,6 +321,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Usually yes — comfort, lighting and chime coding all applies, and a full ISTA scan tells you the honest health of the car\'s many modules. We are straight about what an F01 can and cannot do before you spend anything.',
     },
     related: ['bmw-g30-coding', 'bmw-x5-coding', 'bmw-f10-coding'],
+    upgrades: ['carplayLate','id6','maps','camera','hidden'],
   },
   {
     slug: 'bmw-f-series-coding',
@@ -300,6 +345,7 @@ const CHASSIS: ChassisFacts[] = [
       a: 'All of them \u2014 1/2/3/4/5/7 Series and X1\u2013X6 on F chassis. The exact feature list depends on the head unit and build year, so send the model, year and VIN and we confirm what your car supports.',
     },
     related: ['bmw-f30-coding', 'bmw-f10-coding', 'bmw-f20-coding'],
+    upgrades: ['carplayEvo','id6','fullscreen','cluster6wb','maps','camera','japan','hidden'],
   },
   {
     slug: 'bmw-g-series-coding',
@@ -323,17 +369,18 @@ const CHASSIS: ChassisFacts[] = [
       a: 'Coding changes settings that already exist in the car and is fully reversible \u2014 we can return everything to factory before a dealer visit. Tell us the build and we will be straight about what is sensible on a warranty car.',
     },
     related: ['bmw-g20-coding', 'bmw-g30-coding', 'bmw-x3-coding'],
+    upgrades: ['carplayMgu','androidAuto','maps','japan','hidden'],
   },
 ];
 
 function buildChassisPage(f: ChassisFacts): ServicePage {
   return {
     slug: f.slug,
-    metaTitle: `BMW ${f.title} Coding Ireland | Hidden Features & CarPlay`,
+    metaTitle: `BMW ${f.title} Coding & CarPlay Ireland | Upgrades, Retrofits & Hidden Features`,
     metaDescription: `BMW ${f.codes} coding in Dublin and across Ireland (${f.years}). ${f.popular[0]}, hidden features, Video in Motion and diagnostics — in person or remote.`,
     serviceName: `BMW ${f.title} Coding`,
     eyebrow: `${f.codes} · ${f.years}`,
-    h1: `BMW ${f.title} Coding — Hidden Features, CarPlay & More`,
+    h1: `BMW ${f.title} Coding & CarPlay Ireland`,
     heroSub: `Independent coding for the BMW ${f.title} (${f.years}) in Dublin and across Ireland. ${f.headUnits}. In person at the car, wherever it is parked, or remotely over ENET.`,
     intro: [
       f.genNote,
@@ -381,6 +428,7 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
       { slug: 'bmw-coding-dublin', label: 'BMW coding in Dublin' },
     ],
     waMessage: `Hi — I'd like coding on my BMW ${f.short}. It's a `,
+    upgrades: f.upgrades.map((k) => UPGRADE[k]),
   };
 }
 
