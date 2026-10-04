@@ -9,7 +9,7 @@ import { Reviews } from '@/components/site/Reviews';
 import { GoogleReviews } from '@/components/site/GoogleReviews';
 import { Faq } from '@/components/site/Faq';
 import { VinCheck } from '@/components/site/VinCheck';
-import { Guides, HowItWorksSteps, JapanSection, PopularServices, WhyUs } from '@/components/site/HomeSections';
+import { FeaturedServices, Guides, HowItWorksSteps, PopularServices, WhyUs } from '@/components/site/HomeSections';
 import { Contact } from '@/components/site/Contact';
 import { Footer } from '@/components/site/Footer';
 import { ChatWidgetLazy as ChatWidget } from '@/components/site/ChatWidgetLazy';
@@ -59,7 +59,7 @@ export default async function HomePage({
         <Hero settings={settings} />
         <VinCheck whatsapp={settings.whatsapp} />
         <PopularServices whatsapp={settings.whatsapp} />
-        <JapanSection />
+        <FeaturedServices />
         <Gallery items={gallery} />
         <Reviews reviews={reviews} />
         <GoogleReviews />
