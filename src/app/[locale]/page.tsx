@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { routing } from '@/i18n/routing';
 import { Header } from '@/components/site/Header';
 import { Preloader } from '@/components/site/Preloader';
 import { ScrollProgress } from '@/components/site/ScrollProgress';
@@ -28,7 +29,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'HomeMetadata' });
-  return { title: t('title'), description: t('description') };
+  // The homepage is the one fully translated page, so each locale is its own
+  // canonical with hreflang to the others. Every other page canonicals to
+  // the English URL because its body is English regardless of locale.
+  const url = (l: string) => (l === routing.defaultLocale ? '/' : `/${l}`);
+  const languages: Record<string, string> = Object.fromEntries(routing.locales.map((l) => [l, url(l)]));
+  languages['x-default'] = '/';
+  return {
+    title: t('title'),
+    description: t('description'),
+    alternates: { canonical: url(locale), languages },
+  };
 }
 
 export default async function HomePage({

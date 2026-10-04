@@ -9,7 +9,6 @@ import { getSettings, waLink } from '@/lib/data';
 import { SERVICE_NAV } from '@/lib/servicePages';
 import { LOCATION_NAV } from '@/lib/locationPages';
 import { CHASSIS_NAV } from '@/lib/chassisPages';
-import { routing } from '@/i18n/routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const SLUG = 'bmw-coding-ireland';
@@ -22,17 +21,10 @@ export const revalidate = 86400;
 
 export function generateMetadata(): Metadata {
   const url = `/${SLUG}`;
-  const languages: Record<string, string> = Object.fromEntries(
-    routing.locales.map((l) => [
-      l,
-      l === routing.defaultLocale ? `${SITE_URL}${url}` : `${SITE_URL}/${l}${url}`,
-    ]),
-  );
-  languages['x-default'] = `${SITE_URL}${url}`;
   return {
     title: META_TITLE,
     description: META_DESC,
-    alternates: { canonical: url, languages },
+    alternates: { canonical: url },
     openGraph: {
       type: 'website',
       url: `${SITE_URL}${url}`,

@@ -126,10 +126,15 @@ incognito tab. Local: `npm run build` must be clean before any merge.
 
 ## SEO surface (don't regress)
 
-30+ indexable pages: 7 service landings + 11 county + 11 chassis (dynamic
-`[landing]` route) + hub `/bmw-coding-ireland` + `/bmw-coding-list` + blog (8
-guides) + `/find-us`. Sitemap 264 URLs + `/image-sitemap.xml` (gallery) —
-both in robots.txt. hreflang on all landings (6 locales). JSON-LD: WebSite +
+60+ indexable pages: 12 service landings (incl. CarPlay Ireland, fullscreen
+CarPlay, ID4→ID6, 6WA→6WB, iDrive upgrades) + 11 county + 13 chassis (dynamic
+`[landing]` route) + hub `/bmw-coding-ireland` + `/bmw-coding-list` + blog (12
+guides) + `/find-us`. Sitemap lists ONLY canonical URLs (~64): the homepage in
+all 6 locales (fully translated, self-canonical + hreflang) and every other
+page in English only — their /ru,/pl… copies are English bodies that canonical
+to the English URL, so they carry no hreflang and are not in the sitemap
+(Search Console flagged 295 of them as "alternate with canonical" in Oct 2026).
+`/image-sitemap.xml` (gallery) — both in robots.txt. JSON-LD: WebSite +
 AutoRepair (+AggregateRating only when real reviews exist) + Service/FAQ/
 Breadcrumb per page. `llms.txt` + `/rss.xml` + daily IndexNow ping (key file
 `public/f8a4….txt`). Never add `noindex`, never fabricate reviews.
