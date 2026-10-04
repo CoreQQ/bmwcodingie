@@ -176,6 +176,31 @@ export async function ServiceLanding({
           </div>
         </section>
 
+        {/* Upgrade paths (model pages) */}
+        {p.upgrades && p.upgrades.length > 0 && (
+          <section className="border-b border-white/5 py-16 md:py-20">
+            <div className="mx-auto max-w-edge px-5 md:px-8">
+              <h2 className="font-display text-[clamp(1.8rem,4vw,3rem)] leading-tight">Upgrades for this model</h2>
+              <p className="mt-3 max-w-2xl text-sm text-muted">What is realistic depends on the head unit and build date — every item below is confirmed from your VIN before booking.</p>
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {p.upgrades.map((u) => (
+                  <Link
+                    key={u.title}
+                    href={`/${u.slug}`}
+                    className="group flex flex-col border border-white/8 bg-graphite-800/40 p-5 transition-colors hover:border-[color:var(--page-accent)]"
+                  >
+                    <h3 className="text-base font-semibold text-ink">{u.title}</h3>
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{u.body}</p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--page-accent)]">
+                      Details <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Process */}
         <section className="border-b border-white/5 py-16 md:py-20">
           <div className="mx-auto max-w-edge px-5 md:px-8">

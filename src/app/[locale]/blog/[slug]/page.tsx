@@ -139,11 +139,11 @@ export default async function BlogPost({
                 <div className="m-stripe h-1 w-full" />
                 <div className="flex flex-col items-start justify-between gap-5 p-7 md:flex-row md:items-center">
                   <div>
-                    <h2 className="font-display text-2xl text-ink">Want this on your BMW?</h2>
-                    <p className="mt-1 text-sm text-muted">Send the model, year and what you want — we’ll confirm what’s possible.</p>
+                    <h2 className="font-display text-2xl text-ink">Want to check your BMW? Send us your VIN.</h2>
+                    <p className="mt-1 text-sm text-muted">The last 7 characters are enough — we reply with what your car supports and the price.</p>
                   </div>
                   <div className="flex shrink-0 flex-wrap gap-3">
-                    <Link href="/#contact" className="btn-primary">Book BMW Coding</Link>
+                    <Link href="/#vin-check" className="btn-primary">Check my BMW</Link>
                     <a href={wa} target="_blank" rel="noopener noreferrer" className="btn-ghost inline-flex items-center gap-2">
                       <MessageCircle size={16} /> WhatsApp
                     </a>
