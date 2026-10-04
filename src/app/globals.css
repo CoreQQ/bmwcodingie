@@ -10,7 +10,15 @@
   --m-blue: #2e9be6;
   --m-dark-blue: #0a4fb0;
   --m-red: #e2001a;
-  --graphite: #0a0b0d;
+  --graphite: #0c0f14;
+  /* "Glass over photo": the photo behind every page. Swap these two files
+     (or these two lines) to change the background site-wide. */
+  --site-photo: url('/hero-bg.jpg');
+  --site-photo-mobile: url('/hero-bg-mobile.jpg');
+  --glass: rgba(255, 255, 255, 0.07);
+  --glass-strong: rgba(255, 255, 255, 0.12);
+  --glass-line: rgba(255, 255, 255, 0.16);
+  --accent-soft: #9cc7ff;
 }
 
 * {
@@ -126,7 +134,8 @@ html {
 
   /* Monospace ticker label used across sections */
   .label {
-    @apply font-mono text-[11px] uppercase tracking-ticker text-faint;
+    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.08em];
+    color: var(--accent-soft);
   }
 
   /* Faint, static vignette behind hero-type sections — no motion, no bloom */
@@ -139,15 +148,14 @@ html {
   }
 
   /* Blueprint grid background texture */
+  /* The glass direction has no grid: the photo is the texture. */
   .blueprint {
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 56px 56px;
+    background-image: none;
   }
 
   /* Subtle film grain overlay */
   .grain::before {
+    display: none;
     content: '';
     position: absolute;
     inset: 0;
@@ -158,11 +166,18 @@ html {
 
   /* Buttons: simple and solid — colour shift on hover, slight press on tap. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-bmw px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-white transition-colors duration-200 hover:bg-bmw-dark active:scale-[0.98];
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[14px] bg-bmw px-5 py-2.5 font-sans text-sm font-semibold text-white transition-colors duration-200 hover:bg-bmw-dark active:scale-[0.98] md:px-6 md:py-3;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 border border-graphite-500 px-4 py-2 md:px-6 md:py-3 font-mono text-xs uppercase tracking-widest text-ink transition-colors duration-200 hover:border-m-blue/70 hover:bg-white/5 active:scale-[0.98];
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[14px] border px-5 py-2.5 font-sans text-sm font-semibold text-ink transition-colors duration-200 active:scale-[0.98] md:px-6 md:py-3;
+    background: var(--glass-strong);
+    border-color: rgba(255, 255, 255, 0.28);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 
   /* Nav link with an M-blue underline that grows on hover */
@@ -375,4 +390,92 @@ html {
   html {
     scroll-behavior: auto;
   }
+}
+
+
+/* ================================================================
+   "Glass over photo" — the owner's chosen direction (option G).
+   One photo sits fixed behind every page; content floats over it on
+   frosted panels. Applied here rather than per component so all pages
+   — homepage, landings, blog — change together.
+   ================================================================ */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(12, 15, 20, 0.62) 0%, rgba(12, 15, 20, 0.86) 45%, rgba(12, 15, 20, 0.92) 100%),
+    var(--site-photo) center top / cover no-repeat;
+}
+@media (max-width: 640px) {
+  body::before {
+    background:
+      linear-gradient(180deg, rgba(12, 15, 20, 0.6) 0%, rgba(12, 15, 20, 0.86) 45%, rgba(12, 15, 20, 0.93) 100%),
+      var(--site-photo-mobile) center top / cover no-repeat;
+  }
+}
+
+/* No tricolour stripes in this direction. */
+.m-stripe,
+.m-stripe-v {
+  display: none !important;
+}
+
+/* Headings: Sora, sentence case, a little tighter. Sora is far wider than
+   the old condensed face, so the line-height opens up to keep descenders. */
+.font-display {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.06 !important;
+}
+
+/* Frosted panels: every content box that used a translucent graphite fill. */
+[class*='bg-graphite-800/'],
+[class*='bg-graphite-900/60'],
+[class*='bg-graphite-900/70'],
+.glass {
+  background-color: var(--glass) !important;
+  border-color: var(--glass-line) !important;
+  border-radius: 18px;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* Form fields: rounded, see-through. */
+input:not([type='checkbox']):not([type='radio']),
+select,
+textarea {
+  border-radius: 12px;
+}
+main input:not([type='checkbox']):not([type='radio']),
+main select,
+main textarea {
+  background-color: rgba(0, 0, 0, 0.28);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [class*='bg-graphite-800/'],
+  [class*='bg-graphite-900/60'],
+  [class*='bg-graphite-900/70'],
+  .glass {
+    background-color: rgba(18, 22, 28, 0.96) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Former mono labels: same text face, calmer tracking, figures that line up. */
+.font-mono {
+  letter-spacing: 0.03em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* BMW blue text is too dark to read on the frosted panels; buttons keep the
+   true BMW blue as their fill. */
+.text-bmw {
+  color: #8ab9f5 !important;
 }

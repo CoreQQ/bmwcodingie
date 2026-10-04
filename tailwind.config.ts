@@ -7,8 +7,8 @@ const config: Config = {
       colors: {
         // Graphite base
         graphite: {
-          DEFAULT: '#0A0B0D',
-          900: '#0A0B0D',
+          DEFAULT: '#0C0F14',
+          900: '#0C0F14',
           800: '#111316',
           700: '#16191D',
           600: '#1E2227',
@@ -28,9 +28,11 @@ const config: Config = {
         'bmw-dark': '#1454AE',
       },
       fontFamily: {
-        display: ['var(--font-bebas)', 'Impact', 'sans-serif'],
-        sans: ['var(--font-manrope)', 'system-ui', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
+        // The glass direction drops the terminal look: former mono labels use the
+        // text face, with tabular figures where numbers line up.
+        mono: ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         ticker: '0.28em',

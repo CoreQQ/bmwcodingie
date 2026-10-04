@@ -122,7 +122,7 @@ export async function ServiceLanding({
         {/* Intro */}
         <section className="border-b border-white/5 py-16 md:py-20">
           <div className="mx-auto max-w-edge px-5 md:px-8">
-            <div className="grid grid-cols-12 gap-x-10 gap-y-8">
+            <div className="grid grid-cols-12 gap-y-8 lg:gap-x-10">
               <div className="col-span-12 lg:col-span-7">
                 {p.intro.map((para, i) => (
                   <p key={i} className="mb-5 max-w-2xl text-base leading-relaxed text-muted">{para}</p>
