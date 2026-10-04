@@ -429,6 +429,7 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
     ],
     waMessage: `Hi — I'd like coding on my BMW ${f.short}. It's a `,
     upgrades: f.upgrades.map((k) => UPGRADE[k]),
+    galleryMatch: f.codes.split(',').map((c) => c.trim()).filter((c) => /^[A-Z]\d{2}$/.test(c)),
   };
 }
 
