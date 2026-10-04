@@ -479,3 +479,27 @@ main textarea {
 .text-bmw {
   color: #8ab9f5 !important;
 }
+
+/* One heading scale for Sora. The old sizes were set for a condensed face,
+   and in a face this wide they ran into neighbouring columns (the FAQ title
+   sat over its own answers). */
+h1.font-display {
+  font-size: clamp(2.1rem, 6.2vw, 4.2rem) !important;
+}
+h2.font-display {
+  font-size: clamp(1.8rem, 4.4vw, 3.2rem) !important;
+  overflow-wrap: anywhere;
+}
+
+/* Choice tiles (where we work, date and time chips) follow the same rounded
+   language as the panels around them, selected or not. */
+main button[aria-pressed] {
+  border-radius: 14px;
+}
+
+/* Room for the dismissible notice card under the header (Announcement.tsx). */
+#top > div:first-child { transition: padding-top 0.3s ease; }
+html[data-notice] #top > div:first-child { padding-top: 10.5rem; }
+@media (min-width: 768px) {
+  html[data-notice] #top > div:first-child { padding-top: 16rem; }
+}

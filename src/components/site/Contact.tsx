@@ -289,7 +289,7 @@ export function Contact({
                           }`}
                         >
                           <span className="block text-sm text-ink">{label}</span>
-                          <span className="mt-1 block text-[11px] leading-relaxed text-faint">{hint}</span>
+                          <span className="mt-1 block text-[12px] leading-relaxed text-muted">{hint}</span>
                         </button>
                       );
                     })}

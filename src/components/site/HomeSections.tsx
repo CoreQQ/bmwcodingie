@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { BLOG_POSTS } from '@/lib/blog';
 import { waHref, waMessageFor } from '@/lib/waMessage';
+import { FeatureCarousel, type FeatureSlide } from './FeatureCarousel';
 
 // The homepage blocks from the owner's brief, in one file because they share
 // the same shape: an eyebrow, a heading and a grid. Every card ends in one of
@@ -72,30 +73,65 @@ export async function PopularServices({ whatsapp }: { whatsapp: string }) {
   );
 }
 
-export async function JapanSection() {
-  const t = await getTranslations('Japan');
-  const items = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6', 'i7'].map((k) => t(k));
+/** The big featured block, now a carousel of the main services. Japan → EU
+ *  leads because it is the second-strongest page on the site. */
+export async function FeaturedServices() {
+  const tj = await getTranslations('Japan');
+  const t = await getTranslations('Featured');
+  const tp = await getTranslations('Popular');
+  const list = (prefix: string, n: number) => Array.from({ length: n }, (_, i) => t(`${prefix}${i + 1}`));
+  const check = { label: tj('ctaCheck'), href: '#vin-check' };
+  const slides: FeatureSlide[] = [
+    {
+      key: 'japan',
+      eyebrow: tj('eyebrow'),
+      heading: tj('heading'),
+      price: tj('price'),
+      items: ['i1', 'i2', 'i3', 'i4', 'i5', 'i6', 'i7'].map((k) => tj(k)),
+      primary: check,
+      secondary: { label: tj('ctaBook'), href: '/japan-import-bmw-conversion-ireland' },
+    },
+    {
+      key: 'carplay',
+      eyebrow: t('carplayEyebrow'),
+      heading: t('carplayHeading'),
+      price: tp('carplayPrice'),
+      items: list('carplayI', 6),
+      primary: check,
+      secondary: { label: t('carplayCta'), href: '/apple-carplay-activation-dublin' },
+    },
+    {
+      key: 'coding',
+      eyebrow: t('codingEyebrow'),
+      heading: t('codingHeading'),
+      price: tp('codingPrice'),
+      items: list('codingI', 6),
+      primary: check,
+      secondary: { label: t('codingCta'), href: '/bmw-coding-dublin' },
+    },
+    {
+      key: 'retrofits',
+      eyebrow: t('retrofitsEyebrow'),
+      heading: t('retrofitsHeading'),
+      price: t('retrofitsPrice'),
+      items: list('retrofitsI', 6),
+      primary: check,
+      secondary: { label: t('retrofitsCta'), href: '/bmw-retrofits-dublin' },
+    },
+    {
+      key: 'diagnostics',
+      eyebrow: t('diagEyebrow'),
+      heading: t('diagHeading'),
+      price: t('diagPrice'),
+      items: list('diagI', 6),
+      primary: check,
+      secondary: { label: t('diagCta'), href: '/bmw-diagnostics-dublin' },
+    },
+  ];
   return (
     <section id="japan" className="relative border-t border-white/5 py-16 md:py-24">
       <div className="mx-auto max-w-edge px-5 md:px-8">
-        <div className="grid gap-10 border border-white/10 bg-graphite-800/40 p-6 md:grid-cols-12 md:p-10">
-          <div className="md:col-span-6">
-            <span className="label text-bmw">{t('eyebrow')}</span>
-            <h2 className="mt-3 font-display text-[clamp(2.2rem,6vw,4rem)] leading-[0.92]">{t('heading')}</h2>
-            <p className="mt-6 font-mono text-2xl text-bmw">{t('price')}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a href="#vin-check" className="btn-primary">{t('ctaCheck')}</a>
-              <Link href="/japan-import-bmw-conversion-ireland" className="btn-ghost">{t('ctaBook')}</Link>
-            </div>
-          </div>
-          <ul className="space-y-3 md:col-span-6">
-            {items.map((i) => (
-              <li key={i} className="flex items-start gap-3 text-ink">
-                <Check size={17} className="mt-0.5 shrink-0 text-bmw" /> {i}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <FeatureCarousel slides={slides} prevLabel={t('prev')} nextLabel={t('next')} />
       </div>
     </section>
   );
