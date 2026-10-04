@@ -8,6 +8,8 @@ import { useCookieConsent } from '@/lib/useCookieConsent';
 // works without env config; env var still wins if set.
 const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-17881862993';
 const CONVERSION_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL || 'EuOdCIWFl9QcENGm3s5C';
+// GA4 shares the same gtag.js load; every gtag('event') reaches both tags.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-698G9NVGCZ';
 
 // Google Consent Mode v2: the tag loads for everyone with all storage DENIED
 // by default (cookieless pings only — GDPR-safe, and Google's tag scanner can
@@ -43,6 +45,7 @@ export function GoogleAdsTag() {
           });
           gtag('js', new Date());
           gtag('config', '${ADS_ID}');
+          ${GA_ID ? `gtag('config', '${GA_ID}');` : ''}
         `}
       </Script>
       <Script
@@ -51,6 +54,17 @@ export function GoogleAdsTag() {
       />
     </>
   );
+}
+
+/**
+ * GA4 event (whatsapp_click, call_click, vin_check_submit, booking_submit…).
+ * Consent Mode handles the cookie side: before consent GA4 only gets a
+ * cookieless ping, so this is safe to call unconditionally.
+ */
+export function trackGaEvent(name: string, params: Record<string, string | number | undefined> = {}) {
+  if (!GA_ID) return;
+  const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
+  gtag?.('event', name, { ...params, send_to: GA_ID });
 }
 
 /** Fire a Google Ads conversion (modeled cookielessly pre-consent). */

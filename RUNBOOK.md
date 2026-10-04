@@ -37,6 +37,7 @@ Dormant ─▶ /api/whatsapp (Meta Cloud API AI bot), /api/manychat (bridge)
 | `CRON_SECRET` | rec. | Bearer for /api/cron/reminders |
 | `GOOGLE_REVIEW_URL` | optional | overrides the baked-in review link |
 | `NEXT_PUBLIC_GOOGLE_ADS_ID` / `NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL` | when ads run | conversion tag (consent-gated) |
+| `NEXT_PUBLIC_GA_ID` | optional (default G-698G9NVGCZ baked in) | GA4 via the same gtag; events whatsapp_click, call_click, vin_check_submit, booking_submit |
 | `NEXT_PUBLIC_META_PIXEL_ID` | when ads run | Meta pixel (consent-gated) |
 | `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_ID` / `WHATSAPP_VERIFY_TOKEN` / `WHATSAPP_APP_SECRET` | for WA bot | Meta Cloud API (webhook `https://www.bmwcoding.ie/api/whatsapp`) |
 | `MANYCHAT_SECRET` | for ManyChat | bridge auth (`?key=` or `x-manychat-secret`) |

@@ -7,7 +7,7 @@ import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
 import { trackMetaEvent } from './MetaPixel';
 import { getAttribution, getLanding, getTimeOnSite } from '@/lib/attribution';
-import { trackGoogleConversion } from './GoogleAdsTag';
+import { trackGaEvent, trackGoogleConversion } from './GoogleAdsTag';
 import { Link } from '@/i18n/navigation';
 import { SlotPicker } from './SlotPicker';
 
@@ -114,6 +114,7 @@ export function Contact({
       setStatus('sent');
       trackMetaEvent('Lead', { content_name: form.service || 'General enquiry' });
       trackGoogleConversion();
+      trackGaEvent('booking_submit', { service: form.service || 'General enquiry', visit_type: form.visit_type || undefined });
       setForm({ name: '', contact: '', bmw_model: '', service: '', how_heard: '', contact_pref: '', message: '', visit_type: '', visit_address: '', vin: '', slot_date: '', slot_time: '' });
     } catch {
       setStatus('error');
