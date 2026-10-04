@@ -86,7 +86,7 @@ export default async function BlogPost({
       <Header />
       <main>
         <article className="relative">
-          <section className="relative overflow-hidden border-b border-white/5 pb-12 pt-28 md:pb-16 md:pt-40">
+          <section className="notice-room relative overflow-hidden border-b border-white/5 pb-12 pt-28 md:pb-16 md:pt-40">
             <div className="absolute inset-0 -z-10">
               <div className="blueprint absolute inset-0 opacity-60" />
               <div className="absolute inset-0 hero-glow" />

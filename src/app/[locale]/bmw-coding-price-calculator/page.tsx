@@ -60,7 +60,7 @@ export default async function PriceCalculatorPage({
       <Header />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <main className="mx-auto max-w-edge px-5 pb-24 pt-32 md:px-8 md:pt-40">
+      <main className="notice-room mx-auto max-w-edge px-5 pb-24 pt-32 md:px-8 md:pt-40">
         <div className="mb-10 flex items-center gap-3">
           <span className="label">Prices</span>
           <span className="m-stripe h-[2px] w-10" />

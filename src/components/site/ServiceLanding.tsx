@@ -49,6 +49,16 @@ export async function ServiceLanding({
           telephone: settings.phone,
           email: settings.email,
         },
+        ...(p.price?.amount
+          ? {
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: 'EUR',
+                priceSpecification: { '@type': 'PriceSpecification', minPrice: p.price.amount, priceCurrency: 'EUR' },
+                url,
+              },
+            }
+          : {}),
       },
       {
         '@type': 'FAQPage',
@@ -95,7 +105,7 @@ export async function ServiceLanding({
 
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden border-b border-white/5 pb-14 pt-28 md:pb-20 md:pt-40">
+        <section className="notice-room relative overflow-hidden border-b border-white/5 pb-14 pt-28 md:pb-20 md:pt-40">
           <div className="absolute inset-0 -z-10">
             <div className="blueprint absolute inset-0 opacity-60" />
             <div className="absolute inset-0 hero-glow" />
@@ -112,6 +122,11 @@ export async function ServiceLanding({
             </div>
             <h1 className="max-w-4xl font-display text-[clamp(2.1rem,6vw,4.2rem)] leading-[0.95]">{p.h1}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">{p.heroSub}</p>
+            {p.price && (
+              <p className="mt-5 inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-semibold text-ink">
+                {p.price.text}
+              </p>
+            )}
             {ctaRow}
             <p className="mt-6 flex items-center gap-2 text-sm text-faint">
               <MapPin size={15} className="text-[color:var(--page-accent)]" /> In person across Dublin, Kildare, Wicklow &amp; Meath · remote across Ireland
