@@ -5,7 +5,7 @@ import { ScanSearch } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { waHref } from '@/lib/waMessage';
-import { trackGoogleConversion } from './GoogleAdsTag';
+import { trackGaEvent, trackGoogleConversion } from './GoogleAdsTag';
 import { trackMetaEvent } from './MetaPixel';
 
 // Grouped so a long list still reads quickly in the phone's picker.
@@ -73,6 +73,7 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
     fetch('/api/vin-check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(() => {});
     trackMetaEvent('Lead', { content_name: `VIN check · ${service}` });
     trackGoogleConversion();
+    trackGaEvent('vin_check_submit', { service });
     if (phone.trim()) {
       setState('sent');
       return;

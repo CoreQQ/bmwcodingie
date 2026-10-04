@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { captureAttribution } from '@/lib/attribution';
 import { trackMetaEvent } from './MetaPixel';
+import { trackGaEvent } from './GoogleAdsTag';
 import { getStoredConsent } from '@/lib/useCookieConsent';
 
 const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
@@ -21,6 +22,9 @@ export function Attribution() {
       const isCall = a.href.startsWith('tel:');
       if (!isWhatsApp && !isCall) return;
 
+      // GA4 first: Consent Mode keeps it cookieless before consent, so the
+      // click still counts (modelled) and the page it came from is kept.
+      trackGaEvent(isWhatsApp ? 'whatsapp_click' : 'call_click', { page_path: location.pathname });
       if (getStoredConsent() !== 'accepted') return;
       // Google Ads: a lightweight event, importable as a conversion action.
       const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
