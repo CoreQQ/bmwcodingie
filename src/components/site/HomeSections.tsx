@@ -26,8 +26,8 @@ const POPULAR = [
   { key: 'carplay', href: '/apple-carplay-activation-dublin', wa: '/carplay', priced: true },
   { key: 'japan', href: '/japan-import-bmw-conversion-ireland', wa: '/japan', priced: true },
   { key: 'coding', href: '/bmw-coding-dublin', wa: '/', priced: true },
-  { key: 'idrive', href: '/bmw-retrofits-dublin', wa: '/idrive', priced: false },
-  { key: 'cluster', href: '/bmw-retrofits-dublin', wa: '/6wb', priced: false },
+  { key: 'idrive', href: '/bmw-id4-to-id6-upgrade', wa: '/idrive', priced: false },
+  { key: 'cluster', href: '/bmw-6wa-to-6wb-retrofit', wa: '/6wb', priced: false },
   { key: 'diagnostics', href: '/bmw-diagnostics-dublin', wa: '/diagnostics', priced: false },
 ] as const;
 

@@ -26,6 +26,8 @@ export type ServicePage = {
   waMessage: string;
   /** areaServed override for schema (defaults to Dublin + surrounding). */
   area?: string[];
+  /** Shown in the hero; `amount` (EUR, lowest real price) also feeds the schema offer. */
+  price?: { amount?: number; text: string };
 };
 
 // Reusable honest closing note shown on every page.
@@ -129,9 +131,10 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     ],
     related: [
       { slug: 'bmw-android-auto-activation', label: 'BMW Android Auto activation' },
+      { slug: 'bmw-fullscreen-carplay', label: 'fullscreen CarPlay' },
+      { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6 update' },
+      { slug: 'bmw-carplay-activation-ireland', label: 'CarPlay activation outside Dublin' },
       { slug: 'bmw-map-updates-fsc-codes', label: 'BMW map updates and FSC codes' },
-      { slug: 'remote-bmw-coding-ireland', label: 'remote BMW coding across Ireland' },
-      { slug: 'bmw-coding-dublin', label: 'BMW coding in Dublin' },
     ],
     waMessage: 'Hi — I’d like Apple CarPlay activation on my BMW. My car is a ',
   },
@@ -283,7 +286,8 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { slug: 'bmw-coding-dublin', label: 'BMW coding in Dublin' },
       { slug: 'bmw-diagnostics-dublin', label: 'ISTA diagnostics' },
       { slug: 'apple-carplay-activation-dublin', label: 'Apple CarPlay activation' },
-      { slug: 'remote-bmw-coding-ireland', label: 'remote BMW coding across Ireland' },
+      { slug: 'bmw-6wa-to-6wb-retrofit', label: '6WA → 6WB digital cluster' },
+      { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6 update' },
     ],
     waMessage: 'Hi — I’d like a BMW retrofit in Dublin. My car is a ',
   },
@@ -449,7 +453,12 @@ export const SERVICE_NAV: { slug: string; label: string }[] = [
   { slug: 'bmw-coding-ireland', label: 'BMW Coding Ireland' },
   { slug: 'bmw-coding-dublin', label: 'BMW Coding Dublin' },
   { slug: 'apple-carplay-activation-dublin', label: 'Apple CarPlay Activation' },
+  { slug: 'bmw-carplay-activation-ireland', label: 'CarPlay Activation Ireland' },
+  { slug: 'bmw-fullscreen-carplay', label: 'Fullscreen CarPlay' },
   { slug: 'bmw-android-auto-activation', label: 'Android Auto Activation' },
+  { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6' },
+  { slug: 'bmw-idrive-upgrade-ireland', label: 'iDrive Upgrades' },
+  { slug: 'bmw-6wa-to-6wb-retrofit', label: '6WA → 6WB Retrofit' },
   { slug: 'bmw-diagnostics-dublin', label: 'BMW Diagnostics' },
   { slug: 'bmw-retrofits-dublin', label: 'BMW Retrofits' },
   { slug: 'japan-import-bmw-conversion-ireland', label: 'Japan Import Conversion' },

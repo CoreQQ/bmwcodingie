@@ -74,7 +74,7 @@ export default async function CodingListPage({
       <Header />
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden border-b border-white/5 pb-14 pt-28 md:pb-20 md:pt-40">
+        <section className="notice-room relative overflow-hidden border-b border-white/5 pb-14 pt-28 md:pb-20 md:pt-40">
           <div className="absolute inset-0 -z-10">
             <div className="blueprint absolute inset-0 opacity-60" />
             <div className="absolute inset-0 hero-glow" />

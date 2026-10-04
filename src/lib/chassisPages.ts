@@ -376,6 +376,7 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
           ? `BMW ${CHASSIS.find((c) => c.slug === slug)!.title} coding`
           : slug,
       })),
+      { slug: 'bmw-idrive-upgrade-ireland', label: 'iDrive upgrades & CarPlay for this model' },
       { slug: 'bmw-coding-list', label: 'the full BMW coding list' },
       { slug: 'bmw-coding-dublin', label: 'BMW coding in Dublin' },
     ],

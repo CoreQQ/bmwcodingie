@@ -498,7 +498,9 @@ main button[aria-pressed] {
 }
 
 /* Room for the dismissible notice card under the header (Announcement.tsx). */
-html[data-notice] #top > div:first-child { padding-top: 10.5rem; }
+html[data-notice] #top > div:first-child,
+html[data-notice] .notice-room { padding-top: 10.5rem; }
 @media (min-width: 768px) {
-  html[data-notice] #top > div:first-child { padding-top: 16rem; }
+  html[data-notice] #top > div:first-child,
+  html[data-notice] .notice-room { padding-top: 16rem; }
 }
