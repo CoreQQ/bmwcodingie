@@ -7,8 +7,13 @@ import { BLOG_POSTS } from '@/lib/blog';
 // Gallery photos live in a separate image sitemap (/image-sitemap.xml) because
 // Next 14's MetadataRoute.Sitemap drops the `images` field.
 
+// Only canonical URLs belong in a sitemap. The homepage is fully translated
+// and self-canonical per locale; every other page declares the English URL
+// as canonical, so listing its /ru, /pl… copies only wastes crawl budget
+// (Search Console showed them as "alternate page with proper canonical").
+const TRANSLATED_PATHS = [{ path: '', priority: 1 }];
+
 const PATHS = [
-  { path: '', priority: 1 },
   { path: '/bmw-coding-ireland', priority: 0.9 },
   { path: '/models', priority: 0.8 },
   { path: '/bmw-coding-list', priority: 0.8 },
@@ -28,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return `${base}${prefix}${path}`;
   }
 
-  return PATHS.flatMap(({ path, priority }) =>
+  const translated = TRANSLATED_PATHS.flatMap(({ path, priority }) =>
     routing.locales.map((locale) => ({
       url: localeUrl(locale, path),
       lastModified: new Date(),
@@ -41,4 +46,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     })),
   );
+  const english = PATHS.map(({ path, priority }) => ({
+    url: localeUrl(routing.defaultLocale, path),
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority,
+  }));
+  return [...translated, ...english];
 }

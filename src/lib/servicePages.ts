@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { routing } from '@/i18n/routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -474,17 +473,12 @@ export const SERVICE_NAV: { slug: string; label: string }[] = [
 /** Build metadata for any landing page object (title, description, canonical, hreflang, OG). */
 export function buildLandingMetadata(p: ServicePage): Metadata {
   const url = `/${p.slug}`;
-  const languages: Record<string, string> = Object.fromEntries(
-    routing.locales.map((l) => [
-      l,
-      l === routing.defaultLocale ? `${SITE_URL}${url}` : `${SITE_URL}/${l}${url}`,
-    ]),
-  );
-  languages['x-default'] = `${SITE_URL}${url}`;
+  // No hreflang here: the body is English in every locale and canonical
+  // points at the English URL, so language alternates would contradict it.
   return {
     title: p.metaTitle,
     description: p.metaDescription,
-    alternates: { canonical: url, languages },
+    alternates: { canonical: url },
     openGraph: {
       type: 'website',
       url: `${SITE_URL}${url}`,
