@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Check, X, HelpCircle, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { CarModel, CategoryWithServices, ModelCompatibility, SiteSettings } from '@/lib/types';
-import { waLink } from '@/lib/data';
+import { waLink } from '@/lib/waMessage';
 
 export function ModelPicker({
   models,

@@ -146,9 +146,6 @@ export const getCompatibility = cache(async (): Promise<ModelCompatibility[]> =>
 });
 
 /** Build a clean wa.me link from a stored number. Returns '#' if number is empty. */
-export function waLink(whatsapp: string, text?: string): string {
-  const digits = whatsapp.replace(/[^\d]/g, '');
-  if (!digits) return '#';
-  const q = text ? `?text=${encodeURIComponent(text)}` : '';
-  return `https://wa.me/${digits}${q}`;
-}
+// Kept here for server callers; the implementation is in waMessage.ts so
+// client components can import it without pulling supabase into the bundle.
+export { waLink } from './waMessage';

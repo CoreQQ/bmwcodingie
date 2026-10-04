@@ -14,7 +14,10 @@ export function Preloader() {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Phones never see it: on a slow device the SSR overlay would sit over the
+    // page until hydration plus the animation (PageSpeed mobile LCP/SI).
+    // globals.css hides it before hydration; this skips the timers.
+    if (window.matchMedia('(prefers-reduced-motion: reduce), (max-width: 767px)').matches) {
       setHidden(true);
       return;
     }

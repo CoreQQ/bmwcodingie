@@ -360,6 +360,11 @@ html {
     animation-duration: 0.35s;
   }
 }
+@media (max-width: 767px) {
+  .preloader {
+    display: none !important;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .preloader {
     display: none !important;

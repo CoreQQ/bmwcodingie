@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Phone, MessageCircle, Send, Instagram, Mail, MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { SiteSettings } from '@/lib/types';
-import { waLink } from '@/lib/data';
+import { waLink } from '@/lib/waMessage';
 import { trackMetaEvent } from './MetaPixel';
 import { getAttribution, getLanding, getTimeOnSite } from '@/lib/attribution';
 import { trackGaEvent, trackGoogleConversion } from './GoogleAdsTag';
