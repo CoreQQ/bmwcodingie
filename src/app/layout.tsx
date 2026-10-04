@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Bebas_Neue, Manrope } from 'next/font/google';
+import { DM_Sans, Sora } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
@@ -8,16 +8,17 @@ import { GoogleAdsTag } from '@/components/site/GoogleAdsTag';
 import { Attribution } from '@/components/site/Attribution';
 import { VisitorPing } from '@/components/site/VisitorPing';
 
-const bebas = Bebas_Neue({
-  weight: '400',
+// "Glass over photo" direction: Sora for headings, DM Sans for text.
+const sora = Sora({
+  weight: ['600', '700'],
   subsets: ['latin'],
-  variable: '--font-bebas',
+  variable: '--font-display',
   display: 'swap',
 });
 
-const manrope = Manrope({
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-manrope',
+  variable: '--font-body',
   display: 'swap',
 });
 
@@ -27,7 +28,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   // Tints the mobile browser chrome to match the site's graphite background.
-  themeColor: '#0A0B0D',
+  themeColor: '#0C0F14',
 };
 
 export const metadata: Metadata = {
@@ -83,7 +84,7 @@ export const metadata: Metadata = {
 // which sets the request locale and therefore renders statically too.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${bebas.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${sora.variable} ${dmSans.variable}`}>
       <body className="font-sans antialiased">
         {/* Guard against the "removeChild/insertBefore: not a child" crash that
             browser auto-translate (Google Translate etc.) triggers by swapping

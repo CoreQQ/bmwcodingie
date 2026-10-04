@@ -16,7 +16,7 @@ export function WhatsAppFloat({ whatsapp }: { whatsapp: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="WhatsApp us"
-      className="fixed bottom-6 right-6 z-50 hidden h-14 items-center gap-2 bg-[#25D366] px-5 font-mono text-xs font-semibold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-[#1ebe5b] md:inline-flex"
+      className="fixed bottom-6 right-6 z-50 hidden h-14 items-center gap-2 rounded-full bg-[#25D366] px-6 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-[#1ebe5b] md:inline-flex"
     >
       <MessageCircle size={18} /> WhatsApp us
     </a>
