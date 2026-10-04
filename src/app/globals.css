@@ -13,8 +13,8 @@
   --graphite: #0c0f14;
   /* "Glass over photo": the photo behind every page. Swap these two files
      (or these two lines) to change the background site-wide. */
-  --site-photo: url('/hero-bg.jpg');
-  --site-photo-mobile: url('/hero-bg-mobile.jpg');
+  --site-photo: url('/site-bg.webp');
+  --site-photo-mobile: url('/site-bg-mobile.webp');
   --glass: rgba(255, 255, 255, 0.07);
   --glass-strong: rgba(255, 255, 255, 0.12);
   --glass-line: rgba(255, 255, 255, 0.16);
