@@ -50,7 +50,9 @@ export function GoogleAdsTag() {
       </Script>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`}
-        strategy="afterInteractive"
+        // After load, not after hydration: on slow 4G the tag competed with
+        // CSS and fonts during the LCP window. dataLayer queues events meanwhile.
+        strategy="lazyOnload"
       />
     </>
   );

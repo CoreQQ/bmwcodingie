@@ -28,3 +28,11 @@ export function waHref(whatsapp: string, text: string): string {
 }
 
 export { DEFAULT_MESSAGE as WA_DEFAULT_MESSAGE };
+
+/** wa.me link with an optional pre-filled text; '#' when no number is set. */
+export function waLink(whatsapp: string, text?: string): string {
+  const digits = whatsapp.replace(/[^\d]/g, '');
+  if (!digits) return '#';
+  const q = text ? `?text=${encodeURIComponent(text)}` : '';
+  return `https://wa.me/${digits}${q}`;
+}
