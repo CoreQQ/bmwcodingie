@@ -166,6 +166,13 @@ export default async function LocaleLayout({
           __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e'),
         }}
       />
+      {/* Reserve the notice's space in the hero before first paint; doing it
+          after hydration shifted the whole page (CLS). Key matches Announcement. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{if(localStorage.getItem('bmw-notice-mobile-live')!=='seen')document.documentElement.dataset.notice='1'}catch(e){document.documentElement.dataset.notice='1'}`,
+        }}
+      />
       <Announcement
         title={tNotice('title')}
         body={tNotice('body')}
