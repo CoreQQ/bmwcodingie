@@ -54,6 +54,16 @@ export function GoogleAdsTag() {
         // CSS and fonts during the LCP window. dataLayer queues events meanwhile.
         strategy="lazyOnload"
       />
+      {/* The Ads container does not load GA4 on its own (verified: no G-
+          destination request, zero GA4 hits) unless the accounts are linked
+          in GA4 admin, so GA4 gets its own container. Both read the same
+          dataLayer, so the configs above cover both. */}
+      {GA_ID && (
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="lazyOnload"
+        />
+      )}
     </>
   );
 }
