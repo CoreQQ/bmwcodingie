@@ -1,4 +1,5 @@
 import { translateToRussian } from './translate';
+import { waLinkFor } from './phone';
 
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT_ID = process.env.TG_CHAT_ID;
@@ -198,7 +199,8 @@ export function bookingLines(lead: Lead): string[] {
     slot ? '📅 <b>New booking request</b>' : '🚗 <b>New BMW Coding IE enquiry</b>',
     '━━━━━━━━━━━━━━━━━━━',
     `👤 <b>Name:</b> ${esc(lead.name)}`,
-    `☎️ <b>Contact:</b> ${esc(lead.contact)}`,
+    // A number is a link so one tap opens the chat; anything else stays plain text.
+    `☎️ <b>Contact:</b> ${waLinkFor(lead.contact) ? `<a href="${waLinkFor(lead.contact)}">${esc(lead.contact)}</a>` : esc(lead.contact)}`,
   ];
   if (slot) lines.push(`🕒 <b>Requested slot:</b> ${esc(slot)}`);
   // Where matters as much as when: without it nobody knows who is travelling.
@@ -241,12 +243,13 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
   }
 
   const slot = formatSlot(lead.slot_date, lead.slot_time);
-  // Confirm/decline buttons only make sense for a saved slot booking.
-  const keyboard =
-    lead.id && slot
-      ? bookingKeyboard(lead.id, lead.name, slot, lead.public_token, lead.visitType)
-      : undefined;
-  return sendTelegramMessage(lines.join('\n'), keyboard);
+  // Confirm/decline buttons only make sense for a saved slot booking; the
+  // WhatsApp button goes on every lead that came with a number.
+  const rows: InlineButton[][] = [];
+  const wa = waLinkFor(lead.contact);
+  if (wa) rows.push([{ text: '💬 Open in WhatsApp', url: wa }]);
+  if (lead.id && slot) rows.push(...bookingKeyboard(lead.id, lead.name, slot, lead.public_token, lead.visitType).inline_keyboard);
+  return sendTelegramMessage(lines.join('\n'), rows.length ? { inline_keyboard: rows } : undefined);
 }
 
 // ─── Webhook helpers (used by /api/telegram) ───
@@ -277,13 +280,14 @@ export async function editBookingMessage(
     outcome === 'confirmed'
       ? { text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(lead.name, slot, lead.public_token) } }
       : { text: '📋 Copy "offer other times" reply', copy_text: { text: declineReply(lead.name, slot) } };
+  const wa = waLinkFor(lead.contact);
   await tgCall('editMessageText', {
     chat_id: chatId,
     message_id: messageId,
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
-    reply_markup: { inline_keyboard: [[button]] },
+    reply_markup: { inline_keyboard: wa ? [[{ text: '💬 Open in WhatsApp', url: wa }], [button]] : [[button]] },
   });
 }
 

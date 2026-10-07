@@ -166,7 +166,8 @@
     "nameOptionalLabel": "Nume (opțional)",
     "vinOptionalLabel": "Ultimele 7 caractere din VIN (opțional)",
     "carServiceMissing": "Spune-ne modelul / anul BMW și serviciul de care ai nevoie.",
-    "addressMissing": "Adaugă adresa sau zona, ca să știm unde venim."
+    "addressMissing": "Adaugă adresa sau zona, ca să știm unde venim.",
+    "phoneError": "Introdu un număr de telefon valid, de ex. 087 123 4567 sau +353 87 123 4567."
   },
   "Footer": {
     "pitch": "Coding, diagnostic și retrofit BMW independent, în Dublin și în toată Irlanda — la fața locului sau la distanță prin ENET.",
@@ -306,13 +307,16 @@
     "heading": "Nu știi ce suportă BMW-ul tău?",
     "body": "Trimite ultimele 7 caractere din VIN și spune-ne ce vrei să activezi sau să montezi. Verificăm compatibilitatea pentru BMW-ul tău.",
     "vinLabel": "Ultimele 7 caractere din VIN",
-    "modelLabel": "Model / an (opțional)",
+    "modelLabel": "Model / an",
     "serviceLabel": "Ce te interesează?",
-    "phoneLabel": "Telefon / WhatsApp (opțional)",
+    "phoneLabel": "Telefon / WhatsApp",
     "cta": "Verifică BMW-ul meu",
-    "hint": "Lasă numărul și îți scriem noi. Sau lasă gol și continui pe WhatsApp.",
+    "hint": "Verificăm VIN-ul și răspundem pe WhatsApp sau prin SMS — de obicei într-o oră în programul de lucru.",
     "vinError": "Introdu ultimele 7 caractere din VIN (litere și cifre).",
-    "sent": "Mulțumim. Verificăm BMW-ul tău și te contactăm în curând."
+    "sent": "Mulțumim. Verificăm BMW-ul tău și te contactăm în curând.",
+    "modelError": "Spune-ne modelul și anul, de ex. F30 320d, 2017.",
+    "phoneError": "Introdu un număr de telefon valid, de ex. 087 123 4567 sau +353 87 123 4567.",
+    "sentWhatsapp": "Continuă acum pe WhatsApp"
   },
   "Popular": {
     "eyebrow": "Servicii BMW populare",
