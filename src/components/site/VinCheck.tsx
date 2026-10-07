@@ -5,6 +5,7 @@ import { ScanSearch } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { waHref } from '@/lib/waMessage';
+import { normalizePhone } from '@/lib/phone';
 import { trackGaEvent, trackGoogleConversion } from './GoogleAdsTag';
 import { trackMetaEvent } from './MetaPixel';
 
@@ -57,34 +58,36 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
   const [model, setModel] = useState('');
   const [service, setService] = useState(SERVICES[0]);
   const [phone, setPhone] = useState('');
-  const [state, setState] = useState<'idle' | 'sent' | 'error'>('idle');
+  const [state, setState] = useState<'idle' | 'sent'>('idle');
+  // Which field is wrong, so the message sits under the field and the rest stays quiet.
+  const [error, setError] = useState<'vin' | 'model' | 'phone' | null>(null);
 
   const clean = vin.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  const valid = clean.length === 7;
+  const vinOk = clean.length === 7;
+  const e164 = normalizePhone(phone);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!valid) {
-      setState('error');
-      return;
-    }
-    const payload = JSON.stringify({ vin: clean, model, service, phone, page: path });
-    // keepalive so the heads-up still reaches Alex when WhatsApp takes over the tab.
+    // Every field is required: a check with no number or no car is a lead
+    // Alex cannot act on (that is what the old optional form produced).
+    if (!vinOk) return setError('vin');
+    if (model.trim().length < 3) return setError('model');
+    if (!e164) return setError('phone');
+    setError(null);
+    const payload = JSON.stringify({ vin: clean, model: model.trim(), service, phone: e164, page: path });
     fetch('/api/vin-check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(() => {});
     trackMetaEvent('Lead', { content_name: `VIN check · ${service}` });
     trackGoogleConversion();
     trackGaEvent('vin_check_submit', { service });
-    if (phone.trim()) {
-      setState('sent');
-      return;
-    }
-    const text =
-      `Hi, I'd like to check my BMW.\n` +
-      `VIN (last 7): ${clean}\n` +
-      (model ? `Model: ${model}\n` : '') +
-      `Interested in: ${service}`;
-    window.open(waHref(whatsapp, text), '_blank', 'noopener');
+    setState('sent');
   }
+
+  // After sending, the same details pre-typed for WhatsApp so the chat can start at once.
+  const waText =
+    `Hi, I'd like to check my BMW.\n` +
+    `VIN (last 7): ${clean}\n` +
+    (model ? `Model: ${model}\n` : '') +
+    `Interested in: ${service}`;
 
   const input = 'w-full border border-white/10 bg-graphite-800 px-4 py-3 text-sm text-ink placeholder:text-faint focus:border-bmw focus:outline-none';
 
@@ -101,9 +104,14 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
             <p className="mt-4 text-muted">{t('body')}</p>
           </div>
 
-          <form onSubmit={submit} className="space-y-3 md:col-span-7">
+          <form onSubmit={submit} noValidate className="space-y-3 md:col-span-7">
             {state === 'sent' ? (
-              <div role="alert" className="border border-bmw/40 bg-bmw/10 p-5 text-sm text-ink">{t('sent')}</div>
+              <div role="alert" className="border border-bmw/40 bg-bmw/10 p-5 text-sm text-ink">
+                <p>{t('sent')}</p>
+                <a href={waHref(whatsapp, waText)} target="_blank" rel="noopener noreferrer" className="btn-ghost mt-4 inline-flex items-center gap-2">
+                  {t('sentWhatsapp')}
+                </a>
+              </div>
             ) : (
               <>
                 <label className="block">
@@ -112,22 +120,36 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
                     value={vin}
                     onChange={(e) => {
                       setVin(e.target.value);
-                      if (state === 'error') setState('idle');
+                      if (error === 'vin') setError(null);
                     }}
+                    required
+                    aria-invalid={error === 'vin'}
                     maxLength={9}
                     autoCapitalize="characters"
                     autoComplete="off"
                     placeholder="e.g. FK41749"
                     className={`${input} font-mono uppercase tracking-widest`}
                   />
+                  {error === 'vin' && <p className="mt-2 text-sm text-red-400">{t('vinError')}</p>}
                 </label>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label className="block">
-                    <span className="label mb-2 block">{t('modelLabel')}</span>
-                    <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="e.g. F30 320d, 2017" className={input} />
+                    <span className="label mb-2 block">{t('modelLabel')} *</span>
+                    <input
+                      value={model}
+                      onChange={(e) => {
+                        setModel(e.target.value);
+                        if (error === 'model') setError(null);
+                      }}
+                      placeholder="e.g. F30 320d, 2017"
+                      required
+                      aria-invalid={error === 'model'}
+                      className={input}
+                    />
+                    {error === 'model' && <p className="mt-2 text-sm text-red-400">{t('modelError')}</p>}
                   </label>
                   <label className="block">
-                    <span className="label mb-2 block">{t('serviceLabel')}</span>
+                    <span className="label mb-2 block">{t('serviceLabel')} *</span>
                     <select value={service} onChange={(e) => setService(e.target.value)} className={input}>
                       {SERVICE_GROUPS.map((g) => (
                         <optgroup key={g.label} label={g.label} className="bg-graphite-800">
@@ -140,10 +162,22 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
                   </label>
                 </div>
                 <label className="block">
-                  <span className="label mb-2 block">{t('phoneLabel')}</span>
-                  <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="+353 …" className={input} />
+                  <span className="label mb-2 block">{t('phoneLabel')} *</span>
+                  <input
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (error === 'phone') setError(null);
+                    }}
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="087 123 4567 or +353 …"
+                    required
+                    aria-invalid={error === 'phone'}
+                    className={input}
+                  />
+                  {error === 'phone' && <p className="mt-2 text-sm text-red-400">{t('phoneError')}</p>}
                 </label>
-                {state === 'error' && <p className="text-sm text-red-400">{t('vinError')}</p>}
                 <button type="submit" className="btn-primary w-full justify-center">
                   {t('cta')}
                 </button>

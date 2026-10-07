@@ -166,7 +166,8 @@
     "nameOptionalLabel": "Name (optional)",
     "vinOptionalLabel": "Last 7 digits of VIN (optional)",
     "carServiceMissing": "Please tell us your BMW model / year and the service you need.",
-    "addressMissing": "Please add your address or area so we know where to come."
+    "addressMissing": "Please add your address or area so we know where to come.",
+    "phoneError": "Please enter a valid phone number, e.g. 087 123 4567 or +353 87 123 4567."
   },
   "Footer": {
     "pitch": "Independent BMW coding, diagnostics and retrofits across Dublin and Ireland — in person or remotely over ENET.",
@@ -306,13 +307,16 @@
     "heading": "Not sure what your BMW supports?",
     "body": "Send us the last 7 digits of your VIN and tell us what you would like to activate or retrofit. We'll check compatibility for your BMW.",
     "vinLabel": "Last 7 digits of VIN",
-    "modelLabel": "Model / year (optional)",
+    "modelLabel": "Model / year",
     "serviceLabel": "What would you like?",
-    "phoneLabel": "Phone / WhatsApp (optional)",
+    "phoneLabel": "Phone / WhatsApp",
     "cta": "Check my BMW",
-    "hint": "Leave your number and we'll text you back — or leave it empty and the check continues in WhatsApp.",
+    "hint": "We check your VIN and reply on WhatsApp or by text — usually within the hour in working time.",
     "vinError": "Please enter the last 7 characters of your VIN (letters and numbers).",
-    "sent": "Thank you. We'll check your BMW and contact you shortly."
+    "sent": "Thank you. We'll check your BMW and contact you shortly.",
+    "modelError": "Please tell us the model and year, e.g. F30 320d, 2017.",
+    "phoneError": "Please enter a valid phone number, e.g. 087 123 4567 or +353 87 123 4567.",
+    "sentWhatsapp": "Continue on WhatsApp now"
   },
   "Popular": {
     "eyebrow": "Popular BMW services",

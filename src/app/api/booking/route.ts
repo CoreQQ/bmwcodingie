@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { normalizePhone } from '@/lib/phone';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { parseUserAgent } from '@/lib/parseUserAgent';
 import { notifyTelegram } from '@/lib/telegram';
@@ -24,7 +25,10 @@ export async function POST(req: Request) {
   }
 
   const name = String(body.name ?? '').trim().slice(0, 120);
-  const contact = String(body.contact ?? '').trim().slice(0, 120);
+  const rawContact = String(body.contact ?? '').trim().slice(0, 120);
+  // The field is "Phone / WhatsApp": store it in one shape so wa.me links,
+  // repeat-customer matching and the agenda all see the same number.
+  const contact = normalizePhone(rawContact) ?? '';
   const bmw_model = String(body.bmw_model ?? '').trim().slice(0, 160);
   const service =
     String(body.service ?? '').trim().slice(0, 160) ||
@@ -59,8 +63,11 @@ export async function POST(req: Request) {
   const rawTime = String(body.slot_time ?? '').trim().slice(0, 40);
   const slot_time = /^\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}$/.test(rawTime) ? rawTime : '';
 
-  if (!name || !contact) {
+  if (!name || !rawContact) {
     return NextResponse.json({ ok: false, error: 'Name and contact required' }, { status: 400 });
+  }
+  if (!contact) {
+    return NextResponse.json({ ok: false, error: 'phone' }, { status: 400 });
   }
 
   const lead = { name, contact, bmw_model, service, message, slot_date, slot_time, visitType: visit_type ?? undefined, visitAddress: visit_address ?? undefined, source: source ?? undefined, howHeard: how_heard ?? undefined, contactPref: contact_pref ?? undefined, landing: landing ?? undefined, device: foreign && device ? `${device} · 🌍 ${country} — outside service area` : device, language, dwell };

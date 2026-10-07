@@ -166,7 +166,8 @@
     "nameOptionalLabel": "Vardas (nebūtina)",
     "vinOptionalLabel": "Paskutiniai 7 VIN simboliai (nebūtina)",
     "carServiceMissing": "Nurodykite BMW modelį / metus ir reikiamą paslaugą.",
-    "addressMissing": "Nurodykite adresą ar rajoną, kad žinotume, kur atvykti."
+    "addressMissing": "Nurodykite adresą ar rajoną, kad žinotume, kur atvykti.",
+    "phoneError": "Įveskite teisingą telefono numerį, pvz. 087 123 4567 arba +353 87 123 4567."
   },
   "Footer": {
     "pitch": "Nepriklausomas BMW kodavimas, diagnostika ir retrofitai visame Dubline ir Airijoje — gyvai arba nuotoliniu būdu per ENET.",
@@ -306,13 +307,16 @@
     "heading": "Nežinote, ką palaiko jūsų BMW?",
     "body": "Atsiųskite paskutinius 7 VIN simbolius ir ką norite aktyvuoti ar sumontuoti. Patikrinsime suderinamumą jūsų BMW.",
     "vinLabel": "Paskutiniai 7 VIN simboliai",
-    "modelLabel": "Modelis / metai (nebūtina)",
+    "modelLabel": "Modelis / metai",
     "serviceLabel": "Kas jus domina?",
-    "phoneLabel": "Telefonas / WhatsApp (nebūtina)",
+    "phoneLabel": "Telefonas / WhatsApp",
     "cta": "Patikrinti mano BMW",
-    "hint": "Palikite numerį ir mes parašysime. Arba palikite tuščią ir tęskite per WhatsApp.",
+    "hint": "Patikrinsime VIN ir atsakysime per WhatsApp arba SMS — paprastai per valandą darbo metu.",
     "vinError": "Įveskite paskutinius 7 VIN simbolius (raides ir skaičius).",
-    "sent": "Ačiū. Patikrinsime jūsų BMW ir netrukus susisieksime."
+    "sent": "Ačiū. Patikrinsime jūsų BMW ir netrukus susisieksime.",
+    "modelError": "Nurodykite modelį ir metus, pvz. F30 320d, 2017.",
+    "phoneError": "Įveskite teisingą telefono numerį, pvz. 087 123 4567 arba +353 87 123 4567.",
+    "sentWhatsapp": "Tęsti WhatsApp dabar"
   },
   "Popular": {
     "eyebrow": "Populiarios BMW paslaugos",

@@ -5,6 +5,7 @@ import { Phone, MessageCircle, Send, Instagram, Mail, MapPin } from 'lucide-reac
 import { useTranslations } from 'next-intl';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/waMessage';
+import { isValidPhone } from '@/lib/phone';
 import { trackMetaEvent } from './MetaPixel';
 import { getAttribution, getLanding, getTimeOnSite } from '@/lib/attribution';
 import { trackGaEvent, trackGoogleConversion } from './GoogleAdsTag';
@@ -66,6 +67,11 @@ export function Contact({
     if (!form.contact.trim()) {
       setStatus('error');
       setErrorMsg(t('validationError'));
+      return;
+    }
+    if (!isValidPhone(form.contact)) {
+      setStatus('error');
+      setErrorMsg(t('phoneError'));
       return;
     }
     if (!consult && (!form.bmw_model.trim() || !form.service)) {
