@@ -26,6 +26,7 @@ import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
 import { buildAgenda, buildLeadCard, type AgendaLead } from '@/lib/agenda';
+import { jpAddressMessage } from '@/lib/jpAddress';
 import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
 import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
@@ -793,6 +794,14 @@ export async function POST(req: Request) {
       await sendOwnerMessage(lines.join('\n'));
       return ok();
     }
+    // Random but internally consistent Japanese address (real postal code,
+    // prefecture, city and town; random block, building and room) — for
+    // forms around Japan-import work that insist on a Japanese address.
+    if (/^\/(jp|japan|jpaddr)(@\w+)?\b/.test(text)) {
+      const { text: body, keyboard } = jpAddressMessage();
+      await sendOwnerMessage(body, keyboard as never);
+      return ok();
+    }
     if (/^\/stats(@\w+)?\b/.test(text)) {
       const s = await getBusinessStats(sb);
       const lines = [
@@ -932,6 +941,14 @@ export async function POST(req: Request) {
   // Invoice wizard price-choice callbacks.
   if (cq.data.startsWith('inv:')) {
     await tryHandleInvoiceCallback(sb, chatId, messageId, cq.data, (t) => answerCallback(cq.id, t));
+    return ok();
+  }
+
+  // /jp → "Another one": redraw the same message with a fresh address.
+  if (cq.data === 'jp:new') {
+    const { text, keyboard } = jpAddressMessage();
+    await editMessage(chatId, messageId, text, keyboard as never);
+    await answerCallback(cq.id);
     return ok();
   }
 
