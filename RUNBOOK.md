@@ -62,7 +62,8 @@ unknown columns and retries; other readers fall back to defaults.
 `/stats` (+revenue) · `/invoice` PDF wizard (`/cancel`) · `/review [Name Service]` ·
 `/client <name|number|C-code>` · `/reply [key]` canned replies · `/cheat [query|add|del]` ·
 `/paid [120 Name Service]` · `/ban` `/unban` `/banlist` · `/calendar` ICS ·
-`/wa +353… text` (when WA connected) · `/setup` re-registers this menu.
+`/wa +353… text` (when WA connected) · `/jp` random (real-locality) Japanese address with
+copy buttons · `/setup` re-registers this menu.
 
 Mini App **PULT** tabs: Today · Money (full accounting) · Schedule (block
 days) · Clients (CRM: search, LTV, history, notes, ban, rename, delete,

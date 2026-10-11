@@ -59,6 +59,7 @@ export async function registerBotCommands(): Promise<boolean> {
     { command: 'client', description: '👤 История клиента: /client имя или номер' },
     { command: 'reply', description: '📋 Готовые ответы клиентам' },
     { command: 'cheat', description: '🔧 Шпаргалка кодировок: /cheat vim' },
+    { command: 'jp', description: '🇯🇵 Случайный японский адрес' },
     { command: 'log', description: '💶 Быстро записать оплату кнопками' },
     { command: 'paid', description: '💰 Деньги: итоги, расходы, доли' },
     { command: 'ban', description: '⛔️ Забанить: /ban C-007 причина' },
