@@ -40,7 +40,7 @@ const HONEST_NOTE =
 export const SERVICE_PAGES: Record<string, ServicePage> = {
   'bmw-coding-dublin': {
     slug: 'bmw-coding-dublin',
-    metaTitle: 'BMW Coding Dublin | Hidden Features, iDrive Coding & Retrofits',
+    metaTitle: 'BMW Coding Dublin | Mobile Service, From €80, Pay on Completion',
     metaDescription:
       'BMW coding in Dublin for F-Series and G-Series models. Hidden features, iDrive coding, comfort functions, ISTA diagnostics and retrofits. In-person and remote options.',
     serviceName: 'BMW Coding',
@@ -302,7 +302,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
   'japan-import-bmw-conversion-ireland': {
     slug: 'japan-import-bmw-conversion-ireland',
     galleryMatch: ['japan'],
-    metaTitle: 'Japan Import BMW Conversion Ireland | BMW Region Change & Map Updates',
+    metaTitle: 'Japanese Import BMW Conversion Ireland | Japan → EU Radio, Nav & CarPlay',
     metaDescription:
       'BMW Japan to EU conversion in Ireland. Region change, navigation FSC, map updates, ETC mirror and TCB checks for Japanese import BMW models.',
     serviceName: 'Japan to EU BMW Conversion',

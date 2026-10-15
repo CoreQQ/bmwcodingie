@@ -132,6 +132,30 @@ const CHASSIS: ChassisFacts[] = [
     upgrades: ['carplayEvo','id6','cluster6wb','maps','camera','hidden'],
   },
   {
+    slug: 'bmw-f40-coding',
+    title: '1 Series (F40) / 2 Series Gran Coupé (F44)',
+    short: 'F40 1 Series',
+    codes: 'F40, F44',
+    years: '2019–present',
+    headUnits: 'iDrive 6 (NBT Evo ID6) on base Live Cockpit cars, iDrive 7 (MGU) with Live Cockpit Plus / Professional, iDrive 8 on the newest builds',
+    genNote:
+      'The F40 is the first front-wheel-drive 1 Series and shares its electronics with the X1 and X2, not the old F20. Most cars left the factory with CarPlay, so the usual jobs are different: Android Auto and CarPlay where a trial lapsed or an import lost it, Japan → EU conversions (F40s are a common Japanese import), digital speed, folding mirrors, lighting and the sport displays in the Live Cockpit cluster.',
+    popular: [
+      'Apple CarPlay where it is missing or trial-expired (iDrive 6 €150 · iDrive 7 €220)',
+      'Android Auto activation on iDrive 7 cars',
+      'Japan → EU conversion for imported F40s — radio, language, EU maps',
+      'Digital speed and sport / M display layouts in the cluster',
+      'Auto-folding mirrors on lock and one-touch windows',
+      'Video in Motion (passenger use only) and Start/Stop memory',
+    ],
+    faq: {
+      q: 'Does my F40 1 Series have Apple CarPlay?',
+      a: 'Most F40s from 2019 on have CarPlay from the factory. Where it is missing, where a ConnectedDrive trial ran out, or on a Japanese import whose services were tied to Japan, activation is €150 on iDrive 6 and €220 on iDrive 7 — no subscription. Send your VIN and we confirm which system you have.',
+    },
+    related: ['bmw-f20-coding', 'bmw-x1-coding', 'bmw-g20-coding'],
+    upgrades: ['carplayEvo','carplayMgu','androidAuto','maps','japan','hidden'],
+  },
+  {
     slug: 'bmw-f32-coding',
     title: '4 Series (F32 / F33 / F36)',
     short: 'F32 4 Series',

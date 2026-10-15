@@ -36,7 +36,7 @@ const BODY = `# BMW Coding (bmwcoding.ie)
 
 ## By model
 - 3 Series: [F30](${SITE_URL}/bmw-f30-coding), [G20](${SITE_URL}/bmw-g20-coding) · 5 Series: [F10](${SITE_URL}/bmw-f10-coding), [G30](${SITE_URL}/bmw-g30-coding)
-- [F20 1 Series](${SITE_URL}/bmw-f20-coding), [F32 4 Series](${SITE_URL}/bmw-f32-coding), [M3/M4](${SITE_URL}/bmw-m3-m4-coding), [7 Series](${SITE_URL}/bmw-7-series-coding)
+- [F20 1 Series](${SITE_URL}/bmw-f20-coding), [F40 1 Series / F44](${SITE_URL}/bmw-f40-coding), [F32 4 Series](${SITE_URL}/bmw-f32-coding), [M3/M4](${SITE_URL}/bmw-m3-m4-coding), [7 Series](${SITE_URL}/bmw-7-series-coding)
 - SUVs: [X1](${SITE_URL}/bmw-x1-coding), [X3](${SITE_URL}/bmw-x3-coding), [X5](${SITE_URL}/bmw-x5-coding)
 
 ## Reference
