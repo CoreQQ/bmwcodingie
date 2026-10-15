@@ -44,13 +44,35 @@ export async function GET(req: Request) {
     return new Response(challenge ?? '', { status: 200 });
   }
   if (!mode) {
-    // Status check for humans.
+    // Status check for humans: is traffic flowing, and does the assistant see
+    // the owner's own replies (smb_message_echoes)? Counts and times only —
+    // no numbers, no message text.
+    const sb = getSupabaseAdmin();
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const stat = async (via: string, ownerOnly = false) => {
+      if (!sb) return { n: 0, last: null as string | null };
+      let q = sb
+        .from('wa_messages')
+        .select('created_at', { count: 'exact' })
+        .gt('created_at', since)
+        .eq('via', via);
+      if (ownerOnly) q = q.like('content', '[Alex]%');
+      const { data, count } = await q.order('created_at', { ascending: false }).limit(1);
+      return { n: count ?? 0, last: (data?.[0] as { created_at?: string } | undefined)?.created_at ?? null };
+    };
+    const [owner, customer, ai] = await Promise.all([stat('owner', true), stat('customer'), stat('ai')]);
     return NextResponse.json({
       ok: true,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
       verify: Boolean(expected),
+      last24h: {
+        owner_replies_seen: owner.n,
+        last_owner_reply: owner.last,
+        customer_messages: customer.n,
+        assistant_replies_delivered: ai.n,
+      },
     });
   }
   return new Response('Forbidden', { status: 403 });
