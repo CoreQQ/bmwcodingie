@@ -331,21 +331,32 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     }
   }
 
+  // If WhatsApp refuses the send, the answer is not wasted: Alex gets it
+  // ready to copy and paste from his phone.
+  let sendError = '';
   if (reply) {
     const sent = await sendWhatsAppText(waId, reply);
-    if (!sent.ok) throw new Error(sent.error || 'send failed');
-    await sb.from('wa_messages').insert({ msg_id: sent.id || `out:${msg.id}`, wa_id: waId, role: 'assistant', content: reply, via: 'ai' });
+    if (sent.ok) {
+      await sb.from('wa_messages').insert({ msg_id: sent.id || `out:${msg.id}`, wa_id: waId, role: 'assistant', content: reply, via: 'ai' });
+    } else {
+      sendError = sent.error || 'send failed';
+    }
   }
 
   // Mirror to the owner.
   const lines = [head];
   if (photo) lines.push('📷 <i>sent a photo</i>');
   if (text) lines.push(`«${esc(text)}»${ruLine}`);
-  if (reply) lines.push(`🤖 ${esc(reply)}`);
+  if (reply && !sendError) lines.push(`🤖 ${esc(reply)}`);
+  if (sendError)
+    lines.push(
+      `❌ <b>WhatsApp refused to send the answer</b> — the customer got nothing. Copy it and send from your phone:\n<pre>${esc(reply.slice(0, 3000))}</pre>\n<code>${esc(sendError.slice(0, 300))}</code>`,
+    );
   if (!reply && !aiError && !skipped && text && /\balex\b/i.test(text))
     lines.push("👋 They're talking to you by name — the assistant stayed quiet and stands down for 6h.");
   else if (!reply && !aiError && !skipped) lines.push('🤫 The assistant chose not to answer this one — it is yours.');
   if (aiError) lines.push(`⚠️ <b>The assistant could not answer</b> — the customer got no reply. Answer them yourself.\n<code>${esc(aiError.slice(0, 200))}</code>`);
   if (skipped) lines.push(skipped);
-  await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: [controls, numberRow] });
+  const copyRow = sendError ? [[{ text: '📋 Copy answer', copy_text: { text: reply.slice(0, 256) } }]] : [];
+  await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: [...copyRow, controls, numberRow] });
 }
