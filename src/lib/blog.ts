@@ -622,6 +622,70 @@ export const BLOG_POSTS: BlogPost[] = [
       { slug: 'bmw-id4-to-id6-upgrade', label: 'ID4 → ID6 update' },
     ],
   },
+  {
+    slug: 'does-my-bmw-support-apple-carplay',
+    title: 'Does My BMW Support Apple CarPlay? Check by Year and iDrive',
+    metaTitle: 'Does My BMW Support Apple CarPlay? Year & iDrive Guide (Ireland)',
+    description:
+      'A quick way to tell whether your BMW can have Apple CarPlay: the model year, the look of the iDrive screen and the head unit behind it — plus what activation costs in Ireland.',
+    date: '2026-10-15',
+    readMinutes: 5,
+    intro: [
+      'Short version: BMWs built from around 2016 with iDrive 6 (NBT Evo) or anything newer can almost always have Apple CarPlay. Cars before that usually cannot without new hardware. The year is only a hint, though — the head unit decides, and two 2016 cars can have different ones. Here is how to tell what you have in under a minute.',
+    ],
+    sections: [
+      {
+        heading: 'Quick answer by year',
+        paragraphs: [
+          'These are the typical cases; the VIN confirms yours.',
+        ],
+        bullets: [
+          '2019 and newer (iDrive 7 / 8, the wide curved-style display): CarPlay is supported, often fitted from the factory. If it is missing or a trial expired, it can be activated — €220 on iDrive 7, iDrive 8 priced per car.',
+          '2016–2019 with the tile home screen (iDrive 6 / NBT Evo): supported. Many cars shipped with it locked or on a subscription; activation by coding is €150, permanent, wireless on most ID6 builds.',
+          '2016–2017 with a list-style menu on a newer car: possibly NBT Evo running old ID4/ID5 software — the €50 update to ID6 usually makes CarPlay possible.',
+          '2013–2016 with NBT (iDrive 4/5 look) or any CIC car: no native CarPlay. Hidden features, navigation and diagnostics still apply, but CarPlay would need a different head unit.',
+        ],
+      },
+      {
+        heading: 'Check the screen, not the badge',
+        paragraphs: [
+          'Turn the car on and look at the home screen. A grid of large tiles you can rearrange is iDrive 6 (NBT Evo) — CarPlay territory. A wide screen with swipeable widgets and a curved look is iDrive 7 or 8 — also fine. A vertical list of menu items (CD/Multimedia, Radio, Telephone, Navigation…) on a dark background is the older NBT or CIC family — generally no CarPlay.',
+          'Still not sure? The last 7 characters of your VIN tell us the exact head unit and software level in a minute, which is why every job we do starts there.',
+        ],
+      },
+      {
+        heading: 'Three situations that confuse people',
+        paragraphs: [
+          'A car that had CarPlay and lost it. BMW sold CarPlay as a yearly ConnectedDrive subscription on many 2017–2019 cars; when it lapsed, the icon disappeared. Activation brings it back permanently — no subscription.',
+          'A Japanese import. The hardware is the same, but the car’s services were set up for Japan. A Japan → EU conversion (from €250) fixes the radio, language and navigation, and CarPlay is included where the head unit supports it.',
+          'A base-spec car with the small screen. Early 1 Series and X1 with the basic radio have no head unit that can run CarPlay; the same car in higher spec does. Only the VIN tells which one yours is.',
+        ],
+      },
+      {
+        heading: 'Wired or wireless?',
+        paragraphs: [
+          'iDrive 7 and 8 cars are wireless by design. On NBT Evo, wireless works on most ID6 builds and needs the Wi-Fi antenna, which some cars have and some do not (fitting one is €30). Wired-only is the fallback where the build does not support wireless — we tell you which before booking.',
+        ],
+      },
+      {
+        heading: 'What it costs and how it is done',
+        paragraphs: [
+          'Activation is coding, not parts: €150 on NBT Evo, €220 on iDrive 7, one-off. It takes under an hour, remotely anywhere in Ireland with a Windows laptop and an ENET cable, or at your car around Dublin. We pair your iPhone and show CarPlay working before you pay.',
+        ],
+        bullets: [
+          'NBT Evo (iDrive 6) — €150; ID4 → ID6 update first if needed, +€50',
+          'iDrive 7 (MGU) — €220; Android Auto €200 on the same system',
+          'iDrive 8 / 8.5 — checked and priced per car',
+          'No subscription, reversible like all coding',
+        ],
+      },
+    ],
+    related: [
+      { slug: 'bmw-carplay-activation-ireland', label: 'CarPlay activation across Ireland' },
+      { slug: 'bmw-id4-to-id6-upgrade', label: 'ID4 → ID6 update' },
+      { slug: 'blog/which-idrive-do-i-have', label: 'Which iDrive do I have?' },
+    ],
+  },
 ];
 
 
