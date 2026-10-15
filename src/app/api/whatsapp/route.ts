@@ -1,9 +1,15 @@
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { waitUntil } from '@vercel/functions';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { WHATSAPP_PROMPT } from '@/lib/assistantPrompt';
-import { sendWhatsAppText, markWhatsAppRead, isWhatsAppConfigured } from '@/lib/whatsapp';
+import {
+  sendWhatsAppText,
+  markWhatsAppRead,
+  isWhatsAppConfigured,
+  whatsAppPhoneId,
+  downloadWhatsAppMedia,
+} from '@/lib/whatsapp';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
 import { translateToRussian } from '@/lib/translate';
 import { isRateLimited } from '@/lib/rateLimit';
@@ -13,170 +19,326 @@ import { generateWaReply } from '@/lib/waAgent';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-// AI auto-responder for the business WhatsApp number (official Cloud API).
-// Every inbound message is answered by Claude with the shared business brain,
-// mirrored to the owner's Telegram (with a pause button per chat), and stored
-// in Supabase so the model sees the conversation history.
+// WhatsApp Business Cloud API webhook — Meta's own payload format, whether
+// Meta posts here directly or through a coexistence relay (Dualhook's Webhook
+// Override sends Meta's events straight to this URL). Every inbound message
+// is answered by the shared business brain, mirrored to the owner's Telegram
+// and stored in Supabase; the owner's own replies from his phone arrive as
+// smb_message_echoes, so the assistant finally knows when to stay quiet.
+//
+// Meta wants a 200 within seconds and retries otherwise: we acknowledge at
+// once and do the real work in waitUntil(), deduplicating on the message id.
 
 const ok = () => NextResponse.json({ ok: true });
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const STAND_DOWN_MS = 6 * 60 * 60 * 1000;
 
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-// ── Webhook verification handshake (Meta calls this once on setup) ──
+// ── Verification handshake (Meta GETs this once when the webhook is saved) ──
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const mode = url.searchParams.get('hub.mode');
   const token = url.searchParams.get('hub.verify_token');
   const challenge = url.searchParams.get('hub.challenge');
-  if (mode === 'subscribe' && token && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+  const expected = process.env.WHATSAPP_VERIFY_TOKEN;
+  if (mode === 'subscribe' && expected && token === expected) {
     return new Response(challenge ?? '', { status: 200 });
+  }
+  if (!mode) {
+    // Status check for humans.
+    return NextResponse.json({
+      ok: true,
+      hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
+      configured: isWhatsAppConfigured(),
+      base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
+      verify: Boolean(expected),
+    });
   }
   return new Response('Forbidden', { status: 403 });
 }
 
+type WaMedia = { id: string; mime_type?: string; caption?: string };
 type WaMessage = {
   id: string;
   from: string;
+  timestamp?: string;
   type: string;
   text?: { body: string };
+  image?: WaMedia;
+  sticker?: WaMedia;
+  audio?: WaMedia;
+  video?: WaMedia;
+  document?: WaMedia & { filename?: string };
+  location?: { latitude: number; longitude: number; name?: string; address?: string };
+  interactive?: { button_reply?: { title?: string }; list_reply?: { title?: string } };
+  button?: { text?: string };
 };
+type WaEcho = { id: string; from: string; to: string; timestamp?: string; type: string; text?: { body: string } };
+type WaStatus = {
+  id: string;
+  status: string;
+  recipient_id?: string;
+  errors?: { code?: number; title?: string; message?: string; error_data?: { details?: string } }[];
+};
+type WaChange = {
+  field?: string;
+  value?: {
+    metadata?: { phone_number_id?: string };
+    messages?: WaMessage[];
+    contacts?: { wa_id?: string; profile?: { name?: string } }[];
+    statuses?: WaStatus[];
+    message_echoes?: WaEcho[];
+  };
+};
+type WaUpdate = { object?: string; entry?: { id?: string; changes?: WaChange[] }[] };
 
-export async function POST(req: Request) {
-  const raw = await req.text();
-
-  // Optional signature check (set WHATSAPP_APP_SECRET to enable).
+/**
+ * Who may post here. With Meta direct we check its HMAC; through Dualhook the
+ * signature is made with their app secret, which we never see, so the URL
+ * carries our own secret instead (?key=<WHATSAPP_VERIFY_TOKEN>). Either
+ * proof is enough; neither means the request is rejected.
+ */
+function authorised(req: Request, raw: string): boolean {
   const appSecret = process.env.WHATSAPP_APP_SECRET;
   if (appSecret) {
     const sig = req.headers.get('x-hub-signature-256') || '';
     const expected = 'sha256=' + crypto.createHmac('sha256', appSecret).update(raw).digest('hex');
     const a = Buffer.from(sig);
     const b = Buffer.from(expected);
-    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
-      return new Response('Bad signature', { status: 401 });
-    }
+    if (a.length === b.length && crypto.timingSafeEqual(a, b)) return true;
+  }
+  const key = new URL(req.url).searchParams.get('key') || '';
+  const token = process.env.WHATSAPP_VERIFY_TOKEN || '';
+  return Boolean(token) && key.length === token.length && crypto.timingSafeEqual(Buffer.from(key), Buffer.from(token));
+}
+
+export async function POST(req: Request) {
+  const raw = await req.text();
+  if (!authorised(req, raw)) return new Response('Unauthorized', { status: 401 });
+
+  // Dualhook's "Test Ping" from its dashboard — prove the wiring in Telegram.
+  const dhEvent = req.headers.get('x-dualhook-event');
+  if (dhEvent) {
+    waitUntil(
+      sendOwnerWithMarkup(`✅ <b>Dualhook → site</b>: received <code>${esc(dhEvent)}</code>. Webhook wiring works.`).catch(
+        () => undefined,
+      ),
+    );
+    return ok();
   }
 
-  if (!isWhatsAppConfigured()) return ok();
-
-  let update: {
-    entry?: { changes?: { value?: { messages?: WaMessage[]; contacts?: { profile?: { name?: string } }[] } }[] }[];
-  };
+  let update: WaUpdate;
   try {
     update = JSON.parse(raw);
   } catch {
     return ok();
   }
+  if (update.object && update.object !== 'whatsapp_business_account') return ok();
 
-  const sb = getSupabaseAdmin();
-  if (!sb) return ok();
-
-  for (const entry of update.entry ?? []) {
-    for (const change of entry.changes ?? []) {
-      const value = change.value;
-      if (!value?.messages?.length) continue; // delivery/read statuses etc.
-      const name = value.contacts?.[0]?.profile?.name || '';
-
-      for (const msg of value.messages) {
-        try {
-          await handleMessage(sb, msg, name);
-        } catch (e) {
-          // Never fail the webhook — Meta retries aggressively. Tell the owner.
-          const err = e instanceof Error ? e.message : String(e);
-          await sendOwnerWithMarkup(
-            `⚠️ WhatsApp bot error for <code>+${msg.from}</code>: ${escapeHtml(err)}\nReply manually: <code>/wa +${msg.from} your text</code>`,
-          );
-        }
-      }
-    }
-  }
+  // Acknowledge now, work after: Meta's retry clock is short, Opus is not.
+  waitUntil(handleUpdate(update).catch(() => undefined));
   return ok();
 }
 
-async function handleMessage(
-  sb: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
-  msg: WaMessage,
-  name: string,
-) {
-  const waId = msg.from;
-  const label = name ? `${name} · ` : '';
+async function handleUpdate(update: WaUpdate): Promise<void> {
+  const sb = getSupabaseAdmin();
+  const ourPhone = whatsAppPhoneId();
+  for (const entry of update.entry ?? []) {
+    for (const change of entry.changes ?? []) {
+      const value = change.value;
+      if (!value) continue;
+      // Another number on the same account is not ours to answer.
+      if (ourPhone && value.metadata?.phone_number_id && value.metadata.phone_number_id !== ourPhone) continue;
 
-  // Non-text messages: mirror to the owner, no AI attempt.
-  if (msg.type !== 'text' || !msg.text?.body) {
-    await sendOwnerWithMarkup(
-      `💬 <b>WhatsApp</b> · ${escapeHtml(label)}<code>+${waId}</code>\n📎 Sent a ${msg.type} message — open WhatsApp to view. AI didn't reply.`,
-      { inline_keyboard: [[{ text: '📋 Copy number', copy_text: { text: `+${waId}` } }]] },
-    );
+      const field = change.field || (value.messages ? 'messages' : '');
+      if (field === 'smb_message_echoes' || field === 'message_echoes') {
+        const echoes = (value as unknown as { message_echoes?: WaEcho[]; smb_message_echoes?: WaEcho[] });
+        for (const e of echoes.message_echoes ?? echoes.smb_message_echoes ?? []) {
+          await handleOwnerEcho(sb, e, field === 'smb_message_echoes').catch(() => undefined);
+        }
+        continue;
+      }
+      if (field === 'messages' || value.messages || value.statuses) {
+        for (const st of value.statuses ?? []) await handleStatus(sb, st).catch(() => undefined);
+        const names = new Map<string, string>();
+        for (const c of value.contacts ?? []) if (c.wa_id && c.profile?.name) names.set(c.wa_id, c.profile.name);
+        for (const msg of value.messages ?? []) {
+          const name = names.get(msg.from) || value.contacts?.[0]?.profile?.name || '';
+          try {
+            await handleMessage(sb, msg, name);
+          } catch (e) {
+            // Never let an error be silent: the customer got nothing.
+            const err = e instanceof Error ? e.message : String(e);
+            await sendOwnerWithMarkup(
+              `⚠️ <b>WhatsApp bot error</b> · <code>+${msg.from}</code>\n<code>${esc(err.slice(0, 300))}</code>\nThe customer got no reply — answer them yourself.`,
+              { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${msg.from}` }]] },
+            ).catch(() => undefined);
+          }
+        }
+      }
+      // history / smb_app_state_sync / account_* : nothing to do, 200 was enough.
+    }
+  }
+}
+
+/** The owner typed in WhatsApp himself: he has the chat, store what he said. */
+async function handleOwnerEcho(sb: SupabaseClient | null, e: WaEcho, fromPhone: boolean): Promise<void> {
+  if (!sb || !e.to) return;
+  const waId = e.to;
+  const body = e.type === 'text' ? e.text?.body?.trim() ?? '' : `[${e.type}]`;
+  // Dedupe on the WAMID; our own API sends arrive here too (message_echoes)
+  // and are already stored under the id the send returned.
+  const { error } = await sb
+    .from('wa_messages')
+    .insert({ msg_id: e.id, wa_id: waId, role: 'assistant', content: fromPhone ? `[Alex] ${body}` : body, via: 'owner' });
+  if (error?.code === '23505') return;
+  if (!fromPhone) return;
+  // Alex is talking: the assistant stands down for six hours from his last word.
+  await sb
+    .from('wa_chats')
+    .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString(), last_at: new Date().toISOString() })
+    .then(() => undefined, () => undefined);
+}
+
+/** Delivery statuses: only failures matter, and they must reach the owner. */
+async function handleStatus(sb: SupabaseClient | null, st: WaStatus): Promise<void> {
+  if (st.status !== 'failed') return;
+  const to = st.recipient_id || '';
+  const why = (st.errors ?? [])
+    .map((er) => [er.code, er.title, er.error_data?.details || er.message].filter(Boolean).join(' · '))
+    .join('\n');
+  let text = '';
+  if (sb && st.id) {
+    const { data } = await sb.from('wa_messages').select('content').eq('msg_id', st.id).maybeSingle();
+    text = (data as { content?: string } | null)?.content ?? '';
+  }
+  await sendOwnerWithMarkup(
+    `❌ <b>WhatsApp could not deliver</b>${to ? ` · <code>+${to}</code>` : ''}\n<code>${esc(why || 'no reason given')}</code>${
+      text ? `\n\nThe message:\n<pre>${esc(text.slice(0, 1500))}</pre>` : ''
+    }`,
+    to ? { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${to}` }]] } : undefined,
+  );
+}
+
+function describe(msg: WaMessage): string {
+  switch (msg.type) {
+    case 'image': return 'a photo';
+    case 'sticker': return 'a sticker';
+    case 'audio': return 'a voice note';
+    case 'video': return 'a video';
+    case 'document': return `a document${msg.document?.filename ? ` (${msg.document.filename})` : ''}`;
+    case 'location': return 'a location';
+    case 'contacts': return 'a contact card';
+    default: return `a ${msg.type} message`;
+  }
+}
+
+async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: string): Promise<void> {
+  const waId = msg.from;
+  const label = name ? `${esc(name)} · ` : '';
+  const who = `+${waId}`;
+  const numberRow = [{ text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` }, { text: '📋 Number', copy_text: { text: who } }];
+
+  // What did they say? Text, a tapped button, or a photo with a caption.
+  let text =
+    msg.text?.body?.trim() ||
+    msg.interactive?.button_reply?.title ||
+    msg.interactive?.list_reply?.title ||
+    msg.button?.text ||
+    '';
+  const photo = msg.type === 'image' ? msg.image : undefined;
+  if (photo?.caption) text = text || photo.caption.trim();
+
+  if (!sb) {
+    // No database: still never lose the lead.
+    await sendOwnerWithMarkup(`💬 <b>WhatsApp</b> · ${label}<code>${who}</code>\n«${esc(text || describe(msg))}»\n⚠️ Database not configured — reply yourself.`, {
+      inline_keyboard: [numberRow],
+    });
     return;
   }
 
-  const text = msg.text.body.trim();
-
-  // Dedupe: Meta retries webhooks; msg_id is the primary key.
+  // Dedupe: Meta retries webhooks; the WAMID is the primary key.
+  const stored = text || (photo ? '[photo]' : `[${msg.type}]`);
   const { error: insErr } = await sb
     .from('wa_messages')
-    .insert({ msg_id: msg.id, wa_id: waId, role: 'user', content: text, via: 'customer' });
-  if (insErr?.code === '23505') return; // already processed
+    .insert({ msg_id: msg.id, wa_id: waId, role: 'user', content: photo && text ? `[photo] ${text}` : stored, via: 'customer' });
+  if (insErr?.code === '23505') return;
 
-  void markWhatsAppRead(msg.id);
+  void ensureClient(sb, who, name || undefined).catch(() => null);
 
-  // Every WhatsApp contact becomes a CRM client automatically — the number
-  // is verified by WhatsApp itself, the profile name fills the card.
-  void ensureClient(sb, `+${waId}`, name || undefined).catch(() => null);
+  // Chat state and the global switch in one go.
+  const now = new Date().toISOString();
+  const [{ data: chat }, { data: cfg }] = await Promise.all([
+    sb.from('wa_chats').upsert({ wa_id: waId, name: name || null, last_at: now }).select('paused, owner_replied_at').single(),
+    sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle(),
+  ]);
+  const aiOff = (cfg as { value?: string } | null)?.value === 'meta';
+  const row = chat as { paused?: boolean; owner_replied_at?: string | null } | null;
+  const ownerHandling = Boolean(row?.owner_replied_at) && Date.now() - new Date(row!.owner_replied_at as string).getTime() < STAND_DOWN_MS;
+  const paused = Boolean(row?.paused) || ownerHandling;
 
-  // Chat state (pause flag + name for the owner's view).
-  const { data: chat } = await sb
-    .from('wa_chats')
-    .upsert({ wa_id: waId, name: name || null, last_at: new Date().toISOString() })
-    .select('paused')
-    .single();
+  const ruLine = text ? await translateToRussian(text).then((t) => (t && t !== text ? `\n🇷🇺 ${esc(t)}` : '')) : '';
+  const head = `💬 <b>WhatsApp</b> · ${label}<code>${who}</code>`;
+  const controls = [
+    { text: paused ? '▶️ Resume AI' : '⏸ Stop AI here', callback_data: `${paused ? 'war' : 'wap'}:${waId}` },
+    { text: "✋ I'll reply (6h)", callback_data: `wamine:${waId}` },
+  ];
 
-  const ruLine = await translateToRussian(text).then((t) => (t && t !== text ? `\n🇷🇺 ${t}` : ''));
-
-  if (chat?.paused) {
-    await sendOwnerWithMarkup(
-      `💬 <b>WhatsApp</b> · ${escapeHtml(label)}<code>+${waId}</code>\n«${escapeHtml(text)}»${escapeHtml(ruLine)}\n\n⏸ AI is paused for this chat — reply yourself:\n<code>/wa +${waId} </code>`,
-      {
-        inline_keyboard: [[
-          { text: '▶️ Resume AI here', callback_data: `war:${waId}` },
-          { text: '📋 Number', copy_text: { text: `+${waId}` } },
-        ]],
-      },
-    );
+  // Attachments the assistant cannot read (voice, sticker, video, document):
+  // tell the customer Alex will look, hand the chat to him, mirror it.
+  const unreadable = msg.type !== 'text' && !photo && !text;
+  if (unreadable) {
+    if (!paused && !aiOff) {
+      const line =
+        "Got that 👍 I can't open attachments here, so I'm passing it straight to Alex — he will look at it himself and come back to you shortly.";
+      const sent = await sendWhatsAppText(waId, line);
+      if (sent.ok) await sb.from('wa_messages').insert({ msg_id: sent.id || `out:${msg.id}`, wa_id: waId, role: 'assistant', content: line, via: 'ai' });
+      await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: now }).then(() => undefined, () => undefined);
+    }
+    await sendOwnerWithMarkup(`${head}\n📎 <i>sent ${describe(msg)} — open WhatsApp to see it. The assistant told them you'll look.</i>`, {
+      inline_keyboard: [controls, numberRow],
+    });
     return;
   }
 
-  // Cost cap: at most 20 AI replies per sender per hour; beyond that we
-  // mirror to the owner without answering.
-  if (isRateLimited(`wa-ai:${waId}`, 20, 60 * 60 * 1000)) {
-    await sendOwnerWithMarkup(
-      `💬 <b>WhatsApp</b> · ${escapeHtml(label)}<code>+${waId}</code>\n«${escapeHtml(text)}»${escapeHtml(ruLine)}\n\n🤖 Rate limit hit for this chat this hour — reply yourself: <code>/wa +${waId} </code>`,
-      { inline_keyboard: [[{ text: '📋 Number', copy_text: { text: `+${waId}` } }]] },
-    );
-    return;
+  // Blue ticks and "typing…" the moment we start, like a person would.
+  if (!paused && !aiOff) void markWhatsAppRead(msg.id, true);
+  else void markWhatsAppRead(msg.id);
+
+  let reply = '';
+  let aiError = '';
+  let skipped = '';
+  if (aiOff) skipped = "🔇 Our assistant is off (/ai on switches it back).";
+  else if (ownerHandling) skipped = '✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.';
+  else if (paused) skipped = '⏸ AI paused for this chat — replies handled by you.';
+  else if (isRateLimited(`wa-ai:${waId}`, 20, 60 * 60 * 1000)) skipped = '🤖 Hourly limit for this chat reached — reply yourself.';
+  else {
+    try {
+      // A photo goes to the model as an image (their iDrive screen, a dash
+      // warning); fetched here because the media URL needs our bearer token.
+      let imageUrl: string | undefined;
+      if (photo?.id) imageUrl = (await downloadWhatsAppMedia(photo.id))?.dataUrl;
+      const out = await generateWaReply(sb, waId, text || 'Photo attached.', name || undefined, 'claude-opus-5', who, imageUrl);
+      reply = out.reply.trim();
+    } catch (e) {
+      aiError = e instanceof Error ? e.message : String(e);
+    }
   }
 
-  const { reply } = await generateWaReply(sb, waId, text, name);
+  if (reply) {
+    const sent = await sendWhatsAppText(waId, reply);
+    if (!sent.ok) throw new Error(sent.error || 'send failed');
+    await sb.from('wa_messages').insert({ msg_id: sent.id || `out:${msg.id}`, wa_id: waId, role: 'assistant', content: reply, via: 'ai' });
+  }
 
-  const sent = await sendWhatsAppText(waId, reply);
-  if (!sent.ok) throw new Error(sent.error || 'send failed');
-
-  await sb.from('wa_messages').insert({
-    msg_id: sent.id || `out:${msg.id}`,
-    wa_id: waId,
-    role: 'assistant',
-    content: reply,
-    via: 'ai',
-  });
-
-  await sendOwnerWithMarkup(
-    `💬 <b>WhatsApp</b> · ${escapeHtml(label)}<code>+${waId}</code>\n«${escapeHtml(text)}»${escapeHtml(ruLine)}\n\n🤖 ${escapeHtml(reply)}`,
-    {
-      inline_keyboard: [[
-        { text: '⏸ Stop AI here', callback_data: `wap:${waId}` },
-        { text: '📋 Number', copy_text: { text: `+${waId}` } },
-      ]],
-    },
-  );
+  // Mirror to the owner.
+  const lines = [head];
+  if (photo) lines.push('📷 <i>sent a photo</i>');
+  if (text) lines.push(`«${esc(text)}»${ruLine}`);
+  if (reply) lines.push(`🤖 ${esc(reply)}`);
+  if (!reply && !aiError && !skipped && text && /\balex\b/i.test(text))
+    lines.push("👋 They're talking to you by name — the assistant stayed quiet and stands down for 6h.");
+  else if (!reply && !aiError && !skipped) lines.push('🤫 The assistant chose not to answer this one — it is yours.');
+  if (aiError) lines.push(`⚠️ <b>The assistant could not answer</b> — the customer got no reply. Answer them yourself.\n<code>${esc(aiError.slice(0, 200))}</code>`);
+  if (skipped) lines.push(skipped);
+  await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: [controls, numberRow] });
 }
