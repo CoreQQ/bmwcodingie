@@ -115,14 +115,21 @@ export async function POST(req: Request) {
   const raw = await req.text();
   if (!authorised(req, raw)) return new Response('Unauthorized', { status: 401 });
 
-  // Dualhook's "Test Ping" from its dashboard — prove the wiring in Telegram.
+  // Dualhook's own management events (account_update, template status…) come
+  // with this header. Only the dashboard's Test Ping and anything that smells
+  // like trouble reach the owner; the rest is acknowledged quietly.
   const dhEvent = req.headers.get('x-dualhook-event');
   if (dhEvent) {
-    waitUntil(
-      sendOwnerWithMarkup(`✅ <b>Dualhook → site</b>: received <code>${esc(dhEvent)}</code>. Webhook wiring works.`).catch(
-        () => undefined,
-      ),
-    );
+    const trouble = /disconnect|offboard|health|alert|restrict|ban|violat|review|fail|error|expir|inactiv/i.test(dhEvent + ' ' + raw.slice(0, 2000));
+    if (dhEvent === 'test_ping') {
+      waitUntil(sendOwnerWithMarkup('✅ <b>Dualhook → site</b>: test ping received. Webhook wiring works.').catch(() => undefined));
+    } else if (trouble) {
+      waitUntil(
+        sendOwnerWithMarkup(
+          `⚠️ <b>Dualhook event</b> <code>${esc(dhEvent)}</code>\n<pre>${esc(raw.slice(0, 1200))}</pre>`,
+        ).catch(() => undefined),
+      );
+    }
     return ok();
   }
 
