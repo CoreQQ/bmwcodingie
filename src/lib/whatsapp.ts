@@ -52,8 +52,23 @@ export async function sendWhatsAppText(
       type: 'text',
       text: { body, preview_url: true },
     });
-    const json = r.json as { messages?: { id: string }[]; error?: { message?: string } } | null;
-    if (!r.ok) return { ok: false, error: json?.error?.message || `HTTP ${r.status}` };
+    const json = r.json as {
+      messages?: { id: string }[];
+      error?: { message?: string; code?: number; error_subcode?: number; error_data?: { details?: string }; fbtrace_id?: string };
+    } | null;
+    if (!r.ok) {
+      // Keep Meta's code, subcode, details and trace id: "permission denied"
+      // alone cannot be diagnosed, the subcode and details can.
+      const e = json?.error;
+      const bits = [
+        e?.code !== undefined ? `#${e.code}${e.error_subcode ? `/${e.error_subcode}` : ''}` : `HTTP ${r.status}`,
+        e?.message,
+        e?.error_data?.details,
+        e?.fbtrace_id ? `trace ${e.fbtrace_id}` : '',
+        !e ? JSON.stringify(r.json).slice(0, 300) : '',
+      ].filter(Boolean);
+      return { ok: false, error: bits.join(' — ') };
+    }
     return { ok: true, id: json?.messages?.[0]?.id };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'network error' };
