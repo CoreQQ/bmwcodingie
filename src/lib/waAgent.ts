@@ -370,7 +370,25 @@ export async function generateWaReply(
   ]
     .filter(Boolean)
     .join('\n');
+  // Whether to say hello is decided here, not left to the model: it saw old
+  // history (or nothing it recognised as a start) and skipped the greeting on
+  // a customer's first message. First contact → greet and say it is the AI
+  // assistant; back after a break → a short "hi again"; mid-chat → no hello.
+  const lastAiAt = [...recent].reverse().find((m) => m.role === 'assistant' && m.created_at)?.created_at;
+  const sinceAi = lastAiAt ? Date.now() - new Date(lastAiAt).getTime() : Infinity;
+  const firstName = (profileName || '').trim().split(/\s+/)[0];
+  const greeting =
+    sinceAi === Infinity
+      ? `GREETING: this is your first message to this customer. Open with a short hello${
+          firstName ? ` using their first name (${firstName})` : ''
+        } and say once that you're the AI assistant for BMW Coding IE, then answer.`
+      : sinceAi > 12 * 60 * 60 * 1000
+        ? `GREETING: they are coming back after a break. Open with a short friendly "Hi again${
+            firstName ? ` ${firstName}` : ''
+          }!" — no need to introduce yourself again — then answer.`
+        : 'GREETING: you are mid-conversation. No hello, just carry on.';
   const notes = [
+    greeting,
     known ? `WHAT YOU ALREADY KNOW ABOUT THIS CUSTOMER (do not ask again):\n${known}` : '',
     lastAssistant
       ? `YOUR PREVIOUS MESSAGE (do not repeat it — say something new):\n${lastAssistant.slice(0, 600)}`
