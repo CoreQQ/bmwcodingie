@@ -19,7 +19,9 @@ Owner  ──▶ Telegram bot (/api/telegram webhook) — full control plane
 Customer ─▶ /b/<token> — live booking tracker
 Cron   ──▶ /api/cron/reminders daily 07:00 UTC (agenda, review nudges,
            stale-booking flags, IndexNow ping)
-Dormant ─▶ /api/whatsapp (Meta Cloud API AI bot), /api/manychat (bridge)
+Customer ─▶ WhatsApp ──▶ /api/whatsapp (Meta Cloud API webhook; via Dualhook
+           coexistence relay — owner's number stays in the WhatsApp app)
+Legacy   ─▶ /api/manychat (ManyChat External Request bridge, being retired)
 ```
 
 ## Environment variables (Vercel → Settings → Environment Variables)
@@ -40,7 +42,11 @@ Dormant ─▶ /api/whatsapp (Meta Cloud API AI bot), /api/manychat (bridge)
 | `NEXT_PUBLIC_GA_ID` | optional (default G-698G9NVGCZ baked in) | GA4 via the same gtag; events whatsapp_click, call_click, vin_check_submit, booking_submit |
 | `NEXT_PUBLIC_META_PIXEL_ID` | when ads run | Meta pixel (consent-gated) |
 | `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_ID` / `WHATSAPP_VERIFY_TOKEN` / `WHATSAPP_APP_SECRET` | for WA bot | Meta Cloud API (webhook `https://www.bmwcoding.ie/api/whatsapp`) |
-| `MANYCHAT_SECRET` | for ManyChat | bridge auth (`?key=` or `x-manychat-secret`) |
+| `MANYCHAT_SECRET` | legacy | ManyChat bridge auth (`?key=` or `x-manychat-secret`) |
+| `WHATSAPP_VERIFY_TOKEN` | for WhatsApp | Meta GET-challenge token AND the `?key=` on the webhook URL (Dualhook signs with its own app secret we never see) |
+| `WHATSAPP_API_BASE` | for Dualhook | `https://api.dualhook.com/v25.0`; unset = graph.facebook.com direct |
+| `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_ID` | for WhatsApp | Dualhook `dh_live_…` key (or Meta token) + phone_number_id from the Dualhook connection |
+| `WHATSAPP_APP_SECRET` | Meta direct only | X-Hub-Signature-256 check |
 
 After changing env vars: **Redeploy** (with cache is fine).
 
