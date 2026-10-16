@@ -100,7 +100,7 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
   'bmw-cruise-control-retrofit': {
     slug: 'bmw-cruise-control-retrofit',
     metaTitle: 'BMW Cruise Control Retrofit & Activation Dublin | Coding or Parts',
-    metaDescription: 'Cruise control for your BMW: free VIN check tells you if coding alone enables it or which genuine parts are needed. Dublin workshop or remote coding across Ireland.',
+    metaDescription: 'Cruise control for your BMW: free VIN check tells you if coding alone enables it or which genuine parts are needed. Mobile visit around Dublin or remote coding across Ireland.',
     serviceName: 'BMW Cruise Control Retrofit',
     eyebrow: 'Retrofit · Dublin & Ireland',
     h1: 'BMW Cruise Control Activation & Retrofit',
