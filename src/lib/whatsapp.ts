@@ -20,6 +20,22 @@ export function isWhatsAppConfigured(): boolean {
   return Boolean(creds());
 }
 
+/**
+ * Does the configured key still work? A read of our own phone number —
+ * nothing is sent. Returns the HTTP status and the key's last 4 characters
+ * so a stale or revoked key in the environment is obvious without exposing it.
+ */
+export async function checkWhatsAppKey(): Promise<{ status: number; key_tail: string } | null> {
+  const c = creds();
+  if (!c) return null;
+  try {
+    const res = await fetch(`${base()}/${c.phoneId}`, { headers: { Authorization: `Bearer ${c.token}` } });
+    return { status: res.status, key_tail: c.token.slice(-4) };
+  } catch {
+    return { status: 0, key_tail: c.token.slice(-4) };
+  }
+}
+
 /** The phone_number_id we serve — webhooks for any other number are ignored. */
 export function whatsAppPhoneId(): string {
   return process.env.WHATSAPP_PHONE_ID || '';
