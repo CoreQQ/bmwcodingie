@@ -9,6 +9,9 @@ import { CallHours } from '@/components/site/CallHours';
 import { WhatsAppFloat } from '@/components/site/WhatsAppFloat';
 import { Announcement } from '@/components/site/Announcement';
 import { isMobileOnly } from '@/lib/transition';
+import { getHours } from '@/lib/stats';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { DEFAULT_HOURS, type HoursMap } from '@/lib/hours';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -42,6 +45,26 @@ export default async function LocaleLayout({
   ]);
 
   const mobileOnly = isMobileOnly();
+
+  // Opening hours in the schema come from the same table the booking diary
+  // uses (admin → hours), not from a copy typed into this file.
+  const sbAdmin = getSupabaseAdmin();
+  const hours: HoursMap = sbAdmin ? await getHours(sbAdmin).catch(() => DEFAULT_HOURS) : DEFAULT_HOURS;
+  const DAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const hh = (n: number) => `${String(Math.min(n, 23)).padStart(2, '0')}:${n >= 24 ? '59' : '00'}`;
+  const byWindow = new Map<string, string[]>();
+  for (let d = 0; d < 7; d++) {
+    const w = hours[d];
+    if (!w) continue;
+    const key = `${hh(w[0])}-${hh(w[1])}`;
+    byWindow.set(key, [...(byWindow.get(key) ?? []), DAY[d]]);
+  }
+  const openingHoursSpecification = [...byWindow.entries()].map(([k, days]) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: days,
+    opens: k.split('-')[0],
+    closes: k.split('-')[1],
+  }));
 
   const sameAs = [
     settings.instagram ? `https://instagram.com/${settings.instagram.replace(/^@/, '')}` : null,
@@ -121,20 +144,7 @@ export default async function LocaleLayout({
         ...(mobileOnly
           ? {}
           : { geo: { '@type': 'GeoCoordinates', latitude: 53.3000625, longitude: -6.4818572 } }),
-        openingHoursSpecification: [
-          {
-            '@type': 'OpeningHoursSpecification',
-            dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-            opens: '19:00',
-            closes: '23:00',
-          },
-          {
-            '@type': 'OpeningHoursSpecification',
-            dayOfWeek: ['Saturday', 'Sunday'],
-            opens: '11:00',
-            closes: '23:00',
-          },
-        ],
+        ...(openingHoursSpecification.length ? { openingHoursSpecification } : {}),
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
           name: 'BMW coding & retrofit services',

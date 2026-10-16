@@ -33,8 +33,8 @@
     "priceFrom": "від",
     "specWhere": "Де",
     "specWhereValue": "Приїжджаємо до вас — або зустрічаємось, де зручно",
-    "title1": "Кодування та ретрофіт BMW",
-    "title2": "в Ірландії",
+    "title1": "Кодування BMW в Ірландії",
+    "title2": "CarPlay, iDrive і Japan → EU",
     "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Діагностика · Ретрофіт",
     "lead": "Професійне кодування та ретрофіт BMW по Дубліну та всій Ірландії. Виїзд до вас і віддалене кодування.",
     "ctaCheck": "Перевірити мій BMW",
@@ -42,7 +42,10 @@
     "benefit1": "Спеціаліст з BMW",
     "benefit2": "Виїзд до вас",
     "benefit3": "Віддалене кодування",
-    "benefit4": "Рішення рівня OEM"
+    "benefit4": "Рішення рівня OEM",
+    "quoteLink": "Дізнатися ціну",
+    "servicesLink": "Усі послуги",
+    "projectsLink": "Наші роботи"
   },
   "Services": {
     "eyebrow": "01 / Послуги",

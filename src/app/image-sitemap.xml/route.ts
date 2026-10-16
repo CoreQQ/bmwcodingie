@@ -4,7 +4,7 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
 // Standalone Google image sitemap — Next 14's MetadataRoute.Sitemap drops the
 // `images` field, so we emit the XML ourselves. Lists real work photos against
-// the homepage so they can surface in Google Images. Refreshed daily.
+// the homepage and the /projects page so they can surface in Google Images. Refreshed daily.
 export const revalidate = 86400;
 
 const esc = (s: string) =>
@@ -27,6 +27,10 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>${SITE}/</loc>
+${images}
+  </url>
+  <url>
+    <loc>${SITE}/projects</loc>
 ${images}
   </url>
 </urlset>`;

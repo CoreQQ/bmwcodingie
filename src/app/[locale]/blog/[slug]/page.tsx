@@ -64,16 +64,32 @@ export default async function BlogPost({
   const settings = await getSettings();
   const wa = waLink(settings.whatsapp, 'Hi — I read your guide and I have a question about my BMW. It’s a ');
 
+  const url = `${SITE_URL}/blog/${post.slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    description: post.description,
-    datePublished: post.date,
-    author: { '@type': 'Organization', name: 'BMW Coding', url: SITE_URL },
-    publisher: { '@type': 'Organization', name: 'BMW Coding', url: SITE_URL },
-    image: `${SITE_URL}/og.jpg`,
-    mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+    '@graph': [
+      {
+        '@type': 'Article',
+        '@id': `${url}#article`,
+        headline: post.title,
+        description: post.description,
+        datePublished: post.date,
+        dateModified: post.date,
+        inLanguage: 'en-IE',
+        author: { '@id': `${SITE_URL}/#business` },
+        publisher: { '@id': `${SITE_URL}/#business` },
+        image: `${SITE_URL}/og.jpg`,
+        mainEntityOfPage: url,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Guides', item: `${SITE_URL}/blog` },
+          { '@type': 'ListItem', position: 3, name: post.title, item: url },
+        ],
+      },
+    ],
   };
 
   return (

@@ -12,6 +12,20 @@ function reviewAsk(name: string, service: string): string {
   return REVIEW_TEMPLATES[0].build(name, service);
 }
 
+/**
+ * Where tomorrow happens, in the customer's words. The service is mobile-only
+ * since 20 Sep 2026: this used to send everyone to the old Greenogue unit
+ * ("look for the orange gates") — a customer following it would have driven
+ * to an empty yard.
+ */
+function whereLine(visitType?: string | null, visitAddress?: string | null): string {
+  if (visitType === 'mobile') {
+    return visitAddress ? `Alex will come to you at ${visitAddress}.` : 'Alex will come to you — reply with the address if you have not sent it yet.';
+  }
+  if (visitType === 'meet') return 'Alex will message you the meeting spot today.';
+  return 'Alex will confirm where to meet (or how to connect for remote coding) here on WhatsApp.';
+}
+
 export const runtime = 'nodejs';
 
 // IndexNow: tell Bing-family crawlers (which also feed ChatGPT, Copilot and
@@ -21,11 +35,19 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
 async function pingIndexNow(): Promise<void> {
   try {
-    const { BLOG_POSTS } = await import('@/lib/blog');
+    const [{ BLOG_POSTS }, { ALL_SERVICE_SLUGS }, { DYNAMIC_LANDING_SLUGS }] = await Promise.all([
+      import('@/lib/blog'),
+      import('@/lib/servicePages'),
+      import('@/lib/landings'),
+    ]);
+    // Every canonical page, not just the home page and blog: the service and
+    // model pages are the ones that bring enquiries.
     const urls = [
       `${SITE}/`,
       `${SITE}/bmw-coding-ireland`,
       `${SITE}/blog`,
+      ...ALL_SERVICE_SLUGS.map((s) => `${SITE}/${s}`),
+      ...DYNAMIC_LANDING_SLUGS.map((s) => `${SITE}/${s}`),
       ...BLOG_POSTS.map((p) => `${SITE}/blog/${p.slug}`),
     ];
     await fetch('https://api.indexnow.org/indexnow', {
@@ -72,23 +94,32 @@ export async function GET(req: Request) {
   const quietHours = dublinHour < 8 || dublinHour >= 20;
 
   if (!quietHours) {
-    const { data: soon } = await sb
+    // visit_type / visit_address are newer columns: fall back if the
+    // migration has not run, rather than skip everyone's reminder.
+    const withVisit = await sb
       .from('bookings')
-      .select('id, name, contact, service, slot_date, slot_time, reminded_at')
+      .select('id, name, contact, service, slot_date, slot_time, reminded_at, visit_type, visit_address')
       .eq('slot_date', tomorrow)
       .eq('status', 'confirmed');
-    const due = ((soon ?? []) as (Booking & { reminded_at?: string | null })[]).filter(
+    const { data: soon } = withVisit.error
+      ? await sb
+          .from('bookings')
+          .select('id, name, contact, service, slot_date, slot_time, reminded_at')
+          .eq('slot_date', tomorrow)
+          .eq('status', 'confirmed')
+      : withVisit;
+    type Due = Booking & { reminded_at?: string | null; visit_type?: string | null; visit_address?: string | null };
+    const due = ((soon ?? []) as Due[]).filter(
       (b) => !b.reminded_at && b.contact,
     );
 
-    const unsent: (Booking & { reminded_at?: string | null })[] = [];
+    const unsent: Due[] = [];
     for (const b of due) {
       const first = (b.name || '').split(/\s+/)[0] || 'there';
       const msg =
         `Hi ${first} 👋 Reminder: your BMW is booked in tomorrow, ${b.slot_date} at ${b.slot_time}` +
         `${b.service ? ` for ${b.service}` : ''}.\n\n` +
-        `We're at Grants View, Greenogue Business Park, Rathcoole — don't follow the sat-nav pin, ` +
-        `use ${SITE}/find-us (look for the big ORANGE GATES, drive through and keep RIGHT to the end).\n\n` +
+        `${whereLine(b.visit_type, b.visit_address)}\n\n` +
         `If anything changed, just reply here and we'll sort it.`;
 
       const phone = b.contact.replace(/\D/g, '');
@@ -117,9 +148,7 @@ export async function GET(req: Request) {
                 text:
                   `Hi ${(b.name || '').split(/\s+/)[0] || 'there'} 👋 Reminder: your BMW is booked in tomorrow, ` +
                   `${b.slot_date} at ${b.slot_time}${b.service ? ` for ${b.service}` : ''}. ` +
-                  `We're at Grants View, Greenogue Business Park, Rathcoole — don't follow the sat-nav pin, use ` +
-                  `${SITE}/find-us (big ORANGE GATES, drive through, keep RIGHT to the end). ` +
-                  `If anything changed, just reply here.`,
+                  `${whereLine(b.visit_type, b.visit_address)} If anything changed, just reply here.`,
               },
             },
           ]),

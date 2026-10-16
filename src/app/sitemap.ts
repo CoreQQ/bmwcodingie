@@ -20,6 +20,7 @@ const PATHS = [
   { path: '/bmw-coding-price-calculator', priority: 0.9 },
   { path: '/blog', priority: 0.7 },
   { path: '/find-us', priority: 0.6 },
+  { path: '/projects', priority: 0.8 },
   ...BLOG_POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.7 })),
   ...ALL_SERVICE_SLUGS.map((slug) => ({ path: `/${slug}`, priority: 0.9 })),
   ...DYNAMIC_LANDING_SLUGS.map((slug) => ({ path: `/${slug}`, priority: 0.8 })),

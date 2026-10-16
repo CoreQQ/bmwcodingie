@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import type { GalleryItem } from '@/lib/types';
 import { Reveal } from './Reveal';
 
@@ -61,14 +62,15 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                 onClick={() => setActive(i)}
                 className="group relative block w-[82%] shrink-0 snap-center overflow-hidden border border-white/8 bg-graphite-800 sm:w-full"
               >
-                <div className="aspect-[4/3] w-full overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  {/* Optimised by Next (WebP/AVIF at the size shown): the originals
+                      are phone photos and PNG screenshots of 1–4.5 MB each. */}
+                  <Image
                     src={g.image_url}
                     alt={g.caption || t('altFallback')}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 82vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                   />
                 </div>
                 <span className="m-stripe absolute left-0 top-0 h-full w-1 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -128,7 +130,8 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
           <figure className="max-h-[88vh] max-w-5xl" onClick={(e) => e.stopPropagation()}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={items[active].image_url}
+              // Full-screen view: a 1920px optimised copy instead of the raw upload.
+              src={`/_next/image?url=${encodeURIComponent(items[active].image_url)}&w=1920&q=80`}
               alt={items[active].caption || t('altFallback')}
               className="max-h-[80vh] w-auto border border-white/10"
             />

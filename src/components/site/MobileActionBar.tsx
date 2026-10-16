@@ -54,6 +54,7 @@ export function MobileActionBar({ phone, whatsapp }: { phone: string; whatsapp: 
   return (
     <div
       aria-hidden={!show}
+      {...((!show ? { inert: '' } : {}) as object)}
       className={`fixed inset-x-0 bottom-0 z-40 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden ${
         show ? 'translate-y-0' : 'translate-y-full'
       }`}

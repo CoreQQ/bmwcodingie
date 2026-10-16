@@ -33,8 +33,8 @@
     "priceFrom": "de la",
     "specWhere": "Unde",
     "specWhereValue": "Venim la tine — sau ne întâlnim unde îți convine",
-    "title1": "Coding și retrofit BMW",
-    "title2": "în Irlanda",
+    "title1": "Coding BMW în Irlanda",
+    "title2": "CarPlay, iDrive și Japan → EU",
     "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnoză · Retrofit",
     "lead": "Servicii profesionale de coding și retrofit BMW în Dublin și în toată Irlanda. Venim la tine sau lucrăm remote.",
     "ctaCheck": "Verifică-ți BMW-ul",
@@ -42,7 +42,10 @@
     "benefit1": "Specialist BMW",
     "benefit2": "Venim la tine",
     "benefit3": "Coding remote",
-    "benefit4": "Soluții la nivel OEM"
+    "benefit4": "Soluții la nivel OEM",
+    "quoteLink": "Cere o ofertă",
+    "servicesLink": "Toate serviciile",
+    "projectsLink": "Lucrări reale"
   },
   "Services": {
     "eyebrow": "01 / Servicii",

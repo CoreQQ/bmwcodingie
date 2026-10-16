@@ -121,7 +121,7 @@ export const CODING_LIST: CodingCategory[] = [
     title: 'Conversions & region',
     items: [
       'Japan → EU conversion (region, bands, language)',
-      'Navigation FSC generation & European map install',
+      'Navigation FSC activation & European map install',
       'Language and units (km/h, °C) set-up',
       'ETC mirror & TCB handling on imports',
       'Hidden menus & bespoke coding to your spec',

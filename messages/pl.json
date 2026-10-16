@@ -33,8 +33,8 @@
     "priceFrom": "od",
     "specWhere": "Gdzie",
     "specWhereValue": "Przyjeżdżamy do Ciebie — albo spotykamy się, gdzie wygodnie",
-    "title1": "Kodowanie i retrofity BMW",
-    "title2": "w Irlandii",
+    "title1": "Kodowanie BMW w Irlandii",
+    "title2": "CarPlay, iDrive i Japan → EU",
     "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnostyka · Retrofity",
     "lead": "Profesjonalne kodowanie i retrofity BMW w Dublinie i całej Irlandii. Dojazd do klienta i kodowanie zdalne.",
     "ctaCheck": "Sprawdź swoje BMW",
@@ -42,7 +42,10 @@
     "benefit1": "Specjalista BMW",
     "benefit2": "Dojazd do klienta",
     "benefit3": "Kodowanie zdalne",
-    "benefit4": "Rozwiązania na poziomie OEM"
+    "benefit4": "Rozwiązania na poziomie OEM",
+    "quoteLink": "Zapytaj o cenę",
+    "servicesLink": "Wszystkie usługi",
+    "projectsLink": "Nasze realizacje"
   },
   "Services": {
     "eyebrow": "01 / Usługi",

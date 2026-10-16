@@ -291,7 +291,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: '3. Navigation: FSC and European maps',
         paragraphs: [
-          'The import\u2019s navigation carries Japanese maps, useless here. On compatible systems we generate the navigation FSC (the authorisation code tied to your car) and install current European maps, so guidance works from Malin Head to Mizen. On some cars navigation was never activated at all — the same FSC process can switch it on.',
+          'The import\u2019s navigation carries Japanese maps, useless here. On compatible systems we apply the navigation FSC (the authorisation code tied to your car) and install current European maps, so guidance works from Malin Head to Mizen. On some cars navigation was never activated at all — the same FSC process can switch it on.',
         ],
       },
       {

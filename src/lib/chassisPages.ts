@@ -102,7 +102,7 @@ const CHASSIS: ChassisFacts[] = [
     ],
     faq: {
       q: 'My F10 is a Japanese import — can you sort the navigation?',
-      a: 'Yes — Japan-to-EU conversion is a regular F10 job: region change, radio bands, navigation FSC generation and European maps, plus the ETC mirror handling imports need. Send the year and build and we quote the full conversion.',
+      a: 'Yes — Japan-to-EU conversion is a regular F10 job: region change, radio bands, navigation FSC activation and European maps, plus the ETC mirror handling imports need. Send the year and build and we quote the full conversion.',
     },
     related: ['bmw-g30-coding', 'bmw-f30-coding', 'bmw-x5-coding'],
     upgrades: ['carplayLate','id6','clusterAsk','maps','camera','japan','hidden'],

@@ -33,8 +33,8 @@
     "priceFrom": "from",
     "specWhere": "Where",
     "specWhereValue": "We come to you — or meet where suits",
-    "title1": "BMW Coding & Retrofits",
-    "title2": "in Ireland",
+    "title1": "BMW Coding Ireland",
+    "title2": "CarPlay, iDrive & Japan → EU",
     "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnostics · Retrofits",
     "lead": "Professional BMW coding and retrofit services across Dublin & Ireland. Mobile service and remote coding available.",
     "ctaCheck": "Check your BMW",
@@ -42,7 +42,10 @@
     "benefit1": "BMW Specialist",
     "benefit2": "Mobile Service",
     "benefit3": "Remote Coding Available",
-    "benefit4": "OEM-Level Solutions"
+    "benefit4": "OEM-Level Solutions",
+    "quoteLink": "Request a quote",
+    "servicesLink": "View all services",
+    "projectsLink": "Real projects"
   },
   "Services": {
     "eyebrow": "01 / Services",
@@ -248,8 +251,8 @@
     "metaDescription": "Pick your exact BMW chassis code and year to see which coding, diagnostics and retrofit options are available for your car in Dublin."
   },
   "HomeMetadata": {
-    "title": "BMW Coding Dublin & Ireland — Mobile, CarPlay, Japan → EU",
-    "description": "BMW coding, diagnostics and retrofits in Dublin and across Ireland. Apple CarPlay, Android Auto, ISTA diagnostics, Japan to EU conversion, map updates and remote coding."
+    "title": "BMW Coding Ireland | CarPlay, iDrive & Japan to EU",
+    "description": "BMW coding specialists in Dublin and across Ireland: Apple CarPlay activation, Japan to EU conversion, iDrive upgrades and diagnostics. Mobile and remote."
   },
   "Reviews": {
     "eyebrow": "Reviews",

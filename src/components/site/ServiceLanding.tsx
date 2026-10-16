@@ -7,6 +7,8 @@ import { Footer } from './Footer';
 import { HONEST_COMPATIBILITY_NOTE } from '@/lib/servicePages';
 import { ALL_LANDINGS } from '@/lib/landings';
 import { MobileActionBar } from './MobileActionBar';
+import Image from 'next/image';
+import { BLOG_POSTS } from '@/lib/blog';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const DEFAULT_AREA = ['Dublin', 'Kildare', 'Wicklow', 'Meath', 'Ireland'];
@@ -38,6 +40,9 @@ export async function ServiceLanding({
     : [];
 
   const wa = waLink(settings.whatsapp, p.waMessage);
+  // Guides that point at this page (each post lists the services it relates
+  // to) — so every service page links back to the articles that explain it.
+  const guides = BLOG_POSTS.filter((post) => post.related.some((r) => r.slug === p.slug)).slice(0, 4);
   const url = `${SITE_URL}/${p.slug}`;
 
   const jsonLd = {
@@ -51,13 +56,10 @@ export async function ServiceLanding({
         description: p.metaDescription,
         url,
         areaServed: AREA.map((name) => ({ '@type': 'AdministrativeArea', name })),
-        provider: {
-          '@type': 'AutoRepair',
-          name: 'BMW Coding',
-          url: SITE_URL,
-          telephone: settings.phone,
-          email: settings.email,
-        },
+        // The business entity is defined once in the layout; point at it so
+        // Google sees one provider, not a second, thinner copy per page.
+        provider: { '@id': `${SITE_URL}/#business` },
+        brand: { '@type': 'Brand', name: 'BMW' },
         ...(p.price?.amount
           ? {
               offers: {
@@ -219,8 +221,15 @@ export async function ServiceLanding({
               <ul className={`mt-8 grid gap-4 ${work.length === 1 ? 'max-w-md' : 'sm:grid-cols-2'} ${work.length > 2 ? 'lg:grid-cols-4' : ''}`}>
                 {work.map((g) => (
                   <li key={g.id} className="overflow-hidden border border-white/8 bg-graphite-800/40">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={g.image_url} alt={g.caption} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
+                    <div className="relative aspect-[4/3] w-full">
+                      <Image
+                        src={g.image_url}
+                        alt={g.caption}
+                        fill
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover"
+                      />
+                    </div>
                     <p className="p-3 text-sm text-muted">{g.caption}</p>
                   </li>
                 ))}
@@ -268,6 +277,24 @@ export async function ServiceLanding({
         {/* Related + CTA */}
         <section className="py-16 md:py-20">
           <div className="mx-auto max-w-edge px-5 md:px-8">
+            {guides.length > 0 && (
+              <div className="mb-10">
+                <h2 className="label mb-5">Guides on this topic</h2>
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {guides.map((g) => (
+                    <li key={g.slug}>
+                      <Link
+                        href={`/blog/${g.slug}`}
+                        className="group flex h-full items-start justify-between gap-3 border border-white/10 bg-graphite-800/40 p-4 text-sm text-muted transition-colors hover:border-[color:var(--page-accent)] hover:text-ink"
+                      >
+                        <span>{g.title}</span>
+                        <ArrowRight size={14} className="mt-0.5 shrink-0" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <h2 className="label mb-5">Related BMW services</h2>
             <div className="flex flex-wrap gap-3">
               {p.related.map((r) => (

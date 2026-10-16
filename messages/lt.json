@@ -33,8 +33,8 @@
     "priceFrom": "nuo",
     "specWhere": "Kur",
     "specWhereValue": "Atvykstame pas jus — arba susitinkame, kur patogu",
-    "title1": "BMW kodavimas ir modernizavimas",
-    "title2": "Airijoje",
+    "title1": "BMW kodavimas Airijoje",
+    "title2": "CarPlay, iDrive ir Japan → EU",
     "servicesLine": "Apple CarPlay · Japan → EU · iDrive · Diagnostika · Modernizavimas",
     "lead": "Profesionalus BMW kodavimas ir modernizavimas Dubline ir visoje Airijoje. Atvykstame pas jus arba koduojame nuotoliniu būdu.",
     "ctaCheck": "Patikrinti savo BMW",
@@ -42,7 +42,10 @@
     "benefit1": "BMW specialistas",
     "benefit2": "Atvykstame pas jus",
     "benefit3": "Nuotolinis kodavimas",
-    "benefit4": "OEM lygio sprendimai"
+    "benefit4": "OEM lygio sprendimai",
+    "quoteLink": "Gauti kainą",
+    "servicesLink": "Visos paslaugos",
+    "projectsLink": "Mūsų darbai"
   },
   "Services": {
     "eyebrow": "01 / Paslaugos",
