@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { setRequestLocale } from 'next-intl/server';
 import { ArrowRight, Clock } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
@@ -12,7 +13,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'BMW Coding Guides | CarPlay, Hidden Features & Remote Coding',
+  title: { absolute: seoTitle('BMW Coding Guides | CarPlay, Hidden Features & Remote Coding') },
   description:
     'Practical guides on BMW coding: CarPlay activation on NBT Evo and MGU, the best hidden features for F-series cars, and how remote ENET coding works.',
   alternates: { canonical: '/blog' },

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { ArrowLeft, ArrowRight, Clock, MessageCircle } from 'lucide-react';
@@ -29,15 +30,15 @@ export async function generateMetadata({
   const post = getPost(slug);
   if (!post) return {};
   return {
-    title: post.metaTitle,
-    description: post.description,
+    title: { absolute: seoTitle(post.metaTitle) },
+    description: seoDescription(post.description),
     alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
       type: 'article',
       url: `${SITE_URL}/blog/${post.slug}`,
       siteName: 'BMW Coding',
-      title: post.metaTitle,
-      description: post.description,
+      title: seoTitle(post.metaTitle),
+      description: seoDescription(post.description),
       images: [{ url: '/og.jpg', width: 1200, height: 630, alt: post.title }],
     },
   };

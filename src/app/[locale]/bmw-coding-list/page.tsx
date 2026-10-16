@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { setRequestLocale } from 'next-intl/server';
 import { Check, MessageCircle, ScanLine } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
@@ -13,8 +14,8 @@ export const revalidate = 86400;
 
 export function generateMetadata(): Metadata {
   return {
-    title: CODING_META.title,
-    description: CODING_META.description,
+    title: { absolute: seoTitle(CODING_META.title) },
+    description: seoDescription(CODING_META.description),
     alternates: { canonical: '/bmw-coding-list' },
     openGraph: {
       type: 'website',

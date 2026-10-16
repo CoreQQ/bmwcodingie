@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { setRequestLocale } from 'next-intl/server';
 import { ArrowRight, MapPin, Car, Wrench, MessageCircle } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
@@ -22,8 +23,8 @@ export const revalidate = 86400;
 export function generateMetadata(): Metadata {
   const url = `/${SLUG}`;
   return {
-    title: META_TITLE,
-    description: META_DESC,
+    title: { absolute: seoTitle(META_TITLE) },
+    description: seoDescription(META_DESC),
     alternates: { canonical: url },
     openGraph: {
       type: 'website',

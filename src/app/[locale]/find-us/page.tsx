@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { setRequestLocale } from 'next-intl/server';
 import { AlertTriangle, MapPin, MessageCircle, Navigation, Phone, Truck } from 'lucide-react';
 import { Header } from '@/components/site/Header';
@@ -27,8 +28,8 @@ export function generateMetadata(): Metadata {
     ? 'BMW Coding is a mobile service: we come to your home or workplace across Dublin, Kildare, Wicklow and Meath, or work remotely over ENET anywhere in Ireland.'
     : 'How to find the BMW Coding workshop in Greenogue Business Park, Rathcoole (West Dublin, off the N7). Use our directions button — sat-nav pins route into a dead end.';
   return {
-    title,
-    description,
+    title: { absolute: seoTitle(title) },
+    description: seoDescription(description),
     alternates: { canonical: '/find-us' },
     openGraph: {
       type: 'website',

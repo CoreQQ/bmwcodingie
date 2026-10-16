@@ -6,7 +6,14 @@ import { routing } from '@/i18n/routing';
 const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const { pathname, search } = req.nextUrl;
+
+  // The production deployment is also reachable on *.vercel.app — a full
+  // duplicate of the site. Send it to the real domain so only one exists.
+  const host = req.headers.get('host') || '';
+  if (process.env.VERCEL_ENV === 'production' && host.endsWith('.vercel.app')) {
+    return NextResponse.redirect(new URL(`${pathname}${search}`, 'https://www.bmwcoding.ie'), 308);
+  }
 
   // Allow the login page and its POST action through.
   if (pathname === '/admin/login') {

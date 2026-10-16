@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
@@ -17,8 +18,8 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'ModelsPage' });
   return {
-    title: t('metaTitle'),
-    description: t('metaDescription'),
+    title: { absolute: seoTitle(t('metaTitle')) },
+    description: seoDescription(t('metaDescription')),
     alternates: { canonical: '/models' },
   };
 }
