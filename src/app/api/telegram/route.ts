@@ -25,13 +25,14 @@ import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
-import { buildAgenda, buildLeadCard, type AgendaLead } from '@/lib/agenda';
+import { buildAgenda, buildLeadCard, markContactHandled, markAllWaitingHandled, type AgendaLead } from '@/lib/agenda';
 import { jpAddressMessage } from '@/lib/jpAddress';
 import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
 import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import { CHEAT_SHEET, CHEAT_DISCLAIMER, findCheat, formatCheat } from '@/lib/cheatsheet';
 import type { Booking } from '@/lib/types';
+import { isRateLimited } from '@/lib/rateLimit';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -88,6 +89,7 @@ export async function POST(req: Request) {
   }
 
   let update: {
+    update_id?: number;
     message?: { text?: string; chat: { id: number } };
     callback_query?: {
       id: string;
@@ -98,6 +100,12 @@ export async function POST(req: Request) {
   try {
     update = await req.json();
   } catch {
+    return ok();
+  }
+
+  // Telegram re-delivers an update when our answer is slow; without this the
+  // owner got the same agenda (or the same command reply) twice in a minute.
+  if (typeof update.update_id === 'number' && isRateLimited(`tg-update:${update.update_id}`, 1, 15 * 60 * 1000)) {
     return ok();
   }
 
@@ -369,7 +377,8 @@ export async function POST(req: Request) {
           content: body,
           via: 'owner',
         });
-        await sendOwnerMessage(`✅ Sent to <code>+${to}</code>`);
+        const cleared = await markContactHandled(sb, to).catch(() => 0);
+        await sendOwnerMessage(`✅ Sent to <code>+${to}</code>${cleared ? ` · ${cleared} enquiry(ies) marked answered` : ''}`);
       } else {
         await sendOwnerMessage(`❌ Failed: ${sent.error || 'unknown error'}`);
       }
@@ -897,6 +906,7 @@ export async function POST(req: Request) {
   if (cq.data.startsWith('wamine:')) {
     const waId = cq.data.slice(7);
     await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() });
+    await markContactHandled(sb, waId).catch(() => 0);
     await answerCallback(cq.id, 'Yours for 6 hours');
     await sendOwnerMessage(
       `✋ You have this chat with <code>+${waId}</code>. The assistant will not reply for 6 hours; ` +
@@ -980,6 +990,39 @@ export async function POST(req: Request) {
     const agenda = await buildAgenda(sb);
     await editMessage(chatId, messageId, agenda.text, agenda.keyboard);
     await answerCallback(cq.id);
+    return ok();
+  }
+
+  // "All answered": clear the waiting list in one tap and redraw the agenda.
+  if (cq.data === 'agclear') {
+    const n = await markAllWaitingHandled(sb);
+    const agenda = await buildAgenda(sb);
+    await editMessage(
+      chatId,
+      messageId,
+      agenda.empty ? '⏰ <b>Daily agenda</b>\n\nNothing booked and nobody waiting.' : agenda.text,
+      agenda.keyboard,
+    );
+    await answerCallback(cq.id, n ? `Cleared ${n} ✓` : 'Nothing to clear');
+    return ok();
+  }
+
+  // "Answered" on a lead card: this person (every enquiry from the number) is done.
+  const leadDone = /^leaddone:(\d+)$/.exec(cq.data);
+  if (leadDone) {
+    const id = Number(leadDone[1]);
+    const { data: row } = await sb.from('bookings').select('contact').eq('id', id).maybeSingle();
+    const contact = (row as { contact?: string } | null)?.contact ?? '';
+    const n = (await markContactHandled(sb, contact).catch(() => 0)) || 0;
+    if (!n) await sb.from('bookings').update({ handled: true }).eq('id', id);
+    const agenda = await buildAgenda(sb);
+    await editMessage(
+      chatId,
+      messageId,
+      agenda.empty ? '⏰ <b>Daily agenda</b>\n\nNothing booked and nobody waiting.' : agenda.text,
+      agenda.keyboard,
+    );
+    await answerCallback(cq.id, 'Marked answered ✓');
     return ok();
   }
 

@@ -16,6 +16,7 @@ import { translateToRussian } from '@/lib/translate';
 import { isRateLimited } from '@/lib/rateLimit';
 import { ensureClient } from '@/lib/crm';
 import { generateWaReply } from '@/lib/waAgent';
+import { markContactHandled } from '@/lib/agenda';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -228,6 +229,8 @@ async function handleOwnerEcho(sb: SupabaseClient | null, e: WaEcho, fromPhone: 
     .from('wa_chats')
     .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString(), last_at: new Date().toISOString() })
     .then(() => undefined, () => undefined);
+  // ...and whatever this customer asked is answered: off the agenda's waiting list.
+  await markContactHandled(sb, waId).catch(() => 0);
 }
 
 /** Delivery statuses: only failures matter, and they must reach the owner. */

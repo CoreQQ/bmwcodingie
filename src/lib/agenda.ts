@@ -41,18 +41,69 @@ function collapse(rows: AgendaLead[]): { leads: AgendaLead[]; extras: Map<number
   return { leads: [...seen.values()], extras };
 }
 
-/** Everyone whose enquiry has been sitting unanswered for over a day. */
+/** How long an unanswered enquiry stays on the list before it is considered stale. */
+const WAITING_MAX_DAYS = 14;
+
+/**
+ * Everyone whose enquiry has been sitting unanswered for over a day. The list
+ * used to keep everyone forever — Alex answers on his phone, and nothing told
+ * the agenda he had. Now an enquiry leaves it when he replies in WhatsApp
+ * (owner echo), uses /wa or "I'll reply", taps "Answered", or after two weeks.
+ */
 export async function waitingLeads(sb: SupabaseClient): Promise<{ leads: AgendaLead[]; extras: Map<number, number> }> {
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const staleAt = new Date(Date.now() - WAITING_MAX_DAYS * 86400000).toISOString();
   const { data } = await sb
     .from('bookings')
     .select('id, name, contact, service, bmw_model, message, slot_date, slot_time, status, created_at')
     .eq('status', 'pending')
+    .eq('handled', false)
     .lt('created_at', dayAgo)
+    .gt('created_at', staleAt)
     .order('created_at', { ascending: true })
     .limit(60);
   const { leads, extras } = collapse((data ?? []) as AgendaLead[]);
   return { leads: leads.slice(0, 10), extras };
+}
+
+/** Same person, any format: compare the last 9 digits (drops +353 / 0 prefixes). */
+const phoneKey = (s: string) => (s ?? '').replace(/\D/g, '').slice(-9);
+
+/**
+ * Mark every open enquiry from this number as handled — Alex has answered
+ * them. Matching is done here because stored contacts come in every format
+ * ("+353 87…", "087…", "353…"). Returns how many enquiries were cleared.
+ */
+export async function markContactHandled(sb: SupabaseClient, contact: string): Promise<number> {
+  const key = phoneKey(contact);
+  if (key.length < 7) return 0;
+  const since = new Date(Date.now() - 60 * 86400000).toISOString();
+  const { data } = await sb
+    .from('bookings')
+    .select('id, contact')
+    .eq('status', 'pending')
+    .eq('handled', false)
+    .gt('created_at', since)
+    .limit(500);
+  const ids = ((data ?? []) as { id: number; contact: string }[]).filter((r) => phoneKey(r.contact) === key).map((r) => r.id);
+  if (!ids.length) return 0;
+  await sb.from('bookings').update({ handled: true }).in('id', ids);
+  return ids.length;
+}
+
+/** Clear the whole "waiting" list at once (the agenda's "all answered" button). */
+export async function markAllWaitingHandled(sb: SupabaseClient): Promise<number> {
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await sb
+    .from('bookings')
+    .select('id')
+    .eq('status', 'pending')
+    .eq('handled', false)
+    .lt('created_at', dayAgo)
+    .limit(500);
+  const ids = ((data ?? []) as { id: number }[]).map((r) => r.id);
+  if (ids.length) await sb.from('bookings').update({ handled: true }).in('id', ids);
+  return ids.length;
 }
 
 /** The whole morning message, ready to send or to edit back into. */
@@ -101,7 +152,7 @@ export async function buildAgenda(
             more ? ` (+${more})` : ''
           }`;
           return [{ text: label, callback_data: `lead:${b.id}` }];
-        }),
+        }).concat([[{ text: '🧹 All answered — clear the list', callback_data: 'agclear' }]]),
       }
     : undefined;
 
@@ -137,7 +188,10 @@ export function buildLeadCard(b: AgendaLead): { text: string; keyboard: InlineKe
     ]);
     buttons.push([{ text: '📖 Read the chat', callback_data: `leadlog:${b.id}` }]);
   }
-  buttons.push([{ text: '✖️ Dismiss', callback_data: `bkfree:${b.id}` }]);
+  buttons.push([
+    { text: '✅ Answered', callback_data: `leaddone:${b.id}` },
+    { text: '✖️ Dismiss', callback_data: `bkfree:${b.id}` },
+  ]);
   buttons.push([{ text: '← Back to agenda', callback_data: 'agenda' }]);
 
   return { text: lines.join('\n'), keyboard: { inline_keyboard: buttons } };
