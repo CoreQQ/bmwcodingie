@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from './seoText';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -483,22 +484,25 @@ export function buildLandingMetadata(p: ServicePage): Metadata {
   const url = `/${p.slug}`;
   // No hreflang here: the body is English in every locale and canonical
   // points at the English URL, so language alternates would contradict it.
+  const title = seoTitle(p.metaTitle);
+  const description = seoDescription(p.metaDescription);
   return {
-    title: p.metaTitle,
-    description: p.metaDescription,
+    // absolute: the layout's "| BMW Coding" template would push it past the cut-off
+    title: { absolute: title },
+    description,
     alternates: { canonical: url },
     openGraph: {
       type: 'website',
       url: `${SITE_URL}${url}`,
       siteName: 'BMW Coding',
-      title: p.metaTitle,
-      description: p.metaDescription,
+      title,
+      description,
       images: [{ url: '/og.jpg', width: 1200, height: 630, alt: `${p.serviceName} — BMW Coding IE` }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: p.metaTitle,
-      description: p.metaDescription,
+      title,
+      description,
       images: ['/og.jpg'],
     },
   };

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { routing } from '@/i18n/routing';
 import { Header } from '@/components/site/Header';
 import { Preloader } from '@/components/site/Preloader';
@@ -36,8 +37,8 @@ export async function generateMetadata({
   const languages: Record<string, string> = Object.fromEntries(routing.locales.map((l) => [l, url(l)]));
   languages['x-default'] = '/';
   return {
-    title: t('title'),
-    description: t('description'),
+    title: { absolute: seoTitle(t('title')) },
+    description: seoDescription(t('description')),
     alternates: { canonical: url(locale), languages },
   };
 }

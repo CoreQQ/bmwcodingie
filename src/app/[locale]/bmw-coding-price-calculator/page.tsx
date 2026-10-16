@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seoText';
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/site/Header';
@@ -17,8 +18,8 @@ export const revalidate = 86400;
 
 export function generateMetadata(): Metadata {
   return {
-    title: TITLE,
-    description: DESCRIPTION,
+    title: { absolute: seoTitle(TITLE) },
+    description: seoDescription(DESCRIPTION),
     alternates: { canonical: '/bmw-coding-price-calculator' },
     openGraph: {
       type: 'website',

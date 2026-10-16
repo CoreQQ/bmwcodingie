@@ -400,7 +400,7 @@ const CHASSIS: ChassisFacts[] = [
 function buildChassisPage(f: ChassisFacts): ServicePage {
   return {
     slug: f.slug,
-    metaTitle: `BMW ${f.title} Coding & CarPlay Ireland | Upgrades, Retrofits & Hidden Features`,
+    metaTitle: `BMW ${f.short} Coding & CarPlay Ireland`,
     metaDescription: `BMW ${f.codes} coding in Dublin and across Ireland (${f.years}). ${f.popular[0]}, hidden features, Video in Motion and diagnostics — in person or remote.`,
     serviceName: `BMW ${f.title} Coding`,
     eyebrow: `${f.codes} · ${f.years}`,
