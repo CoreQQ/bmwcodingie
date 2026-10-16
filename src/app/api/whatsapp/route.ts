@@ -9,6 +9,7 @@ import {
   isWhatsAppConfigured,
   whatsAppPhoneId,
   downloadWhatsAppMedia,
+  checkWhatsAppKey,
 } from '@/lib/whatsapp';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
 import { translateToRussian } from '@/lib/translate';
@@ -60,13 +61,14 @@ export async function GET(req: Request) {
       const { data, count } = await q.order('created_at', { ascending: false }).limit(1);
       return { n: count ?? 0, last: (data?.[0] as { created_at?: string } | undefined)?.created_at ?? null };
     };
-    const [owner, customer, ai] = await Promise.all([stat('owner', true), stat('customer'), stat('ai')]);
+    const [owner, customer, ai, key] = await Promise.all([stat('owner', true), stat('customer'), stat('ai'), checkWhatsAppKey()]);
     return NextResponse.json({
       ok: true,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
       verify: Boolean(expected),
+      key,
       last24h: {
         owner_replies_seen: owner.n,
         last_owner_reply: owner.last,
