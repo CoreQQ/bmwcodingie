@@ -42,7 +42,13 @@ export async function GET(req: Request) {
   const token = url.searchParams.get('hub.verify_token');
   const challenge = url.searchParams.get('hub.challenge');
   const expected = process.env.WHATSAPP_VERIFY_TOKEN;
-  if (mode === 'subscribe' && expected && token === expected) {
+  // Meta's handshake: echo the challenge when the verify token matches. The
+  // webhook URL itself also carries our secret (?key=…), so a matching key is
+  // accepted too — a mistyped verify-token field in the provider's dashboard
+  // (Dualhook, 16 Oct: HTTP 403) must not block the subscription.
+  const key = url.searchParams.get('key') || '';
+  const keyOk = Boolean(expected) && key.length === (expected ?? '').length && crypto.timingSafeEqual(Buffer.from(key), Buffer.from(expected as string));
+  if (mode === 'subscribe' && expected && (token === expected || keyOk)) {
     return new Response(challenge ?? '', { status: 200 });
   }
   if (!mode) {
@@ -178,8 +184,20 @@ async function handleUpdate(update: WaUpdate): Promise<void> {
     for (const change of entry.changes ?? []) {
       const value = change.value;
       if (!value) continue;
-      // Another number on the same account is not ours to answer.
-      if (ourPhone && value.metadata?.phone_number_id && value.metadata.phone_number_id !== ourPhone) continue;
+      // A different phone_number_id is either a test number on the account
+      // or our own number after a re-onboarding (the id changes with a new
+      // WABA). Dropping it silently would lose leads, so the messages are
+      // still handled (replies then fail visibly and arrive as "copy answer"),
+      // and the owner is told once which id to put in WHATSAPP_PHONE_ID.
+      const incomingPhone = value.metadata?.phone_number_id;
+      if (ourPhone && incomingPhone && incomingPhone !== ourPhone && value.messages?.length) {
+        if (!isRateLimited(`wa-phone-mismatch:${incomingPhone}`, 1, 6 * 60 * 60 * 1000)) {
+          await sendOwnerWithMarkup(
+            `⚙️ <b>WhatsApp messages arrive for phone_number_id</b> <code>${esc(incomingPhone)}</code>, but the site is set to <code>${esc(ourPhone)}</code>. ` +
+              'If you re-connected the number, update WHATSAPP_PHONE_ID (and the API key) in Vercel — until then replies cannot be sent automatically.',
+          ).catch(() => undefined);
+        }
+      }
 
       const field = change.field || (value.messages ? 'messages' : '');
       if (field === 'smb_message_echoes' || field === 'message_echoes') {
