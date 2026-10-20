@@ -69,7 +69,7 @@ export async function GET(req: Request) {
   const tomorrow = new Date(Date.now() + 86400000).toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' });
 
   const [visits, attention, leads, wa, pays, nextDay, waiting] = await Promise.all([
-    sb.from('site_visits').select('path, referrer, source, city, returning').gt('created_at', since).limit(5000),
+    sb.from('site_visits').select('path, referrer, source, city, is_returning').gt('created_at', since).limit(5000),
     sb.from('section_time').select('path').gt('created_at', since).limit(20000),
     sb.from('bookings').select('name, source, service').gt('created_at', since).limit(500),
     sb.from('wa_messages').select('wa_id, role, via, content').gt('created_at', since).limit(5000),
@@ -88,10 +88,10 @@ export async function GET(req: Request) {
 
   // Visitors. Until the site_visits table exists (supabase/schema.sql), the
   // section-attention pings stand in as a rough traffic signal.
-  type Visit = { path: string; referrer: string | null; source: string | null; city: string | null; returning: boolean };
+  type Visit = { path: string; referrer: string | null; source: string | null; city: string | null; is_returning: boolean };
   if (!visits.error) {
     const v = (visits.data ?? []) as Visit[];
-    const back = v.filter((x) => x.returning).length;
+    const back = v.filter((x) => x.is_returning).length;
     lines.push(`👀 <b>Visitors:</b> ${v.length}${back ? ` (${back} returning)` : ''}`);
     if (v.length) {
       lines.push(`   Pages: ${top(tally(v.map((x) => x.path)), 4)}`);

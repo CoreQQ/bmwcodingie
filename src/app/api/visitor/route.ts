@@ -68,7 +68,7 @@ export async function POST(req: Request) {
   if (sb) {
     await sb
       .from('site_visits')
-      .insert({ path, referrer: referrer ?? null, source: source ?? null, device, city: city ?? null, country: country ?? null, returning: isReturning })
+      .insert({ path, referrer: referrer ?? null, source: source ?? null, device, city: city ?? null, country: country ?? null, is_returning: isReturning })
       .then(() => undefined, () => undefined);
   }
   return NextResponse.json({ ok: true });

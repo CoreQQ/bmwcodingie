@@ -352,7 +352,7 @@ create table if not exists site_visits (
   device text,
   city text,
   country text,
-  returning boolean not null default false
+  is_returning boolean not null default false
 );
 create index if not exists site_visits_created_idx on site_visits (created_at);
 alter table site_visits enable row level security;
