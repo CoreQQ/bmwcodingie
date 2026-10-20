@@ -47,6 +47,13 @@ function sanitizeMarkup(markup: unknown): unknown {
   };
 }
 
+const warnedOnce = new Set<string>();
+function isRateLimitedOnce(key: string): boolean {
+  if (warnedOnce.has(key)) return true;
+  warnedOnce.add(key);
+  return false;
+}
+
 async function tgCall(method: string, payload: Record<string, unknown>, attempt = 0): Promise<unknown | null> {
   if (!TG_TOKEN) {
     console.warn('[telegram] TG_TOKEN not set — skipping', method);
@@ -72,6 +79,20 @@ async function tgCall(method: string, payload: Record<string, unknown>, attempt 
         return tgCall(method, payload, 1);
       }
       if (res.status === 400) {
+        // The group became a supergroup (it happens when the bot is made an
+        // admin) and got a new id: deliver there now, and say so loudly —
+        // TG_CHAT_ID must be updated or commands from the group are ignored.
+        const moved = (JSON.parse(detail || '{}') as { parameters?: { migrate_to_chat_id?: number } }).parameters?.migrate_to_chat_id;
+        if (moved && payload.chat_id) {
+          const sent = await tgCall(method, { ...payload, chat_id: moved }, 1);
+          if (!isRateLimitedOnce(`tg-migrated:${moved}`)) {
+            await tgCall('sendMessage', {
+              chat_id: moved,
+              text: `⚠️ This group got a new id: ${moved}. Put it in TG_CHAT_ID in Vercel and redeploy — until then the bot cannot see commands here.`,
+            }, 1);
+          }
+          return sent;
+        }
         if (/parse entities/i.test(detail)) {
           const plain = String(payload.text ?? '').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
           const { parse_mode: _drop, ...rest } = payload;
