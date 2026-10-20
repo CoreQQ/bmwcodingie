@@ -942,7 +942,7 @@ function StatsTab({ stats, attention }: { stats: BusinessStats; attention?: { se
             <span className="font-display text-2xl text-ink">€{stats.revenue7.toFixed(0)}</span> this week ·{' '}
             <span className="font-display text-2xl text-ink">€{stats.revenue30.toFixed(0)}</span> this month
           </p>
-          <p className="mt-2 text-[11px] text-faint">Net after costs & shares: 💰 Money in the bot chat</p>
+          <p className="mt-2 text-[11px] text-faint">Net after costs & shares: /paid in the bot chat</p>
         </div>
       )}
       {!!attention?.length && (

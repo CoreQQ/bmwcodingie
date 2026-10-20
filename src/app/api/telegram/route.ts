@@ -26,8 +26,15 @@ import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { answerPendingWaMessage } from '@/lib/waAgent';
-import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
-import { buildAgenda, buildLeadCard, markContactHandled, markAllWaitingHandled, type AgendaLead } from '@/lib/agenda';
+import {
+  buildAgenda,
+  buildLeadCard,
+  buildPendingWa,
+  markContactHandled,
+  markAllWaitingHandled,
+  unansweredChats,
+  type AgendaLead,
+} from '@/lib/agenda';
 import { jpAddressMessage } from '@/lib/jpAddress';
 import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
 import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
@@ -64,6 +71,224 @@ function answerPendingInBackground(sb: SupabaseClient, waId: string): void {
       }
     })().catch(() => undefined),
   );
+}
+
+/** What we stored for a WhatsApp chat, oldest first, Irish time. */
+async function chatLogText(sb: SupabaseClient, waId: string, limit = 10): Promise<string> {
+  const { data } = await sb
+    .from('wa_messages')
+    .select('role, content, via, created_at')
+    .eq('wa_id', waId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  const rows = (data ?? []) as { role: string; content: string; via: string | null; created_at: string }[];
+  const body = rows
+    .reverse()
+    .map((r) => {
+      const time = new Date(r.created_at).toLocaleString('en-IE', {
+        timeZone: 'Europe/Dublin',
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const who = r.role === 'user' ? '👤' : r.via === 'owner' ? '✋' : '🤖';
+      return `${who} <code>${time}</code> ${escapeHtml(r.content.slice(0, 300))}`;
+    })
+    .join('\n\n');
+  return body ? `📖 <b>Chat with +${waId}</b> (oldest first)\n\n${body}` : `Nothing stored for <code>+${waId}</code> yet.`;
+}
+
+async function sendPendingWa(sb: SupabaseClient): Promise<void> {
+  const { text, keyboard } = buildPendingWa(await unansweredChats(sb));
+  await sendOwnerWithMarkup(text, keyboard);
+}
+
+/** The assistant's master switch (app_config.wa_ai_owner: 'meta' = off). */
+async function aiSwitch(sb: SupabaseClient, want?: 'on' | 'off'): Promise<void> {
+  if (!want) {
+    const { data } = await sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle();
+    const on = (data as { value?: string } | null)?.value !== 'meta';
+    await sendOwnerMessage(
+      on
+        ? '🤖 The assistant answers WhatsApp. <code>/wa off all</code> silences it everywhere.'
+        : '🔇 The assistant is off for every chat — messages still arrive here and you answer. <code>/wa on all</code> switches it back.',
+    );
+    return;
+  }
+  const { error } = await sb.from('app_config').upsert({ key: 'wa_ai_owner', value: want === 'on' ? 'ours' : 'meta' });
+  await sendOwnerMessage(
+    error
+      ? `❌ Could not change it: ${escapeHtml(error.message)}`
+      : want === 'off'
+        ? '🔇 Assistant off for every chat. Messages still arrive here — you answer. <code>/wa on all</code> switches it back.'
+        : '🔊 Assistant on again for every chat (chats you stopped one by one stay stopped).',
+  );
+}
+
+async function sendCalendarLink(): Promise<void> {
+  const url = `${SITE_URL}/api/calendar/${calendarToken()}.ics`;
+  const webcal = url.replace(/^https:/, 'webcal:');
+  await sendOwnerMessage(
+    [
+      '📆 <b>Your bookings calendar</b>',
+      '━━━━━━━━━━━━━━━━━━━',
+      'Subscribe once and confirmed bookings appear in your phone calendar automatically.',
+      '',
+      `<b>iPhone:</b> tap → <a href="${webcal}">${webcal}</a>`,
+      `<b>Any calendar app:</b> add subscription → <code>${url}</code>`,
+      '',
+      '⚠️ This link is private — anyone with it can see your bookings.',
+    ].join('\n'),
+  );
+}
+
+async function sendBanlist(sb: SupabaseClient): Promise<void> {
+  const { data } = await sb.from('clients').select('id, phone_key, name, ban_reason').eq('banned', true).order('id');
+  const list = (data ?? []) as { id: number; phone_key: string; name: string | null; ban_reason: string | null }[];
+  const lines = ['⛔️ <b>Blacklist</b>', '━━━━━━━━━━━━━━━━━━━'];
+  if (!list.length) lines.push('Empty.');
+  for (const c of list) {
+    lines.push(
+      `<code>${clientCode(c.id)}</code> · ${escapeHtml(c.name || '—')} · …${c.phone_key.slice(-6)}${c.ban_reason ? ` — ${escapeHtml(c.ban_reason)}` : ''}`,
+    );
+  }
+  lines.push('', 'Ban: <code>/ban C-007 reason</code> or <code>/ban 0871234567 reason</code> · Unban: <code>/unban C-007</code>');
+  await sendOwnerMessage(lines.join('\n'));
+}
+
+async function sendCheatIndex(sb: SupabaseClient): Promise<void> {
+  const { data: mine } = await sb.from('cheat_notes').select('id, title').order('created_at', { ascending: false }).limit(30);
+  const lines = ['🔧 <b>Coding cheat-sheet</b>', CHEAT_DISCLAIMER, '', '<b>Search:</b> <code>/cheat vim</code> · <code>/cheat mirrors</code>', '', '<b>Built-in topics:</b>'];
+  lines.push(CHEAT_SHEET.map((e) => `• ${escapeHtml(e.title)}`).join('\n'));
+  const list = (mine ?? []) as { id: number; title: string }[];
+  if (list.length) {
+    lines.push('', '<b>Your notes:</b>');
+    for (const n of list) lines.push(`• <code>#${n.id}</code> ${escapeHtml(n.title)}`);
+  }
+  lines.push('', 'Add: <code>/cheat add Title | details</code> · Remove: <code>/cheat del 5</code>');
+  await sendOwnerMessage(lines.join('\n'));
+}
+
+async function sendStats(sb: SupabaseClient): Promise<void> {
+  const s = await getBusinessStats(sb);
+  const lines = [
+    '📊 <b>Business stats</b>',
+    '━━━━━━━━━━━━━━━━━━━',
+    `📥 Enquiries: <b>${s.last7}</b> this week · <b>${s.last30}</b> this month · ${s.total} all time`,
+    `📅 Slots: ✅ ${s.confirmedUpcoming} confirmed upcoming · ⏳ ${s.pending} pending`,
+  ];
+  if (s.paymentsCount > 0) {
+    lines.push(`💶 Revenue: <b>€${s.revenue7.toFixed(0)}</b> this week · <b>€${s.revenue30.toFixed(0)}</b> this month`);
+  }
+  // Section attention: where visitors actually spend their time (7 days).
+  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  const { data: att } = await sb.from('section_time').select('section, seconds').gte('day', weekAgo).limit(5000);
+  if (att?.length) {
+    const bySec = new Map<string, number>();
+    for (const r of att as { section: string; seconds: number }[]) {
+      bySec.set(r.section, (bySec.get(r.section) ?? 0) + Number(r.seconds || 0));
+    }
+    const top = [...bySec].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const fmtT = (v: number) => (v >= 3600 ? `${Math.floor(v / 3600)}h ${Math.round((v % 3600) / 60)}m` : `${Math.round(v / 60)}m`);
+    lines.push('', '<b>⏱ Attention by section (7d):</b>');
+    for (const [k, v] of top) lines.push(`  ${fmtT(v)} — ${escapeHtml(k)}`);
+  }
+  if (s.topServices.length) {
+    lines.push('', '<b>Most requested:</b>');
+    for (const t of s.topServices) lines.push(`  ${t.count} × ${t.service}`);
+  }
+  if (s.nextBookings.length) {
+    lines.push('', '<b>Next confirmed:</b>');
+    for (const b of s.nextBookings) lines.push(`  ${b.slot_date} ${b.slot_time} — ${b.name}`);
+  }
+  await sendOwnerMessage(lines.join('\n'));
+}
+
+/** Review-request texts, personalised when a name (or C-code) is given. */
+async function sendReviewTemplates(sb: SupabaseClient, rest: string): Promise<void> {
+  let name = '';
+  let service = '';
+  const codeM = /^(c[-\s]?0*\d+)\b\s*([\s\S]*)$/i.exec(rest);
+  if (codeM) {
+    const c = await resolveClient(sb, codeM[1]);
+    name = c?.name || '';
+    service = codeM[2].trim();
+  } else if (rest.includes(' - ')) {
+    const [n, ...svc] = rest.split(' - ');
+    name = n.trim();
+    service = svc.join(' - ').trim();
+  } else {
+    const [n = '', ...svcParts] = rest.split(/\s+/);
+    name = n;
+    service = svcParts.join(' ');
+  }
+  const lines = [
+    '⭐ <b>Review request</b>',
+    '━━━━━━━━━━━━━━━━━━━',
+    name
+      ? `For <b>${escapeHtml(name)}</b>${service ? ` · ${escapeHtml(service)}` : ''} — tap a message to copy it:`
+      : 'Tap a message to copy it. Personalise: <code>/review C-007 CarPlay</code> or <code>/review John Smith - CarPlay</code>.',
+    '',
+  ];
+  for (const tpl of REVIEW_TEMPLATES) {
+    lines.push(`<b>${tpl.label}</b>`);
+    lines.push(`<code>${escapeHtml(tpl.build(name || 'there', service))}</code>`);
+    lines.push('');
+  }
+  if (!hasReviewUrl()) lines.push('⚠️ Set <code>GOOGLE_REVIEW_URL</code> in Vercel so the link is included automatically.');
+  await sendOwnerMessage(lines.join('\n'));
+}
+
+const TOOLS_KEYBOARD = {
+  inline_keyboard: [
+    [{ text: '🇯🇵 Japanese address', callback_data: 'tool:jp' }],
+    [{ text: '🔧 Coding cheat-sheet', callback_data: 'tool:cheat' }],
+    [{ text: '📊 Stats', callback_data: 'tool:stats' }],
+    [{ text: '📆 Calendar link', callback_data: 'tool:cal' }],
+    [{ text: '⛔️ Blacklist', callback_data: 'tool:ban' }],
+  ],
+};
+
+const OWNER_USER_ID = process.env.TG_OWNER_ID;
+
+/**
+ * Alex swipes left on a WhatsApp message in the group and types: the text
+ * goes to that customer. Only replies to the bot's own WhatsApp messages (the
+ * mirror, the 🚨 handover alert) count — a reply to a booking card or to
+ * anything else is never sent anywhere.
+ */
+async function trySwipeReply(sb: SupabaseClient, replied: string, body: string): Promise<boolean> {
+  const head = replied.split('\n').slice(0, 3).join(' ');
+  if (!/WhatsApp|NEEDS YOU/i.test(head)) return false;
+  const waId = /\+(\d{8,15})\b/.exec(head)?.[1];
+  if (!waId) return false;
+  const open = { text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` };
+  if (!isWhatsAppConfigured()) {
+    await sendOwnerWithMarkup('WhatsApp sending is not connected — answer from your phone.', { inline_keyboard: [[open]] });
+    return true;
+  }
+  const sent = await sendWhatsAppText(waId, body);
+  if (sent.ok) {
+    await sb
+      .from('wa_messages')
+      .insert({ msg_id: sent.id || `owner:${waId}:${Date.now()}`, wa_id: waId, role: 'assistant', content: `[Alex] ${body}`, via: 'owner' })
+      .then(() => undefined, () => undefined);
+    // Alex is talking: the assistant stands down here, as when he replies from his phone.
+    await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() }).then(() => undefined, () => undefined);
+    await markContactHandled(sb, waId).catch(() => 0);
+    await sendOwnerMessage(`✅ Sent to <code>+${waId}</code> · the assistant stays quiet in this chat for 6h.`);
+    return true;
+  }
+  const err = sent.error || 'send failed';
+  const outsideWindow = /131047|re-?engagement|24 ?hours?/i.test(err);
+  await sendOwnerWithMarkup(
+    outsideWindow
+      ? `⌛ Not sent: more than 24h since <code>+${waId}</code> last wrote, and WhatsApp only allows templates after that. Send it from your phone:`
+      : `❌ Not sent to <code>+${waId}</code>:\n<code>${escapeHtml(err.slice(0, 300))}</code>`,
+    { inline_keyboard: [[open], [{ text: '📋 Copy your text', copy_text: { text: body } }]] },
+  );
+  return true;
 }
 
 export const runtime = 'nodejs';
@@ -118,7 +343,12 @@ export async function POST(req: Request) {
 
   let update: {
     update_id?: number;
-    message?: { text?: string; chat: { id: number } };
+    message?: {
+      text?: string;
+      chat: { id: number };
+      from?: { id: number };
+      reply_to_message?: { text?: string; caption?: string };
+    };
     callback_query?: {
       id: string;
       data?: string;
@@ -143,14 +373,39 @@ export async function POST(req: Request) {
   const msg = update.message;
   if (msg?.text) {
     let text = msg.text.trim();
-    if (text === '💰 Money') text = '/paid';
-    else if (text === '📅 Bookings') text = '/bookings';
-    else if (text === '📊 Stats') text = '/stats';
-    else if (text === '💶 Paid') text = '/log';
+    // Reply-keyboard buttons (installed by /setup) arrive as plain text; the
+    // old labels stay mapped so a keyboard from before still works.
+    const KEYS: Record<string, string> = {
+      '⏰ Agenda': '/agenda',
+      '📅 Bookings': '/bookings',
+      '💰 Paid': '/paid',
+      '🧰 Tools': '/tools',
+      '💰 Money': '/paid',
+      '📊 Stats': '/stats',
+      '💶 Paid': '/paid',
+    };
+    text = KEYS[text] ?? text;
+    // Retired commands → where they live now.
+    text = text
+      .replace(/^\/log\b.*$/s, '/paid')
+      .replace(/^\/client\b/, '/find')
+      .replace(/^\/ai\s+(on|off)\s*$/i, '/wa $1 all')
+      .replace(/^\/ai\s*$/i, '/wa');
     if (!isOwner(msg.chat.id)) return ok();
     if (!sb) {
       await sendOwnerMessage('Database not configured.');
       return ok();
+    }
+
+    // A reply (swipe left) to a WhatsApp message goes to that customer.
+    const replied = msg.reply_to_message?.text || msg.reply_to_message?.caption || '';
+    if (replied && !text.startsWith('/')) {
+      if (!OWNER_USER_ID || String(msg.from?.id) === String(OWNER_USER_ID)) {
+        if (await trySwipeReply(sb, replied, text)) return ok();
+      } else if (/WhatsApp|NEEDS YOU/i.test(replied.split('\n').slice(0, 3).join(' '))) {
+        await sendOwnerMessage('⚠️ Not sent — only the owner’s replies go to customers.');
+        return ok();
+      }
     }
 
     if (/^\/invoice(@\w+)?\b/.test(text)) {
@@ -203,21 +458,45 @@ export async function POST(req: Request) {
         .sort((a, b) => String(b.created_at ?? '').localeCompare(String(a.created_at ?? '')))
         .slice(0, 8);
 
-      if (!hits.length) {
+      // Clients (with their history and C-code) and WhatsApp chats too —
+      // /client used to be a separate command for the same question.
+      const safe = q.replace(/[,()%*]/g, ' ').trim();
+      const [clients, waChats] = await Promise.all([
+        findClients(sb, q).catch(() => []),
+        sb
+          .from('wa_chats')
+          .select('wa_id, name')
+          .or(digits.length >= 4 ? `name.ilike.%${safe}%,wa_id.like.%${digits}%` : `name.ilike.%${safe}%`)
+          .order('last_at', { ascending: false })
+          .limit(5)
+          .then((r) => ((r.data ?? []) as { wa_id: string; name: string | null }[]), () => []),
+      ]);
+      if (!hits.length && !clients.length && !waChats.length) {
         await sendOwnerMessage(`Nothing found for <b>${escapeHtml(q)}</b>.`);
         return ok();
       }
       const icon = (st?: string) =>
         st === 'confirmed' ? '✅' : st === 'cancelled' ? '✖️' : st === 'declined' ? '⛔️' : '⏳';
-      const lines = [`🔎 <b>${hits.length} result${hits.length === 1 ? '' : 's'} for “${escapeHtml(q)}”</b>`, ''];
-      for (const h of hits) {
-        const slot = h.slot_date ? ` · ${h.slot_date} ${h.slot_time ?? ''}`.trimEnd() : '';
-        lines.push(`${icon(h.status)} ${escapeHtml(h.name)}${h.service ? ` — ${escapeHtml(h.service)}` : ''}${slot}`);
+      const lines = [`🔎 <b>“${escapeHtml(q)}”</b>`];
+      if (clients.length) {
+        lines.push('', '👥 <b>Clients</b>', clients.slice(0, 3).map((c) => formatClient(c, escapeHtml).join('\n')).join('\n\n'));
+      }
+      if (waChats.length) {
+        lines.push('', '💬 <b>WhatsApp chats</b>');
+        for (const c of waChats) lines.push(`• ${escapeHtml(c.name || '—')} · <code>+${c.wa_id}</code>`);
+      }
+      if (hits.length) {
+        lines.push('', '📋 <b>Enquiries & bookings</b>');
+        for (const h of hits) {
+          const slot = h.slot_date ? ` · ${h.slot_date} ${h.slot_time ?? ''}`.trimEnd() : '';
+          lines.push(`${icon(h.status)} ${escapeHtml(h.name)}${h.service ? ` — ${escapeHtml(h.service)}` : ''}${slot}`);
+        }
       }
       await sendOwnerWithMarkup(lines.join('\n'), {
-        inline_keyboard: hits.map((h) => [
-          { text: `${icon(h.status)} ${h.name.slice(0, 26)}`, callback_data: `lead:${h.id}` },
-        ]),
+        inline_keyboard: [
+          ...waChats.map((c) => [{ text: `📖 ${(c.name || `+${c.wa_id}`).slice(0, 26)}`, callback_data: `walog:${c.wa_id}` }]),
+          ...hits.map((h) => [{ text: `${icon(h.status)} ${h.name.slice(0, 26)}`, callback_data: `lead:${h.id}` }]),
+        ],
       });
       return ok();
     }
@@ -239,161 +518,89 @@ export async function POST(req: Request) {
       return ok();
     }
     if (/^\/calendar(@\w+)?\b/.test(text)) {
-      const url = `${SITE_URL}/api/calendar/${calendarToken()}.ics`;
-      const webcal = url.replace(/^https:/, 'webcal:');
-      await sendOwnerMessage(
-        [
-          '📆 <b>Your bookings calendar</b>',
-          '━━━━━━━━━━━━━━━━━━━',
-          'Subscribe once and confirmed bookings appear in your phone calendar automatically.',
-          '',
-          `<b>iPhone:</b> tap → <a href="${webcal}">${webcal}</a>`,
-          `<b>Any calendar app:</b> add subscription → <code>${url}</code>`,
-          '',
-          '⚠️ This link is private — anyone with it can see your bookings.',
-        ].join('\n'),
-      );
+      await sendCalendarLink();
+      return ok();
+    }
+    if (/^\/tools(@\w+)?\b/.test(text)) {
+      await sendOwnerWithMarkup('🧰 <b>Tools</b> — tap one.\nBan someone: <code>/ban C-007 reason</code> · <code>/unban C-007</code>', TOOLS_KEYBOARD);
       return ok();
     }
     if (/^\/wa(@\w+)?\b/.test(text)) {
-      // Chat controls that work on any transport (ManyChat included):
-      //   /wa stop  +353…   pause the AI for that chat
-      //   /wa start +353…   let the AI answer again
-      //   /wa reset +353…   wipe the conversation so it starts fresh
-      // "/wa log +353…" — what WE stored for that chat. Compare it with the
-      // real WhatsApp thread: same texts means the assistant is fine and the
-      // delivery layer is at fault, different texts means the model is.
-      const logCmd = /^\/wa(@\w+)?\s+log\s+(\+?[\d\s()-]{6,})$/i.exec(text);
-      if (logCmd) {
-        const waId = logCmd[2].replace(/\D/g, '');
-        const { data } = await sb
-          .from('wa_messages')
-          .select('role, content, via, created_at')
-          .eq('wa_id', waId)
-          .order('created_at', { ascending: false })
-          .limit(10);
-        const rows = (data ?? []) as { role: string; content: string; via: string | null; created_at: string }[];
-        const body = rows
-          .reverse()
-          .map((r) => {
-            const time = new Date(r.created_at).toLocaleTimeString('en-IE', {
-              timeZone: 'Europe/Dublin',
-              hour: '2-digit',
-              minute: '2-digit',
-            });
-            const who = r.role === 'user' ? '👤' : r.via === 'owner' ? '✋' : '🤖';
-            return `${who} <code>${time}</code> ${escapeHtml(r.content.slice(0, 300))}`;
-          })
-          .join('\n\n');
-        await sendOwnerMessage(
-          body
-            ? `🗂 <b>What we stored for +${waId}</b> (Irish time, oldest first)\n\n${body}`
-            : `Nothing stored for <code>+${waId}</code> yet.`,
+      const rest = text.replace(/^\/wa(@\w+)?\s*/, '').trim();
+      // /wa on its own: what it can do, and whether the assistant is on.
+      if (!rest || /^help$/i.test(rest)) {
+        const [{ data: cfg }, pending] = await Promise.all([
+          sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle(),
+          unansweredChats(sb).catch(() => []),
+        ]);
+        const on = (cfg as { value?: string } | null)?.value !== 'meta';
+        await sendOwnerWithMarkup(
+          [
+            `💬 <b>WhatsApp</b> · assistant ${on ? '🟢 on' : '🔴 off for every chat'}`,
+            '━━━━━━━━━━━━━━━━━━━',
+            '↩️ <b>Reply to any WhatsApp message here</b> (swipe left) and your text goes to that customer.',
+            '',
+            '<code>/wa pending</code> — who is waiting for a reply',
+            '<code>/wa log +353…</code> — the chat as the assistant saw it',
+            '<code>/wa stop +353…</code> · <code>/wa start +353…</code> — assistant off / on in one chat',
+            '<code>/wa reset +353…</code> — the assistant forgets that chat',
+            '<code>/wa +353… text</code> — send a message',
+            `<code>/wa ${on ? 'off' : 'on'} all</code> — assistant ${on ? 'off' : 'on'} in every chat`,
+          ].join('\n'),
+          { inline_keyboard: [[{ text: `⏳ Waiting for a reply (${pending.length})`, callback_data: 'wapend' }]] },
         );
         return ok();
       }
+      if (/^(pending|waiting)$/i.test(rest)) {
+        await sendPendingWa(sb);
+        return ok();
+      }
+      const all = /^(on|off)\s+all$/i.exec(rest);
+      if (all) {
+        await aiSwitch(sb, all[1].toLowerCase() as 'on' | 'off');
+        return ok();
+      }
+      const logCmd = /^log\s+(\+?[\d\s()-]{6,})$/i.exec(rest);
+      if (logCmd) {
+        await sendOwnerMessage(await chatLogText(sb, logCmd[1].replace(/\D/g, '')));
+        return ok();
+      }
 
-      const ctrl = /^\/wa(@\w+)?\s+(stop|start|pause|resume|reset|clear|mine)\s+(\+?[\d\s()-]{6,})$/i.exec(text);
+      const ctrl = /^(stop|start|pause|resume|reset|clear|mine)\s+(\+?[\d\s()-]{6,})$/i.exec(rest);
       if (ctrl) {
-        const action = ctrl[2].toLowerCase();
-        const waId = ctrl[3].replace(/\D/g, '');
+        const action = ctrl[1].toLowerCase();
+        const waId = ctrl[2].replace(/\D/g, '');
         if (action === 'reset' || action === 'clear') {
           await sb.from('wa_messages').delete().eq('wa_id', waId);
           await sb.from('app_config').delete().eq('key', `wa_memory:${waId}`);
-          await sendOwnerMessage(
-            `🧹 Conversation with <code>+${waId}</code> wiped — the assistant starts fresh next message.`,
-          );
+          await sendOwnerMessage(`🧹 Conversation with <code>+${waId}</code> wiped — the assistant starts fresh next message.`);
         } else if (action === 'mine') {
           await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() });
+          await markContactHandled(sb, waId).catch(() => 0);
           await sendOwnerMessage(`✋ Assistant stands down on <code>+${waId}</code> for 6 hours.`);
         } else {
           const paused = action === 'stop' || action === 'pause';
-          if (!paused) await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: null });
-          await sb.from('wa_chats').upsert({ wa_id: waId, paused });
-          const { data: check } = await sb
-            .from('wa_chats')
-            .select('paused')
-            .eq('wa_id', waId)
-            .maybeSingle();
+          await sb.from('wa_chats').upsert(paused ? { wa_id: waId, paused } : { wa_id: waId, paused, owner_replied_at: null });
+          const { data: check } = await sb.from('wa_chats').select('paused').eq('wa_id', waId).maybeSingle();
           const now = (check as { paused?: boolean } | null)?.paused;
           await sendOwnerMessage(
             now === paused
-              ? `${paused ? '⏸ AI paused' : '▶️ AI resumed'} for <code>+${waId}</code> (confirmed in the database).`
-              : `⚠️ Could not change it — the chat now reads paused=${String(now)}. Check the number: it must match the id shown on the message (${waId}).`,
+              ? `${paused ? '⏸ AI stopped' : '▶️ AI back on'} for <code>+${waId}</code>${paused ? '' : ' — answering their last message now'}.`
+              : `⚠️ Could not change it — the chat now reads paused=${String(now)}. Check the number: it must match the one on the message (${waId}).`,
           );
           if (now === paused && !paused) answerPendingInBackground(sb, waId);
         }
         return ok();
       }
 
-      // "/wa said +353871234567 what I told them" — record a reply Alex sent
-      // from his own phone, so the assistant stops thinking it is unanswered.
-      const said = /^\/wa(@\w+)?\s+said\s+(\+?[\d\s()-]{6,})\s+([\s\S]+)$/i.exec(text);
-      if (said) {
-        const waId = said[2].replace(/\D/g, '');
-        const body = said[3].trim().slice(0, 4000);
-        const { error } = await sb.from('wa_messages').insert({
-          msg_id: `owner:${waId}:${Date.now()}`,
-          wa_id: waId,
-          role: 'assistant',
-          content: body,
-          via: 'owner',
-        });
-        await sendOwnerMessage(
-          error
-            ? `❌ Could not log it: ${escapeHtml(error.message)}`
-            : `📝 Logged for <code>+${waId}</code> — the assistant now knows you said:\n«${escapeHtml(body)}»`,
-        );
-        return ok();
-      }
-
-      // "/wa +353871234567 your reply" — send a reply from Telegram. Uses the
-      // Cloud API when connected, otherwise ManyChat, so what Alex writes is
-      // both delivered and visible to the assistant next time.
-      const rawSend = /^\/wa(@\w+)?\s+(\+?[\d\s()-]{7,})\s+([\s\S]+)$/.exec(text);
-      if (rawSend && !isWhatsAppConfigured() && isManyChatSendConfigured()) {
-        const waId = rawSend[2].replace(/\D/g, '');
-        const body = rawSend[3].trim();
-        // ManyChat's own subscriber id, captured when the customer wrote in,
-        // beats looking them up by a phone field that is often empty.
-        let mcId = '';
-        {
-          const { data } = await sb.from('wa_chats').select('mc_id').eq('wa_id', waId).maybeSingle();
-          mcId = (data as { mc_id?: string } | null)?.mc_id ?? '';
-        }
-        const sent = await sendManyChatText(waId, body, mcId);
-        if (sent.ok) {
-          await sb.from('wa_messages').insert({
-            msg_id: `owner:${waId}:${Date.now()}`,
-            wa_id: waId,
-            role: 'assistant',
-            content: body,
-            via: 'owner',
-          });
-          await sb.from('wa_chats').upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() });
-          await sendOwnerMessage(`✅ Sent to <code>+${waId}</code> via ManyChat — and the assistant has it in context.`);
-        } else {
-          await sendOwnerMessage(
-            `❌ ManyChat would not send to <code>+${waId}</code>.\n<code>${escapeHtml(
-              sent.error ?? 'unknown error',
-            )}</code>`,
-          );
-        }
-        return ok();
-      }
-
-      if (!isWhatsAppConfigured()) {
-        await sendOwnerMessage(
-          'WhatsApp sending is not connected.\n' +
-            '• Reply from your phone as usual, then run <code>/wa said +353… what you told them</code> so the assistant knows.\n' +
-            '• Or add <code>MANYCHAT_API_KEY</code> in Vercel and send straight from here with <code>/wa +353… your message</code>.',
-        );
-        return ok();
-      }
-      const rest = text.replace(/^\/wa(@\w+)?\s*/, '');
+      // "/wa +353871234567 your message" — send from here.
       const m = rest.match(/^(\+?[\d\s()-]{7,})\s+([\s\S]+)$/);
       if (!m) {
-        await sendOwnerMessage('Usage: <code>/wa +353871234567 your message</code>');
+        await sendOwnerMessage('Not sure what you meant — <code>/wa</code> shows everything it can do.');
+        return ok();
+      }
+      if (!isWhatsAppConfigured()) {
+        await sendOwnerMessage('WhatsApp sending is not connected — answer from your phone.');
         return ok();
       }
       const to = normalizeWaNumber(m[1]);
@@ -401,44 +608,24 @@ export async function POST(req: Request) {
       const sent = await sendWhatsAppText(to, body);
       if (sent.ok) {
         await sb.from('wa_messages').insert({
-          msg_id: sent.id || `owner:${Date.now()}`,
+          msg_id: sent.id || `owner:${to}:${Date.now()}`,
           wa_id: to,
           role: 'assistant',
-          content: body,
+          content: `[Alex] ${body}`,
           via: 'owner',
         });
+        await sb.from('wa_chats').upsert({ wa_id: to, owner_replied_at: new Date().toISOString() }).then(() => undefined, () => undefined);
         const cleared = await markContactHandled(sb, to).catch(() => 0);
         await sendOwnerMessage(`✅ Sent to <code>+${to}</code>${cleared ? ` · ${cleared} enquiry(ies) marked answered` : ''}`);
       } else {
-        await sendOwnerMessage(`❌ Failed: ${sent.error || 'unknown error'}`);
-      }
-      return ok();
-    }
-    // Who answers customers on WhatsApp: ours (the default) or WhatsApp's own
-    // AI. Stored under its own key, separate from the old on/off flag.
-    const ai = /^\/ai(@\w+)?\s*(on|off)?$/i.exec(text);
-    if (ai) {
-      const want = ai[2]?.toLowerCase();
-      if (!want) {
-        const { data } = await sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle();
-        const ours = (data as { value?: string } | null)?.value !== 'meta';
-        await sendOwnerMessage(
-          ours
-            ? "🤖 <b>Our</b> assistant answers WhatsApp. <code>/ai off</code> hands it back to WhatsApp's own AI."
-            : "🤖 <b>WhatsApp's own AI</b> answers customers; ours is silent and only mirrors messages here. <code>/ai on</code> switches ours back.",
+        const outsideWindow = /131047|re-?engagement|24 ?hours?/i.test(sent.error || '');
+        await sendOwnerWithMarkup(
+          outsideWindow
+            ? `⌛ Not sent: more than 24h since <code>+${to}</code> last wrote — WhatsApp only allows templates after that. Send it from your phone.`
+            : `❌ Failed: <code>${escapeHtml((sent.error || 'unknown error').slice(0, 300))}</code>`,
+          { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${to}` }]] },
         );
-        return ok();
       }
-      const { error } = await sb
-        .from('app_config')
-        .upsert({ key: 'wa_ai_owner', value: want === 'on' ? 'ours' : 'meta' });
-      await sendOwnerMessage(
-        error
-          ? `❌ Could not change it: ${escapeHtml(error.message)}`
-          : want === 'off'
-            ? "🔇 Ours is silent — WhatsApp's own AI answers. Messages still arrive here. <code>/ai on</code> switches back."
-            : "🔊 Our assistant answers WhatsApp again. Make sure WhatsApp's own AI is off, or customers get two replies.",
-      );
       return ok();
     }
 
@@ -446,12 +633,12 @@ export async function POST(req: Request) {
       const done = await registerBotCommands();
       await sendOwnerWithMarkup(
         done
-          ? '✅ Меню команд обновлено, быстрые кнопки внизу установлены. Закрой и открой чат, если клавиатура не появилась.'
+          ? '✅ Меню обновлено, кнопки внизу установлены (закрой и открой чат, если не появились).\n↩️ Ответить клиенту в WhatsApp — свайп влево по его сообщению здесь.'
           : '❌ Не удалось обновить меню — попробуй ещё раз через минуту.',
         {
           keyboard: [
-            [{ text: '/log 💶' }, { text: '/bookings 📅' }],
-            [{ text: '/paid 💰' }, { text: '/stats 📊' }],
+            [{ text: '⏰ Agenda' }, { text: '📅 Bookings' }],
+            [{ text: '💰 Paid' }, { text: '🧰 Tools' }],
           ],
           resize_keyboard: true,
           is_persistent: true,
@@ -459,37 +646,8 @@ export async function POST(req: Request) {
       );
       return ok();
     }
-    // Persistent reply-keyboard shortcuts (installed by /setup).
-    if (/^\/log(@\w+)?\b/.test(text)) {
-      const amounts = [40, 60, 80, 100, 120, 150, 200, 250];
-      await sendOwnerWithMarkup('💶 <b>Log a payment</b> — tap the amount:', {
-        inline_keyboard: [
-          amounts.slice(0, 4).map((a) => ({ text: `€${a}`, callback_data: `paidq:${a}` })),
-          amounts.slice(4).map((a) => ({ text: `€${a}`, callback_data: `paidq:${a}` })),
-          [{ text: '✍️ Other / with details', callback_data: 'paidq:custom' }],
-        ],
-      });
-      return ok();
-    }
     if (/^\/banlist(@\w+)?\b/.test(text)) {
-      const { data } = await sb
-        .from('clients')
-        .select('id, phone_key, name, ban_reason')
-        .eq('banned', true)
-        .order('id');
-      const list = (data ?? []) as { id: number; phone_key: string; name: string | null; ban_reason: string | null }[];
-      if (!list.length) {
-        await sendOwnerMessage('📵 Blacklist is empty.');
-        return ok();
-      }
-      const lines = ['⛔️ <b>Blacklist</b>', '━━━━━━━━━━━━━━━━━━━'];
-      for (const c of list) {
-        lines.push(
-          `<code>${clientCode(c.id)}</code> · ${escapeHtml(c.name || '—')} · …${c.phone_key.slice(-6)}${c.ban_reason ? ` — ${escapeHtml(c.ban_reason)}` : ''}`,
-        );
-      }
-      lines.push('', 'Unban: <code>/unban C-001</code>');
-      await sendOwnerMessage(lines.join('\n'));
+      await sendBanlist(sb);
       return ok();
     }
     if (/^\/ban(@\w+)?\b/.test(text)) {
@@ -530,21 +688,6 @@ export async function POST(req: Request) {
       await sendOwnerMessage(`✅ Unbanned <code>${clientCode(client.id)}</code> · ${escapeHtml(client.name || '—')}`);
       return ok();
     }
-    if (/^\/client(@\w+)?\b/.test(text)) {
-      const q = text.replace(/^\/client(@\w+)?\s*/, '').trim();
-      if (q.length < 2) {
-        await sendOwnerMessage('Usage: <code>/client John</code> or <code>/client 0871234567</code>');
-        return ok();
-      }
-      const matches = await findClients(sb, q);
-      if (!matches.length) {
-        await sendOwnerMessage(`No clients found for «${escapeHtml(q)}».`);
-        return ok();
-      }
-      const blocks = matches.map((m) => formatClient(m, escapeHtml).join('\n'));
-      await sendOwnerMessage(['👥 <b>Client history</b>', '━━━━━━━━━━━━━━━━━━━', blocks.join('\n\n')].join('\n'));
-      return ok();
-    }
     if (/^\/cheat(@\w+)?\b/.test(text)) {
       const rest = text.replace(/^\/cheat(@\w+)?\s*/, '').trim();
 
@@ -576,22 +719,8 @@ export async function POST(req: Request) {
         return ok();
       }
 
-      // No query → list categories + own notes.
       if (!rest) {
-        const { data: mine } = await sb
-          .from('cheat_notes')
-          .select('id, title')
-          .order('created_at', { ascending: false })
-          .limit(30);
-        const lines = ['🔧 <b>Coding cheat-sheet</b>', CHEAT_DISCLAIMER, '', '<b>Search:</b> <code>/cheat vim</code> · <code>/cheat mirrors</code>', '', '<b>Built-in topics:</b>'];
-        lines.push(CHEAT_SHEET.map((e) => `• ${escapeHtml(e.title)}`).join('\n'));
-        const list = (mine ?? []) as { id: number; title: string }[];
-        if (list.length) {
-          lines.push('', '<b>Your notes:</b>');
-          for (const n of list) lines.push(`• <code>#${n.id}</code> ${escapeHtml(n.title)}`);
-        }
-        lines.push('', 'Add: <code>/cheat add Title | details</code> · Remove: <code>/cheat del 5</code>');
-        await sendOwnerMessage(lines.join('\n'));
+        await sendCheatIndex(sb);
         return ok();
       }
 
@@ -623,7 +752,10 @@ export async function POST(req: Request) {
         return ok();
       }
       const keyboard = {
-        inline_keyboard: CANNED_REPLIES.map((r) => [{ text: r.label, callback_data: `rt:${r.key}` }]),
+        inline_keyboard: [
+          ...CANNED_REPLIES.map((r) => [{ text: r.label, callback_data: `rt:${r.key}` }]),
+          [{ text: '⭐ Ask for a review', callback_data: 'rv' }],
+        ],
       };
       await sendOwnerMessage('📋 <b>Ready replies</b> — pick one, then tap the text to copy:', keyboard);
       return ok();
@@ -796,41 +928,7 @@ export async function POST(req: Request) {
       return ok();
     }
     if (/^\/review(@\w+)?\b/.test(text)) {
-      // Optional "/review Name Service" — first token is the name.
-      const rest = text.replace(/^\/review(@\w+)?\s*/, '').trim();
-      let name = '';
-      let service = '';
-      const codeM = /^(c[-\s]?0*\d+)\b\s*([\s\S]*)$/i.exec(rest);
-      if (codeM) {
-        const c = await resolveClient(sb, codeM[1]);
-        name = c?.name || '';
-        service = codeM[2].trim();
-      } else if (rest.includes(' - ')) {
-        const [n, ...svc] = rest.split(' - ');
-        name = n.trim();
-        service = svc.join(' - ').trim();
-      } else {
-        const [n = '', ...svcParts] = rest.split(/\s+/);
-        name = n;
-        service = svcParts.join(' ');
-      }
-      const lines = [
-        '⭐ <b>Review request templates</b>',
-        '━━━━━━━━━━━━━━━━━━━',
-        name
-          ? `For <b>${name}</b>${service ? ` · ${service}` : ''} — tap a message to copy it:`
-          : 'Tap a message to copy it. Personalise: <code>/review C-007 CarPlay</code> or <code>/review John Smith - CarPlay</code>.',
-        '',
-      ];
-      for (const tpl of REVIEW_TEMPLATES) {
-        lines.push(`<b>${tpl.label}</b>`);
-        lines.push(`<code>${escapeHtml(tpl.build(name || 'there', service))}</code>`);
-        lines.push('');
-      }
-      if (!hasReviewUrl()) {
-        lines.push('⚠️ Set <code>GOOGLE_REVIEW_URL</code> in Vercel so the link is included automatically.');
-      }
-      await sendOwnerMessage(lines.join('\n'));
+      await sendReviewTemplates(sb, text.replace(/^\/review(@\w+)?\s*/, '').trim());
       return ok();
     }
     // Random but internally consistent Japanese address (real postal code,
@@ -842,43 +940,7 @@ export async function POST(req: Request) {
       return ok();
     }
     if (/^\/stats(@\w+)?\b/.test(text)) {
-      const s = await getBusinessStats(sb);
-      const lines = [
-        '📊 <b>Business stats</b>',
-        '━━━━━━━━━━━━━━━━━━━',
-        `📥 Enquiries: <b>${s.last7}</b> this week · <b>${s.last30}</b> this month · ${s.total} all time`,
-        `📅 Slots: ✅ ${s.confirmedUpcoming} confirmed upcoming · ⏳ ${s.pending} pending`,
-      ];
-      if (s.paymentsCount > 0) {
-        lines.push(`💶 Revenue: <b>€${s.revenue7.toFixed(0)}</b> this week · <b>€${s.revenue30.toFixed(0)}</b> this month`);
-      }
-      // Section attention: where visitors actually spend their time (7 days).
-      const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-      const { data: att } = await sb
-        .from('section_time')
-        .select('section, seconds')
-        .gte('day', weekAgo)
-        .limit(5000);
-      if (att?.length) {
-        const bySec = new Map<string, number>();
-        for (const r of att as { section: string; seconds: number }[]) {
-          bySec.set(r.section, (bySec.get(r.section) ?? 0) + Number(r.seconds || 0));
-        }
-        const top = [...bySec].sort((a, b) => b[1] - a[1]).slice(0, 8);
-        const fmtT = (v: number) =>
-          v >= 3600 ? `${Math.floor(v / 3600)}h ${Math.round((v % 3600) / 60)}m` : `${Math.round(v / 60)}m`;
-        lines.push('', '<b>⏱ Attention by section (7d):</b>');
-        for (const [k, v] of top) lines.push(`  ${fmtT(v)} — ${escapeHtml(k)}`);
-      }
-      if (s.topServices.length) {
-        lines.push('', '<b>Most requested:</b>');
-        for (const t of s.topServices) lines.push(`  ${t.count} × ${t.service}`);
-      }
-      if (s.nextBookings.length) {
-        lines.push('', '<b>Next confirmed:</b>');
-        for (const b of s.nextBookings) lines.push(`  ${b.slot_date} ${b.slot_time} — ${b.name}`);
-      }
-      await sendOwnerMessage(lines.join('\n'));
+      await sendStats(sb);
       return ok();
     }
     // Otherwise, feed it to an active invoice draft (if any).
@@ -901,30 +963,54 @@ export async function POST(req: Request) {
   const chatId = cq.message.chat.id;
   const messageId = cq.message.message_id;
 
-  // Canned reply pick → send the text as a tap-to-copy block.
-  if (cq.data.startsWith('paidq:')) {
-    const v = cq.data.slice(6);
-    if (v === 'custom') {
-      await answerCallback(cq.id, 'Type it in the field below');
-      await sendOwnerMessage(
-        'Type: <code>/paid 120 John CarPlay</code>\nFull economics: <code>/paid 200 John CarPlay cost 50 FSC share 25 Alex</code>',
-      );
-      return ok();
-    }
-    const amount = Number(v);
-    if (amount > 0) {
-      const { error } = await sb.from('payments').insert({ amount });
-      if (error) {
-        await answerCallback(cq.id, 'Failed — run the payments migration');
-      } else {
-        await answerCallback(cq.id, `Logged €${amount}`);
-        await sendOwnerMessage(
-          `✅ Logged <b>€${amount}</b>\nAdd client/costs? <code>/paid del last</code> then retype, e.g. <code>/paid ${amount} John CarPlay cost 50 FSC</code>\nTotals: /paid`,
-        );
-      }
-    }
+  // ── WhatsApp: who is waiting, handled elsewhere, read a chat ──
+  if (cq.data === 'wapend') {
+    const { text, keyboard } = buildPendingWa(await unansweredChats(sb));
+    await editMessage(chatId, messageId, text, keyboard);
+    await answerCallback(cq.id);
     return ok();
   }
+  const waDone = /^wadone:(\d{8,15})$/.exec(cq.data);
+  if (waDone) {
+    // Called them, saw them, sorted it elsewhere: a note in the chat so it
+    // leaves the list (and the assistant knows Alex has dealt with it).
+    await sb
+      .from('wa_messages')
+      .insert({ msg_id: `owner:done:${waDone[1]}:${Date.now()}`, wa_id: waDone[1], role: 'assistant', content: '[Alex] (handled outside this chat)', via: 'owner' })
+      .then(() => undefined, () => undefined);
+    await markContactHandled(sb, waDone[1]).catch(() => 0);
+    const { text, keyboard } = buildPendingWa(await unansweredChats(sb));
+    await editMessage(chatId, messageId, text, keyboard);
+    await answerCallback(cq.id, 'Marked handled ✓');
+    return ok();
+  }
+  const waLog = /^walog:(\d{8,15})$/.exec(cq.data);
+  if (waLog) {
+    await answerCallback(cq.id);
+    await sendOwnerMessage(await chatLogText(sb, waLog[1]));
+    return ok();
+  }
+
+  // /tools buttons and the review templates from /reply.
+  const tool = /^tool:(jp|cheat|stats|cal|ban)$/.exec(cq.data);
+  if (tool) {
+    await answerCallback(cq.id);
+    if (tool[1] === 'jp') {
+      const { text, keyboard } = jpAddressMessage();
+      await sendOwnerMessage(text, keyboard as never);
+    } else if (tool[1] === 'cheat') await sendCheatIndex(sb);
+    else if (tool[1] === 'stats') await sendStats(sb);
+    else if (tool[1] === 'cal') await sendCalendarLink();
+    else await sendBanlist(sb);
+    return ok();
+  }
+  if (cq.data === 'rv') {
+    await answerCallback(cq.id);
+    await sendReviewTemplates(sb, '');
+    return ok();
+  }
+
+  // Canned reply pick → send the text as a tap-to-copy block.
   if (cq.data.startsWith('rt:')) {
     const r = getReply(cq.data.slice(3));
     await answerCallback(cq.id);
@@ -1085,31 +1171,8 @@ export async function POST(req: Request) {
       .eq('id', Number(leadLog[1]))
       .maybeSingle();
     const waId = ((data as { contact?: string } | null)?.contact ?? '').replace(/\D/g, '');
-    const { data: msgs } = waId
-      ? await sb
-          .from('wa_messages')
-          .select('role, content, via, created_at')
-          .eq('wa_id', waId)
-          .order('created_at', { ascending: false })
-          .limit(10)
-      : { data: [] };
-    const rows = (msgs ?? []) as { role: string; content: string; via: string | null; created_at: string }[];
-    const body = rows
-      .reverse()
-      .map((r) => {
-        const time = new Date(r.created_at).toLocaleTimeString('en-IE', {
-          timeZone: 'Europe/Dublin',
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-        const who = r.role === 'user' ? '👤' : r.via === 'owner' ? '✋' : '🤖';
-        return `${who} <code>${time}</code> ${escapeHtml(r.content.slice(0, 280))}`;
-      })
-      .join('\n\n');
-    await sendOwnerMessage(
-      body ? `📖 <b>Chat with +${waId}</b>\n\n${body}` : 'No stored messages for this contact.',
-    );
     await answerCallback(cq.id);
+    await sendOwnerMessage(waId ? await chatLogText(sb, waId) : 'No stored messages for this contact.');
     return ok();
   }
 
@@ -1313,6 +1376,17 @@ export async function POST(req: Request) {
 
   await sb.from('bookings').update({ status }).eq('id', id);
 
+  // Rebuild the whole card, not a reduced one: after Confirm the source,
+  // landing page, address and client code used to disappear from it.
+  const extra = booking as Booking & {
+    source?: string | null;
+    how_heard?: string | null;
+    contact_pref?: string | null;
+    landing?: string | null;
+    visit_type?: string | null;
+    visit_address?: string | null;
+  };
+  const client = await resolveClient(sb, booking.contact).catch(() => null);
   const lead: Lead = {
     name: booking.name,
     contact: booking.contact,
@@ -1322,6 +1396,13 @@ export async function POST(req: Request) {
     slot_date: booking.slot_date,
     slot_time: booking.slot_time,
     public_token: booking.public_token,
+    source: extra.source ?? undefined,
+    howHeard: extra.how_heard ?? undefined,
+    contactPref: extra.contact_pref ?? undefined,
+    landing: extra.landing ?? undefined,
+    visitType: extra.visit_type ?? undefined,
+    visitAddress: extra.visit_address ?? undefined,
+    clientNote: client ? `🆔 <b>Client:</b> ${clientCode(client.id)}` : undefined,
   };
   await editBookingMessage(chatId, messageId, lead, status);
   await answerCallback(cq.id, status === 'confirmed' ? 'Marked as confirmed ✅' : 'Marked as declined ❌');

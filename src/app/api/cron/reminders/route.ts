@@ -4,7 +4,8 @@ import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
 import { buildAgenda } from '@/lib/agenda';
-import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
+import { sendWhatsAppText, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { phoneKey } from '@/lib/crm';
 
 // Uses the shared "short & friendly" template so /review and the daily nudge
 // stay consistent.
@@ -12,7 +13,25 @@ function reviewAsk(name: string, service: string): string {
   return REVIEW_TEMPLATES[0].build(name, service);
 }
 
+/**
+ * Where tomorrow happens, in the customer's words. The service is mobile-only
+ * since 20 Sep 2026: this used to send everyone to the old Greenogue unit
+ * ("look for the orange gates") — a customer following it would have driven
+ * to an empty yard.
+ */
+function whereLine(visitType?: string | null, visitAddress?: string | null): string {
+  if (visitType === 'mobile') {
+    return visitAddress ? `Alex will come to you at ${visitAddress}.` : 'Alex will come to you — reply with the address if you have not sent it yet.';
+  }
+  if (visitType === 'meet') return 'Alex will message you the meeting spot today.';
+  return 'Alex will confirm where to meet (or how to connect for remote coding) here on WhatsApp.';
+}
+
 export const runtime = 'nodejs';
+// Never prerender: without CRON_SECRET the handler reads nothing from the
+// request, so Next built it as a static page — it ran once per deploy (the
+// "duplicate agenda" messages) and the real 08:00 call got the cached copy.
+export const dynamic = 'force-dynamic';
 
 // IndexNow: tell Bing-family crawlers (which also feed ChatGPT, Copilot and
 // DuckDuckGo) that our key pages changed. Free, no auth beyond the key file.
@@ -21,11 +40,19 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
 async function pingIndexNow(): Promise<void> {
   try {
-    const { BLOG_POSTS } = await import('@/lib/blog');
+    const [{ BLOG_POSTS }, { ALL_SERVICE_SLUGS }, { DYNAMIC_LANDING_SLUGS }] = await Promise.all([
+      import('@/lib/blog'),
+      import('@/lib/servicePages'),
+      import('@/lib/landings'),
+    ]);
+    // Every canonical page, not just the home page and blog: the service and
+    // model pages are the ones that bring enquiries.
     const urls = [
       `${SITE}/`,
       `${SITE}/bmw-coding-ireland`,
       `${SITE}/blog`,
+      ...ALL_SERVICE_SLUGS.map((s) => `${SITE}/${s}`),
+      ...DYNAMIC_LANDING_SLUGS.map((s) => `${SITE}/${s}`),
       ...BLOG_POSTS.map((p) => `${SITE}/blog/${p.slug}`),
     ];
     await fetch('https://api.indexnow.org/indexnow', {
@@ -43,13 +70,16 @@ async function pingIndexNow(): Promise<void> {
   }
 }
 
-// Daily agenda reminder (Vercel cron, 07:00 UTC — see vercel.json). Sends the
-// owner today's and tomorrow's slot bookings; stays silent when both are empty.
+// Morning run (Vercel cron, 08:00 UTC = 09:00 Irish summer time, 08:00 winter —
+// see vercel.json): the agenda, tomorrow's customer reminders, review nudges.
 export async function GET(req: Request) {
+  // Vercel's cron sends "Bearer CRON_SECRET"; without the secret set, at
+  // least insist on its user agent so a stranger cannot fire the run.
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
-    return NextResponse.json({ ok: false }, { status: 401 });
-  }
+  const fromCron = secret
+    ? req.headers.get('authorization') === `Bearer ${secret}`
+    : /vercel-cron/i.test(req.headers.get('user-agent') || '');
+  if (!fromCron) return NextResponse.json({ ok: false }, { status: 401 });
 
   const sb = getSupabaseAdmin();
   if (!sb) return NextResponse.json({ ok: true, skipped: 'no-db' });
@@ -72,27 +102,54 @@ export async function GET(req: Request) {
   const quietHours = dublinHour < 8 || dublinHour >= 20;
 
   if (!quietHours) {
-    const { data: soon } = await sb
+    // visit_type / visit_address are newer columns: fall back if the
+    // migration has not run, rather than skip everyone's reminder.
+    const withVisit = await sb
       .from('bookings')
-      .select('id, name, contact, service, slot_date, slot_time, reminded_at')
+      .select('id, name, contact, service, slot_date, slot_time, reminded_at, visit_type, visit_address')
       .eq('slot_date', tomorrow)
       .eq('status', 'confirmed');
-    const due = ((soon ?? []) as (Booking & { reminded_at?: string | null })[]).filter(
+    const { data: soon } = withVisit.error
+      ? await sb
+          .from('bookings')
+          .select('id, name, contact, service, slot_date, slot_time, reminded_at')
+          .eq('slot_date', tomorrow)
+          .eq('status', 'confirmed')
+      : withVisit;
+    type Due = Booking & { reminded_at?: string | null; visit_type?: string | null; visit_address?: string | null };
+    const due = ((soon ?? []) as Due[]).filter(
       (b) => !b.reminded_at && b.contact,
     );
 
-    const unsent: (Booking & { reminded_at?: string | null })[] = [];
+    // Customers who wrote to us on WhatsApp in the last 24h, by phone key.
+    const recentWa = new Map<string, string>();
+    if (due.length && isWhatsAppConfigured()) {
+      const { data: recent } = await sb
+        .from('wa_messages')
+        .select('wa_id')
+        .eq('role', 'user')
+        .gt('created_at', new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString())
+        .limit(2000);
+      for (const r of (recent ?? []) as { wa_id: string }[]) recentWa.set(phoneKey(r.wa_id), r.wa_id);
+    }
+
+    const unsent: Due[] = [];
     for (const b of due) {
       const first = (b.name || '').split(/\s+/)[0] || 'there';
       const msg =
         `Hi ${first} 👋 Reminder: your BMW is booked in tomorrow, ${b.slot_date} at ${b.slot_time}` +
         `${b.service ? ` for ${b.service}` : ''}.\n\n` +
-        `We're at Grants View, Greenogue Business Park, Rathcoole — don't follow the sat-nav pin, ` +
-        `use ${SITE}/find-us (look for the big ORANGE GATES, drive through and keep RIGHT to the end).\n\n` +
+        `${whereLine(b.visit_type, b.visit_address)}\n\n` +
         `If anything changed, just reply here and we'll sort it.`;
 
-      const phone = b.contact.replace(/\D/g, '');
-      const sent = phone ? (await sendManyChatText(phone, msg)).ok : false;
+      // WhatsApp only lets a business write freely within 24h of the
+      // customer's last message; outside it a reminder needs an approved
+      // template, so those go to Alex as a ready-to-paste text instead.
+      const waId = recentWa.get(phoneKey(b.contact));
+      const sent = waId ? (await sendWhatsAppText(waId, msg)).ok : false;
+      if (sent && waId) {
+        await sb.from('wa_messages').insert({ msg_id: `reminder:${b.id}`, wa_id: waId, role: 'assistant', content: msg, via: 'ai' }).then(() => undefined, () => undefined);
+      }
       if (sent) {
         await sb.from('bookings').update({ reminded_at: new Date().toISOString() }).eq('id', b.id);
       } else {
@@ -101,12 +158,10 @@ export async function GET(req: Request) {
     }
 
     if (unsent.length) {
-      // No ManyChat key (or the send failed): hand the owner a ready message
-      // to tap, copy and paste — the reminder still happens.
+      // Not sendable from here (no recent WhatsApp chat, or the send failed):
+      // hand the owner a ready message to tap, copy and paste.
       await sendOwnerWithMarkup(
-        `🔔 <b>Remind tomorrow's customers</b>${
-          isManyChatSendConfigured() ? ' (auto-send failed — do it by hand)' : ''
-        }\n${unsent
+        `🔔 <b>Remind tomorrow's customers</b> — tap to copy, send from your phone:\n${unsent
           .map((b) => `  • ${b.name} · ${b.slot_time}${b.service ? ` · ${b.service}` : ''}`)
           .join('\n')}`,
         {
@@ -117,9 +172,7 @@ export async function GET(req: Request) {
                 text:
                   `Hi ${(b.name || '').split(/\s+/)[0] || 'there'} 👋 Reminder: your BMW is booked in tomorrow, ` +
                   `${b.slot_date} at ${b.slot_time}${b.service ? ` for ${b.service}` : ''}. ` +
-                  `We're at Grants View, Greenogue Business Park, Rathcoole — don't follow the sat-nav pin, use ` +
-                  `${SITE}/find-us (big ORANGE GATES, drive through, keep RIGHT to the end). ` +
-                  `If anything changed, just reply here.`,
+                  `${whereLine(b.visit_type, b.visit_address)} If anything changed, just reply here.`,
               },
             },
           ]),

@@ -339,3 +339,20 @@ alter table bookings add column if not exists visit_address text;
 -- without it the site infers it from the wording, never showing a hardware
 -- retrofit as remote.
 alter table services add column if not exists delivery text;
+
+-- Site visits for the evening digest (replaced a Telegram message per visitor,
+-- 20 Oct 2026). One row per browser session after cookie consent, Irish/UK
+-- visitors only. No IP and no user-agent string — the page and a city.
+create table if not exists site_visits (
+  id bigserial primary key,
+  created_at timestamptz not null default now(),
+  path text not null,
+  referrer text,
+  source text,
+  device text,
+  city text,
+  country text,
+  returning boolean not null default false
+);
+create index if not exists site_visits_created_idx on site_visits (created_at);
+alter table site_visits enable row level security;

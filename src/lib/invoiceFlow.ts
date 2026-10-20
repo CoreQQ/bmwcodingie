@@ -109,8 +109,17 @@ export async function tryHandleInvoiceText(
   chatId: number,
   text: string,
 ): Promise<boolean> {
+  // Unknown /commands are never invoice input.
+  if (text.startsWith('/')) return false;
   const draft = await getDraft(sb, chatId);
   if (!draft || !draft.step) return false;
+  // A wizard abandoned half-way used to swallow whatever Alex typed hours
+  // later as a client or service name. Thirty quiet minutes ends it.
+  const touched = (draft as { updated_at?: string }).updated_at;
+  if (touched && Date.now() - new Date(touched).getTime() > 30 * 60 * 1000) {
+    await clearDraft(sb, chatId);
+    return false;
+  }
 
   if (text === '✅ Create invoice') {
     await finalize(sb, chatId, draft);
