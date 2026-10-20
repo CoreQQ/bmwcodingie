@@ -293,6 +293,21 @@ async function openLeadFor(
  * lead (booking + client + owner notification) when the model captures one.
  * `text` is the message just received; history is read from wa_messages.
  */
+// The facts the assistant saves with `remember` (car, year, head unit, what
+// was agreed). Kept in app_config under one key per chat, so long chats keep
+// them after the messages that carried them fall out of the 16-message
+// window — and no migration is needed for it.
+const memoryKey = (waId: string) => `wa_memory:${waId}`;
+
+async function loadWaMemory(sb: SupabaseClient, waId: string): Promise<string> {
+  const { data } = await sb.from('app_config').select('value').eq('key', memoryKey(waId)).maybeSingle();
+  return (data as { value?: string } | null)?.value ?? '';
+}
+
+async function saveWaMemory(sb: SupabaseClient, waId: string, facts: string): Promise<void> {
+  await sb.from('app_config').upsert({ key: memoryKey(waId), value: facts }).then(() => undefined, () => undefined);
+}
+
 export async function generateWaReply(
   sb: SupabaseClient,
   waId: string,
@@ -312,12 +327,11 @@ export async function generateWaReply(
   // any longer chat the model never saw what the customer had just said — it
   // kept answering the start of the conversation, which is exactly what
   // "going round in circles" looks like from the other side.
-  const { data: history } = await sb
-    .from('wa_messages')
-    .select('role, content, via, created_at')
-    .eq('wa_id', waId)
-    .order('created_at', { ascending: false })
-    .limit(16);
+  const [{ data: history }, stored] = await Promise.all([
+    sb.from('wa_messages').select('role, content, via, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(16),
+    priorMemory === undefined ? loadWaMemory(sb, waId).catch(() => '') : Promise.resolve(priorMemory),
+  ]);
+  priorMemory = stored || undefined;
   const recent = ((history ?? []) as { role: string; content: string; via?: string | null; created_at?: string }[])
     .slice()
     .reverse();
@@ -678,6 +692,7 @@ export async function generateWaReply(
     reply = `Got it — Alex will confirm with you shortly. You can also pick a time here: ${BOOKING_LINK}`;
   }
   if (timeAlert) await timeAlert;
+  if (memory && memory !== (priorMemory ?? '')) await saveWaMemory(sb, waId, memory);
   if (!reply) throw new Error('empty AI reply');
   return { reply, memory };
 }
