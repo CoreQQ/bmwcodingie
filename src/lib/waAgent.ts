@@ -5,6 +5,7 @@ import { ensureClient, clientCode } from './crm';
 import { notifyTelegram, sendOwnerAlert } from './telegram';
 import { getHours, getSlotDuration, getBlockedDates } from './stats';
 import { windowsFor, windowsOverlap } from './hours';
+import { sendWhatsAppText } from './whatsapp';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -679,4 +680,36 @@ export async function generateWaReply(
   if (timeAlert) await timeAlert;
   if (!reply) throw new Error('empty AI reply');
   return { reply, memory };
+}
+
+const SERVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/** "Resume AI" on a chat the assistant sat out: answer the customer's last
+ *  message now rather than waiting for their next one. Only when that message
+ *  is still the newest in the chat (nobody has answered it) and inside
+ *  WhatsApp's 24h window, where a free-form reply is allowed. */
+export async function answerPendingWaMessage(
+  sb: SupabaseClient,
+  waId: string,
+): Promise<{ text: string; reply: string; sendError?: string; aiError?: string } | null> {
+  const [{ data: last }, { data: chat }] = await Promise.all([
+    sb.from('wa_messages').select('role, content, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    sb.from('wa_chats').select('name').eq('wa_id', waId).maybeSingle(),
+  ]);
+  const row = last as { role?: string; content?: string; created_at?: string } | null;
+  if (!row || row.role !== 'user' || !row.content || !row.created_at) return null;
+  if (Date.now() - new Date(row.created_at).getTime() > SERVICE_WINDOW_MS) return null;
+  const text = row.content;
+  const name = (chat as { name?: string | null } | null)?.name || undefined;
+  let reply = '';
+  try {
+    reply = (await generateWaReply(sb, waId, text, name, 'claude-opus-5', `+${waId}`)).reply.trim();
+  } catch (e) {
+    return { text, reply: '', aiError: e instanceof Error ? e.message : String(e) };
+  }
+  if (!reply) return { text, reply };
+  const sent = await sendWhatsAppText(waId, reply);
+  if (!sent.ok) return { text, reply, sendError: sent.error || 'send failed' };
+  await sb.from('wa_messages').insert({ msg_id: sent.id || `out:resume:${waId}:${Date.now()}`, wa_id: waId, role: 'assistant', content: reply, via: 'ai' });
+  return { text, reply };
 }
