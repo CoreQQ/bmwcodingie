@@ -138,6 +138,30 @@ export async function findClients(sb: SupabaseClient, query: string): Promise<Cl
   return matches;
 }
 
+/**
+ * What we have done (or been asked) for this number before, as one plain line
+ * for the WhatsApp assistant — so a returning customer is not asked for the
+ * car they booked in last month. Newest first, at most five.
+ */
+export async function historyForAssistant(sb: SupabaseClient, contact: string): Promise<string> {
+  const key = phoneKey(contact);
+  if (key.length < 7) return '';
+  const jobs = (await recentBookings(sb, 400)).filter((b) => phoneKey(b.contact) === key).slice(0, 5);
+  if (!jobs.length) return '';
+  const today = new Date().toISOString().slice(0, 10);
+  const state = (b: Booking) =>
+    b.status === 'confirmed'
+      ? b.slot_date && b.slot_date < today
+        ? 'done'
+        : `booked for ${shortDate(b.slot_date)}`
+      : b.status === 'pending'
+        ? 'enquiry, not booked'
+        : b.status;
+  return jobs
+    .map((b) => `${shortDate(b.slot_date || b.created_at)}: ${[b.service, b.bmw_model].filter(Boolean).join(' · ') || 'enquiry'} (${state(b)})`)
+    .join('; ');
+}
+
 const STATUS_ICON: Record<string, string> = {
   confirmed: '✅',
   pending: '⏳',

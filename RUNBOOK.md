@@ -12,16 +12,18 @@ Visitor ──▶ bmwcoding.ie (Next.js 14 on Vercel, edge-cached)
               │  /api/booking ──▶ Supabase (bookings, clients) ──▶ Telegram notify
               │  /api/slots   ──▶ live availability (hours, duration, overlaps)
               │  /api/chat    ──▶ Anthropic (site AI assistant)
-              │  /api/visitor ──▶ Telegram visitor ping (consent-gated)
+              │  /api/visitor ──▶ site_visits row (consent-gated) → evening digest
 Owner  ──▶ Telegram bot (/api/telegram webhook) — full control plane
        ──▶ Mini App "PULT" (/miniapp + /api/miniapp) — visual admin + CRM
        ──▶ /admin web panel — content editing
 Customer ─▶ /b/<token> — live booking tracker
-Cron   ──▶ /api/cron/reminders daily 07:00 UTC (agenda, review nudges,
-           stale-booking flags, IndexNow ping)
+Cron   ──▶ /api/cron/reminders daily 08:00 UTC (agenda, customer reminders
+           over WhatsApp, review nudges, IndexNow ping)
+       ──▶ /api/cron/digest daily 21:00 UTC (evening summary: visitors,
+           enquiries, WhatsApp, money, tomorrow)
 Customer ─▶ WhatsApp ──▶ /api/whatsapp (Meta Cloud API webhook; via Dualhook
-           coexistence relay — owner's number stays in the WhatsApp app)
-Legacy   ─▶ /api/manychat (ManyChat External Request bridge, being retired)
+           coexistence relay — owner's number stays in the WhatsApp app).
+           ManyChat was removed on 20 Oct 2026.
 ```
 
 ## Environment variables (Vercel → Settings → Environment Variables)
@@ -36,13 +38,13 @@ Legacy   ─▶ /api/manychat (ManyChat External Request bridge, being retired)
 | `TG_OWNER_ID` | rec. | Mini App owner check (falls back to TG_CHAT_ID) |
 | `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` | yes | /admin login + calendar token |
 | `ANTHROPIC_API_KEY` | yes | site chat + WhatsApp AI |
-| `CRON_SECRET` | rec. | Bearer for /api/cron/reminders |
+| `CRON_SECRET` | rec. | Bearer for /api/cron/reminders and /api/cron/digest |
 | `GOOGLE_REVIEW_URL` | optional | overrides the baked-in review link |
 | `NEXT_PUBLIC_GOOGLE_ADS_ID` / `NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL` | when ads run | conversion tag (consent-gated) |
 | `NEXT_PUBLIC_GA_ID` | optional (default G-698G9NVGCZ baked in) | GA4 via the same gtag; events whatsapp_click, call_click, vin_check_submit, booking_submit |
 | `NEXT_PUBLIC_META_PIXEL_ID` | when ads run | Meta pixel (consent-gated) |
 | `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_ID` / `WHATSAPP_VERIFY_TOKEN` / `WHATSAPP_APP_SECRET` | for WA bot | Meta Cloud API (webhook `https://www.bmwcoding.ie/api/whatsapp`) |
-| `MANYCHAT_SECRET` | legacy | ManyChat bridge auth (`?key=` or `x-manychat-secret`) |
+| `MANYCHAT_SECRET` | legacy name | still accepted as the `?key=` for /api/insights, /api/section-time stats and /api/google-place (ManyChat itself is gone) |
 | `WHATSAPP_VERIFY_TOKEN` | for WhatsApp | Meta GET-challenge token AND the `?key=` on the webhook URL (Dualhook signs with its own app secret we never see) |
 | `WHATSAPP_API_BASE` | for Dualhook | `https://api.dualhook.com/v25.0`; unset = graph.facebook.com direct |
 | `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_ID` | for WhatsApp | Dualhook `dh_live_…` key (or Meta token) + phone_number_id from the Dualhook connection |
@@ -57,19 +59,38 @@ After changing env vars: **Redeploy** (with cache is fine).
 `blocked_dates` · `business_hours` (weekday pk) · `invoice_drafts` ·
 `app_config` (k/v: `slot_duration_hours`) · `clients` (codes C-001, `banned`, `note`) ·
 `payments` · `wa_chats`/`wa_messages` (WhatsApp) · `cheat_notes` (/cheat add) ·
-`car_models` (+configurator)
+`car_models` (+configurator) · `site_visits` (evening digest; until it exists
+the digest falls back to section_time). The assistant's per-chat facts live in
+`app_config` as `wa_memory:<wa_id>`; `wa_ai_owner = meta` means "assistant off
+for every chat" (`/wa off all`).
 
 **A missing table/column never breaks the site**: the booking insert drops
 unknown columns and retries; other readers fall back to defaults.
 
-## Telegram bot commands
+## Telegram bot commands (rebuilt 20 Oct 2026 — 8 in the menu)
 
-`/bookings` dates → day view (Free windows line; per booking: 💶 Paid, 🕓 Move, 🗑 Free) ·
-`/stats` (+revenue) · `/invoice` PDF wizard (`/cancel`) · `/review [Name Service]` ·
-`/client <name|number|C-code>` · `/reply [key]` canned replies · `/cheat [query|add|del]` ·
-`/paid [120 Name Service]` · `/ban` `/unban` `/banlist` · `/calendar` ICS ·
-`/wa +353… text` (when WA connected) · `/jp` random (real-locality) Japanese address with
-copy buttons · `/setup` re-registers this menu.
+- `/agenda` — today, tomorrow, enquiries waiting >24h, and **WhatsApp chats
+  nobody answered** (button → list with 🤖 answer now / 💬 open / ✅ handled).
+- `/bookings` — dates → day view (free windows; per booking 💶 Paid, 🕓 Move, 🗑 Free).
+- `/find <name|number|service>` — clients (history + C-code), WhatsApp chats
+  (📖 read), enquiries. `/client` is an alias.
+- `/paid [120 Name Service] [cost 50 FSC] [share 25 Name]` · `/paid del last`.
+  Also 💶 under a booking and the PULT Money tab. `/log` is an alias of `/paid`.
+- `/wa` — help + assistant state. `/wa pending` · `/wa log|stop|start|reset|mine +353…` ·
+  `/wa +353… text` · `/wa off all` / `/wa on all` (old `/ai on|off` maps here).
+  **Swipe-reply** to a WhatsApp mirror or 🚨 alert in the group sends the text to
+  that customer (only within 24h of their last message; only TG_OWNER_ID's replies).
+- `/reply [key]` — canned replies + ⭐ review request (`/review Name Service` still works).
+- `/invoice` — PDF wizard (`/cancel`; a draft idle for 30 min expires).
+- `/tools` — 🇯🇵 `/jp` address · 🔧 `/cheat [query|add|del]` · 📊 `/stats` ·
+  📆 `/calendar` · ⛔️ `/banlist` (`/ban C-007 reason`, `/unban`).
+- `/setup` re-registers the menu and the reply keyboard (⏰ Agenda · 📅 Bookings ·
+  💰 Paid · 🧰 Tools).
+
+Automatic messages: booking/VIN/chat leads, one WhatsApp mirror per customer
+message (a specific-time request is a line in it, not a separate alert), 🚨
+pinned alert only when a customer asks for a person or is fed up, morning
+agenda + reminders, evening digest. No per-visitor pings any more.
 
 Mini App **PULT** tabs: Today · Money (full accounting) · Schedule (block
 days) · Clients (CRM: search, LTV, history, notes, ban, rename, delete,
@@ -110,7 +131,8 @@ Blacklisted clients: booking auto-declined silently, slot never held.
 | "Server / app error" reports: removeChild | browser auto-translate vs React | guarded in root layout (`Node.prototype.removeChild` patch) — if new patterns appear, extend guard |
 | Slow TTFB / cache MISS | something made root layout dynamic | root layout must stay locale-independent; `setRequestLocale` in [locale] |
 | Hydration crash (#418/#425) | `new Date()` in first render of a static page | gate with `mounted` state (see SlotPicker) |
-| No visitor pings | normal — pings only fire after cookie **Accept all** | check Vercel Analytics / GSC for true traffic |
+| Digest says "site activity" not "visitors" | `site_visits` table not created yet | run the `site_visits` block of `supabase/schema.sql` |
+| Swipe-reply says "only the owner's replies" | TG_OWNER_ID is not the replier's user id | set TG_OWNER_ID to Alex's personal Telegram id |
 | Command menu missing in group | Telegram cache | `/setup` again, reopen chat |
 
 ## Deploy flow

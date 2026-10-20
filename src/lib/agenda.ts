@@ -106,6 +106,76 @@ export async function markAllWaitingHandled(sb: SupabaseClient): Promise<number>
   return ids.length;
 }
 
+// ── WhatsApp chats nobody has answered ─────────────────────────────
+// The customer spoke last and neither the assistant nor Alex (from his phone,
+// a swipe-reply or /wa) has answered since. This is the list that would have
+// caught everyone left hanging while sending was broken (14–20 Oct).
+
+export type PendingChat = { waId: string; name: string; text: string; at: string };
+
+/** Messages that need no answer: a 👍 reaction, a system notice. */
+const NO_REPLY_NEEDED = /^\[(reaction|system|unsupported)\]/;
+const SERVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+export async function unansweredChats(sb: SupabaseClient, days = 7): Promise<PendingChat[]> {
+  const since = new Date(Date.now() - days * 86400000).toISOString();
+  const { data } = await sb
+    .from('wa_messages')
+    .select('wa_id, role, content, created_at')
+    .gt('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(4000);
+  const last = new Map<string, { role: string; content: string; created_at: string }>();
+  for (const m of (data ?? []) as { wa_id: string; role: string; content: string; created_at: string }[]) {
+    if (last.has(m.wa_id) || NO_REPLY_NEEDED.test(m.content ?? '')) continue;
+    last.set(m.wa_id, m);
+  }
+  const waiting = [...last].filter(([id, m]) => m.role === 'user' && /^\d{8,15}$/.test(id));
+  if (!waiting.length) return [];
+  const { data: chats } = await sb.from('wa_chats').select('wa_id, name').in('wa_id', waiting.map(([id]) => id));
+  const names = new Map(((chats ?? []) as { wa_id: string; name: string | null }[]).map((c) => [c.wa_id, c.name ?? '']));
+  // Longest wait first.
+  return waiting
+    .map(([waId, m]) => ({ waId, name: names.get(waId) || '', text: m.content, at: m.created_at }))
+    .sort((a, b) => a.at.localeCompare(b.at));
+}
+
+function ago(iso: string): string {
+  const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
+  return h < 1 ? 'just now' : h < 48 ? `${h}h ago` : `${Math.floor(h / 24)}d ago`;
+}
+
+/** The "who is waiting on WhatsApp" screen, one row of buttons per person. */
+export function buildPendingWa(list: PendingChat[]): { text: string; keyboard: InlineKeyboard } {
+  if (!list.length) {
+    return {
+      text: '✅ <b>WhatsApp</b> — nobody is waiting for a reply.',
+      keyboard: { inline_keyboard: [[{ text: '← Agenda', callback_data: 'agenda' }]] },
+    };
+  }
+  const shown = list.slice(0, 10);
+  const lines = [`⏳ <b>WhatsApp — waiting for a reply</b> (${list.length})`, '━━━━━━━━━━━━━━━━━━━'];
+  for (const c of shown) {
+    lines.push(`<b>${esc(c.name || 'No name')}</b> · <code>+${c.waId}</code> · ${ago(c.at)}`);
+    lines.push(`  «${esc(c.text.slice(0, 120))}${c.text.length > 120 ? '…' : ''}»`);
+  }
+  if (list.length > shown.length) lines.push(`…and ${list.length - shown.length} more.`);
+  lines.push(
+    '',
+    '🤖 the assistant answers now (only within 24h of their message) · 💬 open the chat · ✅ you dealt with it another way',
+  );
+  const buttons: InlineButton[][] = shown.map((c) => {
+    const first = (c.name || `+${c.waId}`).split(/\s+/)[0].slice(0, 14);
+    const row: InlineButton[] = [];
+    if (Date.now() - new Date(c.at).getTime() < SERVICE_WINDOW_MS) row.push({ text: `🤖 ${first}`, callback_data: `war:${c.waId}` });
+    row.push({ text: `💬 ${first}`, url: `https://wa.me/${c.waId}` });
+    row.push({ text: '✅', callback_data: `wadone:${c.waId}` });
+    return row;
+  });
+  buttons.push([{ text: '← Agenda', callback_data: 'agenda' }]);
+  return { text: lines.join('\n'), keyboard: { inline_keyboard: buttons } };
+}
+
 /** The whole morning message, ready to send or to edit back into. */
 export async function buildAgenda(
   sb: SupabaseClient,
@@ -113,7 +183,7 @@ export async function buildAgenda(
   const today = dayKey(0);
   const tomorrow = dayKey(1);
 
-  const [{ data: slotData }, waiting] = await Promise.all([
+  const [{ data: slotData }, waiting, waPending] = await Promise.all([
     sb
       .from('bookings')
       .select('id, name, contact, service, slot_date, slot_time, status')
@@ -121,6 +191,7 @@ export async function buildAgenda(
       .in('status', ['pending', 'confirmed'])
       .order('slot_time', { ascending: true }),
     waitingLeads(sb),
+    unansweredChats(sb).catch(() => [] as PendingChat[]),
   ]);
   const rows = (slotData ?? []) as AgendaLead[];
 
@@ -139,27 +210,29 @@ export async function buildAgenda(
   lines.push('', `<b>Tomorrow</b> (${tomorrow}):`);
   lines.push(...(tomorrows.length ? fmt(tomorrows) : ['  —']));
 
+  if (waPending.length) {
+    lines.push('', `💬 <b>WhatsApp:</b> ${waPending.length} ${waPending.length === 1 ? 'person is' : 'people are'} waiting for a reply.`);
+  }
   if (waiting.leads.length) {
-    lines.push('', '⚠️ <b>Waiting for your reply over 24h:</b>');
+    lines.push('', '⚠️ <b>Enquiries waiting for your reply over 24h:</b>');
     lines.push('  Tap a name to open it.');
   }
 
-  const keyboard: InlineKeyboard | undefined = waiting.leads.length
-    ? {
-        inline_keyboard: waiting.leads.map((b) => {
-          const more = waiting.extras.get(b.id) ?? 0;
-          const label = `⏳ ${b.name.slice(0, 22)}${b.service ? ` · ${b.service.slice(0, 18)}` : ''}${
-            more ? ` (+${more})` : ''
-          }`;
-          return [{ text: label, callback_data: `lead:${b.id}` }];
-        }).concat([[{ text: '🧹 All answered — clear the list', callback_data: 'agclear' }]]),
-      }
-    : undefined;
+  const buttons: InlineButton[][] = [];
+  if (waPending.length) buttons.push([{ text: `⏳ WhatsApp waiting (${waPending.length})`, callback_data: 'wapend' }]);
+  if (waiting.leads.length) {
+    for (const b of waiting.leads) {
+      const more = waiting.extras.get(b.id) ?? 0;
+      const label = `⏳ ${b.name.slice(0, 22)}${b.service ? ` · ${b.service.slice(0, 18)}` : ''}${more ? ` (+${more})` : ''}`;
+      buttons.push([{ text: label, callback_data: `lead:${b.id}` }]);
+    }
+    buttons.push([{ text: '🧹 All answered — clear the list', callback_data: 'agclear' }]);
+  }
 
   return {
     text: lines.join('\n'),
-    keyboard,
-    empty: rows.length === 0 && waiting.leads.length === 0,
+    keyboard: buttons.length ? { inline_keyboard: buttons } : undefined,
+    empty: rows.length === 0 && waiting.leads.length === 0 && waPending.length === 0,
   };
 }
 

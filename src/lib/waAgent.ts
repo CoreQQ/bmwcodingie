@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import { WHATSAPP_PROMPT } from './assistantPrompt';
-import { ensureClient, clientCode } from './crm';
+import { ensureClient, clientCode, historyForAssistant } from './crm';
 import { notifyTelegram, sendOwnerAlert } from './telegram';
 import { getHours, getSlotDuration, getBlockedDates } from './stats';
 import { windowsFor, windowsOverlap } from './hours';
@@ -9,10 +9,8 @@ import { sendWhatsAppText } from './whatsapp';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
-// Shared brain for the WhatsApp agent. Used by both transports: the direct
-// Meta Cloud API webhook (/api/whatsapp) and the ManyChat bridge
-// (/api/manychat), so both behave identically — same prompt, same lead
-// capture, same Telegram notifications.
+// The WhatsApp agent's brain: prompt, tools, lead capture and handover. Called
+// by the Cloud API webhook (/api/whatsapp) and by "Resume AI" in the bot.
 
 
 
@@ -171,22 +169,6 @@ function requestedTime(text: string): string {
   return [...new Set(found.map((f) => f.trim()))].join(' ').slice(0, 40);
 }
 
-/** Tell Alex someone wants a particular time, without taking the chat off the assistant. */
-async function notifyOwnerTime(waId: string, name: string | undefined, text: string, when: string): Promise<void> {
-  const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  await sendOwnerAlert(
-    `⏰ <b>Wants a specific time: ${esc(when)}</b>\n` +
-      `${name ? `<b>${esc(name)}</b> · ` : ''}<code>+${waId}</code>\n\n«${esc(text.slice(0, 600))}»\n\n` +
-      'The assistant is still chatting with them and has told them you confirm times personally.',
-    {
-      inline_keyboard: [
-        [{ text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` }],
-        [{ text: '📋 Number', copy_text: { text: `+${waId}` } }],
-      ],
-    },
-  );
-}
-
 const LEAD_TOOL: Anthropic.Tool = {
   name: 'save_lead',
   description:
@@ -313,7 +295,7 @@ export async function generateWaReply(
   waId: string,
   text: string,
   profileName?: string,
-  /** Fast model for transports that time out quickly (ManyChat waits seconds). */
+  /** Model id; Opus by default. */
   model = 'claude-opus-5',
   /** How the customer is addressed in the CRM — a +number, or an id label
    *  when the transport gives us no phone (then no client record is made). */
@@ -322,14 +304,15 @@ export async function generateWaReply(
   imageUrl?: string,
   /** Facts remembered from earlier messages (survives even without a DB). */
   priorMemory?: string,
-): Promise<{ reply: string; memory: string }> {
+): Promise<{ reply: string; memory: string; askedTime?: string }> {
   // Newest 16, then put back in order. This used to read the OLDEST 14, so in
   // any longer chat the model never saw what the customer had just said — it
   // kept answering the start of the conversation, which is exactly what
   // "going round in circles" looks like from the other side.
-  const [{ data: history }, stored] = await Promise.all([
+  const [{ data: history }, stored, pastJobs] = await Promise.all([
     sb.from('wa_messages').select('role, content, via, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(16),
     priorMemory === undefined ? loadWaMemory(sb, waId).catch(() => '') : Promise.resolve(priorMemory),
+    /^\+?\d{8,15}$/.test(contact) ? historyForAssistant(sb, contact).catch(() => '') : Promise.resolve(''),
   ]);
   priorMemory = stored || undefined;
   const recent = ((history ?? []) as { role: string; content: string; via?: string | null; created_at?: string }[])
@@ -358,12 +341,10 @@ export async function generateWaReply(
   }
 
   // A specific time is Alex's to confirm, but the rest of their message still
-  // deserves an answer — so he is alerted and the assistant carries on, told
-  // exactly how to handle the time part.
+  // deserves an answer — the assistant carries on, told exactly how to handle
+  // the time part, and the mirror in Telegram flags it. (It used to be a loud
+  // pinned alert of its own, fired by any "tomorrow" or "fri".)
   const when = requestedTime(text);
-  // Not awaited: the alert runs while the model writes, instead of adding a
-  // second of Telegram round-trips before it even starts.
-  const timeAlert = when ? notifyOwnerTime(waId, profileName, text, when).catch(() => undefined) : null;
 
   const messages = recent
     .filter((m) => m.content?.trim())
@@ -382,6 +363,9 @@ export async function generateWaReply(
   const known = [
     profileName ? `WhatsApp profile name: ${profileName} (use it — do not ask their name unless it is clearly not a real one)` : '',
     priorMemory ? priorMemory : '',
+    pastJobs
+      ? `Their history with us (our booking records, newest first): ${pastJobs}. Use it so you never ask again for a car we already know; mention it only when it helps (e.g. "last time we did CarPlay on your F30").`
+      : '',
   ]
     .filter(Boolean)
     .join('\n');
@@ -680,8 +664,7 @@ export async function generateWaReply(
     convo.push({ role: 'user', content: results });
     // The tools are notes and alerts — their results never change what the
     // customer should read. Once there is a reply, stop: a second model call
-    // just to "acknowledge" a note doubled the wait and pushed replies past
-    // ManyChat's window.
+    // just to "acknowledge" a note doubled the wait for the customer.
     if (reply) break;
   }
 
@@ -691,10 +674,9 @@ export async function generateWaReply(
   } else if (!reply && usedTool) {
     reply = `Got it — Alex will confirm with you shortly. You can also pick a time here: ${BOOKING_LINK}`;
   }
-  if (timeAlert) await timeAlert;
   if (memory && memory !== (priorMemory ?? '')) await saveWaMemory(sb, waId, memory);
   if (!reply) throw new Error('empty AI reply');
-  return { reply, memory };
+  return { reply, memory, askedTime: when || undefined };
 }
 
 const SERVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -706,25 +688,31 @@ const SERVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
 export async function answerPendingWaMessage(
   sb: SupabaseClient,
   waId: string,
-): Promise<{ text: string; reply: string; sendError?: string; aiError?: string } | null> {
-  const [{ data: last }, { data: chat }] = await Promise.all([
-    sb.from('wa_messages').select('role, content, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+): Promise<{ text: string; reply: string; sendError?: string; aiError?: string; askedTime?: string } | null> {
+  const [{ data: recent }, { data: chat }] = await Promise.all([
+    sb.from('wa_messages').select('role, content, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(6),
     sb.from('wa_chats').select('name').eq('wa_id', waId).maybeSingle(),
   ]);
-  const row = last as { role?: string; content?: string; created_at?: string } | null;
+  // A 👍 reaction after their question is not what needs answering.
+  const row = ((recent ?? []) as { role?: string; content?: string; created_at?: string }[]).find(
+    (m) => !/^\[(reaction|system|unsupported)\]/.test(m.content ?? ''),
+  );
   if (!row || row.role !== 'user' || !row.content || !row.created_at) return null;
   if (Date.now() - new Date(row.created_at).getTime() > SERVICE_WINDOW_MS) return null;
   const text = row.content;
   const name = (chat as { name?: string | null } | null)?.name || undefined;
   let reply = '';
+  let askedTime: string | undefined;
   try {
-    reply = (await generateWaReply(sb, waId, text, name, 'claude-opus-5', `+${waId}`)).reply.trim();
+    const out = await generateWaReply(sb, waId, text, name, 'claude-opus-5', `+${waId}`);
+    reply = out.reply.trim();
+    askedTime = out.askedTime;
   } catch (e) {
     return { text, reply: '', aiError: e instanceof Error ? e.message : String(e) };
   }
   if (!reply) return { text, reply };
   const sent = await sendWhatsAppText(waId, reply);
-  if (!sent.ok) return { text, reply, sendError: sent.error || 'send failed' };
+  if (!sent.ok) return { text, reply, sendError: sent.error || 'send failed', askedTime };
   await sb.from('wa_messages').insert({ msg_id: sent.id || `out:resume:${waId}:${Date.now()}`, wa_id: waId, role: 'assistant', content: reply, via: 'ai' });
-  return { text, reply };
+  return { text, reply, askedTime };
 }

@@ -4,7 +4,8 @@ import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
 import { buildAgenda } from '@/lib/agenda';
-import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
+import { sendWhatsAppText, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { phoneKey } from '@/lib/crm';
 
 // Uses the shared "short & friendly" template so /review and the daily nudge
 // stay consistent.
@@ -27,6 +28,10 @@ function whereLine(visitType?: string | null, visitAddress?: string | null): str
 }
 
 export const runtime = 'nodejs';
+// Never prerender: without CRON_SECRET the handler reads nothing from the
+// request, so Next built it as a static page — it ran once per deploy (the
+// "duplicate agenda" messages) and the real 08:00 call got the cached copy.
+export const dynamic = 'force-dynamic';
 
 // IndexNow: tell Bing-family crawlers (which also feed ChatGPT, Copilot and
 // DuckDuckGo) that our key pages changed. Free, no auth beyond the key file.
@@ -65,13 +70,16 @@ async function pingIndexNow(): Promise<void> {
   }
 }
 
-// Daily agenda reminder (Vercel cron, 07:00 UTC — see vercel.json). Sends the
-// owner today's and tomorrow's slot bookings; stays silent when both are empty.
+// Morning run (Vercel cron, 08:00 UTC = 09:00 Irish summer time, 08:00 winter —
+// see vercel.json): the agenda, tomorrow's customer reminders, review nudges.
 export async function GET(req: Request) {
+  // Vercel's cron sends "Bearer CRON_SECRET"; without the secret set, at
+  // least insist on its user agent so a stranger cannot fire the run.
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
-    return NextResponse.json({ ok: false }, { status: 401 });
-  }
+  const fromCron = secret
+    ? req.headers.get('authorization') === `Bearer ${secret}`
+    : /vercel-cron/i.test(req.headers.get('user-agent') || '');
+  if (!fromCron) return NextResponse.json({ ok: false }, { status: 401 });
 
   const sb = getSupabaseAdmin();
   if (!sb) return NextResponse.json({ ok: true, skipped: 'no-db' });
@@ -113,6 +121,18 @@ export async function GET(req: Request) {
       (b) => !b.reminded_at && b.contact,
     );
 
+    // Customers who wrote to us on WhatsApp in the last 24h, by phone key.
+    const recentWa = new Map<string, string>();
+    if (due.length && isWhatsAppConfigured()) {
+      const { data: recent } = await sb
+        .from('wa_messages')
+        .select('wa_id')
+        .eq('role', 'user')
+        .gt('created_at', new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString())
+        .limit(2000);
+      for (const r of (recent ?? []) as { wa_id: string }[]) recentWa.set(phoneKey(r.wa_id), r.wa_id);
+    }
+
     const unsent: Due[] = [];
     for (const b of due) {
       const first = (b.name || '').split(/\s+/)[0] || 'there';
@@ -122,8 +142,14 @@ export async function GET(req: Request) {
         `${whereLine(b.visit_type, b.visit_address)}\n\n` +
         `If anything changed, just reply here and we'll sort it.`;
 
-      const phone = b.contact.replace(/\D/g, '');
-      const sent = phone ? (await sendManyChatText(phone, msg)).ok : false;
+      // WhatsApp only lets a business write freely within 24h of the
+      // customer's last message; outside it a reminder needs an approved
+      // template, so those go to Alex as a ready-to-paste text instead.
+      const waId = recentWa.get(phoneKey(b.contact));
+      const sent = waId ? (await sendWhatsAppText(waId, msg)).ok : false;
+      if (sent && waId) {
+        await sb.from('wa_messages').insert({ msg_id: `reminder:${b.id}`, wa_id: waId, role: 'assistant', content: msg, via: 'ai' }).then(() => undefined, () => undefined);
+      }
       if (sent) {
         await sb.from('bookings').update({ reminded_at: new Date().toISOString() }).eq('id', b.id);
       } else {
@@ -132,12 +158,10 @@ export async function GET(req: Request) {
     }
 
     if (unsent.length) {
-      // No ManyChat key (or the send failed): hand the owner a ready message
-      // to tap, copy and paste — the reminder still happens.
+      // Not sendable from here (no recent WhatsApp chat, or the send failed):
+      // hand the owner a ready message to tap, copy and paste.
       await sendOwnerWithMarkup(
-        `🔔 <b>Remind tomorrow's customers</b>${
-          isManyChatSendConfigured() ? ' (auto-send failed — do it by hand)' : ''
-        }\n${unsent
+        `🔔 <b>Remind tomorrow's customers</b> — tap to copy, send from your phone:\n${unsent
           .map((b) => `  • ${b.name} · ${b.slot_time}${b.service ? ` · ${b.service}` : ''}`)
           .join('\n')}`,
         {

@@ -96,25 +96,18 @@ async function tgCall(method: string, payload: Record<string, unknown>, attempt 
  * Called by the owner's /setup command so BotFather isn't needed.
  */
 export async function registerBotCommands(): Promise<boolean> {
+  // Eight commands, in the order a working day needs them. Everything else
+  // (/jp, /cheat, /stats, /calendar, /banlist) sits behind /tools; old names
+  // (/client, /log, /review, /ai) still work but are not listed.
   const commands = [
-    { command: 'find', description: '🔎 Найти всё: /find miranda, /find 8770, /find japan' },
     { command: 'agenda', description: '⏰ Сегодня, завтра и кто ждёт ответа' },
-    { command: 'bookings', description: '📋 Заявки: подтвердить / отклонить / освободить' },
-    { command: 'stats', description: '📊 Статистика: заявки, топ услуг, записи' },
-    { command: 'invoice', description: '🧾 Создать PDF-инвойс' },
-    { command: 'review', description: '⭐ Тексты «попросите отзыв» со ссылкой' },
-    { command: 'calendar', description: '📆 Подписка на календарь записей' },
-    { command: 'client', description: '👤 История клиента: /client имя или номер' },
-    { command: 'reply', description: '📋 Готовые ответы клиентам' },
-    { command: 'cheat', description: '🔧 Шпаргалка кодировок: /cheat vim' },
-    { command: 'jp', description: '🇯🇵 Случайный японский адрес' },
-    { command: 'log', description: '💶 Быстро записать оплату кнопками' },
-    { command: 'paid', description: '💰 Деньги: итоги, расходы, доли' },
-    { command: 'ban', description: '⛔️ Забанить: /ban C-007 причина' },
-    { command: 'banlist', description: '📵 Список забаненных' },
-    { command: 'wa', description: '💬 Ответить в WhatsApp (когда подключим)' },
-    { command: 'setup', description: '🔧 Обновить меню команд' },
-    { command: 'cancel', description: '✖️ Отменить создание инвойса' },
+    { command: 'bookings', description: '📅 Записи по дням: подтвердить, перенести, оплата' },
+    { command: 'find', description: '🔎 Найти клиента, заявку или чат: имя, номер, услуга' },
+    { command: 'paid', description: '💰 Деньги: /paid 120 Имя Услуга · итоги' },
+    { command: 'wa', description: '💬 WhatsApp: кто ждёт, ассистент вкл/выкл' },
+    { command: 'reply', description: '📋 Готовые ответы и запрос отзыва' },
+    { command: 'invoice', description: '🧾 Счёт PDF' },
+    { command: 'tools', description: '🧰 Японский адрес, шпаргалка, статистика, календарь, бан-лист' },
   ];
   // Register for private chats, all groups, and (explicitly) the owner's
   // chat/group — groups need their own scope or Telegram won't list commands.
@@ -327,7 +320,7 @@ export async function editBookingMessage(
   const text = [...(await bookingDetailLines(lead)), '', stamp].join('\n');
   const button: InlineButton =
     outcome === 'confirmed'
-      ? { text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(lead.name, slot, lead.public_token) } }
+      ? { text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(lead.name, slot, lead.public_token, lead.visitType) } }
       : { text: '📋 Copy "offer other times" reply', copy_text: { text: declineReply(lead.name, slot) } };
   const wa = waLinkFor(lead.contact);
   await tgCall('editMessageText', {
@@ -559,41 +552,6 @@ function dublinTime(): string {
   } catch {
     return new Date().toISOString();
   }
-}
-
-export type VisitorPing = {
-  path: string;
-  referrer?: string;
-  device: 'mobile' | 'desktop';
-  ip?: string;
-  browser?: string;
-  os?: string;
-  country?: string;
-  city?: string;
-  isp?: string;
-  language?: string;
-  isReturning?: boolean;
-  source?: string;
-};
-
-/** Sends a "someone's on the site" notification with full visit details. */
-export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
-  const lines = [
-    v.isReturning ? '🔁 <b>Returning visitor</b>' : '👀 <b>New visitor on the site</b>',
-    '━━━━━━━━━━━━━━━━━━━',
-    `🕒 <b>Time:</b> ${esc(dublinTime())}`,
-    `📄 <b>Page:</b> ${esc(v.path)}`,
-    `🔗 <b>Source:</b> ${esc(v.referrer || 'Direct / unknown')}`,
-    ...(v.source ? [`📣 <b>Campaign:</b> ${esc(v.source)}`] : []),
-    `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}${v.os ? ` · ${esc(v.os)}` : ''}`,
-  ];
-  if (v.browser) lines.push(`🧭 <b>Browser:</b> ${esc(v.browser)}`);
-  if (v.language) lines.push(`🗣 <b>Language:</b> ${esc(v.language)}`);
-  if (v.country) lines.push(`🌍 <b>Country:</b> ${esc(v.country)}`);
-  if (v.city) lines.push(`🏙 <b>City:</b> ${esc(v.city)}`);
-  if (v.isp) lines.push(`🏢 <b>Provider:</b> ${esc(v.isp)}`);
-  lines.push(`🌐 <b>IP:</b> <code>${esc(v.ip || 'unknown')}</code>`);
-  return sendTelegramMessage(lines.join('\n'));
 }
 
 /** Generic event notification (admin login, server error, file upload, …). */

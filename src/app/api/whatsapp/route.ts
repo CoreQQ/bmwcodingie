@@ -71,6 +71,9 @@ export async function GET(req: Request) {
     const [owner, customer, ai, key] = await Promise.all([stat('owner', true), stat('customer'), stat('ai'), checkWhatsAppKey()]);
     return NextResponse.json({
       ok: true,
+      // Deploy marker: bump it in a redeploy-only commit, then check it here
+      // to know the new build (and new env values) are live.
+      v: 90,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
@@ -359,7 +362,8 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   let reply = '';
   let aiError = '';
   let skipped = '';
-  if (aiOff) skipped = "🔇 Our assistant is off (/ai on switches it back).";
+  let askedTime = '';
+  if (aiOff) skipped = '🔇 The assistant is off for every chat — <code>/wa on all</code> switches it back.';
   else if (ownerHandling) skipped = '✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.';
   else if (paused) skipped = '⏸ AI paused for this chat — replies handled by you.';
   else if (isRateLimited(`wa-ai:${waId}`, 20, 60 * 60 * 1000)) skipped = '🤖 Hourly limit for this chat reached — reply yourself.';
@@ -371,6 +375,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
       if (photo?.id) imageUrl = (await downloadWhatsAppMedia(photo.id))?.dataUrl;
       const out = await generateWaReply(sb, waId, text || 'Photo attached.', name || undefined, 'claude-opus-5', who, imageUrl);
       reply = out.reply.trim();
+      askedTime = out.askedTime ?? '';
     } catch (e) {
       aiError = e instanceof Error ? e.message : String(e);
     }
@@ -402,6 +407,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   else if (!reply && !aiError && !skipped) lines.push('🤫 The assistant chose not to answer this one — it is yours.');
   if (aiError) lines.push(`⚠️ <b>The assistant could not answer</b> — the customer got no reply. Answer them yourself.\n<code>${esc(aiError.slice(0, 200))}</code>`);
   if (skipped) lines.push(skipped);
+  if (askedTime) lines.push(`⏰ <b>Asked for a specific time: ${esc(askedTime)}</b> — the assistant told them you confirm times yourself.`);
   const copyRow = sendError ? [[{ text: '📋 Copy answer', copy_text: { text: reply.slice(0, 256) } }]] : [];
   await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: [...copyRow, controls, numberRow] });
 }
