@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import {
@@ -24,6 +25,7 @@ import { getBusinessStats, getHours, getBlockedDates, getSlotDuration } from '@/
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { answerPendingWaMessage } from '@/lib/waAgent';
 import { sendManyChatText, isManyChatSendConfigured } from '@/lib/manychatSend';
 import { buildAgenda, buildLeadCard, markContactHandled, markAllWaitingHandled, type AgendaLead } from '@/lib/agenda';
 import { jpAddressMessage } from '@/lib/jpAddress';
@@ -40,7 +42,33 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/** After "Resume AI": the customer's last message went unanswered while the
+ *  assistant stood down, so answer it now and show Alex what was sent. */
+function answerPendingInBackground(sb: SupabaseClient, waId: string): void {
+  waitUntil(
+    (async () => {
+      const r = await answerPendingWaMessage(sb, waId);
+      if (!r) return;
+      const head = `💬 <b>WhatsApp</b> · <code>+${waId}</code>\n«${escapeHtml(r.text.slice(0, 500))}»`;
+      if (r.aiError) {
+        await sendOwnerMessage(`${head}\n⚠️ <b>The assistant could not answer</b> — reply yourself.\n<code>${escapeHtml(r.aiError.slice(0, 200))}</code>`);
+      } else if (!r.reply) {
+        await sendOwnerMessage(`${head}\n🤫 The assistant chose not to answer this one — it is yours.`);
+      } else if (r.sendError) {
+        await sendOwnerWithMarkup(
+          `${head}\n❌ <b>WhatsApp refused to send the answer</b> — copy it and send from your phone:\n<pre>${escapeHtml(r.reply.slice(0, 3000))}</pre>\n<code>${escapeHtml(r.sendError.slice(0, 300))}</code>`,
+          { inline_keyboard: [[{ text: '📋 Copy answer', copy_text: { text: r.reply.slice(0, 256) } }]] },
+        );
+      } else {
+        await sendOwnerMessage(`${head}\n🤖 ${escapeHtml(r.reply)}`);
+      }
+    })().catch(() => undefined),
+  );
+}
+
 export const runtime = 'nodejs';
+// "Resume AI" drafts and sends a WhatsApp answer after the callback is acknowledged.
+export const maxDuration = 60;
 
 const WEBHOOK_SECRET = process.env.TG_WEBHOOK_SECRET;
 
@@ -292,6 +320,7 @@ export async function POST(req: Request) {
               ? `${paused ? '⏸ AI paused' : '▶️ AI resumed'} for <code>+${waId}</code> (confirmed in the database).`
               : `⚠️ Could not change it — the chat now reads paused=${String(now)}. Check the number: it must match the id shown on the message (${waId}).`,
           );
+          if (now === paused && !paused) answerPendingInBackground(sb, waId);
         }
         return ok();
       }
@@ -918,7 +947,9 @@ export async function POST(req: Request) {
   if (cq.data.startsWith('wap:') || cq.data.startsWith('war:')) {
     const waId = cq.data.slice(4);
     const paused = cq.data.startsWith('wap:');
-    const { error } = await sb.from('wa_chats').upsert({ wa_id: waId, paused });
+    // Resuming also ends the 6h "Alex is handling it" stand-down — otherwise
+    // the button says "resumed" while the assistant keeps sitting it out.
+    const { error } = await sb.from('wa_chats').upsert(paused ? { wa_id: waId, paused } : { wa_id: waId, paused, owner_replied_at: null });
     const { data: check } = await sb
       .from('wa_chats')
       .select('paused')
@@ -943,8 +974,9 @@ export async function POST(req: Request) {
     await sendOwnerMessage(
       paused
         ? `⏸ AI paused for <code>+${waId}</code> — reply with <code>/wa +${waId} your text</code>`
-        : `▶️ AI resumed for <code>+${waId}</code>`,
+        : `▶️ AI resumed for <code>+${waId}</code> — answering their last message now.`,
     );
+    if (!paused) answerPendingInBackground(sb, waId);
     return ok();
   }
 
