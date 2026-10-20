@@ -299,6 +299,7 @@ export async function POST(req: Request) {
         const waId = ctrl[3].replace(/\D/g, '');
         if (action === 'reset' || action === 'clear') {
           await sb.from('wa_messages').delete().eq('wa_id', waId);
+          await sb.from('app_config').delete().eq('key', `wa_memory:${waId}`);
           await sendOwnerMessage(
             `🧹 Conversation with <code>+${waId}</code> wiped — the assistant starts fresh next message.`,
           );

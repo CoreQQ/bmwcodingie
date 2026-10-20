@@ -20,20 +20,68 @@ export type InlineButton =
 export type InlineKeyboard = { inline_keyboard: InlineButton[][] };
 
 /** Low-level call to a Bot API method. Never throws; returns the parsed JSON or null. */
-async function tgCall(method: string, payload: Record<string, unknown>): Promise<unknown | null> {
+/** Cut to at most `max` UTF-16 units without splitting an emoji in half —
+ *  a half surrogate makes Telegram reject the whole message. */
+function clipText(s: string, max: number): string {
+  let out = '';
+  for (const ch of s) {
+    if (out.length + ch.length > max) break;
+    out += ch;
+  }
+  return out;
+}
+
+/** copy_text buttons take 1–256 characters; anything else fails the send. */
+function sanitizeMarkup(markup: unknown): unknown {
+  const kb = (markup as { inline_keyboard?: unknown[][] } | null)?.inline_keyboard;
+  if (!Array.isArray(kb)) return markup;
+  return {
+    ...(markup as object),
+    inline_keyboard: kb.map((row) =>
+      row.map((b) => {
+        const btn = b as { copy_text?: { text?: string } };
+        if (!btn.copy_text) return b;
+        return { ...btn, copy_text: { text: clipText(btn.copy_text.text || ' ', 256) || ' ' } };
+      }),
+    ),
+  };
+}
+
+async function tgCall(method: string, payload: Record<string, unknown>, attempt = 0): Promise<unknown | null> {
   if (!TG_TOKEN) {
     console.warn('[telegram] TG_TOKEN not set — skipping', method);
     return null;
   }
+  const body = payload.reply_markup ? { ...payload, reply_markup: sanitizeMarkup(payload.reply_markup) } : payload;
   try {
     const res = await fetch(`${API}/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
       console.error(`[telegram] ${method} failed:`, res.status, detail);
+      if (attempt > 0 || method !== 'sendMessage') return null;
+      // A lead notification must arrive even when Telegram objects to how it
+      // is dressed: wait out a flood limit, or resend without the buttons,
+      // or as plain text if the HTML would not parse.
+      if (res.status === 429) {
+        const wait = Number((JSON.parse(detail || '{}') as { parameters?: { retry_after?: number } }).parameters?.retry_after) || 5;
+        await new Promise((r) => setTimeout(r, Math.min(wait, 35) * 1000));
+        return tgCall(method, payload, 1);
+      }
+      if (res.status === 400) {
+        if (/parse entities/i.test(detail)) {
+          const plain = String(payload.text ?? '').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+          const { parse_mode: _drop, ...rest } = payload;
+          return tgCall(method, { ...rest, text: plain }, 1);
+        }
+        if (payload.reply_markup) {
+          const { reply_markup: _drop, ...rest } = payload;
+          return tgCall(method, rest, 1);
+        }
+      }
       return null;
     }
     return await res.json().catch(() => null);
