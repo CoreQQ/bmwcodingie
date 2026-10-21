@@ -172,7 +172,10 @@ export async function downloadWhatsAppMedia(
     const res = await fetch(meta.url, { headers, signal: ctrl.signal });
     clearTimeout(timer);
     if (!res.ok) return null;
-    const mime = (res.headers.get('content-type') || meta.mime_type || '').split(';')[0].trim();
+    // Files sent as documents can come back as application/octet-stream;
+    // Meta's own mime_type is the truth then.
+    const headerType = (res.headers.get('content-type') || '').split(';')[0].trim();
+    const mime = /^image\//.test(headerType) ? headerType : (meta.mime_type || headerType).split(';')[0].trim();
     const buf = Buffer.from(await res.arrayBuffer());
     if (buf.byteLength > 4_500_000) return null;
     return { dataUrl: `data:${mime};base64,${buf.toString('base64')}`, mime };
