@@ -86,6 +86,13 @@ export const ADD_ONS: { id: string; label: string; note?: string; price: number 
 export const CALL_OUT = { base: 20, perKm: 1.25 };
 
 /**
+ * The smallest job, visit or remote session (owner's decision, 21 Oct 2026):
+ * single settings keep their own prices but are combined up to at least this.
+ * The call-out fee comes on top. "BMW coding from €80" on the site means this.
+ */
+export const MIN_JOB = 80;
+
+/**
  * Systems where nothing is a fixed figure. On iDrive 8.5 the work depends on
  * the software version in front of us, so every number is a starting point and
  * must be shown as one.

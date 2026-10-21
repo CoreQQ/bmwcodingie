@@ -50,7 +50,7 @@
   "Services": {
     "eyebrow": "01 / Usługi",
     "heading": "Co kodujemy",
-    "intro": "Stałe ceny tam, gdzie da się je podać, i szczera wycena „na zapytanie” tam, gdzie decyduje sam samochód. Większość prac można wykonać na miejscu lub zdalnie — retrofity sprzętowe tylko na miejscu.",
+    "intro": "Stałe ceny tam, gdzie da się je podać, i szczera wycena „na zapytanie” tam, gdzie decyduje sam samochód. Większość prac można wykonać na miejscu lub zdalnie — retrofity sprzętowe tylko na miejscu. Minimalne zlecenie to €80 za wizytę lub sesję zdalną; drobne ustawienia łączymy w jedno.",
     "remoteOk": "Możliwe zdalnie",
     "footnote": "Nie widzisz swojej dokładnej potrzeby na liście? Odblokowywanie ukrytych funkcji i niestandardowe kodowanie to nasza codzienność — napisz, jaki masz samochód i czego potrzebujesz, a powiemy wprost, czy jest to możliwe.",
     "showAll": "Pokaż wszystkie {n}",
@@ -111,7 +111,7 @@
     "q6": "Mój samochód to import ze specyfikacją japońską — można go przekonwertować?",
     "a6": "Konwersje Japonia→UE to dla nas standardowe zlecenie: zmiana regionu, FSC, obsługa lusterek ETC i kwestie TCB. Wyślij szczegóły, a powiemy, czego potrzebuje konkretnie Twój samochód.",
     "q7": "Czy dojazd do samochodu jest płatny?",
-    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszej bazy w Rathcoole, zachodni Dublin. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
+    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszej bazy w zachodnim Dublinie. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
   },
   "Contact": {
     "eyebrow": "07 / Rezerwacja",

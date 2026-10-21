@@ -5,8 +5,8 @@ import type { ServicePage } from './servicePages';
 export const EXTRA_LANDINGS: Record<string, ServicePage> = {
   'bmw-hidden-features': {
     slug: 'bmw-hidden-features',
-    price: { amount: 50, text: 'Hidden-features session from €50 · single setting from €40' },
-    metaTitle: 'BMW Hidden Features Coding Dublin | From €50',
+    price: { amount: 80, text: 'From €80 per session (the minimum job) · settings from €40 each, combined into one bundle' },
+    metaTitle: 'BMW Hidden Features Coding Dublin | From €80',
     metaDescription: 'Enable BMW hidden features in Dublin or remotely across Ireland: Video in Motion, digital speed, folding mirrors, welcome lights and more. Reversible, pay on completion.',
     serviceName: 'BMW Hidden Features Coding',
     eyebrow: 'Coding · All F & G series',

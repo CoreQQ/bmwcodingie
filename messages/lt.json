@@ -50,7 +50,7 @@
   "Services": {
     "eyebrow": "01 / Paslaugos",
     "heading": "Ką mes koduojame",
-    "intro": "Fiksuotos kainos, kai galime jas nurodyti, ir sąžiningas „pagal užklausą“ įkainojimas, kai sprendžia automobilis. Daugumą darbų galime atlikti gyvai arba nuotoliniu būdu — techninės įrangos retrofitai atliekami tik gyvai.",
+    "intro": "Fiksuotos kainos, kai galime jas nurodyti, ir sąžiningas „pagal užklausą“ įkainojimas, kai sprendžia automobilis. Daugumą darbų galime atlikti gyvai arba nuotoliniu būdu — techninės įrangos retrofitai atliekami tik gyvai. Minimalus užsakymas — €80 už vizitą ar nuotolinę sesiją; smulkūs nustatymai sujungiami.",
     "remoteOk": "Galima nuotoliniu būdu",
     "footnote": "Nematote tiksliai to, ko reikia? Paslėptų funkcijų aktyvavimas ir individualus kodavimas — tai dalis mūsų darbo. Parašykite, koks automobilis ir ko norite, ir mes tiesiai pasakysime, ar tai įmanoma.",
     "showAll": "Rodyti visas {n}",
@@ -111,7 +111,7 @@
     "q6": "Mano importuotas automobilis yra Japonijos specifikacijos — galite jį konvertuoti?",
     "a6": "Konversija iš Japonijos į ES specifikaciją — dažnas darbas: regiono pakeitimas, FSC, ETC veidrodžių valdymas ir TCB aspektai. Atsiųskite informaciją, ir pasakysime, ko konkrečiai reikia jūsų automobiliui.",
     "q7": "Ar atvykimas pas automobilį yra mokamas?",
-    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų bazės Rathcoole, vakarų Dublinas. Tikslią kelionės kainą sužinosite prieš registraciją. Dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
+    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų bazės vakarų Dubline. Tikslią kelionės kainą sužinosite prieš registraciją. Dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
   },
   "Contact": {
     "eyebrow": "07 / Rezervacija",

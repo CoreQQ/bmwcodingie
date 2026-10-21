@@ -90,7 +90,7 @@ const LOCATIONS: LocationFacts[] = [
     towns: ['Bray', 'Greystones', 'Wicklow town', 'Arklow', 'Blessington'],
     inPerson: true,
     localLine:
-      'Bray, Greystones and Blessington are a short hop from our Rathcoole base, and we regularly come to the car anywhere in north Wicklow — Arklow and south Wicklow can choose a visit or remote.',
+      'Bray, Greystones and Blessington are a short hop from our west Dublin base, and we regularly come to the car anywhere in north Wicklow — Arklow and south Wicklow can choose a visit or remote.',
     nearby: ['bmw-coding-kildare', 'bmw-coding-wexford', 'bmw-coding-meath'],
   },
   {

@@ -72,9 +72,9 @@ ranking/CTR impact · **Medium** — worth fixing · **Low** — hygiene.
 PageSpeed's own lab run on the live site has not been repeated since these
 changes — see TEST-RESULTS.md.
 
-## Owner decisions needed
+## Owner decisions (answered 21 Oct 2026)
 
-1. **Coding "from" price:** homepage card says "BMW Coding — From €80"; the price calculator lists a single setting from €40 and a hidden-features session from €50. The Dublin coding page now says "priced per job — see the calculator" until you choose one figure.
-2. **FSC wording:** pages now say "apply the FSC activation code". If you obtain codes a specific way, tell me and the wording can say so precisely.
-3. **Louth** is marked as an in-person county; your stated area is Dublin, Kildare, Wicklow, Meath (+€1.25/km beyond Dublin). Confirm or switch Louth to remote.
-4. **"Base in Rathcoole"** appears in the call-out explanation (distance is measured from there) and in the Kildare/Wicklow copy. It is not presented as a place to visit; confirm you are happy to name the area.
+1. **Coding "from" price → minimum job €80.** Single settings keep their €40–60 prices but are combined into a job of at least €80 per visit or remote session (call-out on top). Calculator tops up to €80, coding and hidden-features pages say "from €80", the assistants and the price guide explain it. `MIN_JOB` in `src/lib/pricing.ts`.
+2. **FSC wording:** "apply the FSC activation code" stays (no change requested).
+3. **Louth → in person** (as published); added to the assistants' and the coding page's area list.
+4. **"Base in Rathcoole" → "base in west Dublin"** in the call-out FAQ (6 languages), calculator, Wicklow copy and both assistants.
