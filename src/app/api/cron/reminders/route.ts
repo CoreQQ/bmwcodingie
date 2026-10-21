@@ -4,8 +4,14 @@ import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
 import { buildAgenda } from '@/lib/agenda';
-import { sendWhatsAppText, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { sendWhatsAppText, sendWhatsAppTemplate, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { phoneKey } from '@/lib/crm';
+import { normalizePhone } from '@/lib/phone';
+
+// Utility template on the WhatsApp account (submitted 21 Oct 2026, id
+// 2125231011455361): "Hi {{1}}, a reminder that your BMW is booked in for
+// {{2}} at {{3}}. {{4}} If anything has changed, just reply here."
+const REMINDER_TEMPLATE = 'appointment_reminder';
 
 // Uses the shared "short & friendly" template so /review and the daily nudge
 // stay consistent.
@@ -143,12 +149,33 @@ export async function GET(req: Request) {
         `If anything changed, just reply here and we'll sort it.`;
 
       // WhatsApp only lets a business write freely within 24h of the
-      // customer's last message; outside it a reminder needs an approved
-      // template, so those go to Alex as a ready-to-paste text instead.
+      // customer's last message. Everyone else gets the approved
+      // appointment_reminder template; if that fails too (not approved yet,
+      // no payment method on the account) Alex gets a ready-to-paste text.
       const waId = recentWa.get(phoneKey(b.contact));
-      const sent = waId ? (await sendWhatsAppText(waId, msg)).ok : false;
-      if (sent && waId) {
-        await sb.from('wa_messages').insert({ msg_id: `reminder:${b.id}`, wa_id: waId, role: 'assistant', content: msg, via: 'ai' }).then(() => undefined, () => undefined);
+      let sent = false;
+      let sentTo = '';
+      let content = msg;
+      if (waId) {
+        sent = (await sendWhatsAppText(waId, msg)).ok;
+        sentTo = waId;
+      } else if (isWhatsAppConfigured()) {
+        const to = normalizePhone(b.contact)?.slice(1) ?? '';
+        if (to) {
+          const day = new Date(`${b.slot_date}T12:00:00Z`).toLocaleDateString('en-IE', {
+            timeZone: 'Europe/Dublin',
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+          });
+          const params = [first, `tomorrow, ${day}`, b.slot_time || 'the agreed time', whereLine(b.visit_type, b.visit_address)];
+          sent = (await sendWhatsAppTemplate(to, REMINDER_TEMPLATE, 'en', params)).ok;
+          sentTo = to;
+          content = `Hi ${params[0]}, a reminder that your BMW is booked in for ${params[1]} at ${params[2]}. ${params[3]} If anything has changed, just reply here.`;
+        }
+      }
+      if (sent && sentTo) {
+        await sb.from('wa_messages').insert({ msg_id: `reminder:${b.id}`, wa_id: sentTo, role: 'assistant', content, via: 'ai' }).then(() => undefined, () => undefined);
       }
       if (sent) {
         await sb.from('bookings').update({ reminded_at: new Date().toISOString() }).eq('id', b.id);
