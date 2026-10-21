@@ -4,8 +4,8 @@ No rankings are promised. Targets are actions and measurable signals.
 
 ## Days 0–30
 **Site (developer)**
-- [ ] Review and deploy this branch (owner says "deploy"), then request indexing in Search Console for `/`, `/projects`, the 10 P1/P2 service pages.
-- [ ] Fix the ServiceLanding hydration errors (#418/#423) — bisect the client islands; reduces client work on every service page.
+- [x] Review and deploy this branch (deployed 21 Oct). Next: request indexing in Search Console for `/`, `/projects`, the 10 P1/P2 service pages.
+- [x] Fix the ServiceLanding hydration errors (#418/#423) — fixed 21 Oct (footer LinkBlock).
 - [ ] Re-run PageSpeed Insights (mobile) on `/` and `/apple-carplay-activation-dublin`; record LCP/CLS in TEST-RESULTS.md.
 - [ ] Owner decisions from SEO-AUDIT.md (coding "from" price, FSC wording, Louth, "base in Rathcoole").
 

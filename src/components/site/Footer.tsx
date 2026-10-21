@@ -96,43 +96,55 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
 
         {/* SEO internal links — collapsible on phones, always open on md+ */}
         <LinkBlock title="BMW Coding Services" cols="sm:grid-cols-3 lg:grid-cols-4">
-          <li>
-            <Link href="/bmw-coding-price-calculator" className="text-bmw transition-colors hover:text-ink">
-              Price calculator
-            </Link>
-          </li>
-          {SERVICE_NAV.map((s) => (
-            <li key={s.slug}>
-              <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
-                {s.label}
-              </Link>
-            </li>
-          ))}
+          {() => (
+            <>
+              <li>
+                <Link href="/bmw-coding-price-calculator" className="text-bmw transition-colors hover:text-ink">
+                  Price calculator
+                </Link>
+              </li>
+              {SERVICE_NAV.map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </>
+          )}
         </LinkBlock>
 
         <LinkBlock title="BMW Coding by Area" cols="sm:grid-cols-3 lg:grid-cols-6">
-          <li>
-            <Link href="/bmw-coding-dublin" className="transition-colors hover:text-ink">
-              Dublin
-            </Link>
-          </li>
-          {LOCATION_NAV.map((s) => (
-            <li key={s.slug}>
-              <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
-                {s.label}
-              </Link>
-            </li>
-          ))}
+          {() => (
+            <>
+              <li>
+                <Link href="/bmw-coding-dublin" className="transition-colors hover:text-ink">
+                  Dublin
+                </Link>
+              </li>
+              {LOCATION_NAV.map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </>
+          )}
         </LinkBlock>
 
         <LinkBlock title="BMW Coding by Model" cols="sm:grid-cols-3 lg:grid-cols-4">
-          {CHASSIS_NAV.map((s) => (
-            <li key={s.slug}>
-              <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
-                {s.label}
-              </Link>
-            </li>
-          ))}
+          {() => (
+            <>
+              {CHASSIS_NAV.map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/${s.slug}`} className="transition-colors hover:text-ink">
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </>
+          )}
         </LinkBlock>
 
         {/* Plain links to each language homepage — the header switcher is a
@@ -173,14 +185,17 @@ function LinkBlock({
 }: {
   title: string;
   cols: string;
-  children: React.ReactNode;
+  /** Called once per layout: the same element objects rendered in two
+   *  places broke hydration on every service page (React #418/#423) and
+   *  crashed the dev server ("reading 'is'"). */
+  children: () => React.ReactNode;
 }) {
   return (
     <div className="border-t border-white/8">
       {/* md+: always visible */}
       <div className="hidden py-8 md:block">
         <h3 className="label mb-4">{title}</h3>
-        <ul className={`grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted ${cols}`}>{children}</ul>
+        <ul className={`grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted ${cols}`}>{children()}</ul>
       </div>
       {/* phones: collapsible */}
       <details className="group py-4 md:hidden">
@@ -188,7 +203,7 @@ function LinkBlock({
           {title}
           <span className="text-faint transition-transform duration-200 group-open:rotate-45">+</span>
         </summary>
-        <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 pb-3 pt-2 text-sm text-muted">{children}</ul>
+        <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 pb-3 pt-2 text-sm text-muted">{children()}</ul>
       </details>
     </div>
   );

@@ -173,19 +173,15 @@ AutoRepair (+AggregateRating only when real reviews exist) + Service/FAQ/
 Breadcrumb per page. `llms.txt` + `/rss.xml` + daily IndexNow ping (key file
 `public/f8a4….txt`). Never add `noindex`, never fabricate reviews.
 
-## Known issue (cosmetic, documented July 2026)
+## Fixed: landing-page hydration errors (July → 21 Oct 2026)
 
-Landing pages rendered by `ServiceLanding` (service/county/chassis pages) log
-recoverable React hydration errors (8×#418 + 1×#423) in the browser console on
-production builds. **No user-visible impact**: React falls back to client
-rendering, the page looks and works correctly, and crawlers read the complete
-SSR HTML (SEO unaffected). Homepage and blog are clean; dev mode doesn't
-reproduce. Repro: `npm run build && npx next start`, open /bmw-f30-coding,
-watch console. Investigated: not width-dependent, not the translate-guard
-(predates it), text content SSR≈hydrated (only structural/attr level).
-Next step if ever needed: build with unminified React errors
-(NEXT_PRIVATE_DEBUG or patched react-dom) to get the exact node, or bisect by
-stubbing ServiceLanding islands (Header/MobileActionBar) one at a time.
+`ServiceLanding` pages logged 8×#418 + 1×#423 on every production load, and the
+dev server 500'd on them with "Cannot read properties of null (reading 'is')".
+Cause: the footer's `LinkBlock` rendered the same `children` element objects
+twice (desktop grid + phone `<details>`), which Next 14's RSC payload
+de-duplication cannot hydrate. Fix: `children` is a function called once per
+copy. **Rule: never render one JSX element object in two places** — build it
+with a function (see `ctaRow()` in ServiceLanding).
 
 ## The one rule
 

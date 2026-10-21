@@ -41,7 +41,7 @@ const HONEST_NOTE =
 export const SERVICE_PAGES: Record<string, ServicePage> = {
   'bmw-coding-dublin': {
     slug: 'bmw-coding-dublin',
-    price: { amount: 80, text: 'From €80 per visit or remote session (the minimum job) — settings from €40 each, combined; exact price from your VIN' },
+    price: { amount: 80, text: 'From €80 per visit or session · single settings from €40, combined' },
     metaTitle: 'BMW Coding Dublin | Mobile Service, Pay on Completion',
     metaDescription:
       'BMW coding in Dublin at your home or workplace: hidden features, comfort and lighting coding, iDrive tweaks and ISTA checks for F and G series. Reversible.',

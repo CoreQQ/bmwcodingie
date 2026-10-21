@@ -90,7 +90,10 @@ export async function ServiceLanding({
     ],
   };
 
-  const ctaRow = (
+  // A function, not a shared element: rendering one JSX object in two places
+  // trips React's server-payload de-duplication in Next 14 — dev crashed with
+  // "reading 'is'" and production logged 8×#418 + #423 on every landing page.
+  const ctaRow = () => (
     <div className="mt-8 flex flex-wrap items-center gap-4">
       <Link href="/#contact" className="btn-primary">
         Book BMW Coding
@@ -138,7 +141,7 @@ export async function ServiceLanding({
                 {p.price.text}
               </p>
             )}
-            {ctaRow}
+            {ctaRow()}
             <p className="mt-6 flex items-center gap-2 text-sm text-faint">
               <MapPin size={15} className="text-[color:var(--page-accent)]" /> In person across Dublin, Kildare, Wicklow &amp; Meath · remote across Ireland
             </p>
@@ -254,7 +257,7 @@ export async function ServiceLanding({
                 </div>
               ))}
             </div>
-            {ctaRow}
+            {ctaRow()}
           </div>
         </section>
 
