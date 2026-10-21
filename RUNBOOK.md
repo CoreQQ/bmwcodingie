@@ -164,7 +164,11 @@ all 6 locales (fully translated, self-canonical + hreflang) and every other
 page in English only — their /ru,/pl… copies are English bodies that canonical
 to the English URL, so they carry no hreflang and are not in the sitemap
 (Search Console flagged 295 of them as "alternate with canonical" in Oct 2026).
-`/image-sitemap.xml` (gallery) — both in robots.txt. JSON-LD: WebSite +
+`/image-sitemap.xml` (gallery) — both in robots.txt.
+Titles/descriptions go through `src/lib/seoText.ts` (≤62 / ≤158 chars, brand
+only when it fits) — use it for any new page. `/projects` lists real gallery
+photos with their captions (`src/lib/projectLinks.ts` links each to its
+service/model pages). Full audit, keyword map and roadmap: `docs/seo/`. JSON-LD: WebSite +
 AutoRepair (+AggregateRating only when real reviews exist) + Service/FAQ/
 Breadcrumb per page. `llms.txt` + `/rss.xml` + daily IndexNow ping (key file
 `public/f8a4….txt`). Never add `noindex`, never fabricate reviews.

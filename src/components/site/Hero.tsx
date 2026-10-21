@@ -1,5 +1,6 @@
 import { Check, MessageCircle, ScanSearch } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
+import { Link } from '@/i18n/navigation';
 import type { SiteSettings } from '@/lib/types';
 import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
 
@@ -23,6 +24,8 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
 
           <h1 className="font-display text-[clamp(2.1rem,7.4vw,4.4rem)]">
             <span className="block">{t('title1')}</span>
+            {/* Read as one heading ("BMW Coding Ireland — CarPlay, …") by crawlers and screen readers. */}
+            <span className="sr-only"> — </span>
             <span className="block text-[#9cc7ff]">{t('title2')}</span>
           </h1>
 
@@ -45,6 +48,15 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
               <MessageCircle size={16} /> {t('ctaWhatsapp')}
             </a>
           </div>
+
+          {/* Quiet secondary paths for people not ready to message yet. */}
+          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+            <a href="#contact" className="underline-offset-4 hover:text-ink hover:underline">{t('quoteLink')}</a>
+            <span aria-hidden="true">·</span>
+            <a href="#services" className="underline-offset-4 hover:text-ink hover:underline">{t('servicesLink')}</a>
+            <span aria-hidden="true">·</span>
+            <Link href="/projects" className="underline-offset-4 hover:text-ink hover:underline">{t('projectsLink')}</Link>
+          </p>
 
           <ul className="mt-8 grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap">
             {benefits.map((b) => (

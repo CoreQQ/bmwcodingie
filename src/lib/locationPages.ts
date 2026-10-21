@@ -90,7 +90,7 @@ const LOCATIONS: LocationFacts[] = [
     towns: ['Bray', 'Greystones', 'Wicklow town', 'Arklow', 'Blessington'],
     inPerson: true,
     localLine:
-      'Bray, Greystones and Blessington are a short hop from our Rathcoole base, and we regularly come to the car anywhere in north Wicklow — Arklow and south Wicklow can choose a visit or remote.',
+      'Bray, Greystones and Blessington are a short hop from our west Dublin base, and we regularly come to the car anywhere in north Wicklow — Arklow and south Wicklow can choose a visit or remote.',
     nearby: ['bmw-coding-kildare', 'bmw-coding-wexford', 'bmw-coding-meath'],
   },
   {
@@ -174,7 +174,7 @@ function buildLocationPage(f: LocationFacts): ServicePage {
     models: [
       'F-Series: F20, F30, F31, F32, F36, F10, F80, F82 and related chassis',
       'G-Series: G20, G30, G31, G01, G05 and other current platforms',
-      'Head units: NBT, NBT Evo and MGU (iDrive 6, 7 and 8)',
+      'Head units: NBT (iDrive 4), NBT Evo (iDrive 5/6) and MGU (iDrive 7/8) — CarPlay needs NBT Evo or newer',
       'Tooling: ISTA / Rheingold, E-Sys with PSdZData and ENET / OBD',
     ],
     process: f.inPerson

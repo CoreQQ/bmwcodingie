@@ -62,7 +62,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
   'bmw-fullscreen-carplay': {
     slug: 'bmw-fullscreen-carplay',
     galleryMatch: ['fullscreen','carplay'],
-    metaTitle: 'BMW Fullscreen CarPlay | Use the Whole Widescreen — Dublin & Ireland',
+    metaTitle: 'BMW Fullscreen CarPlay | Widescreen NBT Evo Ireland',
     metaDescription:
       'BMW fullscreen CarPlay on widescreen NBT Evo displays: CarPlay across the full 10.25" screen instead of a window. Compatibility checked from your VIN. Dublin & remote.',
     serviceName: 'BMW Fullscreen CarPlay',
@@ -112,7 +112,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
   'bmw-id4-to-id6-upgrade': {
     slug: 'bmw-id4-to-id6-upgrade',
     galleryMatch: ['id6','id4','idrive update'],
-    metaTitle: 'BMW iDrive ID4 to ID6 Upgrade | NBT Evo Software Update — Ireland',
+    metaTitle: 'BMW ID4 to ID6 Upgrade Ireland | NBT Evo, €50',
     metaDescription:
       'Update an NBT Evo BMW from ID4 or ID5 to the ID6 interface: the newer tile menu and the software level CarPlay needs. €50, usually done with CarPlay. Dublin & remote.',
     serviceName: 'BMW iDrive ID4 to ID6 Upgrade',
@@ -164,7 +164,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
   'bmw-6wa-to-6wb-retrofit': {
     slug: 'bmw-6wa-to-6wb-retrofit',
     galleryMatch: ['6wb','cluster'],
-    metaTitle: 'BMW 6WA to 6WB Retrofit | Digital Instrument Cluster — Dublin',
+    metaTitle: 'BMW 6WB Digital Cluster Retrofit Ireland | 6WA → 6WB',
     metaDescription:
       'BMW 6WA to 6WB retrofit in Dublin: replace the analogue dials with the full digital instrument cluster, coded to your car. Mobile visit. Quoted after VIN check.',
     serviceName: 'BMW 6WA to 6WB Retrofit',
@@ -216,7 +216,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
   'bmw-idrive-upgrade-ireland': {
     slug: 'bmw-idrive-upgrade-ireland',
     galleryMatch: ['id6','idrive','screen upgrade','carplay'],
-    metaTitle: 'BMW iDrive Upgrade Ireland | What Your iDrive Can Become',
+    metaTitle: 'BMW iDrive Upgrade Ireland | ID6, CarPlay & Maps',
     metaDescription:
       'BMW iDrive upgrades across Ireland by system: CIC, NBT, NBT Evo, iDrive 7 and 8. Software updates, CarPlay, maps and what really needs new hardware. Checked from your VIN.',
     serviceName: 'BMW iDrive Upgrade Ireland',

@@ -108,6 +108,7 @@ export function Header() {
             <nav
               className={`border-t border-white/5 bg-graphite-900/95 px-5 pb-6 pt-2 backdrop-blur-xl transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0'}`}
               aria-hidden={!open}
+              {...((!open ? { inert: '' } : {}) as object)}
             >
               {NAV.map((n) => (
                 <NavItem

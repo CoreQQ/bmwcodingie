@@ -53,7 +53,7 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
           </div>
 
           <div className="col-span-6 md:col-span-3">
-            <h4 className="label mb-4">{t('contactHeading')}</h4>
+            <h2 className="label mb-4">{t('contactHeading')}</h2>
             <ul className="space-y-2 text-sm text-muted">
               <li>
                 <a href={`tel:${settings.phone.replace(/\s+/g, '')}`} className="hover:text-ink">
@@ -74,7 +74,7 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
           </div>
 
           <div className="col-span-6 md:col-span-2">
-            <h4 className="label mb-4">{t('hoursHeading')}</h4>
+            <h2 className="label mb-4">{t('hoursHeading')}</h2>
             <ul className="space-y-2 text-sm text-muted">
               <li>{t('hours1')}</li>
               <li>{t('hours2')}</li>
@@ -83,13 +83,13 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
           </div>
 
           <div className="col-span-12 md:col-span-2">
-            <h4 className="label mb-4">{t('navigateHeading')}</h4>
+            <h2 className="label mb-4">{t('navigateHeading')}</h2>
             <ul className="space-y-2 text-sm text-muted">
-              <li><a href="#services" className="hover:text-ink">{t('navServices')}</a></li>
+              <li><a href="/#services" className="hover:text-ink">{t('navServices')}</a></li>
               <li><a href="/find-us" className="hover:text-ink">{t('navHowItWorks')}</a></li>
-              <li><a href="#work" className="hover:text-ink">{t('navWork')}</a></li>
-              <li><a href="#about" className="hover:text-ink">{t('navAbout')}</a></li>
-              <li><a href="#contact" className="hover:text-ink">{t('navBook')}</a></li>
+              <li><a href="/#work" className="hover:text-ink">{t('navWork')}</a></li>
+              <li><a href="/#about" className="hover:text-ink">{t('navAbout')}</a></li>
+              <li><a href="/#contact" className="hover:text-ink">{t('navBook')}</a></li>
             </ul>
           </div>
         </div>
@@ -135,6 +135,22 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
           ))}
         </LinkBlock>
 
+        {/* Plain links to each language homepage — the header switcher is a
+            control, so crawlers could not follow it to /ru, /pl… */}
+        <nav aria-label="Languages" className="flex flex-wrap gap-x-4 gap-y-1 border-t border-white/8 pt-6 text-xs text-faint">
+          {[
+            ['/', 'English'],
+            ['/ru', 'Русский'],
+            ['/uk', 'Українська'],
+            ['/pl', 'Polski'],
+            ['/lt', 'Lietuvių'],
+            ['/ro', 'Română'],
+          ].map(([href, label]) => (
+            <a key={href} href={href} hrefLang={href === '/' ? 'en' : href.slice(1)} className="hover:text-ink">
+              {label}
+            </a>
+          ))}
+        </nav>
         <div className="flex flex-col items-start justify-between gap-3 border-t border-white/8 py-6 text-xs text-faint md:flex-row md:items-center">
           <span>{t('copyright', { year })}</span>
           <span className="font-mono">{t('trademark')}</span>

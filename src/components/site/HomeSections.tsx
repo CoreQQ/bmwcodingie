@@ -48,6 +48,8 @@ export async function PopularServices({ whatsapp }: { whatsapp: string }) {
                 <div className="mt-5 grid grid-cols-2 gap-2">
                   <Link href={s.href} className="btn-ghost justify-center text-[11px]">
                     {t('moreInfo')}
+                    {/* "More info" ×6 is meaningless out of context (screen readers, link lists, search engines). */}
+                    <span className="sr-only"> — {t(`${s.key}Title`)}</span>
                   </Link>
                   <a
                     href={waHref(whatsapp, waMessageFor(s.wa))}
@@ -64,7 +66,7 @@ export async function PopularServices({ whatsapp }: { whatsapp: string }) {
         </div>
         <p className="mt-6 text-sm text-muted">
           {t('allPrices')}{' '}
-          <Link href="/bmw-coding-price-calculator" className="text-bmw hover:underline">
+          <Link href="/bmw-coding-price-calculator" className="text-bmw underline underline-offset-2 hover:text-ink">
             {t('calculator')} →
           </Link>
         </p>

@@ -7,6 +7,7 @@ import {
   CALL_OUT,
   HEAD_UNITS,
   isFromUnit,
+  MIN_JOB,
   PRICE_ITEMS,
   isBundledOut,
   type HeadUnit,
@@ -56,6 +57,12 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
       if (!addOns.includes(a.id)) continue;
       lines.push({ label: a.label, amount: a.price });
       total += a.price;
+    }
+    // One €40 setting on its own is not a job: the work comes to at least the
+    // minimum, and the line says so — adding another setting costs nothing extra.
+    if (total > 0 && total < MIN_JOB) {
+      lines.push({ label: `Minimum job is €${MIN_JOB} — add another setting at no extra cost`, amount: MIN_JOB - total });
+      total = MIN_JOB;
     }
     if (mobile) {
       lines.push({ label: 'Call-out around Dublin', amount: CALL_OUT.base });
@@ -184,7 +191,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-ink">Come to my car (around Dublin)</span>
                 <span className="mt-0.5 block text-[11px] text-faint">
-                  Outside Dublin it is €{CALL_OUT.perKm.toFixed(2)}/km from our base in Rathcoole
+                  Outside Dublin it is €{CALL_OUT.perKm.toFixed(2)}/km from our base in west Dublin
                 </span>
               </span>
               <span className="shrink-0 font-mono text-xs text-muted">+€{CALL_OUT.base}</span>
@@ -212,7 +219,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                 <li key={i} className="flex items-baseline justify-between gap-3 text-sm">
                   <span className="text-muted">{l.label}</span>
                   <span className="shrink-0 font-mono text-xs text-ink">
-                    {l.amount === null ? 'n/a' : l.bundled ? 'included' : `€${l.amount}`}
+                    {l.amount === null ? 'n/a' : l.bundled ? 'included' : l.label.startsWith('Minimum job') ? `+€${l.amount}` : `€${l.amount}`}
                   </span>
                 </li>
               ))}

@@ -14,7 +14,7 @@ import { CHASSIS_NAV } from '@/lib/chassisPages';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const SLUG = 'bmw-coding-ireland';
 
-const META_TITLE = 'BMW Coding Ireland | Every County & Model — CarPlay, Hidden Features';
+const META_TITLE = 'BMW Coding Across Ireland | Every County & Model';
 const META_DESC =
   'BMW coding across Ireland — in person around Dublin, Kildare, Wicklow and Meath, and remote over ENET nationwide. Browse every county we cover and every BMW model we code.';
 

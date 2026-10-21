@@ -5,7 +5,8 @@ import type { ServicePage } from './servicePages';
 export const EXTRA_LANDINGS: Record<string, ServicePage> = {
   'bmw-hidden-features': {
     slug: 'bmw-hidden-features',
-    metaTitle: "BMW Hidden Features Coding Dublin | Enable What's Already in Your Car",
+    price: { amount: 80, text: 'From €80 per session (the minimum job) · settings from €40 each, combined into one bundle' },
+    metaTitle: 'BMW Hidden Features Coding Dublin | From €80',
     metaDescription: 'Enable BMW hidden features in Dublin or remotely across Ireland: Video in Motion, digital speed, folding mirrors, welcome lights and more. Reversible, pay on completion.',
     serviceName: 'BMW Hidden Features Coding',
     eyebrow: 'Coding · All F & G series',
@@ -53,7 +54,8 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
   },
   'bmw-reverse-camera-retrofit': {
     slug: 'bmw-reverse-camera-retrofit',
-    metaTitle: 'BMW Reverse Camera Retrofit Dublin | Factory-Style, Coded into iDrive',
+    price: { text: 'Quoted per car after a VIN check (camera, wiring and coding)' },
+    metaTitle: 'BMW Reverse Camera Retrofit Dublin | OEM-Style',
     metaDescription: 'Factory-style BMW reverse camera retrofits in Dublin: OEM camera, proper wiring and iDrive coding with guidance lines. F and G series. See it working, pay on completion.',
     serviceName: 'BMW Reverse Camera Retrofit',
     eyebrow: 'Retrofit · Dublin & Ireland',
@@ -99,7 +101,8 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
   },
   'bmw-cruise-control-retrofit': {
     slug: 'bmw-cruise-control-retrofit',
-    metaTitle: 'BMW Cruise Control Retrofit & Activation Dublin | Coding or Parts',
+    price: { text: 'Quoted per car — coding only, or genuine parts plus coding' },
+    metaTitle: 'BMW Cruise Control Retrofit Dublin | Coding or Parts',
     metaDescription: 'Cruise control for your BMW: free VIN check tells you if coding alone enables it or which genuine parts are needed. Mobile visit around Dublin or remote coding across Ireland.',
     serviceName: 'BMW Cruise Control Retrofit',
     eyebrow: 'Retrofit · Dublin & Ireland',

@@ -41,9 +41,10 @@ const HONEST_NOTE =
 export const SERVICE_PAGES: Record<string, ServicePage> = {
   'bmw-coding-dublin': {
     slug: 'bmw-coding-dublin',
-    metaTitle: 'BMW Coding Dublin | Mobile Service, From €80, Pay on Completion',
+    price: { amount: 80, text: 'From €80 per visit or remote session (the minimum job) — settings from €40 each, combined; exact price from your VIN' },
+    metaTitle: 'BMW Coding Dublin | Mobile Service, Pay on Completion',
     metaDescription:
-      'BMW coding in Dublin for F-Series and G-Series models. Hidden features, iDrive coding, comfort functions, ISTA diagnostics and retrofits. In-person and remote options.',
+      'BMW coding in Dublin at your home or workplace: hidden features, comfort and lighting coding, iDrive tweaks and ISTA checks for F and G series. Reversible.',
     serviceName: 'BMW Coding',
     eyebrow: 'BMW Coding · Dublin & Ireland',
     h1: 'BMW Coding Dublin — Hidden Features, iDrive Coding & Retrofits',
@@ -51,7 +52,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       'Independent BMW coding in Dublin for F-Series and G-Series cars. We enable hidden features, fine-tune iDrive and comfort functions, and back it with ISTA diagnostics — in person around Dublin or remotely across Ireland where supported.',
     intro: [
       'BMW coding changes software parameters that already live inside your car. Instead of swapping parts, we adjust how the existing control units behave — enabling features that are dormant from the factory, tidying up convenience functions, and tailoring the car to how you actually drive it. Everything we change is reversible, and we can return any setting to factory before a dealer visit.',
-      'BMW Coding is an independent BMW coding specialist based in Dublin. Most work is done in person across Dublin, Kildare, Wicklow and Meath, and remote BMW coding is available across Ireland when your car and connection support it. You pay on completion, once the feature has been shown working on your car.',
+      'BMW Coding is an independent BMW coding specialist based in Dublin. Most work is done in person across Dublin, Kildare, Wicklow, Meath and Louth, and remote BMW coding is available across Ireland when your car and connection support it. You pay on completion, once the feature has been shown working on your car.',
     ],
     includedHeading: 'What BMW coding can enable',
     included: [
@@ -67,7 +68,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     models: [
       'F-Series: F20, F21, F30, F31, F32, F36, F10, F11, F80, F82 and related chassis',
       'G-Series: G20, G30, G31, G01, G05 and other current platforms',
-      'Head units: NBT, NBT Evo and MGU (iDrive 6, 7 and 8)',
+      'Head units: NBT (iDrive 4), NBT Evo (iDrive 5/6) and MGU (iDrive 7/8) — CarPlay needs NBT Evo or newer',
       'Tooling: ISTA / Rheingold, E-Sys with PSdZData, BimmerCode and ENET / OBD',
     ],
     process: [
@@ -77,7 +78,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Pay on completion', body: 'You see the result before you pay. Card or cash, no dealer queue and no upfront deposit.' },
     ],
     faqs: [
-      { q: 'Which BMW models do you code?', a: 'F-Series and G-Series cars with NBT, NBT Evo and MGU head units (iDrive 6/7/8). Send your model, year and VIN-derived build and we will confirm exactly what is possible on your car.' },
+      { q: 'Which BMW models do you code?', a: 'F-Series and G-Series cars with NBT, NBT Evo and MGU head units (iDrive 4 to 8). Send your model, year and VIN-derived build and we will confirm exactly what is possible on your car.' },
       { q: 'Will coding affect my BMW warranty?', a: 'Coding adjusts software values that already exist in the car and is reversible. We can return any setting to factory before a dealer visit, and we will tell you up front if a request is likely to be flagged.' },
       { q: 'Can BMW coding be done remotely?', a: 'Yes, for many functions. You connect a laptop with an ENET cable to the OBD port and we code over the connection. Some coding and all hardware retrofits need to be done in person.' },
       { q: 'How long does BMW coding take?', a: 'Most coding sessions take from thirty minutes to a couple of hours depending on how many features are involved and whether diagnostics are needed first.' },
@@ -93,15 +94,16 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'apple-carplay-activation-dublin': {
     slug: 'apple-carplay-activation-dublin',
+    price: { amount: 150, text: '€150 on NBT Evo · €220 on iDrive 7 (MGU) · one-off, no subscription' },
     galleryMatch: ['carplay'],
-    metaTitle: 'BMW Apple CarPlay Activation Dublin | Wireless CarPlay Coding',
+    metaTitle: 'BMW Apple CarPlay Activation Dublin | From €150',
     metaDescription:
-      'Activate BMW Apple CarPlay in Dublin. Wireless CarPlay, NBT Evo, MGU and supported iDrive systems. Remote and in-person activation available.',
+      'Apple CarPlay activation in Dublin — we come to your car. €150 on NBT Evo, €220 on iDrive 7, one-off with no subscription. Compatibility checked from your VIN.',
     serviceName: 'BMW Apple CarPlay Activation',
     eyebrow: 'Apple CarPlay · Dublin & Ireland',
     h1: 'BMW Apple CarPlay Activation Dublin — Wireless CarPlay Coding',
     heroSub:
-      'Full Apple CarPlay activation for supported BMWs in Dublin and across Ireland. Wired or wireless CarPlay enabled on NBT, NBT Evo and MGU head units, in person or remotely over ENET.',
+      'Full Apple CarPlay activation for supported BMWs in Dublin and across Ireland — on NBT Evo (iDrive 5/6) and MGU (iDrive 7) head units, wired or wireless where the build supports it, at your car or remotely over ENET.',
     intro: [
       'Many BMWs already have the hardware for Apple CarPlay but ship with it locked or trial-limited. We enable full, unrestricted CarPlay through coding — no subscription, no annual fee — so your iPhone connects every time you get in the car. On most NBT Evo and MGU systems this includes wireless CarPlay, with wired activation on systems that support it.',
       'Activation is available in person around Dublin and the surrounding counties, or remotely across Ireland when your car and connection allow it. We confirm your head unit and software version first so you know exactly what your car will get before booking.',
@@ -119,7 +121,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     models: [
       'NBT Evo (ID5/ID6) — wired and wireless CarPlay on most builds',
       'MGU (iDrive 7/8) — wireless CarPlay; Android Auto on supported builds',
-      'NBT — assessed per car; CarPlay support depends on build and hardware',
+      'NBT (iDrive 4, non-Evo) and CIC — no native CarPlay by coding; it needs a different head unit, so we tell you before you book',
       'Common platforms: F30, F31, F32, F36, F10, G20, G30, G01, G05 and related',
     ],
     process: [
@@ -146,10 +148,11 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-android-auto-activation': {
     slug: 'bmw-android-auto-activation',
+    price: { amount: 200, text: '€200 on iDrive 7 (MGU) · iDrive 8.5 from €400 · iDrive 8 per car · not on NBT Evo' },
     galleryMatch: ['android'],
-    metaTitle: 'BMW Android Auto Activation Ireland | iDrive 7 & MGU Coding',
+    metaTitle: 'BMW Android Auto Activation Ireland | iDrive 7 From €200',
     metaDescription:
-      'BMW Android Auto activation for supported iDrive systems. Available in Dublin and remotely across Ireland where compatible.',
+      'BMW Android Auto activation for iDrive 7 (MGU) cars: €200, iDrive 8.5 from €400, iDrive 8 priced per car. Not possible on NBT Evo. Mobile in Dublin or remote.',
     serviceName: 'BMW Android Auto Activation',
     eyebrow: 'Android Auto · Dublin & Ireland',
     h1: 'BMW Android Auto Activation Ireland — iDrive 7 & MGU Coding',
@@ -197,10 +200,11 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-diagnostics-dublin': {
     slug: 'bmw-diagnostics-dublin',
+    price: { amount: 80, text: 'Full ISTA scan with written summary — from €80' },
     galleryMatch: ['diagnos','ista'],
-    metaTitle: 'BMW Diagnostics Dublin | ISTA Fault Scan & Coding Checks',
+    metaTitle: 'BMW Diagnostics Dublin | ISTA Fault Scan From €80',
     metaDescription:
-      'BMW diagnostics in Dublin using ISTA. Fault scan, control unit check, coding issues, warning lights and written summary of findings.',
+      'Full ISTA diagnostics for BMW in Dublin: every module scanned, faults explained in plain English and a written summary. From €80, at your car or remote.',
     serviceName: 'BMW Diagnostics',
     eyebrow: 'Diagnostics · Dublin & Ireland',
     h1: 'BMW Diagnostics Dublin — ISTA Fault Scan & Coding Checks',
@@ -249,10 +253,11 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-retrofits-dublin': {
     slug: 'bmw-retrofits-dublin',
+    price: { text: 'Quoted per car after a VIN check — ambient lighting from €400 labour plus parts' },
     galleryMatch: ['6wb','cluster','screen upgrade','retrofit'],
-    metaTitle: 'BMW Retrofits Dublin | Ambient Lighting, Cruise Control & Comfort Features',
+    metaTitle: 'BMW Retrofits Dublin | Camera, Cruise, Ambient & More',
     metaDescription:
-      'BMW retrofit services in Dublin including ambient lighting, cruise control, folding mirrors, Comfort Access and coding support for F and G Series models.',
+      'BMW retrofits in Dublin: reverse camera, cruise control, ambient lighting, 6WB digital cluster and more — fitted and coded so they work like factory options.',
     serviceName: 'BMW Retrofits',
     eyebrow: 'Retrofits · Dublin & Ireland',
     h1: 'BMW Retrofits Dublin — Ambient Lighting, Cruise Control & Comfort Features',
@@ -296,29 +301,32 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { slug: 'apple-carplay-activation-dublin', label: 'Apple CarPlay activation' },
       { slug: 'bmw-6wa-to-6wb-retrofit', label: '6WA → 6WB digital cluster' },
       { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6 update' },
+      { slug: 'bmw-reverse-camera-retrofit', label: 'reverse camera retrofit' },
+      { slug: 'bmw-cruise-control-retrofit', label: 'cruise control retrofit' },
     ],
     waMessage: 'Hi — I’d like a BMW retrofit in Dublin. My car is a ',
   },
 
   'japan-import-bmw-conversion-ireland': {
     slug: 'japan-import-bmw-conversion-ireland',
+    price: { amount: 250, text: '€250 on NBT Evo · €280 on iDrive 7 (MGU) · Apple CarPlay included' },
     galleryMatch: ['japan'],
-    metaTitle: 'Japanese Import BMW Conversion Ireland | Japan → EU Radio, Nav & CarPlay',
+    metaTitle: 'BMW Japan to EU Conversion Ireland | Japanese Imports',
     metaDescription:
-      'BMW Japan to EU conversion in Ireland. Region change, navigation FSC, map updates, ETC mirror and TCB checks for Japanese import BMW models.',
+      'Japanese import BMW conversion in Ireland: EU radio bands, English, EU navigation and maps. €250 on NBT Evo, €280 on iDrive 7 — Apple CarPlay included.',
     serviceName: 'Japan to EU BMW Conversion',
     eyebrow: 'Japan Import · Dublin & Ireland',
     h1: 'Japan Import BMW Conversion Ireland — Region Change & Map Updates',
     heroSub:
       'Full Japan-to-EU conversion for imported BMWs in Ireland. Region change, navigation FSC and European maps, ETC mirror handling and TCB checks so a JDM import works properly here.',
     intro: [
-      'A Japanese import BMW is built for the JDM market — its navigation, radio bands, language and some convenience modules are set up for Japan, not Ireland. Converting it is a regular job for us: we change the region so the car runs as a European model, generate the navigation FSC and load European maps, and address the details that catch imports out, like the ETC mirror module and TCB considerations.',
+      'A Japanese import BMW is built for the JDM market — its navigation, radio bands, language and some convenience modules are set up for Japan, not Ireland. Converting it is a regular job for us: we change the region so the car runs as a European model, apply the navigation FSC activation code and load European maps, and address the details that catch imports out, like the ETC mirror module and TCB considerations.',
       'The work is available in Ireland, in person around Dublin and the surrounding counties. Because every import is slightly different, we confirm exactly what your specific car needs first — JDM specs vary by year and build, and an honest scope up front saves time and cost.',
     ],
     includedHeading: 'What a Japan to EU conversion covers',
     included: [
       'Region change so the car runs as a European-spec model',
-      'Navigation FSC generation and European map installation',
+      'Navigation FSC activation and European map installation',
       'Radio band and language set-up for Ireland and the EU',
       'ETC mirror module handling common on JDM imports',
       'TCB and telematics considerations checked and addressed',
@@ -333,15 +341,15 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     ],
     process: [
       { title: 'Send import details', body: 'Give us the model, year and VIN-derived build. We confirm what your JDM import needs and quote the conversion before starting.' },
-      { title: 'Convert the car', body: 'We change the region, generate the FSC, load EU maps and address the import-specific modules around Dublin.' },
+      { title: 'Convert the car', body: 'We change the region, apply the FSC activation, load EU maps and address the import-specific modules around Dublin.' },
       { title: 'Verify and scan', body: 'We confirm navigation, radio and convenience features work, and run a diagnostic scan to check the car is clean.' },
       { title: 'Pay on completion', body: 'Conversions are €250 on NBT Evo and €280 on MGU with CarPlay activation included on both, agreed up front and paid once the work is shown done.' },
     ],
     faqs: [
       { q: 'Can you code Japanese import BMWs for Ireland?', a: 'Yes. Japan to EU conversion is a regular job — region change, navigation FSC, European maps, ETC mirror handling and TCB checks. Send the details and we will tell you exactly what your car needs.' },
-      { q: 'Will the navigation work with European maps?', a: 'On compatible systems we generate the navigation FSC and install European maps so the navigation works here. We confirm your head unit supports it before booking.' },
+      { q: 'Will the navigation work with European maps?', a: 'On compatible systems we apply the navigation FSC activation code and install European maps so the navigation works here. We confirm your head unit supports it before booking.' },
       { q: 'What is the ETC mirror issue on imports?', a: 'Japanese imports often have an ETC toll module tied to the mirror that can cause faults here. We handle it as part of a proper conversion.' },
-      { q: 'How long does a conversion take?', a: 'Most conversions are completed in a single in-person session, though map installation and FSC generation can add time depending on the system.' },
+      { q: 'How long does a conversion take?', a: 'Most conversions are completed in a single in-person session, though map installation and FSC activation can add time depending on the system.' },
     ],
     related: [
       { slug: 'bmw-map-updates-fsc-codes', label: 'BMW map updates and FSC codes' },
@@ -354,23 +362,24 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-map-updates-fsc-codes': {
     slug: 'bmw-map-updates-fsc-codes',
+    price: { text: 'Quoted per car after a VIN check — depends on the system and map region' },
     galleryMatch: ['map'],
-    metaTitle: 'BMW Map Updates & FSC Codes Ireland | Navigation Activation',
+    metaTitle: 'BMW Navigation Map Update Ireland | Maps & FSC Codes',
     metaDescription:
-      'BMW navigation map updates and FSC codes in Ireland. Activation and map support for compatible NBT, NBT Evo and MGU systems.',
+      'BMW navigation map updates and FSC activation codes in Ireland for NBT, NBT Evo and iDrive 7. We confirm what your system needs from the VIN first.',
     serviceName: 'BMW Map Updates & FSC Codes',
     eyebrow: 'Map Updates · Dublin & Ireland',
     h1: 'BMW Map Updates & FSC Codes Ireland — Navigation Activation',
     heroSub:
-      'BMW navigation map updates and FSC code generation in Ireland. Bring your maps up to date and activate navigation on compatible NBT, NBT Evo and MGU systems.',
+      'BMW navigation map updates and FSC activation codes in Ireland. Bring your maps up to date and activate navigation on compatible NBT, NBT Evo and MGU systems.',
     intro: [
-      'BMW navigation runs on map data that needs periodic updating, and each update is authorised by an FSC (Freischaltcode) tied to your car. We update the maps on compatible systems and generate the FSC so the navigation accepts them — handy after an import, after a head-unit change, or simply when your maps are years out of date.',
+      'BMW navigation runs on map data that needs periodic updating, and each update is authorised by an FSC (Freischaltcode) tied to your car. We update the maps on compatible systems and apply the matching FSC activation code so the navigation accepts them — handy after an import, after a head-unit change, or simply when your maps are years out of date.',
       'Map and FSC work is available in Ireland, in person around Dublin and, on some systems, remotely. Compatibility depends on your head unit and current software, so we confirm what your car supports before booking and tell you honestly if an update is not worthwhile on your system.',
     ],
     includedHeading: 'What map and FSC work covers',
     included: [
       'Latest compatible European map data installed',
-      'Navigation FSC generation and activation',
+      'Navigation FSC activation for the new map data',
       'Navigation enabled after an import or head-unit change',
       'A check that the navigation reads and runs the new maps',
       'Advice on what your specific system can and cannot take',
@@ -384,14 +393,14 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     ],
     process: [
       { title: 'Confirm your system', body: 'Send your model, year and VIN-derived build. We identify your head unit and confirm what map and FSC work is possible.' },
-      { title: 'Update and activate', body: 'We install the latest compatible maps and generate the FSC so the navigation accepts them, around Dublin or remotely where supported.' },
+      { title: 'Update and activate', body: 'We install the latest compatible maps and apply the FSC activation code so the navigation accepts them, around Dublin or remotely where supported.' },
       { title: 'Verify navigation', body: 'We confirm the navigation reads the new maps and runs correctly before you pay.' },
       { title: 'Pay on completion', body: 'Priced on request depending on the system and work involved, agreed before we start.' },
     ],
     faqs: [
-      { q: 'Can you update BMW maps and FSC codes?', a: 'Yes, on compatible systems. We install the latest map data and generate the navigation FSC so your car accepts the update. We confirm your head unit supports it first.' },
+      { q: 'Can you update BMW maps and FSC codes?', a: 'Yes, on compatible systems. We install the latest map data and apply the navigation FSC activation code so your car accepts the update. We confirm your head unit supports it first.' },
       { q: 'What is an FSC code?', a: 'An FSC (Freischaltcode) is an authorisation code tied to your car that unlocks or validates features like navigation maps. The right FSC lets the system accept updated maps.' },
-      { q: 'My import has no navigation — can you activate it?', a: 'On compatible systems we can generate the FSC and install maps to activate navigation, which is common after a Japanese import. Send your build and we will confirm.' },
+      { q: 'My import has no navigation — can you activate it?', a: 'On compatible systems we can apply the FSC activation code and install maps to activate navigation, which is common after a Japanese import. Send your build and we will confirm.' },
       { q: 'Can map updates be done remotely?', a: 'Some FSC work can be done remotely, but full map installation often needs the car in person. We tell you which applies to your system.' },
     ],
     related: [
@@ -405,9 +414,10 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'remote-bmw-coding-ireland': {
     slug: 'remote-bmw-coding-ireland',
-    metaTitle: 'Remote BMW Coding Ireland | ENET Coding for BMW F & G Series',
+    price: { text: 'Same prices as in person — no call-out fee' },
+    metaTitle: 'Remote BMW Coding Ireland | ENET, Anywhere in Ireland',
     metaDescription:
-      'Remote BMW coding across Ireland. Connect your BMW with a laptop and ENET cable for supported coding, CarPlay, diagnostics and feature activation.',
+      'Remote BMW coding anywhere in Ireland: connect a Windows laptop and ENET cable and we code, activate CarPlay or diagnose over a screen-share. No call-out fee.',
     serviceName: 'Remote BMW Coding',
     eyebrow: 'Remote Coding · All of Ireland',
     h1: 'Remote BMW Coding Ireland — ENET Coding for F & G Series',
@@ -471,10 +481,14 @@ export const SERVICE_NAV: { slug: string; label: string }[] = [
   { slug: 'bmw-6wa-to-6wb-retrofit', label: '6WA → 6WB Retrofit' },
   { slug: 'bmw-diagnostics-dublin', label: 'BMW Diagnostics' },
   { slug: 'bmw-retrofits-dublin', label: 'BMW Retrofits' },
+  { slug: 'bmw-reverse-camera-retrofit', label: 'Reverse Camera Retrofit' },
+  { slug: 'bmw-cruise-control-retrofit', label: 'Cruise Control Retrofit' },
+  { slug: 'bmw-hidden-features', label: 'Hidden Features Coding' },
   { slug: 'japan-import-bmw-conversion-ireland', label: 'Japan Import Conversion' },
   { slug: 'bmw-map-updates-fsc-codes', label: 'Map Updates & FSC Codes' },
   { slug: 'remote-bmw-coding-ireland', label: 'Remote BMW Coding' },
   { slug: 'bmw-coding-list', label: 'BMW Coding List' },
+  { slug: 'projects', label: 'Real Projects' },
   { slug: 'blog', label: 'Guides & Articles' },
   { slug: 'find-us', label: 'Find Us · Directions' },
 ];

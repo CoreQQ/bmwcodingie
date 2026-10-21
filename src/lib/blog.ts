@@ -194,6 +194,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Sport displays / digital cluster layouts — from €60',
           'Comfort pack (mirrors, windows, chimes, lighting) — from €40–50 per item, bundled cheaper',
           'Japan → EU conversion — €250 NBT Evo, €280 MGU, CarPlay included on both (Android Auto separate, MGU only)',
+          'Minimum job — €80 per visit or remote session; the smaller settings above are combined into one job',
         ],
       },
       {
@@ -254,7 +255,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: 'Price and how it is done',
         paragraphs: [
-          'From €60, done in person around Dublin or remotely over ENET anywhere in Ireland, usually inside half an hour. It bundles well: most people take VIM together with CarPlay activation or a comfort-coding session.',
+          'From €60, done in person around Dublin or remotely over ENET anywhere in Ireland, usually inside half an hour. The minimum job is €80, so most people take VIM together with CarPlay activation or a couple of comfort settings.',
         ],
       },
     ],
@@ -291,7 +292,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: '3. Navigation: FSC and European maps',
         paragraphs: [
-          'The import\u2019s navigation carries Japanese maps, useless here. On compatible systems we generate the navigation FSC (the authorisation code tied to your car) and install current European maps, so guidance works from Malin Head to Mizen. On some cars navigation was never activated at all — the same FSC process can switch it on.',
+          'The import\u2019s navigation carries Japanese maps, useless here. On compatible systems we apply the navigation FSC (the authorisation code tied to your car) and install current European maps, so guidance works from Malin Head to Mizen. On some cars navigation was never activated at all — the same FSC process can switch it on.',
         ],
       },
       {

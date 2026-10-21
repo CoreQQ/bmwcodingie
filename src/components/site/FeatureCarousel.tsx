@@ -82,7 +82,7 @@ export function FeatureCarousel({ slides, prevLabel, nextLabel }: { slides: Feat
               onClick={() => go(i)}
               aria-label={`${s.heading} (${i + 1}/${slides.length})`}
               aria-current={active === i}
-              className={`h-2.5 rounded-full transition-all ${active === i ? 'w-8 bg-white' : 'w-2.5 bg-white/30 hover:bg-white/50'}`}
+              className={`relative h-2.5 rounded-full transition-all before:absolute before:-inset-x-1.5 before:-inset-y-4 before:content-[''] ${active === i ? 'w-8 bg-white' : 'w-2.5 bg-white/30 hover:bg-white/50'}`}
             />
           ))}
         </div>
