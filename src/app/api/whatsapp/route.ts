@@ -73,7 +73,7 @@ export async function GET(req: Request) {
       ok: true,
       // Deploy marker: bump it in a redeploy-only commit, then check it here
       // to know the new build (and new env values) are live.
-      v: 94,
+      v: 95,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
@@ -105,6 +105,9 @@ type WaMessage = {
   location?: { latitude: number; longitude: number; name?: string; address?: string };
   interactive?: { button_reply?: { title?: string }; list_reply?: { title?: string } };
   button?: { text?: string };
+  /** type 'unsupported': what Meta would not pass through (albums, view-once…). */
+  errors?: { code?: number; title?: string; message?: string }[];
+  unsupported?: { type?: string };
 };
 type WaEcho = { id: string; from: string; to: string; timestamp?: string; type: string; text?: { body: string } };
 type WaStatus = {
@@ -300,7 +303,11 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     msg.interactive?.list_reply?.title ||
     msg.button?.text ||
     '';
-  const photo = msg.type === 'image' ? msg.image : undefined;
+  // A photo sent "as a file" (document) is still a photo the model can read —
+  // as long as it is a format it accepts (iPhone HEIC files are not).
+  const docImage =
+    msg.type === 'document' && /^image\/(jpeg|png|webp)$/i.test(msg.document?.mime_type ?? '') ? msg.document : undefined;
+  const photo = msg.type === 'image' ? msg.image : docImage;
   if (photo?.caption) text = text || photo.caption.trim();
 
   if (!sb) {
@@ -337,6 +344,27 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     { text: paused ? '▶️ Resume AI' : '⏸ Stop AI here', callback_data: `${paused ? 'war' : 'wap'}:${waId}` },
     { text: "✋ I'll reply (6h)", callback_data: `wamine:${waId}` },
   ];
+
+  // Something WhatsApp will not hand to the API at all — most often several
+  // photos sent at once (an album, 21 Oct: two iDrive screens arrived as one
+  // "unsupported" message with no images). Ask for them one at a time and
+  // keep the chat with the assistant: it reads single photos fine.
+  if (msg.type === 'unsupported') {
+    if (!paused && !aiOff) {
+      const line =
+        "Sorry — that one didn't come through to me: WhatsApp doesn't pass photo albums to the assistant. Could you send the photos again one at a time? Then I can read them straight away 👍";
+      const sent = await sendWhatsAppText(waId, line);
+      if (sent.ok) await sb.from('wa_messages').insert({ msg_id: sent.id || `out:${msg.id}`, wa_id: waId, role: 'assistant', content: line, via: 'ai' });
+    }
+    const why = msg.errors?.[0]?.title || msg.errors?.[0]?.message || msg.unsupported?.type || 'unsupported';
+    await sendOwnerWithMarkup(
+      `${head}\n📎 <i>sent something WhatsApp does not pass to the assistant (${esc(why)} — usually several photos at once). ${
+        !paused && !aiOff ? 'It asked them to resend one photo at a time.' : 'Open WhatsApp to see it.'
+      }</i>`,
+      { inline_keyboard: [controls, numberRow] },
+    );
+    return;
+  }
 
   // Attachments the assistant cannot read (voice, sticker, video, document):
   // tell the customer Alex will look, hand the chat to him, mirror it.
