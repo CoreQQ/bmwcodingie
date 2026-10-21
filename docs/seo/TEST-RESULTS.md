@@ -41,7 +41,7 @@ live database once deployed.
 | WhatsApp links present (home 12, service 7, projects 6, blog 5) | ✅ |
 | Horizontal overflow at 390 px and 1440 px (home, CarPlay Dublin, F30, projects, blog post) | ✅ 0 px |
 | Console errors: home, projects, blog | ✅ 0 |
-| Console errors: service/model pages (ServiceLanding) | ⚠️ React #418/#423 hydration errors — **pre-existing** (documented in RUNBOOK since July), not introduced here; page renders and works |
+| Console errors: service/model pages (ServiceLanding) | ✅ 0 since 21 Oct (was 8×#418 + #423 since July — footer rendered the same link elements twice; see RUNBOOK) |
 
 ## Lighthouse (local, mobile, simulated throttling — lab only)
 | Page | Perf | A11y | Best pr. | SEO | LCP | CLS | TBT |
