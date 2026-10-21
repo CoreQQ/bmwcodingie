@@ -92,6 +92,11 @@ message (a specific-time request is a line in it, not a separate alert), 🚨
 pinned alert only when a customer asks for a person or is fed up, morning
 agenda + reminders, evening digest. No per-visitor pings any more.
 
+Tomorrow's reminders (morning cron): free text if the customer wrote in the
+last 24h, otherwise the approved WhatsApp template `appointment_reminder`
+(utility, en, 4 body params; created via Dualhook 21 Oct, id 2125231011455361);
+if that fails (pending review, no payment method) Alex gets copy buttons.
+
 Mini App **PULT** tabs: Today · Money (full accounting) · Schedule (block
 days) · Clients (CRM: search, LTV, history, notes, ban, rename, delete,
 call/WhatsApp/review) · Services · Reviews · Hours (+ slot length 1–4h) · Stats.

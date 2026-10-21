@@ -92,6 +92,44 @@ export async function sendWhatsAppText(
 }
 
 /**
+ * Send an approved template — the only kind of message WhatsApp allows more
+ * than 24h after the customer last wrote. `params` fill {{1}}, {{2}}… in the
+ * body; they must not contain line breaks.
+ */
+export async function sendWhatsAppTemplate(
+  to: string,
+  name: string,
+  language: string,
+  params: string[],
+): Promise<{ ok: boolean; id?: string; error?: string }> {
+  const c = creds();
+  if (!c) return { ok: false, error: 'WhatsApp not configured' };
+  try {
+    const r = await post(`${c.phoneId}/messages`, {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to,
+      type: 'template',
+      template: {
+        name,
+        language: { code: language },
+        components: [
+          { type: 'body', parameters: params.map((p) => ({ type: 'text', text: p.replace(/\s*\n+\s*/g, ' ').trim() || '-' })) },
+        ],
+      },
+    });
+    const json = r.json as { messages?: { id: string }[]; error?: { message?: string; code?: number; error_subcode?: number } } | null;
+    if (!r.ok) {
+      const e = json?.error;
+      return { ok: false, error: e ? `#${e.code}${e.error_subcode ? `/${e.error_subcode}` : ''} — ${e.message}` : `HTTP ${r.status}` };
+    }
+    return { ok: true, id: json?.messages?.[0]?.id };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'network error' };
+  }
+}
+
+/**
  * Blue ticks plus the "typing…" indicator while the assistant writes — the
  * part of WhatsApp's own AI people liked. The indicator clears itself when
  * our reply lands (or after ~25s). Fire-and-forget.
