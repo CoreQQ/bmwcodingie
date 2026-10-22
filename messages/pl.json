@@ -45,7 +45,8 @@
     "benefit4": "Rozwiązania na poziomie OEM",
     "quoteLink": "Zapytaj o cenę",
     "servicesLink": "Wszystkie usługi",
-    "projectsLink": "Nasze realizacje"
+    "projectsLink": "Nasze realizacje",
+    "xmasBadge": "Oferta świąteczna: −10% na wszystkie prace do 6 stycznia"
   },
   "Services": {
     "eyebrow": "01 / Usługi",
@@ -299,6 +300,11 @@
     "body": "BMW Coding działa teraz w pełni mobilnie. Pracujemy u Ciebie w domu lub w pracy w Dublinie, Kildare, Wicklow i Meath, albo zdalnie przez ENET w całej Irlandii.",
     "cta": "Jak to działa",
     "dismiss": "Zamknij"
+  },
+  "Christmas": {
+    "title": "Oferta świąteczna: 10% taniej na wszystkie prace",
+    "body": "Do 6 stycznia: CarPlay, kodowanie, konwersje aut z Japonii na EU, retrofity i diagnostyka. Ceny na stronie już uwzględniają rabat; opłata za dojazd bez rabatu.",
+    "cta": "Zobacz ceny"
   },
   "GoogleReviews": {
     "count": "{count} opinii w Google",

@@ -45,7 +45,8 @@
     "benefit4": "Soluții la nivel OEM",
     "quoteLink": "Cere o ofertă",
     "servicesLink": "Toate serviciile",
-    "projectsLink": "Lucrări reale"
+    "projectsLink": "Lucrări reale",
+    "xmasBadge": "Ofertă de Crăciun: −10% la toate lucrările până pe 6 ianuarie"
   },
   "Services": {
     "eyebrow": "01 / Servicii",
@@ -299,6 +300,11 @@
     "body": "BMW Coding este acum un serviciu complet mobil. Lucrăm la tine acasă sau la serviciu în Dublin, Kildare, Wicklow și Meath, ori remote prin ENET oriunde în Irlanda.",
     "cta": "Cum funcționează",
     "dismiss": "Închide"
+  },
+  "Christmas": {
+    "title": "Ofertă de Crăciun: 10% reducere la toate lucrările",
+    "body": "Până pe 6 ianuarie: CarPlay, codare, conversii Japonia → UE, retrofituri și diagnoză. Prețurile de pe site includ deja reducerea; taxa de deplasare nu se reduce.",
+    "cta": "Vezi prețurile"
   },
   "GoogleReviews": {
     "count": "{count} recenzii pe Google",

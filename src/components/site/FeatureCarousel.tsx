@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { OfferPrice } from './OfferPrice';
 
 export type FeatureSlide = {
   key: string;
@@ -55,7 +56,9 @@ export function FeatureCarousel({ slides, prevLabel, nextLabel }: { slides: Feat
               <div className="min-w-0 md:col-span-6">
                 <span className="label">{s.eyebrow}</span>
                 <h3 className="mt-3 font-display text-[clamp(1.8rem,4.4vw,3.2rem)] text-ink">{s.heading}</h3>
-                <p className="mt-5 font-mono text-2xl text-bmw">{s.price}</p>
+                <p className="mt-5 font-mono text-2xl text-bmw">
+                  <OfferPrice text={s.price} />
+                </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <a href={s.primary.href} className="btn-primary">{s.primary.label}</a>
                   <a href={s.secondary.href} className="btn-ghost">{s.secondary.label}</a>

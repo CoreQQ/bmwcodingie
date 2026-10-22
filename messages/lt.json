@@ -45,7 +45,8 @@
     "benefit4": "OEM lygio sprendimai",
     "quoteLink": "Gauti kainą",
     "servicesLink": "Visos paslaugos",
-    "projectsLink": "Mūsų darbai"
+    "projectsLink": "Mūsų darbai",
+    "xmasBadge": "Kalėdinis pasiūlymas: −10% visiems darbams iki sausio 6 d."
   },
   "Services": {
     "eyebrow": "01 / Paslaugos",
@@ -299,6 +300,11 @@
     "body": "BMW Coding dabar yra visiškai mobili paslauga. Dirbame pas jus namuose ar darbe Dubline, Kildare, Wicklow ir Meath arba nuotoliniu būdu per ENET visoje Airijoje.",
     "cta": "Kaip tai veikia",
     "dismiss": "Uždaryti"
+  },
+  "Christmas": {
+    "title": "Kalėdinis pasiūlymas: 10% nuolaida visiems darbams",
+    "body": "Iki sausio 6 d.: CarPlay, kodavimas, japoniškų automobilių konversija į EU, retrofitai ir diagnostika. Kainos svetainėje jau su nuolaida; atvykimo mokesčiui nuolaida netaikoma.",
+    "cta": "Žiūrėti kainas"
   },
   "GoogleReviews": {
     "count": "{count} atsiliepimai Google",

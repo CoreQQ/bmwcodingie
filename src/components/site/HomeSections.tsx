@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation';
 import { BLOG_POSTS } from '@/lib/blog';
 import { waHref, waMessageFor } from '@/lib/waMessage';
 import { FeatureCarousel, type FeatureSlide } from './FeatureCarousel';
+import { OfferPrice } from './OfferPrice';
 
 // The homepage blocks from the owner's brief, in one file because they share
 // the same shape: an eyebrow, a heading and a grid. Every card ends in one of
@@ -44,7 +45,11 @@ export async function PopularServices({ whatsapp }: { whatsapp: string }) {
               <article key={s.key} className="flex flex-col border border-white/10 bg-graphite-800/50 p-6">
                 <h3 className="font-display text-2xl leading-tight text-ink">{t(`${s.key}Title`)}</h3>
                 <p className="mt-2 flex-1 text-sm text-muted">{t(`${s.key}Desc`)}</p>
-                {price && <p className="mt-4 font-mono text-lg text-bmw">{price}</p>}
+                {price && (
+                  <p className="mt-4 font-mono text-lg text-bmw">
+                    <OfferPrice text={price} />
+                  </p>
+                )}
                 <div className="mt-5 grid grid-cols-2 gap-2">
                   <Link href={s.href} className="btn-ghost justify-center text-[11px]">
                     {t('moreInfo')}

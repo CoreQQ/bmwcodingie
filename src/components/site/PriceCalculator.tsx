@@ -12,6 +12,7 @@ import {
   isBundledOut,
   type HeadUnit,
 } from '@/lib/pricing';
+import { XMAS, XMAS_ON, xmasPrice } from '@/lib/season';
 
 // Instant estimate so visitors never have to ask "how much?" — the number one
 // reason people leave a service site. Prices come from src/lib/pricing.ts, the
@@ -31,7 +32,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
   const toggle = (list: string[], set: (v: string[]) => void, id: string) =>
     set(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
-  const { total, anyFrom, lines } = useMemo(() => {
+  const { total, anyFrom, lines, discount } = useMemo(() => {
     const lines: { label: string; amount: number | null; bundled?: boolean }[] = [];
     let total = 0;
     // On iDrive 8.5 nothing is a fixed figure, so the whole estimate is a
@@ -64,11 +65,17 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
       lines.push({ label: `Minimum job is €${MIN_JOB} — add another setting at no extra cost`, amount: MIN_JOB - total });
       total = MIN_JOB;
     }
+    // Christmas offer: 10% off the work. The call-out is travel, not work.
+    let discount = 0;
+    if (XMAS_ON && total > 0) {
+      discount = total - xmasPrice(total);
+      lines.push({ label: `🎄 Christmas offer −${XMAS.pct}% (until ${XMAS.until})`, amount: -discount });
+    }
     if (mobile) {
       lines.push({ label: 'Call-out around Dublin', amount: CALL_OUT.base });
       total += CALL_OUT.base;
     }
-    return { total, anyFrom, lines };
+    return { total, anyFrom, lines, discount };
   }, [picked, addOns, mobile, priceUnit, unit]);
 
   const summary = picked
@@ -219,7 +226,15 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                 <li key={i} className="flex items-baseline justify-between gap-3 text-sm">
                   <span className="text-muted">{l.label}</span>
                   <span className="shrink-0 font-mono text-xs text-ink">
-                    {l.amount === null ? 'n/a' : l.bundled ? 'included' : l.label.startsWith('Minimum job') ? `+€${l.amount}` : `€${l.amount}`}
+                    {l.amount === null
+                      ? 'n/a'
+                      : l.bundled
+                        ? 'included'
+                        : l.amount < 0
+                          ? `−€${-l.amount}`
+                          : l.label.startsWith('Minimum job')
+                            ? `+€${l.amount}`
+                            : `€${l.amount}`}
                   </span>
                 </li>
               ))}
@@ -230,7 +245,11 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
             <div className="mt-4 flex items-baseline justify-between">
               <span className="font-mono text-[11px] uppercase tracking-widest text-faint">Total</span>
               <span className="font-display text-4xl leading-none">
-                {anyFrom && total > 0 ? 'from ' : ''}€{total}
+                {anyFrom && total > 0 ? 'from ' : ''}
+                {discount > 0 && (
+                  <s className="mr-2 text-2xl text-faint decoration-[#e23b4a]/80 decoration-2">€{total}</s>
+                )}
+                €{total - discount}
               </span>
             </div>
           )}

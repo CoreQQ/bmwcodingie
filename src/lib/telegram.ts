@@ -1,5 +1,6 @@
 import { translateToRussian } from './translate';
 import { waLinkFor } from './phone';
+import { XMAS, XMAS_ON } from './season';
 
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT_ID = process.env.TG_CHAT_ID;
@@ -284,6 +285,8 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.dwell) lines.push(`⏱ <b>On site:</b> ${esc(lead.dwell)} before booking`);
   if (lead.clientNote) lines.push(lead.clientNote);
   if (lead.repeatNote) lines.push(lead.repeatNote);
+  // The site shows them the offer price, so the bill must match it.
+  if (XMAS_ON) lines.push(`🎄 <b>Christmas offer:</b> −${XMAS.pct}% on the work (not the call-out), until ${XMAS.until}`);
   return lines;
 }
 

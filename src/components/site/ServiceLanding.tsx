@@ -9,6 +9,8 @@ import { ALL_LANDINGS } from '@/lib/landings';
 import { MobileActionBar } from './MobileActionBar';
 import Image from 'next/image';
 import { BLOG_POSTS } from '@/lib/blog';
+import { OfferPrice } from './OfferPrice';
+import { Snowfall } from './Snowfall';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const DEFAULT_AREA = ['Dublin', 'Kildare', 'Wicklow', 'Meath', 'Ireland'];
@@ -123,6 +125,7 @@ export async function ServiceLanding({
           <div className="absolute inset-0 -z-10">
             <div className="blueprint absolute inset-0 opacity-60" />
             <div className="absolute inset-0 hero-glow" />
+            <Snowfall />
           </div>
           <div className="mx-auto max-w-edge px-5 md:px-8">
             <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-faint">
@@ -137,8 +140,10 @@ export async function ServiceLanding({
             <h1 className="max-w-4xl font-display text-[clamp(2.1rem,6vw,4.2rem)] leading-[0.95]">{p.h1}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">{p.heroSub}</p>
             {p.price && (
-              <p className="mt-5 inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-semibold text-ink">
-                {p.price.text}
+              // inline-block, not flex: flex items drop the spaces between the
+              // struck price and the words after it ("€135on NBT Evo").
+              <p className="mt-5 inline-block rounded-[20px] border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-semibold leading-relaxed text-ink">
+                <OfferPrice text={p.price.text} />
               </p>
             )}
             {ctaRow()}

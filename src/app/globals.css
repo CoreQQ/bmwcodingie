@@ -509,3 +509,24 @@ html[data-notice] .notice-room { padding-top: 10.5rem; }
   html[data-notice] #top > div:first-child,
   html[data-notice] .notice-room { padding-top: 16rem; }
 }
+
+/* ── Christmas offer (NEXT_PUBLIC_SEASON=xmas) — see src/lib/season.ts ── */
+.snowflake {
+  position: absolute;
+  top: -12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+  animation-name: snowfall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+@keyframes snowfall {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  10% { opacity: 0.9; }
+  100% { transform: translate3d(var(--drift, 0px), 105vh, 0); opacity: 0.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .snowfall { display: none; }
+}

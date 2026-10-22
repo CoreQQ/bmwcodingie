@@ -1,10 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Truck, X } from 'lucide-react';
-
-// Bump when the wording changes so a dismissal never hides a newer notice.
-const KEY = 'bmw-notice-mobile-live';
+import { Gift, Truck, X } from 'lucide-react';
+import { NOTICE_KEY } from '@/lib/season';
 
 /**
  * Site-wide notice about the move to a mobile-first service. Sits under the
@@ -17,13 +15,19 @@ export function Announcement({
   cta,
   href,
   dismissLabel,
+  storageKey = NOTICE_KEY,
+  festive = false,
 }: {
   title: string;
   body: string;
   cta: string;
   href: string;
   dismissLabel: string;
+  storageKey?: string;
+  /** The Christmas offer: gift icon and a red edge instead of the van. */
+  festive?: boolean;
 }) {
+  const KEY = storageKey;
   const [show, setShow] = useState(false);
   const [atTop, setAtTop] = useState(true);
 
@@ -33,7 +37,7 @@ export function Announcement({
     } catch {
       setShow(true); // storage blocked — better shown than silently hidden
     }
-  }, []);
+  }, [KEY]);
 
   // A fixed card would sit on top of whatever the visitor is reading, so it
   // only shows at the top of the page and gets out of the way on scroll.
@@ -68,8 +72,16 @@ export function Announcement({
       }`}
       aria-hidden={!atTop}
     >
-      <div className={`${atTop ? 'pointer-events-auto' : ''} mx-auto flex max-w-edge items-start gap-3 rounded-[16px] border border-white/15 bg-[rgba(12,15,20,0.88)] px-4 py-3 shadow-lg backdrop-blur-md md:p-4`}>
-        <Truck size={18} className="mt-0.5 shrink-0 text-bmw" />
+      <div
+        className={`${atTop ? 'pointer-events-auto' : ''} mx-auto flex max-w-edge items-start gap-3 rounded-[16px] border bg-[rgba(12,15,20,0.88)] px-4 py-3 shadow-lg backdrop-blur-md md:p-4 ${
+          festive ? 'border-[#c8102e]/60' : 'border-white/15'
+        }`}
+      >
+        {festive ? (
+          <Gift size={18} className="mt-0.5 shrink-0 text-[#ff5a6a]" />
+        ) : (
+          <Truck size={18} className="mt-0.5 shrink-0 text-bmw" />
+        )}
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold leading-snug text-ink md:text-sm">{title}</p>
           {/* On a phone the full paragraph would bury the page's own headline,
