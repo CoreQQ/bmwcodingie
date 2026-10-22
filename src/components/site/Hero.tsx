@@ -3,8 +3,9 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { SiteSettings } from '@/lib/types';
 import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
-import { XMAS_ON } from '@/lib/season';
+import { XMAS, XMAS_ON } from '@/lib/season';
 import { Snowfall } from './Snowfall';
+import { SantaHat } from './SantaHat';
 
 // First screen per the owner's brief: what we do, the services in one line,
 // two actions (check your BMW, or WhatsApp), and four reasons to trust it.
@@ -22,8 +23,11 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
           {XMAS_ON ? (
             <a
               href="/bmw-coding-price-calculator"
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#c8102e]/60 bg-[#c8102e]/15 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-[#c8102e]/25 sm:text-[13px]"
+              className="relative mb-6 inline-flex items-center gap-2 rounded-full border border-[#c8102e]/60 bg-[#c8102e]/15 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-[#c8102e]/25 sm:text-[13px]"
             >
+              {XMAS.hat === 'badge' && (
+                <SantaHat className="pointer-events-none absolute -left-3 -top-4 w-8 -rotate-[18deg]" />
+              )}
               <span aria-hidden="true">🎄</span> {t('xmasBadge')}
             </a>
           ) : (

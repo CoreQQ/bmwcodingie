@@ -17,6 +17,9 @@ export const XMAS = {
   pct: 10,
   /** Last day of the offer, as shown to customers. */
   until: '6 January',
+  /** Where the Santa hat sits: on the car in the logo, on the logo's "B",
+   *  on the hero badge, or nowhere. */
+  hat: 'car' as 'car' | 'b' | 'badge' | 'none',
 } as const;
 
 export const xmasPrice = (eur: number): number => Math.round((eur * (100 - XMAS.pct)) / 100);
