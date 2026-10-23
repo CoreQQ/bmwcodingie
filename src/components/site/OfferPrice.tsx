@@ -22,7 +22,11 @@ export function OfferPrice({ text, tag = true }: { text: string; tag?: boolean }
         ),
       )}
       {tag && (
-        <span className="ml-2 inline-block translate-y-[-2px] rounded-sm bg-[#c8102e] px-1.5 py-0.5 align-middle font-mono text-[10px] font-semibold uppercase tracking-wider text-white">
+        <span
+          className={`ml-2 inline-block translate-y-[-2px] rounded-sm px-1.5 py-0.5 align-middle font-mono text-[10px] font-semibold uppercase tracking-wider ${
+            XMAS.tag === 'outline' ? 'border border-[#ff6b78] text-[#ff8b95]' : 'bg-[#c8102e] text-white'
+          }`}
+        >
           −{XMAS.pct}%
         </span>
       )}

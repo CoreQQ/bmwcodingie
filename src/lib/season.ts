@@ -20,6 +20,11 @@ export const XMAS = {
   /** Where the Santa hat sits: on the car in the logo, on the logo's "B",
    *  on the hero badge, or nowhere. */
   hat: 'car' as 'car' | 'b' | 'badge' | 'none',
+  // The owner's own choices from the Christmas Look Studio (saved 23 Oct).
+  snow: 'medium' as 'off' | 'light' | 'medium' | 'heavy',
+  garland: true,
+  glow: true,
+  tag: 'outline' as 'filled' | 'outline',
 } as const;
 
 export const xmasPrice = (eur: number): number => Math.round((eur * (100 - XMAS.pct)) / 100);

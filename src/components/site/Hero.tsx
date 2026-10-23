@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation';
 import type { SiteSettings } from '@/lib/types';
 import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
 import { XMAS, XMAS_ON } from '@/lib/season';
-import { Snowfall } from './Snowfall';
+import { Snowfall, XmasGlow } from './Snowfall';
 import { SantaHat } from './SantaHat';
 
 // First screen per the owner's brief: what we do, the services in one line,
@@ -83,6 +83,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
         </div>
       </div>
       {/* After the content on purpose: the notice spacing rule targets #top's first child. */}
+      <XmasGlow />
       <Snowfall />
     </section>
   );

@@ -10,7 +10,7 @@ import { MobileActionBar } from './MobileActionBar';
 import Image from 'next/image';
 import { BLOG_POSTS } from '@/lib/blog';
 import { OfferPrice } from './OfferPrice';
-import { Snowfall } from './Snowfall';
+import { Snowfall, XmasGlow } from './Snowfall';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 const DEFAULT_AREA = ['Dublin', 'Kildare', 'Wicklow', 'Meath', 'Ireland'];
@@ -125,6 +125,7 @@ export async function ServiceLanding({
           <div className="absolute inset-0 -z-10">
             <div className="blueprint absolute inset-0 opacity-60" />
             <div className="absolute inset-0 hero-glow" />
+            <XmasGlow />
             <Snowfall />
           </div>
           <div className="mx-auto max-w-edge px-5 md:px-8">
