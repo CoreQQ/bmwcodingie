@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import type { Booking, Review } from '@/lib/types';
 import type { BusinessStats } from '@/lib/stats';
-import { windowsFor, windowsOverlap, WEEKDAY_LABELS, type HoursMap } from '@/lib/hours';
+import { customWindow, windowsFor, windowsOverlap, WEEKDAY_LABELS, type HoursMap } from '@/lib/hours';
 
 type ServiceRow = { id: number; title: string; price_label: string; visible: boolean; sort_order: number };
 
@@ -283,6 +283,17 @@ function BookingCard({ b, data, busy, act }: { b: Booking; data: Overview; busy:
   const blocked = new Set(data.blocked);
   const days = data.schedule.map((d) => d.day).filter((d) => !blocked.has(d));
 
+  // A time the owner sets himself, checked with the same overlap rule as the grid.
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
+  const custom = customFrom ? customWindow(`${customFrom}${customTo ? `-${customTo}` : ''}`, data.slotDuration || 2) : null;
+  const customClash =
+    Boolean(custom && pickDay) &&
+    [...taken].some((entry) => {
+      const sep = entry.indexOf('|');
+      return entry.slice(0, sep) === pickDay && windowsOverlap(entry.slice(sep + 1), custom as string);
+    });
+
   return (
     <div className="border border-white/8 bg-graphite-800/60 p-4">
       <div className="flex items-center gap-2.5">
@@ -383,6 +394,45 @@ function BookingCard({ b, data, busy, act }: { b: Booking; data: Overview; busy:
                   );
                 })}
               </div>
+
+              {/* Any time, not just the hourly grid. "To" left empty = the usual slot length. */}
+              <p className="mb-2 mt-4 font-mono text-[10px] uppercase tracking-wider text-faint">Custom time</p>
+              <div className="flex flex-wrap items-end gap-2">
+                <label className="grid gap-1 font-mono text-[10px] uppercase text-faint">
+                  From
+                  <input
+                    type="time"
+                    step={300}
+                    value={customFrom}
+                    onChange={(e) => setCustomFrom(e.target.value)}
+                    className="border border-white/10 bg-graphite-900 px-2 py-1.5 font-mono text-xs text-ink"
+                  />
+                </label>
+                <label className="grid gap-1 font-mono text-[10px] uppercase text-faint">
+                  To
+                  <input
+                    type="time"
+                    step={300}
+                    value={customTo}
+                    onChange={(e) => setCustomTo(e.target.value)}
+                    className="border border-white/10 bg-graphite-900 px-2 py-1.5 font-mono text-xs text-ink"
+                  />
+                </label>
+                <ActionBtn
+                  primary
+                  disabled={busy || !custom}
+                  onClick={() => {
+                    if (!custom) return;
+                    setReschedule(false);
+                    void act({ action: 'reschedule', id: b.id, slot_date: pickDay, slot_time: custom });
+                  }}
+                >
+                  <Clock3 size={13} /> {custom ? `Move to ${custom}` : 'Pick a time'}
+                </ActionBtn>
+              </div>
+              {customClash && (
+                <p className="mt-2 text-[11px] text-amber-300">⚠️ Overlaps another booking that day — you can still move it.</p>
+              )}
             </>
           )}
         </div>

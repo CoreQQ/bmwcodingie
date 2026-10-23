@@ -7,6 +7,7 @@ import { getBusinessStats, getSchedule, getBlockedDates, getHours, getSlotDurati
 import { getCrmClients } from '@/lib/crmData';
 import { ensureClient, phoneKey } from '@/lib/crm';
 import { REVIEW_URL } from '@/lib/reviewTemplates';
+import { customWindow } from '@/lib/hours';
 
 export const runtime = 'nodejs';
 
@@ -95,7 +96,9 @@ export async function POST(req: Request) {
     case 'reschedule': {
       const id = Number(body.id);
       const slot_date = String(body.slot_date ?? '');
-      const slot_time = String(body.slot_time ?? '').slice(0, 40);
+      // Grid windows and owner-set times alike are stored as "HH:MM–HH:MM".
+      const raw = String(body.slot_time ?? '').slice(0, 40);
+      const slot_time = customWindow(raw) ?? raw;
       if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(slot_date) || !slot_time) return bad();
       await sb.from('bookings').update({ slot_date, slot_time }).eq('id', id);
       return NextResponse.json({ ok: true });
