@@ -37,7 +37,7 @@ import {
 } from '@/lib/agenda';
 import { jpAddressMessage } from '@/lib/jpAddress';
 import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
-import { windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
+import { customWindow, windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import { CHEAT_SHEET, CHEAT_DISCLAIMER, findCheat, formatCheat } from '@/lib/cheatsheet';
 import type { Booking } from '@/lib/types';
@@ -335,6 +335,50 @@ async function freeWindowsFor(sb: SupabaseClient, date: string, excludeId?: numb
   return windowsFor(hours, weekday, duration).filter((w) => !busy.some((b) => windowsOverlap(b.slot_time, w)));
 }
 
+/** "Custom time" in the move flow waits here for the time Alex types next. */
+const PENDING_MOVE_KEY = 'tg_pending_move';
+const PENDING_MOVE_TTL_MS = 15 * 60 * 1000;
+
+const dayShort = (date: string) =>
+  new Date(`${date}T00:00:00`).toLocaleDateString('en-IE', { weekday: 'short', day: '2-digit', month: 'short' });
+
+/**
+ * Put a booking on a new day and time, then show the day and hand Alex the
+ * message for the customer. Shared by the hourly buttons and a typed time;
+ * a typed time may overlap another job, which is allowed but called out.
+ */
+async function finishMove(
+  sb: SupabaseClient,
+  id: number,
+  date: string,
+  slotTime: string,
+  edit?: { chatId: number | string; messageId: number },
+): Promise<void> {
+  const [{ data: bRow }, { data: sameDay }] = await Promise.all([
+    sb.from('bookings').select('name, public_token').eq('id', id).single(),
+    sb.from('bookings').select('id, name, slot_time').eq('slot_date', date).eq('status', 'confirmed'),
+  ]);
+  await sb.from('bookings').update({ slot_date: date, slot_time: slotTime }).eq('id', id);
+  const clash = ((sameDay ?? []) as { id: number; name: string; slot_time: string }[]).filter(
+    (b) => b.id !== id && b.slot_time && windowsOverlap(b.slot_time, slotTime),
+  );
+  const [rows, freeWins] = await Promise.all([upcomingBookings(sb), freeWindowsFor(sb, date)]);
+  const day = buildBookingsDay(date, rows, freeWins);
+  if (edit) await editMessage(edit.chatId, edit.messageId, day.text, day.keyboard);
+  else await sendOwnerMessage(day.text, day.keyboard);
+  if (!bRow?.name) return;
+  const label = dayShort(date);
+  const track = bRow.public_token ? ` Track it here: ${SITE_URL}/b/${bRow.public_token}` : '';
+  const msgTxt = `Hi ${String(bRow.name).trim().split(/\s+/)[0]}! Quick update — your BMW coding slot is now ${label} · ${slotTime} ✅${track}`;
+  const warn = clash.length
+    ? `\n⚠️ Overlaps with ${clash.map((c) => `${escapeHtml(c.name)} (${escapeHtml(c.slot_time)})`).join(', ')}`
+    : '';
+  await sendOwnerMessage(
+    `✅ Moved <b>${escapeHtml(String(bRow.name))}</b> → ${label} · ${slotTime}${warn}`,
+    { inline_keyboard: [[{ text: '📋 Copy new-time message', copy_text: { text: msgTxt } }]] },
+  );
+}
+
 export async function POST(req: Request) {
   if (WEBHOOK_SECRET) {
     const got = req.headers.get('x-telegram-bot-api-secret-token');
@@ -408,11 +452,39 @@ export async function POST(req: Request) {
       }
     }
 
+    // A time typed after "✍️ Custom time" in the move flow.
+    if (!text.startsWith('/') && /\d/.test(text) && text.length <= 24) {
+      const { data: pend } = await sb.from('app_config').select('value').eq('key', PENDING_MOVE_KEY).maybeSingle();
+      let p: { id: number; date: string; chatId: number | string; messageId: number; at: number } | null = null;
+      try {
+        p = JSON.parse((pend as { value?: string } | null)?.value || 'null');
+      } catch {
+        p = null;
+      }
+      if (p && Date.now() - p.at < PENDING_MOVE_TTL_MS) {
+        const slotTime = customWindow(text, await getSlotDuration(sb));
+        if (!slotTime) {
+          await sendOwnerMessage('Could not read that time. Try <code>10:30</code> or <code>10:30-12:00</code> — or /cancel.');
+          return ok();
+        }
+        await sb.from('app_config').delete().eq('key', PENDING_MOVE_KEY);
+        await finishMove(sb, p.id, p.date, slotTime, { chatId: p.chatId, messageId: p.messageId });
+        return ok();
+      }
+    }
+
     if (/^\/invoice(@\w+)?\b/.test(text)) {
       await startInvoice(sb, msg.chat.id);
       return ok();
     }
     if (text === '✖️ Cancel' || /^\/cancel(@\w+)?\b/.test(text)) {
+      // A waiting "custom time" move is the likelier thing to cancel.
+      const { data: pend } = await sb.from('app_config').select('key').eq('key', PENDING_MOVE_KEY).maybeSingle();
+      if (pend && text !== '✖️ Cancel') {
+        await sb.from('app_config').delete().eq('key', PENDING_MOVE_KEY);
+        await sendOwnerMessage('✖️ Move cancelled — the booking keeps its time.');
+        return ok();
+      }
       await cancelInvoice(sb, msg.chat.id);
       return ok();
     }
@@ -1307,10 +1379,6 @@ export async function POST(req: Request) {
     const id = Number(mvd[1]);
     const date = mvd[2];
     const wins = await freeWindowsFor(sb, date, id);
-    if (!wins.length) {
-      await answerCallback(cq.id, 'No free windows that day — pick another.');
-      return ok();
-    }
     const rows: { text: string; callback_data: string }[][] = [];
     for (let i = 0; i < wins.length; i += 2) {
       rows.push(
@@ -1320,11 +1388,15 @@ export async function POST(req: Request) {
         })),
       );
     }
+    // Any time he likes, not just the hourly grid (a full day included).
+    rows.push([{ text: '✍️ Custom time', callback_data: `bkmvc:${id}:${date}` }]);
     rows.push([{ text: '← Back', callback_data: `bkmv:${id}` }]);
     await editMessage(
       chatId,
       messageId,
-      `🕓 <b>Move booking</b> — free windows on <b>${date}</b>:`,
+      wins.length
+        ? `🕓 <b>Move booking</b> — free windows on <b>${date}</b>, or type your own time:`
+        : `🕓 <b>Move booking</b> — no free windows on <b>${date}</b>. Type your own time, or go back:`,
       { inline_keyboard: rows },
     );
     await answerCallback(cq.id);
@@ -1333,28 +1405,26 @@ export async function POST(req: Request) {
 
   const mvt = /^bkmvt:(\d+):(\d{4}-\d{2}-\d{2}):(\d{1,2})$/.exec(cq.data);
   if (mvt) {
-    const id = Number(mvt[1]);
-    const date = mvt[2];
     const slotTime = windowLabel(Number(mvt[3]), await getSlotDuration(sb));
-    const { data: bRow } = await sb
-      .from('bookings')
-      .select('name, public_token, slot_date, slot_time')
-      .eq('id', id)
-      .single();
-    await sb.from('bookings').update({ slot_date: date, slot_time: slotTime }).eq('id', id);
     await answerCallback(cq.id, 'Moved ✓');
-    const [rows, freeWins] = await Promise.all([upcomingBookings(sb), freeWindowsFor(sb, date)]);
-    const { text, keyboard } = buildBookingsDay(date, rows, freeWins);
-    await editMessage(chatId, messageId, text, keyboard);
-    if (bRow?.name) {
-      const label = new Date(`${date}T00:00:00`).toLocaleDateString('en-IE', { weekday: 'short', day: '2-digit', month: 'short' });
-      const track = bRow.public_token ? ` Track it here: ${SITE_URL}/b/${bRow.public_token}` : '';
-      const msgTxt = `Hi ${String(bRow.name).trim().split(/\s+/)[0]}! Quick update — your BMW coding slot is now ${label} · ${slotTime} ✅${track}`;
-      await sendOwnerMessage(
-        `✅ Moved <b>${escapeHtml(String(bRow.name))}</b> → ${label} · ${slotTime}`,
-        { inline_keyboard: [[{ text: '📋 Copy new-time message', copy_text: { text: msgTxt.slice(0, 256) } }]] } as never,
-      );
-    }
+    await finishMove(sb, Number(mvt[1]), mvt[2], slotTime, { chatId, messageId });
+    return ok();
+  }
+
+  // "Custom time": the next thing Alex types (10:30, 10:30-12:00…) is the new time.
+  const mvc = /^bkmvc:(\d+):(\d{4}-\d{2}-\d{2})$/.exec(cq.data);
+  if (mvc) {
+    const id = Number(mvc[1]);
+    const date = mvc[2];
+    const { data: bRow } = await sb.from('bookings').select('name').eq('id', id).maybeSingle();
+    await sb
+      .from('app_config')
+      .upsert({ key: PENDING_MOVE_KEY, value: JSON.stringify({ id, date, chatId, messageId, at: Date.now() }) });
+    await answerCallback(cq.id);
+    await sendOwnerMessage(
+      `✍️ Type the new time for <b>${escapeHtml(String((bRow as { name?: string } | null)?.name ?? 'this booking'))}</b> on <b>${dayShort(date)}</b>:\n` +
+        '<code>10:30</code> (usual length) or <code>10:30-12:00</code>. /cancel to stop.',
+    );
     return ok();
   }
 

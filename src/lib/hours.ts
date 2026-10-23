@@ -29,10 +29,31 @@ export function windowsFor(hours: HoursMap, weekday: number, duration = DEFAULT_
   return out;
 }
 
-/** Parse "11:00–13:00" (en dash, em dash or hyphen) into start/end hours. */
+/** Parse "11:00–13:00" (en dash, em dash or hyphen) into start/end hours.
+ *  Minutes count (10:30 → 10.5): the owner can now set his own times, and
+ *  11:30–13:30 must clash with 13:00–15:00. */
 export function parseWindow(w: string): [number, number] | null {
-  const m = /^(\d{1,2}):\d{2}\s*[–—-]\s*(\d{1,2}):\d{2}$/.exec(w.trim());
-  return m ? [Number(m[1]), Number(m[2])] : null;
+  const m = /^(\d{1,2}):(\d{2})\s*[–—-]\s*(\d{1,2}):(\d{2})$/.exec(w.trim());
+  return m ? [Number(m[1]) + Number(m[2]) / 60, Number(m[3]) + Number(m[4]) / 60] : null;
+}
+
+/**
+ * A time the owner typed → a window label. "10:30" (lasts the usual slot
+ * length), "10:30-12:00", "10.30 12", "1030–1200", "18" — null when it does
+ * not read as a time of day, or ends after midnight.
+ */
+export function customWindow(input: string, duration = DEFAULT_SLOT_DURATION): string | null {
+  const m = /^(\d{1,2})(?:[:.h]?(\d{2}))?\s*(?:(?:[–—-]|to|до)\s*)?(?:(\d{1,2})(?:[:.h]?(\d{2}))?)?$/i.exec(
+    input.trim().replace(/\s+/g, ' '),
+  );
+  if (!m) return null;
+  const start = Number(m[1]) * 60 + Number(m[2] ?? 0);
+  // No end given: the usual slot length, cut at midnight ("23:00" → 23:00–24:00).
+  const end = m[3] !== undefined ? Number(m[3]) * 60 + Number(m[4] ?? 0) : Math.min(start + duration * 60, 24 * 60);
+  if (Number(m[2] ?? 0) > 59 || Number(m[4] ?? 0) > 59) return null;
+  if (start >= 24 * 60 || end > 24 * 60 || end <= start) return null;
+  const hm = (v: number) => `${pad(Math.floor(v / 60))}:${pad(v % 60)}`;
+  return `${hm(start)}–${hm(end)}`;
 }
 
 /** True when two booking windows overlap in time (e.g. 11–13 vs 12–14). */
