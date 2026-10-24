@@ -22,7 +22,7 @@ const BODY = `# BMW Coding (bmwcoding.ie)
 - [6WA to 6WB Retrofit](${SITE_URL}/bmw-6wa-to-6wb-retrofit): digital instrument cluster, mobile visit, quoted per car
 - [BMW Diagnostics](${SITE_URL}/bmw-diagnostics-dublin): full ISTA fault scan with written summary, from EUR 80
 - [BMW Retrofits](${SITE_URL}/bmw-retrofits-dublin): ambient lighting, cruise control, Comfort Access
-- [Japan Import Conversion](${SITE_URL}/japan-import-bmw-conversion-ireland): EU radio, language and maps, EUR 250 on NBT Evo / EUR 280 on MGU, CarPlay included
+- [Japan Import Conversion](${SITE_URL}/japan-import-bmw-conversion-ireland): EU radio, language and maps, EUR 250 on NBT Evo / from EUR 300 on MGU, CarPlay included
 - [Map Updates & FSC Codes](${SITE_URL}/bmw-map-updates-fsc-codes): navigation activation and updates
 - [Remote BMW Coding](${SITE_URL}/remote-bmw-coding-ireland): ENET sessions anywhere in Ireland
 

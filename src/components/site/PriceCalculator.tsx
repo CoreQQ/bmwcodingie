@@ -52,7 +52,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
       }
       lines.push({ label: item.label, amount });
       total += amount;
-      if (item.from) anyFrom = true;
+      if (item.from || item.fromOn?.includes(priceUnit)) anyFrom = true;
     }
     for (const a of ADD_ONS) {
       if (!addOns.includes(a.id)) continue;
@@ -151,7 +151,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                       ? 'n/a'
                       : bundled
                         ? 'included'
-                        : `${item.from ? 'from ' : ''}€${amount}`}
+                        : `${item.from || item.fromOn?.includes(priceUnit) ? 'from ' : ''}€${amount}`}
                   </span>
                 </button>
               );

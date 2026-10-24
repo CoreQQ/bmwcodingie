@@ -309,11 +309,11 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'japan-import-bmw-conversion-ireland': {
     slug: 'japan-import-bmw-conversion-ireland',
-    price: { amount: 250, text: '€250 on NBT Evo · €280 on iDrive 7 (MGU) · Apple CarPlay included' },
+    price: { amount: 250, text: '€250 on NBT Evo · from €300 on iDrive 7 (MGU) · Apple CarPlay included' },
     galleryMatch: ['japan'],
     metaTitle: 'BMW Japan to EU Conversion Ireland | Japanese Imports',
     metaDescription:
-      'Japanese import BMW conversion in Ireland: EU radio bands, English, EU navigation and maps. €250 on NBT Evo, €280 on iDrive 7 — Apple CarPlay included.',
+      'Japanese import BMW conversion in Ireland: EU radio bands, English, EU navigation and maps. €250 on NBT Evo, from €300 on iDrive 7 — Apple CarPlay included.',
     serviceName: 'Japan to EU BMW Conversion',
     eyebrow: 'Japan Import · Dublin & Ireland',
     h1: 'Japan Import BMW Conversion Ireland — Region Change & Map Updates',
@@ -343,7 +343,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Send import details', body: 'Give us the model, year and VIN-derived build. We confirm what your JDM import needs and quote the conversion before starting.' },
       { title: 'Convert the car', body: 'We change the region, apply the FSC activation, load EU maps and address the import-specific modules around Dublin.' },
       { title: 'Verify and scan', body: 'We confirm navigation, radio and convenience features work, and run a diagnostic scan to check the car is clean.' },
-      { title: 'Pay on completion', body: 'Conversions are €250 on NBT Evo and €280 on MGU with CarPlay activation included on both, agreed up front and paid once the work is shown done.' },
+      { title: 'Pay on completion', body: 'Conversions are €250 on NBT Evo and from €300 on MGU with CarPlay activation included on both — the exact MGU price is agreed up front from your VIN and paid once the work is shown done.' },
     ],
     faqs: [
       { q: 'Can you code Japanese import BMWs for Ireland?', a: 'Yes. Japan to EU conversion is a regular job — region change, navigation FSC, European maps, ETC mirror handling and TCB checks. Send the details and we will tell you exactly what your car needs.' },

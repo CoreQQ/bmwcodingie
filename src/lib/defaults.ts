@@ -67,7 +67,7 @@ export const DEFAULT_CATALOG: CategoryWithServices[] = [
     sort_order: 4,
     translations: {},
     services: [
-      svc(14, 4, 'Japan → EU conversion', 'Region change, radio bands, navigation FSC, EU maps and ETC handling for JDM imports.', '€250 NBT Evo · €280 MGU'),
+      svc(14, 4, 'Japan → EU conversion', 'Region change, radio bands, navigation FSC, EU maps and ETC handling for JDM imports.', '€250 NBT Evo · from €300 MGU'),
       svc(15, 4, 'Full ISTA diagnostics', 'Complete fault scan, read and clear codes, written summary of findings.', 'from €80'),
       svc(16, 4, 'Hidden features & custom coding', 'Bespoke coding to your spec — tell us what you want, we will scope it.', 'On request'),
     ],

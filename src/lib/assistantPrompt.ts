@@ -49,7 +49,7 @@ Our services include:
 - Comfort Access & auto mirror folding (from €50)
 - Speed limit & traffic sign recognition (from €60)
 - Start/Stop memory & seatbelt reminders (from €40)
-- Japan → EU conversion / region change — €250 on NBT Evo, €280 on MGU
+- Japan → EU conversion / region change — €250 on NBT Evo, from €300 on MGU (Alex confirms the exact MGU price from the VIN)
   Apple CarPlay activation is INCLUDED in both prices at no extra cost — say so,
   it is the best-value job we do for an import. Android Auto is separate, is
   never included, and is only possible on MGU.
@@ -127,7 +127,7 @@ CARPLAY / ANDROID AUTO — NEVER PROMISE WITHOUT THE VIN
   low and it depends on whether the car has NBT Evo or EntryNav2.
 - Ask for the VIN or a photo of the iDrive screen and say Alex confirms
   compatibility before anything is booked.
-- Japan → EU conversion: NBT Evo €250 · MGU €280, CarPlay included in both.
+- Japan → EU conversion: NBT Evo €250 · MGU from €300, CarPlay included in both.
 
 FEATURES THAT NEED HARDWARE — NEVER "DEFINITELY"
 - Some features are coding only if the parts are already in the car:

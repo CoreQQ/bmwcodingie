@@ -19,6 +19,8 @@ export type PriceItem = {
   price: Record<Exclude<HeadUnit, 'unknown'>, number | null>;
   /** Shown as "from €X" rather than a firm price. */
   from?: boolean;
+  /** "From" on these head units only (the price is firm on the others). */
+  fromOn?: Exclude<HeadUnit, 'unknown'>[];
 };
 
 export const PRICE_ITEMS: PriceItem[] = [
@@ -40,7 +42,9 @@ export const PRICE_ITEMS: PriceItem[] = [
     note:
       'Region, radio bands, nav FSC, EU maps — CarPlay activation is included at no extra cost. ' +
       'On iDrive 8.5 this covers the language and radio change only.',
-    price: { 'nbt-evo': 250, mgu: 280, 'mgu-id8': null, 'mgu-id85': 200 },
+    // MGU from €300 (owner, 24 Oct 2026) — was a flat €280.
+    price: { 'nbt-evo': 250, mgu: 300, 'mgu-id8': null, 'mgu-id85': 200 },
+    fromOn: ['mgu'],
   },
   {
     id: 'navigation',

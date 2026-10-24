@@ -14,7 +14,7 @@ Competitors in the map pack today: Radio King (4.8★, 1,094 reviews), Bimmerwis
 5. **Service areas:** Dublin, Kildare, Wicklow, Meath (add Louth only if you confirm you drive there). Up to 20 areas; do not list counties you only serve remotely.
 6. **Hours:** match the diary (admin → hours). The site's schema reads the same table.
 7. **Phone / website:** the WhatsApp number used on the site; website `https://www.bmwcoding.ie` (with **www**).
-8. **Services:** add each with the site's price — CarPlay €150/€220, Japan → EU €250/€280, Diagnostics from €80, ID4 → ID6 €50, Android Auto €200, plus "quoted" items (retrofits, maps, 6WB). Link each to its page (see KEYWORD-STRATEGY.md).
+8. **Services:** add each with the site's price — CarPlay €150/€220, Japan → EU €250 / from €300, Diagnostics from €80, ID4 → ID6 €50, Android Auto €200, plus "quoted" items (retrofits, maps, 6WB). Link each to its page (see KEYWORD-STRATEGY.md).
 9. **Photos:** only real jobs (the same photos as the gallery/projects page) — screens, clusters, the car on the driveway. 10+ to start, then 1–2 a week. No generated images.
 10. **Reviews:** after every paid job send the review link (the bot's `/review` command already has the text). Never offer anything in exchange, never write them yourself. Reply to every review within 48 h — short, by name, mention the job.
 11. **Posts:** one per week — a finished job photo + one line + link to the service page.

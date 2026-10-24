@@ -33,7 +33,7 @@ and the new `/projects` page built from existing styles.
 
 ### Prices (verified against `src/lib/pricing.ts` and the agent's price list)
 Shown in the existing price chip and, where a figure exists, as a schema `Offer` (`minPrice`):
-CarPlay €150 NBT Evo / €220 iDrive 7 · Android Auto €200 iDrive 7, iDrive 8.5 from €400, iDrive 8 per car · Japan → EU €250 / €280 incl. CarPlay · Diagnostics from €80 · Hidden features session from €50, single setting from €40 · Retrofits, maps, reverse camera, cruise control: "quoted per car after a VIN check" · Remote: "same prices, no call-out" · Coding Dublin: "priced per job — see the calculator" (owner decision pending, see audit).
+CarPlay €150 NBT Evo / €220 iDrive 7 · Android Auto €200 iDrive 7, iDrive 8.5 from €400, iDrive 8 per car · Japan → EU €250 / from €300 (MGU, since 24 Oct) incl. CarPlay · Diagnostics from €80 · Hidden features session from €50, single setting from €40 · Retrofits, maps, reverse camera, cruise control: "quoted per car after a VIN check" · Remote: "same prices, no call-out" · Coding Dublin: "priced per job — see the calculator" (owner decision pending, see audit).
 
 ### Structured data
 - `AutoRepair` (layout): opening hours generated from the `business_hours` table (same source as the diary), fallback to the existing defaults; still locality-only address.
