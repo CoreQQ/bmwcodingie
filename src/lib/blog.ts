@@ -193,7 +193,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Video in Motion — from €60',
           'Sport displays / digital cluster layouts — from €60',
           'Comfort pack (mirrors, windows, chimes, lighting) — from €40–50 per item, bundled cheaper',
-          'Japan → EU conversion — €250 NBT Evo, €280 MGU, CarPlay included on both (Android Auto separate, MGU only)',
+          'Japan → EU conversion — €250 NBT Evo, from €300 MGU, CarPlay included on both (Android Auto separate, MGU only)',
           'Minimum job — €80 per visit or remote session; the smaller settings above are combined into one job',
         ],
       },
@@ -307,7 +307,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Imports travel far and sit in compounds. A complete diagnostic scan across every control unit shows the honest state of the car — stored faults, battery registration state, anything the auction sheet did not mention. We include a written summary you can keep with the car\u2019s file.',
         ],
         bullets: [
-          'Full conversion (region, bands, nav FSC, EU maps) — €250 NBT Evo, €280 MGU with CarPlay included',
+          'Full conversion (region, bands, nav FSC, EU maps) — €250 NBT Evo, from €300 MGU with CarPlay included',
           'Navigation FSC + EU maps — quoted per system',
           'ISTA scan with written summary — from €80',
           'All demonstrated working before you pay',
@@ -562,7 +562,7 @@ export const BLOG_POSTS: BlogPost[] = [
         heading: 'What coding cannot do',
         paragraphs: [
           'Coding switches on functions the car already has the hardware for. It will not add a head-up display, a camera or a cluster the car was never built with — those are retrofits with parts and wiring. Options that depend on a server subscription are also outside what coding changes.',
-          'Japanese-import G20s are a separate case: the radio band, language and navigation region need a proper conversion (from €280 on iDrive 7, CarPlay included).',
+          'Japanese-import G20s are a separate case: the radio band, language and navigation region need a proper conversion (from €300 on iDrive 7, CarPlay included).',
         ],
       },
       {
