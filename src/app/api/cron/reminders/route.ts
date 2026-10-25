@@ -7,6 +7,8 @@ import { buildAgenda } from '@/lib/agenda';
 import { sendWhatsAppText, sendWhatsAppTemplate, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { phoneKey } from '@/lib/crm';
 import { normalizePhone } from '@/lib/phone';
+import { SEASON } from '@/lib/season';
+import SEASON_DATES from '@/lib/season-dates.json';
 
 // Utility template on the WhatsApp account (submitted 21 Oct 2026, id
 // 2125231011455361): "Hi {{1}}, a reminder that your BMW is booked in for
@@ -227,6 +229,20 @@ export async function GET(req: Request) {
         },
       );
     }
+  }
+
+  // The offer is baked in at build time (next.config.js): if today's date
+  // calls for another one, the site was not rebuilt on the day — say so.
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' });
+  const due =
+    (Object.entries(SEASON_DATES).find(
+      ([, r]) => Array.isArray(r) && today >= (r as string[])[0] && today <= (r as string[])[1],
+    )?.[0] as string | undefined) ?? '';
+  if (due !== SEASON) {
+    const label = (x: string) => (x === 'blackfriday' ? 'Black Friday' : x === 'xmas' ? 'Christmas' : 'no offer');
+    await sendOwnerMessage(
+      `⚠️ <b>The site shows ${label(SEASON)}, but today should be ${label(due)}.</b> It needs a redeploy (Vercel → Deployments → Redeploy) — or tell Claude.`,
+    );
   }
 
   await pingIndexNow();

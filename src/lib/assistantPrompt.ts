@@ -3,7 +3,7 @@
 // channel-specific instructions differ.
 
 import { MOBILE_ONLY_FROM, isMobileOnly } from './transition';
-import { XMAS, XMAS_ON } from './season';
+import { BF, BF_ON, XMAS, XMAS_ON } from './season';
 
 // There is no workshop any more. Offering one sends a customer to a unit we do
 // not hold, so the fact is computed in one place and both prompts read it.
@@ -34,7 +34,15 @@ ${LOCATION_FACT}
   and the €80 minimum job. The call-out fee is not discounted. When you give a price, give the
   offer price and mention the regular one, e.g. "CarPlay on NBT Evo is €135 with our Christmas
   offer (normally €150)".`
-    : ''
+    : BF_ON
+      ? `
+- BLACK FRIDAY OFFER (running now, Friday 27 to Cyber Monday 30 November): ${BF.pct}% off every job
+  DONE on those four days, and Apple CarPlay activation includes the Wi-Fi antenna fitted free
+  where wireless CarPlay needs it (normally €30). The call-out fee is not discounted. Give the
+  offer price and the regular one, e.g. "CarPlay on NBT Evo is €135 this Black Friday (normally
+  €150), antenna included". The discount is for jobs done 27–30 Nov: for a later date say the
+  regular price applies, and that our Christmas offer (10% off) starts on 1 December.`
+      : ''
 }
 
 Our services include:

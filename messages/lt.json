@@ -46,7 +46,8 @@
     "quoteLink": "Gauti kainą",
     "servicesLink": "Visos paslaugos",
     "projectsLink": "Mūsų darbai",
-    "xmasBadge": "Kalėdinis pasiūlymas: −10% visiems darbams iki sausio 6 d."
+    "xmasBadge": "Kalėdinis pasiūlymas: −10% visiems darbams iki sausio 6 d.",
+    "bfBadge": "−10% visiems darbams, Pn 27 – Pr 30 lapkričio"
   },
   "Services": {
     "eyebrow": "01 / Paslaugos",
@@ -305,6 +306,20 @@
     "title": "Kalėdinis pasiūlymas: 10% nuolaida visiems darbams",
     "body": "Iki sausio 6 d.: CarPlay, kodavimas, japoniškų automobilių konversija į EU, retrofitai ir diagnostika. Kainos svetainėje jau su nuolaida; atvykimo mokesčiui nuolaida netaikoma.",
     "cta": "Žiūrėti kainas"
+  },
+  "BlackFriday": {
+    "title": "Black Friday: −10% visiems darbams, lapkričio 27–30 d.",
+    "body": "Nuo penktadienio, lapkričio 27 d., iki Cyber Monday, lapkričio 30 d.: −10% bet kuriam šiomis dienomis atliktam darbui, o aktyvuojant Apple CarPlay — Wi-Fi antena dovanų. Atvykimo mokesčiui nuolaida netaikoma.",
+    "cta": "Žiūrėti pasiūlymą",
+    "posterDates": "Pn 27 – Cyber Monday, lapkričio 30",
+    "posterSub": "−10% bet kuriam darbui per šias keturias dienas: CarPlay, kodavimas, japoniškų automobilių konversija į EU, retrofitai ir diagnostika.",
+    "carplayLabel": "Apple CarPlay aktyvavimas",
+    "carplayMgu": "su NBT Evo · €{now} su iDrive 7 (MGU), įprastai €{was}",
+    "antenna": "Wi-Fi antena dovanų (vertė €30)",
+    "finePrint": "Taikoma darbams, atliktiems lapkričio 27–30 d. Antena montuojama, jei jos reikia belaidžiam CarPlay. Atvykimo mokesčiui nuolaida netaikoma.",
+    "book": "Registruotis Black Friday laikui",
+    "whatsapp": "Rašyti WhatsApp",
+    "waMessage": "Sveiki! Norėčiau CarPlay pagal Black Friday pasiūlymą. Mano BMW — "
   },
   "GoogleReviews": {
     "count": "{count} atsiliepimai Google",

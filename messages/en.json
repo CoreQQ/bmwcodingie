@@ -46,7 +46,8 @@
     "quoteLink": "Request a quote",
     "servicesLink": "View all services",
     "projectsLink": "Real projects",
-    "xmasBadge": "Christmas offer: −10% on all work until 6 January"
+    "xmasBadge": "Christmas offer: −10% on all work until 6 January",
+    "bfBadge": "−10% on all work, Fri 27 – Mon 30 Nov"
   },
   "Services": {
     "eyebrow": "01 / Services",
@@ -305,6 +306,20 @@
     "title": "Christmas offer: 10% off all work",
     "body": "Until 6 January: CarPlay, coding, Japan → EU conversions, retrofits and diagnostics. The prices on the site already show the discount; the call-out fee is not discounted.",
     "cta": "See the prices"
+  },
+  "BlackFriday": {
+    "title": "Black Friday: 10% off all work, 27–30 November",
+    "body": "Friday 27 to Cyber Monday 30 November: 10% off every job done on those days, and Apple CarPlay activation comes with the Wi-Fi antenna fitted free. The call-out fee is not discounted.",
+    "cta": "See the deal",
+    "posterDates": "Fri 27 – Cyber Monday 30 November",
+    "posterSub": "10% off every job done on these four days: CarPlay, coding, Japan → EU conversions, retrofits and diagnostics.",
+    "carplayLabel": "Apple CarPlay activation",
+    "carplayMgu": "on NBT Evo · €{now} on iDrive 7 (MGU), normally €{was}",
+    "antenna": "Wi-Fi antenna fitted free (worth €30)",
+    "finePrint": "For jobs done on 27–30 November. The antenna is fitted where wireless CarPlay needs it. The call-out fee is not discounted.",
+    "book": "Book a Black Friday slot",
+    "whatsapp": "WhatsApp us",
+    "waMessage": "Hi — I'd like the Black Friday CarPlay deal. My BMW is a "
   },
   "GoogleReviews": {
     "count": "{count} reviews on Google",

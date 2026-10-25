@@ -46,7 +46,8 @@
     "quoteLink": "Cere o ofertă",
     "servicesLink": "Toate serviciile",
     "projectsLink": "Lucrări reale",
-    "xmasBadge": "Ofertă de Crăciun: −10% la toate lucrările până pe 6 ianuarie"
+    "xmasBadge": "Ofertă de Crăciun: −10% la toate lucrările până pe 6 ianuarie",
+    "bfBadge": "−10% la toate lucrările, vin 27 – lun 30 noiembrie"
   },
   "Services": {
     "eyebrow": "01 / Servicii",
@@ -305,6 +306,20 @@
     "title": "Ofertă de Crăciun: 10% reducere la toate lucrările",
     "body": "Până pe 6 ianuarie: CarPlay, codare, conversii Japonia → UE, retrofituri și diagnoză. Prețurile de pe site includ deja reducerea; taxa de deplasare nu se reduce.",
     "cta": "Vezi prețurile"
+  },
+  "BlackFriday": {
+    "title": "Black Friday: −10% la toate lucrările, 27–30 noiembrie",
+    "body": "De vineri 27 până în Cyber Monday 30 noiembrie: −10% la orice lucrare făcută în aceste zile, iar la activarea Apple CarPlay antena Wi-Fi e cadou. Taxa de deplasare nu se reduce.",
+    "cta": "Vezi oferta",
+    "posterDates": "Vin 27 – Cyber Monday 30 noiembrie",
+    "posterSub": "−10% la orice lucrare făcută în aceste patru zile: CarPlay, codare, conversii Japonia → UE, retrofituri și diagnoză.",
+    "carplayLabel": "Activare Apple CarPlay",
+    "carplayMgu": "pe NBT Evo · €{now} pe iDrive 7 (MGU), de obicei €{was}",
+    "antenna": "Antenă Wi-Fi montată cadou (valoare €30)",
+    "finePrint": "Pentru lucrări făcute pe 27–30 noiembrie. Antena se montează unde CarPlay wireless are nevoie de ea. Taxa de deplasare nu se reduce.",
+    "book": "Rezervă un loc de Black Friday",
+    "whatsapp": "Scrie-ne pe WhatsApp",
+    "waMessage": "Bună! Aș vrea oferta Black Friday pentru CarPlay. BMW-ul meu este "
   },
   "GoogleReviews": {
     "count": "{count} recenzii pe Google",

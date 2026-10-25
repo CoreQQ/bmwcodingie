@@ -6,6 +6,7 @@ import { Header } from '@/components/site/Header';
 import { Preloader } from '@/components/site/Preloader';
 import { ScrollProgress } from '@/components/site/ScrollProgress';
 import { Hero } from '@/components/site/Hero';
+import { BlackFridayPoster } from '@/components/site/BlackFridayPoster';
 import { Gallery } from '@/components/site/Gallery';
 import { Reviews } from '@/components/site/Reviews';
 import { GoogleReviews } from '@/components/site/GoogleReviews';
@@ -69,6 +70,7 @@ export default async function HomePage({
         {/* The owner's brief: every block leads to one of three actions —
             WhatsApp, the VIN check or booking. Order as specified. */}
         <Hero settings={settings} />
+        <BlackFridayPoster whatsapp={settings.whatsapp} />
         <VinCheck whatsapp={settings.whatsapp} />
         <PopularServices whatsapp={settings.whatsapp} />
         <FeaturedServices />

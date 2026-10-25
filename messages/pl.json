@@ -46,7 +46,8 @@
     "quoteLink": "Zapytaj o cenę",
     "servicesLink": "Wszystkie usługi",
     "projectsLink": "Nasze realizacje",
-    "xmasBadge": "Oferta świąteczna: −10% na wszystkie prace do 6 stycznia"
+    "xmasBadge": "Oferta świąteczna: −10% na wszystkie prace do 6 stycznia",
+    "bfBadge": "−10% na wszystkie prace, pt 27 – pn 30 listopada"
   },
   "Services": {
     "eyebrow": "01 / Usługi",
@@ -305,6 +306,20 @@
     "title": "Oferta świąteczna: 10% taniej na wszystkie prace",
     "body": "Do 6 stycznia: CarPlay, kodowanie, konwersje aut z Japonii na EU, retrofity i diagnostyka. Ceny na stronie już uwzględniają rabat; opłata za dojazd bez rabatu.",
     "cta": "Zobacz ceny"
+  },
+  "BlackFriday": {
+    "title": "Black Friday: −10% na wszystkie prace, 27–30 listopada",
+    "body": "Od piątku 27 do Cyber Monday 30 listopada: −10% na każdą pracę wykonaną w te dni, a do aktywacji Apple CarPlay antena Wi-Fi gratis. Opłata za dojazd bez rabatu.",
+    "cta": "Zobacz ofertę",
+    "posterDates": "Pt 27 – Cyber Monday 30 listopada",
+    "posterSub": "−10% na każdą pracę wykonaną w te cztery dni: CarPlay, kodowanie, konwersje aut z Japonii na EU, retrofity i diagnostyka.",
+    "carplayLabel": "Aktywacja Apple CarPlay",
+    "carplayMgu": "na NBT Evo · €{now} na iDrive 7 (MGU), zwykle €{was}",
+    "antenna": "Antena Wi-Fi gratis (wartość €30)",
+    "finePrint": "Dotyczy prac wykonanych 27–30 listopada. Antenę montujemy, jeśli jest potrzebna do bezprzewodowego CarPlay. Opłata za dojazd bez rabatu.",
+    "book": "Zarezerwuj termin Black Friday",
+    "whatsapp": "Napisz na WhatsApp",
+    "waMessage": "Dzień dobry! Chcę CarPlay w promocji Black Friday. Moje BMW to "
   },
   "GoogleReviews": {
     "count": "{count} opinii w Google",

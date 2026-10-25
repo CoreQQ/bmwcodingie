@@ -12,7 +12,7 @@ import {
   isBundledOut,
   type HeadUnit,
 } from '@/lib/pricing';
-import { XMAS, XMAS_ON, xmasPrice } from '@/lib/season';
+import { BF_ON, OFFER, OFFER_ON, offerPrice } from '@/lib/season';
 
 // Instant estimate so visitors never have to ask "how much?" — the number one
 // reason people leave a service site. Prices come from src/lib/pricing.ts, the
@@ -28,6 +28,8 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
   // iDrive 8 is too build-dependent to publish a number for: what is codable
   // varies with the software version, so every job is quoted from the VIN.
   const quoteOnly = unit === 'mgu-id8';
+
+  const antennaFree = (id: string) => BF_ON && id === 'wifi-antenna' && picked.includes('carplay');
 
   const toggle = (list: string[], set: (v: string[]) => void, id: string) =>
     set(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -56,6 +58,11 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
     }
     for (const a of ADD_ONS) {
       if (!addOns.includes(a.id)) continue;
+      // Black Friday: the Wi-Fi antenna comes with CarPlay activation.
+      if (antennaFree(a.id)) {
+        lines.push({ label: a.label, amount: 0, bundled: true });
+        continue;
+      }
       lines.push({ label: a.label, amount: a.price });
       total += a.price;
     }
@@ -65,11 +72,16 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
       lines.push({ label: `Minimum job is €${MIN_JOB} — add another setting at no extra cost`, amount: MIN_JOB - total });
       total = MIN_JOB;
     }
-    // Christmas offer: 10% off the work. The call-out is travel, not work.
+    // Black Friday / Christmas: 10% off the work. The call-out is travel, not work.
     let discount = 0;
-    if (XMAS_ON && total > 0) {
-      discount = total - xmasPrice(total);
-      lines.push({ label: `🎄 Christmas offer −${XMAS.pct}% (until ${XMAS.until})`, amount: -discount });
+    if (OFFER_ON && total > 0) {
+      discount = total - offerPrice(total);
+      lines.push({
+        label: BF_ON
+          ? `${OFFER.emoji} Black Friday −${OFFER.pct}% (jobs done 27–30 Nov)`
+          : `${OFFER.emoji} ${OFFER.name} offer −${OFFER.pct}% (until ${OFFER.until})`,
+        amount: -discount,
+      });
     }
     if (mobile) {
       lines.push({ label: 'Call-out around Dublin', amount: CALL_OUT.base });
@@ -181,7 +193,9 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                     <span className="block text-sm text-ink">{a.label}</span>
                     {a.note && <span className="mt-0.5 block text-[11px] text-faint">{a.note}</span>}
                   </span>
-                  <span className="shrink-0 font-mono text-xs text-muted">+€{a.price}</span>
+                  <span className="shrink-0 font-mono text-xs text-muted">
+                    {antennaFree(a.id) ? 'free with CarPlay' : `+€${a.price}`}
+                  </span>
                 </button>
               );
             })}
