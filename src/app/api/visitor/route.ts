@@ -2,23 +2,25 @@ import { NextResponse } from 'next/server';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import { isServiceArea } from '@/lib/geo';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { notifyVisitor } from '@/lib/telegram';
+import { parseUserAgent } from '@/lib/parseUserAgent';
 
 export const runtime = 'nodejs';
 
 // Best-effort in-memory cooldown per IP — resets when the lambda goes cold,
-// which is fine here: the goal is just to avoid counting refreshes.
+// which is fine here: the goal is just to avoid obvious refresh-spam.
 const lastNotified = new Map<string, number>();
 const COOLDOWN_MS = 10 * 60 * 1000;
 
 const PRIVATE_IP = /^(127\.|10\.|192\.168\.|::1$|unknown$)/;
 
-type Geo = { country?: string; city?: string };
+type Geo = { country?: string; city?: string; isp?: string };
 
-/** Best-effort country/city lookup. Returns {} on any failure or private IP. */
+/** Best-effort country/city/ISP lookup. Returns {} on any failure or private IP. */
 async function geolocate(ip: string): Promise<Geo> {
   if (PRIVATE_IP.test(ip)) return {};
   try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,city`, {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,city,isp`, {
       signal: AbortSignal.timeout(2000),
     });
     if (!res.ok) return {};
@@ -27,6 +29,7 @@ async function geolocate(ip: string): Promise<Geo> {
     return {
       country: data.country || undefined,
       city: data.city || undefined,
+      isp: data.isp || undefined,
     };
   } catch {
     return {};
@@ -34,11 +37,12 @@ async function geolocate(ip: string): Promise<Geo> {
 }
 
 export async function POST(req: Request) {
-  // One ping per session per visitor is normal — anything chatty is abuse.
+  // One ping per session per visitor is normal — anything chatty is abuse
+  // aimed at flooding the owner's Telegram.
   if (isRateLimited(`visit:${clientIp(req)}`, 4, 10 * 60 * 1000)) {
     return NextResponse.json({ ok: true });
   }
-  // Visitors outside the service area are not counted.
+  // Visitors outside the service area are neither pinged nor counted.
   if (!isServiceArea(req)) return NextResponse.json({ ok: true });
 
   let body: Record<string, unknown>;
@@ -61,15 +65,21 @@ export async function POST(req: Request) {
   }
   lastNotified.set(ip, Date.now());
 
-  // Counted for the evening digest instead of a Telegram message per visitor
-  // (the noisiest thing the bot sent). City-level place only — no IP stored.
-  const { country, city } = await geolocate(ip);
+  const { browser, os } = parseUserAgent(req.headers.get('user-agent') || '');
+  const language = req.headers.get('accept-language')?.split(',')[0]?.trim();
+  const { country, city, isp } = await geolocate(ip);
+
+  // Both: a Telegram message per visitor (the owner's choice) and a row for
+  // the evening digest — city-level place only, no IP stored.
   const sb = getSupabaseAdmin();
-  if (sb) {
-    await sb
-      .from('site_visits')
-      .insert({ path, referrer: referrer ?? null, source: source ?? null, device, city: city ?? null, country: country ?? null, is_returning: isReturning })
-      .then(() => undefined, () => undefined);
-  }
+  await Promise.all([
+    notifyVisitor({ path, referrer, device, ip, browser, os, country, city, isp, language, isReturning, source }),
+    sb
+      ? sb
+          .from('site_visits')
+          .insert({ path, referrer: referrer ?? null, source: source ?? null, device, city: city ?? null, country: country ?? null, is_returning: isReturning })
+          .then(() => undefined, () => undefined)
+      : Promise.resolve(),
+  ]);
   return NextResponse.json({ ok: true });
 }

@@ -12,7 +12,7 @@ Visitor ──▶ bmwcoding.ie (Next.js 14 on Vercel, edge-cached)
               │  /api/booking ──▶ Supabase (bookings, clients) ──▶ Telegram notify
               │  /api/slots   ──▶ live availability (hours, duration, overlaps)
               │  /api/chat    ──▶ Anthropic (site AI assistant)
-              │  /api/visitor ──▶ site_visits row (consent-gated) → evening digest
+              │  /api/visitor ──▶ Telegram visitor ping + site_visits row → digest
 Owner  ──▶ Telegram bot (/api/telegram webhook) — full control plane
        ──▶ Mini App "PULT" (/miniapp + /api/miniapp) — visual admin + CRM
        ──▶ /admin web panel — content editing
@@ -90,7 +90,8 @@ unknown columns and retries; other readers fall back to defaults.
 Automatic messages: booking/VIN/chat leads, one WhatsApp mirror per customer
 message (a specific-time request is a line in it, not a separate alert), 🚨
 pinned alert only when a customer asks for a person or is fed up, morning
-agenda + reminders, evening digest. No per-visitor pings any more.
+agenda + reminders, evening digest, and a ping per site visitor (consent-gated,
+IE/GB only, 10-min cooldown per IP — back by the owner's choice on 25 Oct).
 
 Tomorrow's reminders (morning cron): free text if the customer wrote in the
 last 24h, otherwise the approved WhatsApp template `appointment_reminder`
