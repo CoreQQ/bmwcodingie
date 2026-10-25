@@ -575,6 +575,42 @@ function dublinTime(): string {
   }
 }
 
+export type VisitorPing = {
+  path: string;
+  referrer?: string;
+  device: 'mobile' | 'desktop';
+  ip?: string;
+  browser?: string;
+  os?: string;
+  country?: string;
+  city?: string;
+  isp?: string;
+  language?: string;
+  isReturning?: boolean;
+  source?: string;
+};
+
+/** "Someone's on the site", with the visit's details. The owner wants these
+ *  one by one (back on 25 Oct after a week of evening-digest only). */
+export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
+  const lines = [
+    v.isReturning ? '🔁 <b>Returning visitor</b>' : '👀 <b>New visitor on the site</b>',
+    '━━━━━━━━━━━━━━━━━━━',
+    `🕒 <b>Time:</b> ${esc(dublinTime())}`,
+    `📄 <b>Page:</b> ${esc(v.path)}`,
+    `🔗 <b>Source:</b> ${esc(v.referrer || 'Direct / unknown')}`,
+    ...(v.source ? [`📣 <b>Campaign:</b> ${esc(v.source)}`] : []),
+    `${v.device === 'mobile' ? '📱' : '🖥'} <b>Device:</b> ${v.device === 'mobile' ? 'Mobile' : 'Desktop'}${v.os ? ` · ${esc(v.os)}` : ''}`,
+  ];
+  if (v.browser) lines.push(`🧭 <b>Browser:</b> ${esc(v.browser)}`);
+  if (v.language) lines.push(`🗣 <b>Language:</b> ${esc(v.language)}`);
+  if (v.country) lines.push(`🌍 <b>Country:</b> ${esc(v.country)}`);
+  if (v.city) lines.push(`🏙 <b>City:</b> ${esc(v.city)}`);
+  if (v.isp) lines.push(`🏢 <b>Provider:</b> ${esc(v.isp)}`);
+  lines.push(`🌐 <b>IP:</b> <code>${esc(v.ip || 'unknown')}</code>`);
+  return sendTelegramMessage(lines.join('\n'));
+}
+
 /** Generic event notification (admin login, server error, file upload, …). */
 export async function notifyEvent(opts: {
   emoji: string;
