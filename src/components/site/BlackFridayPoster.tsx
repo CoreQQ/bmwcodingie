@@ -6,7 +6,7 @@ import { waHref } from '@/lib/waMessage';
 
 // The Black Friday "poster" under the home hero: one loud statement (−10% on
 // every job done 27–30 Nov) and one concrete deal (CarPlay at the offer price
-// with the Wi-Fi antenna fitted free). Prices come from pricing.ts, so the
+// with the Wi-Fi antenna included). Prices come from pricing.ts, so the
 // poster can never disagree with the calculator.
 
 const ACCENT = '#ffd23f';

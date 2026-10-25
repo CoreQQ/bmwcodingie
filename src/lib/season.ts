@@ -39,7 +39,8 @@ export const XMAS = {
 } as const;
 
 /** Black Friday → Cyber Monday (owner, 25 Oct): 10% off jobs DONE on
- *  27–30 November, and CarPlay activation includes the Wi-Fi antenna. */
+ *  27–30 November, and CarPlay activation includes the Wi-Fi antenna in the
+ *  price — for every car, not only builds that need it. */
 export const BF = {
   pct: 10,
   until: '30 November',

@@ -287,7 +287,7 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.repeatNote) lines.push(lead.repeatNote);
   // The site shows them the offer price, so the bill must match it.
   if (XMAS_ON) lines.push(`🎄 <b>Christmas offer:</b> −${XMAS.pct}% on the work (not the call-out), until ${XMAS.until}`);
-  if (BF_ON) lines.push(`🏷️ <b>Black Friday:</b> −${BF.pct}% on jobs done 27–30 Nov (not the call-out) · Wi-Fi antenna free with CarPlay`);
+  if (BF_ON) lines.push(`🏷️ <b>Black Friday:</b> −${BF.pct}% on jobs done 27–30 Nov (not the call-out) · Wi-Fi antenna included with CarPlay`);
   return lines;
 }
 

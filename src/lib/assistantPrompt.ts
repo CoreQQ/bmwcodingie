@@ -37,8 +37,8 @@ ${LOCATION_FACT}
     : BF_ON
       ? `
 - BLACK FRIDAY OFFER (running now, Friday 27 to Cyber Monday 30 November): ${BF.pct}% off every job
-  DONE on those four days, and Apple CarPlay activation includes the Wi-Fi antenna fitted free
-  where wireless CarPlay needs it (normally €30). The call-out fee is not discounted. Give the
+  DONE on those four days, and Apple CarPlay activation includes the Wi-Fi antenna in the price
+  (normally €30, every car). The call-out fee is not discounted. Give the
   offer price and the regular one, e.g. "CarPlay on NBT Evo is €135 this Black Friday (normally
   €150), antenna included". The discount is for jobs done 27–30 Nov: for a later date say the
   regular price applies, and that our Christmas offer (10% off) starts on 1 December.`

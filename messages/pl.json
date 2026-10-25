@@ -309,14 +309,14 @@
   },
   "BlackFriday": {
     "title": "Black Friday: −10% na wszystkie prace, 27–30 listopada",
-    "body": "Od piątku 27 do Cyber Monday 30 listopada: −10% na każdą pracę wykonaną w te dni, a do aktywacji Apple CarPlay antena Wi-Fi gratis. Opłata za dojazd bez rabatu.",
+    "body": "Od piątku 27 do Cyber Monday 30 listopada: −10% na każdą pracę wykonaną w te dni, a aktywacja Apple CarPlay obejmuje antenę Wi-Fi. Opłata za dojazd bez rabatu.",
     "cta": "Zobacz ofertę",
     "posterDates": "Pt 27 – Cyber Monday 30 listopada",
     "posterSub": "−10% na każdą pracę wykonaną w te cztery dni: CarPlay, kodowanie, konwersje aut z Japonii na EU, retrofity i diagnostyka.",
     "carplayLabel": "Aktywacja Apple CarPlay",
     "carplayMgu": "na NBT Evo · €{now} na iDrive 7 (MGU), zwykle €{was}",
-    "antenna": "Antena Wi-Fi gratis (wartość €30)",
-    "finePrint": "Dotyczy prac wykonanych 27–30 listopada. Antenę montujemy, jeśli jest potrzebna do bezprzewodowego CarPlay. Opłata za dojazd bez rabatu.",
+    "antenna": "Antena Wi-Fi w cenie (wartość €30)",
+    "finePrint": "Dotyczy prac wykonanych 27–30 listopada. Opłata za dojazd bez rabatu.",
     "book": "Zarezerwuj termin Black Friday",
     "whatsapp": "Napisz na WhatsApp",
     "waMessage": "Dzień dobry! Chcę CarPlay w promocji Black Friday. Moje BMW to "

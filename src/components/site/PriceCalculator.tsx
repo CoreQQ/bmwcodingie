@@ -57,12 +57,12 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
       if (item.from || item.fromOn?.includes(priceUnit)) anyFrom = true;
     }
     for (const a of ADD_ONS) {
-      if (!addOns.includes(a.id)) continue;
-      // Black Friday: the Wi-Fi antenna comes with CarPlay activation.
+      // Black Friday: the Wi-Fi antenna is part of the CarPlay price, ticked or not.
       if (antennaFree(a.id)) {
         lines.push({ label: a.label, amount: 0, bundled: true });
         continue;
       }
+      if (!addOns.includes(a.id)) continue;
       lines.push({ label: a.label, amount: a.price });
       total += a.price;
     }
@@ -194,7 +194,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                     {a.note && <span className="mt-0.5 block text-[11px] text-faint">{a.note}</span>}
                   </span>
                   <span className="shrink-0 font-mono text-xs text-muted">
-                    {antennaFree(a.id) ? 'free with CarPlay' : `+€${a.price}`}
+                    {antennaFree(a.id) ? 'included with CarPlay' : `+€${a.price}`}
                   </span>
                 </button>
               );
