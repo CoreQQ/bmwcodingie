@@ -361,7 +361,15 @@
     "clusterTitle": "Retrofit 6WA → 6WB",
     "clusterDesc": "Montaż cyfrowych zegarów",
     "diagnosticsTitle": "Diagnostyka BMW",
-    "diagnosticsDesc": "Diagnostyka ISTA i programowanie"
+    "diagnosticsDesc": "Diagnostyka ISTA i programowanie",
+    "idriveEyebrow": "Stare menu w formie listy?",
+    "idriveI1": "Ekran główny ID6 z kafelkami i nowsze menu",
+    "idriveI2": "Oprogramowanie, którego CarPlay wymaga w większości NBT Evo",
+    "idriveI3": "Ta sama jednostka — bez nowego sprzętu",
+    "clusterEyebrow": "Nadal analogowe zegary?",
+    "clusterI1": "Pełne cyfrowe zegary zamiast wskazówek",
+    "clusterI2": "Tryby Comfort, Sport i Eco Pro",
+    "clusterI3": "Przebieg Twojego auta bez zmian — nigdy go nie ruszamy"
   },
   "Japan": {
     "eyebrow": "BMW z Japonii?",
