@@ -382,7 +382,15 @@
     "clusterTitle": "Ретрофіт 6WA → 6WB",
     "clusterDesc": "Встановлення цифрової панелі приладів",
     "diagnosticsTitle": "Діагностика BMW",
-    "diagnosticsDesc": "Діагностика ISTA та програмування"
+    "diagnosticsDesc": "Діагностика ISTA та програмування",
+    "idriveEyebrow": "Старе меню списком?",
+    "idriveI1": "Головний екран ID6 з плитками та нові меню",
+    "idriveI2": "Версія ПЗ, потрібна для CarPlay на більшості NBT Evo",
+    "idriveI3": "Той самий блок — без нового заліза",
+    "clusterEyebrow": "Досі стрілочні прилади?",
+    "clusterI1": "Повністю цифрова панель замість стрілок",
+    "clusterI2": "Режими Comfort, Sport і Eco Pro",
+    "clusterI3": "Пробіг лишається рідним — ніколи не змінюємо"
   },
   "Japan": {
     "eyebrow": "BMW з Японії?",

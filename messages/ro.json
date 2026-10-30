@@ -382,7 +382,15 @@
     "clusterTitle": "Retrofit 6WA → 6WB",
     "clusterDesc": "Montaj bord digital",
     "diagnosticsTitle": "Diagnoză BMW",
-    "diagnosticsDesc": "Diagnoză ISTA și programare"
+    "diagnosticsDesc": "Diagnoză ISTA și programare",
+    "idriveEyebrow": "Meniu vechi, în listă?",
+    "idriveI1": "Ecran principal ID6 cu dale și meniuri noi",
+    "idriveI2": "Software-ul de care CarPlay are nevoie pe majoritatea NBT Evo",
+    "idriveI3": "Aceeași unitate — fără hardware nou",
+    "clusterEyebrow": "Încă ai bord cu ace?",
+    "clusterI1": "Bord complet digital în locul acelor",
+    "clusterI2": "Afișaje Comfort, Sport și Eco Pro",
+    "clusterI3": "Kilometrajul mașinii rămâne același — nu îl modificăm niciodată"
   },
   "Japan": {
     "eyebrow": "BMW din Japonia?",

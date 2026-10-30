@@ -382,7 +382,15 @@
     "clusterTitle": "6WA → 6WB Retrofit",
     "clusterDesc": "Digital instrument cluster retrofit",
     "diagnosticsTitle": "BMW Diagnostics",
-    "diagnosticsDesc": "ISTA diagnostics & programming"
+    "diagnosticsDesc": "ISTA diagnostics & programming",
+    "idriveEyebrow": "Old list-style iDrive?",
+    "idriveI1": "ID6 live-tile home screen and newer menus",
+    "idriveI2": "The software CarPlay needs on most NBT Evo cars",
+    "idriveI3": "Same head unit — no new hardware",
+    "clusterEyebrow": "Still on analogue dials?",
+    "clusterI1": "Full digital cluster in place of the dials",
+    "clusterI2": "Comfort, Sport and Eco Pro layouts",
+    "clusterI3": "Your car's own mileage kept — never altered"
   },
   "Japan": {
     "eyebrow": "Japanese import BMW?",

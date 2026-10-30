@@ -382,7 +382,15 @@
     "clusterTitle": "6WA → 6WB modernizavimas",
     "clusterDesc": "Skaitmeninio prietaisų skydelio montavimas",
     "diagnosticsTitle": "BMW diagnostika",
-    "diagnosticsDesc": "ISTA diagnostika ir programavimas"
+    "diagnosticsDesc": "ISTA diagnostika ir programavimas",
+    "idriveEyebrow": "Senas sąrašo meniu?",
+    "idriveI1": "ID6 pagrindinis ekranas su plytelėmis ir naujesni meniu",
+    "idriveI2": "Programinė įranga, kurios CarPlay reikia daugumoje NBT Evo",
+    "idriveI3": "Tas pats blokas — be naujos įrangos",
+    "clusterEyebrow": "Vis dar rodyklinis skydelis?",
+    "clusterI1": "Pilnas skaitmeninis skydelis vietoje rodyklių",
+    "clusterI2": "Comfort, Sport ir Eco Pro vaizdai",
+    "clusterI3": "Rida lieka jūsų automobilio — niekada nekeičiama"
   },
   "Japan": {
     "eyebrow": "BMW iš Japonijos?",
