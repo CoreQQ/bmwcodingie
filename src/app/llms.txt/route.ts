@@ -16,7 +16,7 @@ const BODY = `# BMW Coding (bmwcoding.ie)
 - [Apple CarPlay Activation](${SITE_URL}/apple-carplay-activation-dublin): wired/wireless CarPlay, EUR 150 on NBT Evo, EUR 220 on MGU (iDrive 7)
 - [CarPlay Activation Ireland](${SITE_URL}/bmw-carplay-activation-ireland): remote CarPlay activation anywhere in Ireland
 - [Fullscreen CarPlay](${SITE_URL}/bmw-fullscreen-carplay): CarPlay across the full 10.25" widescreen where supported
-- [Android Auto Activation](${SITE_URL}/bmw-android-auto-activation): EUR 200 on iDrive 7 (MGU); not possible on NBT Evo
+- [Android Auto Activation](${SITE_URL}/bmw-android-auto-activation): EUR 250 on NBT Evo with ID6 (new, native) / EUR 200 on iDrive 7 (MGU)
 - [iDrive ID4 to ID6 Upgrade](${SITE_URL}/bmw-id4-to-id6-upgrade): NBT Evo software update, EUR 50
 - [iDrive Upgrades](${SITE_URL}/bmw-idrive-upgrade-ireland): what each iDrive generation can realistically get
 - [6WA to 6WB Retrofit](${SITE_URL}/bmw-6wa-to-6wb-retrofit): digital instrument cluster, mobile visit, quoted per car

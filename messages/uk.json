@@ -49,6 +49,24 @@
     "xmasBadge": "Різдвяна пропозиція: −10% на всі роботи до 6 січня",
     "bfBadge": "−10% на всі роботи, пт 27 – пн 30 листопада"
   },
+  "AndroidAutoNew": {
+    "badge": "Новинка",
+    "eyebrow": "NBT Evo · iDrive 6",
+    "title1": "Android Auto на NBT Evo.",
+    "title2": "Раніше для цього потрібен був iDrive 7. Більше ні.",
+    "body": "Нативний Android Auto на NBT Evo з ID6: Google Maps, Waze, Spotify, дзвінки та повідомлення на рідному екрані вашої BMW. Без адаптерів, донглів і підписок.",
+    "f1": "Нативно — працює всередині iDrive",
+    "f2": "Google Maps і Waze на великому екрані",
+    "f3": "Spotify, дзвінки та повідомлення",
+    "f4": "Без адаптерів і підписок",
+    "priceNote": "разова активація · оплата, коли побачите, що все працює",
+    "ctaCheck": "Перевірити мою BMW",
+    "ctaWhatsapp": "Написати у WhatsApp",
+    "ctaMore": "Як це працює",
+    "needs": "Потрібен NBT Evo з прошивкою ID6 — перевіримо вашу за VIN. На старих ID4/ID5 спершу оновлення до ID6 (€50).",
+    "caption": "Android Auto на широкому екрані NBT Evo (ілюстрація)",
+    "waMessage": "Вітаю! Хочу Android Auto на NBT Evo. Моя BMW — "
+  },
   "Services": {
     "eyebrow": "01 / Послуги",
     "heading": "Що ми кодуємо",

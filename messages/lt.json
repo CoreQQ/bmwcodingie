@@ -49,6 +49,24 @@
     "xmasBadge": "Kalėdinis pasiūlymas: −10% visiems darbams iki sausio 6 d.",
     "bfBadge": "−10% visiems darbams, Pn 27 – Pr 30 lapkričio"
   },
+  "AndroidAutoNew": {
+    "badge": "Naujiena",
+    "eyebrow": "NBT Evo · iDrive 6",
+    "title1": "Android Auto su NBT Evo.",
+    "title2": "Iki šiol tam reikėjo iDrive 7. Nebe.",
+    "body": "Integruotas Android Auto su NBT Evo ir ID6: Google Maps, Waze, Spotify, skambučiai ir žinutės originaliame jūsų BMW ekrane. Be adapterių ir prenumeratų.",
+    "f1": "Integruotas — veikia iDrive viduje",
+    "f2": "Google Maps ir Waze dideliame ekrane",
+    "f3": "Spotify, skambučiai ir žinutės",
+    "f4": "Be adapterių ir prenumeratų",
+    "priceNote": "vienkartinis aktyvavimas · mokate, kai pamatote, kad veikia",
+    "ctaCheck": "Patikrinti mano BMW",
+    "ctaWhatsapp": "Rašyti WhatsApp",
+    "ctaMore": "Kaip tai veikia",
+    "needs": "Reikia NBT Evo su ID6 programine įranga — patikrinsime pagal VIN. Su senesne ID4/ID5 pirmiausia atnaujinimas į ID6 (€50).",
+    "caption": "Android Auto plačiame NBT Evo ekrane (iliustracija)",
+    "waMessage": "Sveiki! Norėčiau Android Auto su NBT Evo. Mano BMW — "
+  },
   "Services": {
     "eyebrow": "01 / Paslaugos",
     "heading": "Ką mes koduojame",
