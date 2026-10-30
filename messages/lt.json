@@ -63,7 +63,9 @@
     "ctaMore": "Kaip tai veikia",
     "needs": "Reikia NBT Evo su ID6 programine įranga — patikrinsime pagal VIN. Su senesne ID4/ID5 pirmiausia atnaujinimas į ID6 (€50).",
     "caption": "Android Auto plačiame NBT Evo ekrane (iliustracija)",
-    "waMessage": "Sveiki! Norėčiau Android Auto su NBT Evo. Mano BMW — "
+    "waMessage": "Sveiki! Norėčiau Android Auto su NBT Evo. Mano BMW — ",
+    "betaTag": "Beta",
+    "beta": "Beta: Android Auto su NBT Evo dar testuojamas. Jis gali veikti ne visuose automobiliuose ir ne su visais telefonais, aktyvavimas atliekamas jūsų rizika — už jo veikimą neatsakome. Mokate tik tada, kai pamatote, kad veikia."
   },
   "Services": {
     "eyebrow": "01 / Paslaugos",
