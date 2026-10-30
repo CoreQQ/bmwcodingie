@@ -47,6 +47,24 @@
     "servicesLink": "View all services",
     "projectsLink": "Real projects"
   },
+  "AndroidAutoNew": {
+    "badge": "New",
+    "eyebrow": "NBT Evo · iDrive 6",
+    "title1": "Android Auto on NBT Evo.",
+    "title2": "Until now it needed iDrive 7. Not any more.",
+    "body": "Native Android Auto activated on NBT Evo with ID6 — Google Maps, Waze, Spotify, calls and messages on your BMW's own screen. No adapter box, no dongle, no subscription.",
+    "f1": "Native — runs inside iDrive",
+    "f2": "Google Maps & Waze on the big screen",
+    "f3": "Spotify, calls and messages",
+    "f4": "No box, no subscription",
+    "priceNote": "one-off activation · paid once you see it working",
+    "ctaCheck": "Check my BMW",
+    "ctaWhatsapp": "WhatsApp us",
+    "ctaMore": "How it works",
+    "needs": "Needs NBT Evo with ID6 software — we confirm yours from the VIN. On older ID4/ID5 software the ID6 update (€50) comes first.",
+    "caption": "Android Auto on the NBT Evo widescreen (illustration)",
+    "waMessage": "Hi — I'd like Android Auto on my NBT Evo. My BMW is a "
+  },
   "Services": {
     "eyebrow": "01 / Services",
     "heading": "What we code",

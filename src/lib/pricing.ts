@@ -33,8 +33,9 @@ export const PRICE_ITEMS: PriceItem[] = [
   {
     id: 'android-auto',
     label: 'Android Auto activation',
-    note: 'MGU only — iDrive 7, or from €400 on iDrive 8.5. iDrive 8 is quoted per car.',
-    price: { 'nbt-evo': null, mgu: 200, 'mgu-id8': null, 'mgu-id85': 400 },
+    // NBT Evo is new (owner, 30 Oct 2026): native Android Auto on ID6 for €250.
+    note: 'New on NBT Evo (needs ID6 software) · iDrive 7 · from €400 on iDrive 8.5. iDrive 8 is quoted per car.',
+    price: { 'nbt-evo': 250, mgu: 200, 'mgu-id8': null, 'mgu-id85': 400 },
   },
   {
     id: 'japan',

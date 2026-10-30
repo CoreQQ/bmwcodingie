@@ -16,7 +16,7 @@ export const CODING_LIST: CodingCategory[] = [
     title: 'Smartphone & connectivity',
     items: [
       'Apple CarPlay — full activation (wired / wireless where supported)',
-      'Android Auto activation (iDrive 7 / MGU where supported)',
+      'Android Auto activation (iDrive 7 / MGU, and now NBT Evo with ID6)',
       'CarPlay screen mirroring and full-screen layout',
       'BMW Apps, Connected Drive & Remote Services enable',
       'Bluetooth audio & second phone pairing',

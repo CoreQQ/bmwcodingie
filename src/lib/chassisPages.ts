@@ -46,7 +46,7 @@ const UPGRADE: Record<UpgradeKey, { title: string; body: string; slug: string }>
   carplayEvo: { title: 'Apple CarPlay — €150', body: 'Activated by coding on NBT Evo (ID5/ID6) cars, wireless on most ID6 builds. Early ID4 software needs the ID6 update first.', slug: 'apple-carplay-activation-dublin' },
   carplayMgu: { title: 'Apple CarPlay — €220', body: 'Activated on iDrive 7 (MGU) cars, wireless as standard. iDrive 8 and 8.5 are priced per car after a VIN check.', slug: 'apple-carplay-activation-dublin' },
   carplayLate: { title: 'Apple CarPlay — from €150', body: 'Possible on cars fitted with NBT Evo; earlier NBT and CIC units need different hardware. Your VIN tells us which you have.', slug: 'bmw-carplay-activation-ireland' },
-  androidAuto: { title: 'Android Auto — €200', body: 'On iDrive 7 (MGU) builds only; iDrive 8 per car. Not possible on NBT Evo.', slug: 'bmw-android-auto-activation' },
+  androidAuto: { title: 'Android Auto — from €200', body: 'New: native on NBT Evo with ID6 (€250). €200 on iDrive 7 (MGU); iDrive 8 per car. Confirmed from your VIN.', slug: 'bmw-android-auto-activation' },
   id6: { title: 'iDrive ID4 → ID6 — €50', body: 'Software update for NBT Evo cars still on the older list-style menu. Often the step that makes CarPlay possible.', slug: 'bmw-id4-to-id6-upgrade' },
   fullscreen: { title: 'Fullscreen CarPlay', body: 'CarPlay across the whole 10.25" widescreen instead of a window, where the software supports it.', slug: 'bmw-fullscreen-carplay' },
   cluster6wb: { title: '6WA → 6WB digital cluster', body: 'Full digital instrument cluster fitted and coded, with Sport and Eco Pro layouts. Mobile visit; quoted after a VIN check.', slug: 'bmw-6wa-to-6wb-retrofit' },
