@@ -65,7 +65,9 @@
     "ctaMore": "Jak to działa",
     "needs": "Wymaga NBT Evo z oprogramowaniem ID6 — sprawdzimy Twoje po VIN. Przy starszym ID4/ID5 najpierw aktualizacja do ID6 (€50).",
     "caption": "Android Auto na szerokim ekranie NBT Evo (ilustracja)",
-    "waMessage": "Dzień dobry! Chcę Android Auto w NBT Evo. Moje BMW to "
+    "waMessage": "Dzień dobry! Chcę Android Auto w NBT Evo. Moje BMW to ",
+    "betaTag": "Beta",
+    "beta": "Beta: Android Auto w NBT Evo jest jeszcze w fazie testów. Może nie działać w każdym aucie i z każdym telefonem, aktywacja odbywa się na Twoje ryzyko — nie ponosimy odpowiedzialności za jego działanie. Płacisz tylko wtedy, gdy zobaczysz, że działa."
   },
   "Services": {
     "eyebrow": "01 / Usługi",

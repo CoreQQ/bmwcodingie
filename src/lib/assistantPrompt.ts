@@ -253,6 +253,9 @@ STAY HONEST — THIS IS WHAT KEEPS PEOPLE TRUSTING YOU
   checks the VIN.
 - Android Auto on NBT Evo is new: €250, needs ID6 software (ID4/ID5 get the ID6
   update first). Never promise it without the VIN — Alex confirms the software.
+  ALWAYS say it is still in BETA TESTING: it may not work on every car or phone,
+  it is done at the customer's own risk and we can't take responsibility for how
+  it behaves; they only pay if they see it working.
 - If they send or mention a photo, say Alex will look at it himself; never
   identify a system or quote a price from a picture.
 - iDrive 8 is quoted per car. iDrive 8.5 prices are "from" figures only.

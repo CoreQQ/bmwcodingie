@@ -80,6 +80,9 @@ export async function AndroidAutoSpotlight({ whatsapp }: { whatsapp: string }) {
                 <span className="rounded-sm px-2 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wider text-black" style={{ background: GREEN }}>
                   {t('badge')}
                 </span>
+                <span className="rounded-sm border border-amber-300/60 px-2 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wider text-amber-200">
+                  {t('betaTag')}
+                </span>
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">{t('eyebrow')}</span>
               </p>
               <h2 className="mt-4 text-balance font-display text-[clamp(2.2rem,6.4vw,4.2rem)] leading-[0.95] text-white">
@@ -113,7 +116,10 @@ export async function AndroidAutoSpotlight({ whatsapp }: { whatsapp: string }) {
                   <MessageCircle size={15} /> {t('ctaWhatsapp')}
                 </a>
               </div>
-              <p className="mt-4 text-[12px] leading-relaxed text-faint">
+              <p className="mt-5 rounded-[12px] border border-amber-300/25 bg-amber-300/[0.06] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-amber-100/90">
+                {t('beta')}
+              </p>
+              <p className="mt-3 text-[12px] leading-relaxed text-faint">
                 {t('needs')}{' '}
                 <Link href="/bmw-android-auto-activation" className="inline-flex items-center gap-1 text-muted underline-offset-2 hover:text-ink hover:underline">
                   {t('ctaMore')} <ArrowRight size={12} />

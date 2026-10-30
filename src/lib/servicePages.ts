@@ -149,7 +149,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
   'bmw-android-auto-activation': {
     slug: 'bmw-android-auto-activation',
     // NBT Evo ID6 is new (owner, 30 Oct 2026): native Android Auto, €250.
-    price: { amount: 200, text: 'New: €250 on NBT Evo (ID6) · €200 on iDrive 7 (MGU) · iDrive 8.5 from €400 · iDrive 8 per car' },
+    price: { amount: 200, text: 'New (beta): €250 on NBT Evo (ID6) · €200 on iDrive 7 (MGU) · iDrive 8.5 from €400 · iDrive 8 per car' },
     galleryMatch: ['android'],
     metaTitle: 'BMW Android Auto Ireland | Now on NBT Evo ID6 & iDrive 7',
     metaDescription:
@@ -160,12 +160,12 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     heroSub:
       'Native Android Auto for BMW in Dublin and across Ireland — on iDrive 7 (MGU), and now on NBT Evo with ID6: the iDrive 6 cars that were always told it could not be done.',
     intro: [
-      'Android Auto has always been an iDrive 7 feature, so owners of NBT Evo cars were told it could not be done. We now activate it natively on NBT Evo with ID6 software: Google Maps, Waze, Spotify, calls and messages on the car’s own screen, with no adapter box or dongle. It is €250, one-off.',
+      'Android Auto has always been an iDrive 7 feature, so owners of NBT Evo cars were told it could not be done. We now activate it natively on NBT Evo with ID6 software: Google Maps, Waze, Spotify, calls and messages on the car’s own screen, with no adapter box or dongle. It is €250, one-off. It is still in testing (beta): it may not work on every car or phone, it is done at your own risk and we can’t take responsibility for how it behaves — you only pay if you see it working.',
       'On iDrive 7 (MGU) we enable Android Auto through coding for €200. Every car is checked from its VIN first, so you know before booking whether your head unit and software version support it. NBT Evo cars still on ID4/ID5 software get the ID6 update (€50) first. Activation is done in person around Dublin or remotely across Ireland.',
     ],
     includedHeading: 'What Android Auto activation includes',
     included: [
-      'Native Android Auto on NBT Evo (ID6) — new, €250',
+      'Native Android Auto on NBT Evo (ID6) — new, in beta testing, €250',
       'Android Auto on MGU (iDrive 7) — €200',
       'Integration into the car’s own iDrive screen — no adapter box',
       'A clear compatibility check from your VIN before booking',
@@ -186,6 +186,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Pay on completion', body: 'You pay once it is shown working: €250 on NBT Evo ID6, €200 on iDrive 7. iDrive 8 is quoted per car from your VIN.' },
     ],
     faqs: [
+      { q: 'Is Android Auto on NBT Evo finished?', a: 'Not yet — it is in beta testing. It may not work on every car or with every phone, it is done at your own risk and we cannot take responsibility for how it behaves. You only pay once you have seen it working on your car.' },
       { q: 'Can you activate Android Auto on NBT Evo (iDrive 6)?', a: 'Yes — on NBT Evo with ID6 software we now activate native Android Auto for €250. Cars still on ID4/ID5 get the ID6 update first; we confirm it from your VIN.' },
       { q: 'Is it an adapter or a box?', a: 'No. It is activated in the car’s own iDrive system, so it runs on the original screen with nothing plugged in behind the dash.' },
       { q: 'Can I have both CarPlay and Android Auto?', a: 'Where your system supports both, yes — we can activate them in the same session. We confirm what your exact car supports beforehand.' },
