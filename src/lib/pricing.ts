@@ -31,10 +31,18 @@ export const PRICE_ITEMS: PriceItem[] = [
     price: { 'nbt-evo': 150, mgu: 220, 'mgu-id8': null, 'mgu-id85': 400 },
   },
   {
+    // €300 with CarPlay in it (owner, 1 Nov 2026) — was a €50 add-on.
+    id: 'id6',
+    label: 'iDrive ID4/ID5 → ID6 update',
+    note: 'NBT Evo — Apple CarPlay activation included · +€100 with the Japan → EU conversion',
+    price: { 'nbt-evo': 300, mgu: null, 'mgu-id8': null, 'mgu-id85': null },
+  },
+  {
     id: 'android-auto',
     label: 'Android Auto activation',
-    // NBT Evo is new (owner, 30 Oct 2026): native Android Auto on ID6 for €250.
-    note: 'New on NBT Evo — beta, in testing, at your own risk (needs ID6 software) · iDrive 7 · from €400 on iDrive 8.5. iDrive 8 is quoted per car.',
+    // NBT Evo is new (owner, 30 Oct 2026): native Android Auto on ID6 for €250,
+    // with the CarPlay activation it runs on and the Wi-Fi antenna in it (1 Nov).
+    note: 'New on NBT Evo — beta, at your own risk, needs ID6 software; CarPlay activation and the Wi-Fi antenna (if needed) included · iDrive 7 · from €400 on iDrive 8.5. iDrive 8 is quoted per car.',
     price: { 'nbt-evo': 250, mgu: 200, 'mgu-id8': null, 'mgu-id85': 400 },
   },
   {
@@ -42,10 +50,23 @@ export const PRICE_ITEMS: PriceItem[] = [
     label: 'Japan → EU conversion',
     note:
       'Region, radio bands, nav FSC, EU maps — CarPlay activation is included at no extra cost. ' +
+      'On iDrive 7 everything that can be converted is included. ' +
       'On iDrive 8.5 this covers the language and radio change only.',
-    // MGU from €300 (owner, 24 Oct 2026) — was a flat €280.
+    // MGU €300 with everything in it (owner, 1 Nov 2026) — was "from €300".
     price: { 'nbt-evo': 250, mgu: 300, 'mgu-id8': null, 'mgu-id85': 200 },
-    fromOn: ['mgu'],
+  },
+  {
+    // Owner, 1 Nov 2026: not BMW's own apps; he sends the list.
+    id: 'apps',
+    label: 'Extra apps on iDrive 7',
+    note: 'Not BMW’s own apps — Alex sends the list · +€100 with the Japan → EU conversion',
+    price: { 'nbt-evo': null, mgu: 200, 'mgu-id8': null, 'mgu-id85': null },
+  },
+  {
+    id: 'cluster-nav',
+    label: 'CarPlay / Android Auto navigation in the instrument cluster',
+    note: 'iDrive 7 · from €80 together with the Japan → EU conversion or the apps',
+    price: { 'nbt-evo': null, mgu: 150, 'mgu-id8': null, 'mgu-id85': null },
   },
   {
     id: 'navigation',
@@ -85,7 +106,6 @@ export const PRICE_ITEMS: PriceItem[] = [
 
 export const ADD_ONS: { id: string; label: string; note?: string; price: number }[] = [
   { id: 'wifi-antenna', label: 'Wi-Fi antenna fitted', note: 'Needed for wireless CarPlay on some builds', price: 30 },
-  { id: 'idrive-upgrade', label: 'iDrive 4 → iDrive 6 upgrade', price: 50 },
 ];
 
 export const CALL_OUT = { base: 20, perKm: 1.25 };
@@ -105,7 +125,36 @@ export const MIN_JOB = 80;
 export const FROM_UNITS: HeadUnit[] = ['mgu-id85'];
 export const isFromUnit = (unit: HeadUnit) => FROM_UNITS.includes(unit);
 
-/** The conversion price already contains CarPlay — never charge for both. */
-export function isBundledOut(selected: string[], itemId: string, _unit: HeadUnit): boolean {
-  return itemId === 'carplay' && selected.includes('japan');
+const onNbtEvo = (unit: HeadUnit) => unit === 'nbt-evo' || unit === 'unknown';
+
+/** CarPlay is already in the Japan conversion, the ID6 update and, on NBT
+ *  Evo, Android Auto (which runs on it) — never charge for it twice. */
+export function isBundledOut(selected: string[], itemId: string, unit: HeadUnit): boolean {
+  if (itemId !== 'carplay') return false;
+  if (selected.includes('japan')) return true;
+  return onNbtEvo(unit) && (selected.includes('id6') || selected.includes('android-auto'));
+}
+
+/** Android Auto on NBT Evo includes the Wi-Fi antenna when the car needs one. */
+export const antennaInAndroidAuto = (selected: string[], unit: HeadUnit) =>
+  selected.includes('android-auto') && onNbtEvo(unit);
+
+/**
+ * What an item costs next to the rest of the job (owner, 1 Nov 2026): the ID6
+ * update is +€100 on top of the Japan conversion (€350 together); on iDrive 7
+ * the apps are +€100 with the conversion, and the cluster navigation is from
+ * €80 with the conversion or the apps (€150 on its own).
+ */
+export function comboPrice(
+  selected: string[],
+  itemId: string,
+  unit: HeadUnit,
+): { amount: number; with: string; from?: boolean } | undefined {
+  const japan = selected.includes('japan');
+  if (itemId === 'id6' && japan && onNbtEvo(unit)) return { amount: 100, with: 'with the Japan conversion' };
+  if (unit !== 'mgu') return undefined;
+  if (itemId === 'apps' && japan) return { amount: 100, with: 'with the Japan conversion' };
+  if (itemId === 'cluster-nav' && (japan || selected.includes('apps')))
+    return { amount: 80, with: japan ? 'with the Japan conversion' : 'with the apps', from: true };
+  return undefined;
 }

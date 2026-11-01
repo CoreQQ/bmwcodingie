@@ -160,22 +160,22 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     heroSub:
       'Native Android Auto for BMW in Dublin and across Ireland — on iDrive 7 (MGU), and now on NBT Evo with ID6: the iDrive 6 cars that were always told it could not be done.',
     intro: [
-      'Android Auto has always been an iDrive 7 feature, so owners of NBT Evo cars were told it could not be done. We now activate it natively on NBT Evo with ID6 software: Google Maps, Waze, Spotify, calls and messages on the car’s own screen, with no adapter box or dongle. It is €250, one-off. It is still in testing (beta): it may not work on every car or phone, it is done at your own risk and we can’t take responsibility for how it behaves — you only pay if you see it working.',
-      'On iDrive 7 (MGU) we enable Android Auto through coding for €200. Every car is checked from its VIN first, so you know before booking whether your head unit and software version support it. NBT Evo cars still on ID4/ID5 software get the ID6 update (€50) first. Activation is done in person around Dublin or remotely across Ireland.',
+      'Android Auto has always been an iDrive 7 feature, so owners of NBT Evo cars were told it could not be done. We now activate it natively on NBT Evo with ID6 software: Google Maps, Waze, Spotify, calls and messages on the car’s own screen, with no adapter box or dongle. It is €250, one-off, and that includes the Apple CarPlay activation it runs on and the Wi-Fi antenna if your car needs one. It is still in testing (beta): it may not work on every car or phone, it is done at your own risk and we can’t take responsibility for how it behaves — you only pay if you see it working.',
+      'On iDrive 7 (MGU) we enable Android Auto through coding for €200. Every car is checked from its VIN first, so you know before booking whether your head unit and software version support it. NBT Evo cars still on ID4/ID5 software get the ID6 update first — we confirm the price for both together. Activation is done in person around Dublin or remotely across Ireland.',
     ],
     includedHeading: 'What Android Auto activation includes',
     included: [
-      'Native Android Auto on NBT Evo (ID6) — new, in beta testing, €250',
+      'Native Android Auto on NBT Evo (ID6) — new, in beta testing, €250 with CarPlay activation and the Wi-Fi antenna (if needed) included',
       'Android Auto on MGU (iDrive 7) — €200',
       'Integration into the car’s own iDrive screen — no adapter box',
       'A clear compatibility check from your VIN before booking',
       'Pairing and a working confirmation before you pay',
-      'CarPlay activation handled in the same session if you want both',
+      'On NBT Evo, CarPlay activation is part of the €250; on iDrive 7 it can be done in the same session',
     ],
     modelsHeading: 'Supported systems',
     models: [
       'NBT Evo (iDrive 6) with ID6 software — now supported, €250',
-      'NBT Evo on ID4/ID5 software — ID6 update (€50) first, confirmed from the VIN',
+      'NBT Evo on ID4/ID5 software — ID6 update first, price for both confirmed from the VIN',
       'MGU (iDrive 7) — supported on most builds, €200',
       'iDrive 8.5 from €400 · iDrive 8 quoted per car',
     ],
@@ -312,11 +312,11 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'japan-import-bmw-conversion-ireland': {
     slug: 'japan-import-bmw-conversion-ireland',
-    price: { amount: 250, text: '€250 on NBT Evo · from €300 on iDrive 7 (MGU) · Apple CarPlay included' },
+    price: { amount: 250, text: '€250 on NBT Evo · €300 on iDrive 7 (MGU) · Apple CarPlay included' },
     galleryMatch: ['japan'],
     metaTitle: 'BMW Japan to EU Conversion Ireland | Japanese Imports',
     metaDescription:
-      'Japanese import BMW conversion in Ireland: EU radio bands, English, EU navigation and maps. €250 on NBT Evo, from €300 on iDrive 7 — Apple CarPlay included.',
+      'Japanese import BMW conversion in Ireland: EU radio bands, English, EU navigation and maps. €250 on NBT Evo, €300 on iDrive 7 — Apple CarPlay included.',
     serviceName: 'Japan to EU BMW Conversion',
     eyebrow: 'Japan Import · Dublin & Ireland',
     h1: 'Japan Import BMW Conversion Ireland — Region Change & Map Updates',
@@ -334,6 +334,8 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       'ETC mirror module handling common on JDM imports',
       'TCB and telematics considerations checked and addressed',
       'A full diagnostic scan to confirm the import is healthy',
+      'NBT Evo still on ID4/ID5: the ID6 update is +€100 (€350 together)',
+      'iDrive 7 extras: apps (not BMW’s own) +€100 · CarPlay / Android Auto navigation in the instrument cluster from €80',
     ],
     modelsHeading: 'Imports and systems we handle',
     models: [
@@ -346,7 +348,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Send import details', body: 'Give us the model, year and VIN-derived build. We confirm what your JDM import needs and quote the conversion before starting.' },
       { title: 'Convert the car', body: 'We change the region, apply the FSC activation, load EU maps and address the import-specific modules around Dublin.' },
       { title: 'Verify and scan', body: 'We confirm navigation, radio and convenience features work, and run a diagnostic scan to check the car is clean.' },
-      { title: 'Pay on completion', body: 'Conversions are €250 on NBT Evo and from €300 on MGU with CarPlay activation included on both — the exact MGU price is agreed up front from your VIN and paid once the work is shown done.' },
+      { title: 'Pay on completion', body: 'Conversions are €250 on NBT Evo and €300 on MGU (everything convertible included) with CarPlay activation included on both — paid once the work is shown done. On NBT Evo cars still on ID4/ID5 the ID6 update is +€100.' },
     ],
     faqs: [
       { q: 'Can you code Japanese import BMWs for Ireland?', a: 'Yes. Japan to EU conversion is a regular job — region change, navigation FSC, European maps, ETC mirror handling and TCB checks. Send the details and we will tell you exactly what your car needs.' },

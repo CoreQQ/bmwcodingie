@@ -9,6 +9,8 @@ import {
   isFromUnit,
   MIN_JOB,
   PRICE_ITEMS,
+  antennaInAndroidAuto,
+  comboPrice,
   isBundledOut,
   type HeadUnit,
 } from '@/lib/pricing';
@@ -29,7 +31,15 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
   // varies with the software version, so every job is quoted from the VIN.
   const quoteOnly = unit === 'mgu-id8';
 
-  const antennaFree = (id: string) => BF_ON && id === 'wifi-antenna' && picked.includes('carplay');
+  // The antenna is part of Android Auto on NBT Evo, and of CarPlay on Black Friday.
+  const antennaWith = (id: string) =>
+    id !== 'wifi-antenna'
+      ? ''
+      : antennaInAndroidAuto(picked, unit)
+        ? 'Android Auto'
+        : BF_ON && picked.includes('carplay')
+          ? 'CarPlay'
+          : '';
 
   const toggle = (list: string[], set: (v: string[]) => void, id: string) =>
     set(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -43,7 +53,8 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
 
     for (const item of PRICE_ITEMS) {
       if (!picked.includes(item.id)) continue;
-      const amount = item.price[priceUnit];
+      const combo = item.price[priceUnit] === null ? undefined : comboPrice(picked, item.id, unit);
+      const amount = combo?.amount ?? item.price[priceUnit];
       if (amount === null) {
         lines.push({ label: item.label, amount: null });
         continue;
@@ -52,13 +63,13 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
         lines.push({ label: item.label, amount: 0, bundled: true });
         continue;
       }
-      lines.push({ label: item.label, amount });
+      lines.push({ label: combo ? `${item.label} (${combo.with})` : item.label, amount });
       total += amount;
-      if (item.from || item.fromOn?.includes(priceUnit)) anyFrom = true;
+      if (item.from || item.fromOn?.includes(priceUnit) || combo?.from) anyFrom = true;
     }
     for (const a of ADD_ONS) {
-      // Black Friday: the Wi-Fi antenna is part of the CarPlay price, ticked or not.
-      if (antennaFree(a.id)) {
+      // Included with Android Auto on NBT Evo (and with CarPlay on Black Friday), ticked or not.
+      if (antennaWith(a.id)) {
         lines.push({ label: a.label, amount: 0, bundled: true });
         continue;
       }
@@ -129,7 +140,8 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
           <p className="label mb-3">2 · What you want</p>
           <div className="space-y-2">
             {PRICE_ITEMS.map((item) => {
-              const amount = item.price[priceUnit];
+              const combo = item.price[priceUnit] === null ? undefined : comboPrice(picked, item.id, unit);
+              const amount = combo?.amount ?? item.price[priceUnit];
               const unavailable = amount === null;
               const on = picked.includes(item.id);
               const bundled = isBundledOut(picked, item.id, unit) && on;
@@ -163,7 +175,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                       ? 'n/a'
                       : bundled
                         ? 'included'
-                        : `${item.from || item.fromOn?.includes(priceUnit) ? 'from ' : ''}€${amount}`}
+                        : `${item.from || item.fromOn?.includes(priceUnit) || combo?.from ? 'from ' : combo ? '+' : ''}€${amount}`}
                   </span>
                 </button>
               );
@@ -194,7 +206,7 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                     {a.note && <span className="mt-0.5 block text-[11px] text-faint">{a.note}</span>}
                   </span>
                   <span className="shrink-0 font-mono text-xs text-muted">
-                    {antennaFree(a.id) ? 'included with CarPlay' : `+€${a.price}`}
+                    {antennaWith(a.id) ? `included with ${antennaWith(a.id)}` : `+€${a.price}`}
                   </span>
                 </button>
               );

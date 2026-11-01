@@ -61,8 +61,8 @@ export async function PopularServices({ whatsapp }: { whatsapp: string }) {
     carplay: { eyebrow: tf('carplayEyebrow'), points: [tf('carplayI1'), tf('carplayI2'), tf('carplayI3')], price: t('carplayPrice') },
     japan: { eyebrow: tj('eyebrow'), points: [tj('i1'), tj('i2'), tj('i4')], price: t('japanPrice') },
     coding: { eyebrow: tf('codingEyebrow'), points: [tf('codingI1'), tf('codingI2'), tf('codingI6')], price: t('codingPrice') },
-    // €50, as on the ID6 page and in the calculator (usually done with CarPlay).
-    idrive: { eyebrow: t('idriveEyebrow'), points: [t('idriveI1'), t('idriveI2'), t('idriveI3')], price: '€50' },
+    // €300 with CarPlay included, as on the ID6 page and in the calculator.
+    idrive: { eyebrow: t('idriveEyebrow'), points: [t('idriveI1'), t('idriveI2'), t('idriveI3')], price: '€300' },
     cluster: { eyebrow: t('clusterEyebrow'), points: [t('clusterI1'), t('clusterI2'), t('clusterI3')], price: tf('retrofitsPrice') },
     diagnostics: { eyebrow: tf('diagEyebrow'), points: [tf('diagI1'), tf('diagI3'), tf('diagI5')], price: tf('diagPrice') },
   };

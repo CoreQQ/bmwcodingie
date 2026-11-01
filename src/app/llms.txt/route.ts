@@ -16,13 +16,13 @@ const BODY = `# BMW Coding (bmwcoding.ie)
 - [Apple CarPlay Activation](${SITE_URL}/apple-carplay-activation-dublin): wired/wireless CarPlay, EUR 150 on NBT Evo, EUR 220 on MGU (iDrive 7)
 - [CarPlay Activation Ireland](${SITE_URL}/bmw-carplay-activation-ireland): remote CarPlay activation anywhere in Ireland
 - [Fullscreen CarPlay](${SITE_URL}/bmw-fullscreen-carplay): CarPlay across the full 10.25" widescreen where supported
-- [Android Auto Activation](${SITE_URL}/bmw-android-auto-activation): EUR 250 on NBT Evo with ID6 (new, native) / EUR 200 on iDrive 7 (MGU)
-- [iDrive ID4 to ID6 Upgrade](${SITE_URL}/bmw-id4-to-id6-upgrade): NBT Evo software update, EUR 50
+- [Android Auto Activation](${SITE_URL}/bmw-android-auto-activation): EUR 250 on NBT Evo with ID6 (new, native, CarPlay activation and Wi-Fi antenna included) / EUR 200 on iDrive 7 (MGU)
+- [iDrive ID4 to ID6 Upgrade](${SITE_URL}/bmw-id4-to-id6-upgrade): NBT Evo software update with Apple CarPlay activation included, EUR 300 (EUR 350 together with a Japan conversion)
 - [iDrive Upgrades](${SITE_URL}/bmw-idrive-upgrade-ireland): what each iDrive generation can realistically get
 - [6WA to 6WB Retrofit](${SITE_URL}/bmw-6wa-to-6wb-retrofit): digital instrument cluster, mobile visit, quoted per car
 - [BMW Diagnostics](${SITE_URL}/bmw-diagnostics-dublin): full ISTA fault scan with written summary, from EUR 80
 - [BMW Retrofits](${SITE_URL}/bmw-retrofits-dublin): ambient lighting, cruise control, Comfort Access
-- [Japan Import Conversion](${SITE_URL}/japan-import-bmw-conversion-ireland): EU radio, language and maps, EUR 250 on NBT Evo / from EUR 300 on MGU, CarPlay included
+- [Japan Import Conversion](${SITE_URL}/japan-import-bmw-conversion-ireland): EU radio, language and maps, EUR 250 on NBT Evo / EUR 300 on MGU, CarPlay included
 - [Map Updates & FSC Codes](${SITE_URL}/bmw-map-updates-fsc-codes): navigation activation and updates
 - [Remote BMW Coding](${SITE_URL}/remote-bmw-coding-ireland): ENET sessions anywhere in Ireland
 
