@@ -187,13 +187,13 @@ export const BLOG_POSTS: BlogPost[] = [
         bullets: [
           'Apple CarPlay activation — €150 on NBT Evo, €220 on MGU (no subscription)',
           'Wi-Fi antenna fitted (for wireless CarPlay on some builds) — +€30',
-          'iDrive 4 → iDrive 6 upgrade — +€50',
-          'Android Auto activation — €200 on iDrive 7 (MGU), new: €250 on NBT Evo with ID6 — iDrive 8 quoted per car',
+          'iDrive ID4/ID5 → ID6 update — €300 with Apple CarPlay activation included (+€100 with a Japan → EU conversion)',
+          'Android Auto activation — €200 on iDrive 7 (MGU), new: €250 on NBT Evo with ID6, CarPlay activation and Wi-Fi antenna included — iDrive 8 quoted per car',
           'Full ISTA diagnostics with written summary — from €80',
           'Video in Motion — from €60',
           'Sport displays / digital cluster layouts — from €60',
           'Comfort pack (mirrors, windows, chimes, lighting) — from €40–50 per item, bundled cheaper',
-          'Japan → EU conversion — €250 NBT Evo, from €300 MGU, CarPlay included on both (Android Auto separate: €250 NBT Evo ID6, €200 MGU)',
+          'Japan → EU conversion — €250 NBT Evo, €300 MGU with everything convertible included, CarPlay included on both (Android Auto separate: €250 NBT Evo ID6, €200 MGU)',
           'Minimum job — €80 per visit or remote session; the smaller settings above are combined into one job',
         ],
       },
@@ -307,7 +307,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Imports travel far and sit in compounds. A complete diagnostic scan across every control unit shows the honest state of the car — stored faults, battery registration state, anything the auction sheet did not mention. We include a written summary you can keep with the car\u2019s file.',
         ],
         bullets: [
-          'Full conversion (region, bands, nav FSC, EU maps) — €250 NBT Evo, from €300 MGU with CarPlay included',
+          'Full conversion (region, bands, nav FSC, EU maps) — €250 NBT Evo, €300 MGU with CarPlay included',
           'Navigation FSC + EU maps — quoted per system',
           'ISTA scan with written summary — from €80',
           'All demonstrated working before you pay',
@@ -505,7 +505,7 @@ export const BLOG_POSTS: BlogPost[] = [
         heading: 'How it is done',
         paragraphs: [
           'The update is applied with dealer-level tools over an ENET connection, either remotely with your own Windows laptop or at your car around Dublin. It takes a while, so the car needs a stable battery supply during the session — we send a short checklist beforehand.',
-          'The update itself is €50, and most owners do it in the same session as CarPlay activation (€150 on NBT Evo).',
+          'The update is €300 and Apple CarPlay activation is included in that price — both are done in the same session. With a Japan → EU conversion the update is +€100.',
         ],
       },
       {
@@ -562,7 +562,7 @@ export const BLOG_POSTS: BlogPost[] = [
         heading: 'What coding cannot do',
         paragraphs: [
           'Coding switches on functions the car already has the hardware for. It will not add a head-up display, a camera or a cluster the car was never built with — those are retrofits with parts and wiring. Options that depend on a server subscription are also outside what coding changes.',
-          'Japanese-import G20s are a separate case: the radio band, language and navigation region need a proper conversion (from €300 on iDrive 7, CarPlay included).',
+          'Japanese-import G20s are a separate case: the radio band, language and navigation region need a proper conversion (€300 on iDrive 7, CarPlay included).',
         ],
       },
       {
@@ -599,7 +599,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: 'Where fullscreen is possible',
         paragraphs: [
-          'The fullscreen layout applies to NBT Evo cars with the 10.25" widescreen — typically F-series models from around 2016 to 2019 and the earliest G-series cars with iDrive 6. The software level matters: some ID5 cars need the ID6 update (€50) before the layout can be enabled.',
+          'The fullscreen layout applies to NBT Evo cars with the 10.25" widescreen — typically F-series models from around 2016 to 2019 and the earliest G-series cars with iDrive 6. The software level matters: some ID5 cars need the ID6 update (€300, CarPlay activation included) before the layout can be enabled.',
           'Cars with the 6.5" or 8.8" screens already give most of the display to CarPlay, so there is little to gain. On iDrive 7 (MGU) CarPlay is already shown large and the split-screen options vary by software version.',
         ],
         bullets: [
@@ -643,7 +643,7 @@ export const BLOG_POSTS: BlogPost[] = [
         bullets: [
           '2019 and newer (iDrive 7 / 8, the wide curved-style display): CarPlay is supported, often fitted from the factory. If it is missing or a trial expired, it can be activated — €220 on iDrive 7, iDrive 8 priced per car.',
           '2016–2019 with the tile home screen (iDrive 6 / NBT Evo): supported. Many cars shipped with it locked or on a subscription; activation by coding is €150, permanent, wireless on most ID6 builds.',
-          '2016–2017 with a list-style menu on a newer car: possibly NBT Evo running old ID4/ID5 software — the €50 update to ID6 usually makes CarPlay possible.',
+          '2016–2017 with a list-style menu on a newer car: possibly NBT Evo running old ID4/ID5 software — the update to ID6 (€300, CarPlay activation included) usually makes CarPlay possible.',
           '2013–2016 with NBT (iDrive 4/5 look) or any CIC car: no native CarPlay. Hidden features, navigation and diagnostics still apply, but CarPlay would need a different head unit.',
         ],
       },
@@ -674,7 +674,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Activation is coding, not parts: €150 on NBT Evo, €220 on iDrive 7, one-off. It takes under an hour, remotely anywhere in Ireland with a Windows laptop and an ENET cable, or at your car around Dublin. We pair your iPhone and show CarPlay working before you pay.',
         ],
         bullets: [
-          'NBT Evo (iDrive 6) — €150; ID4 → ID6 update first if needed, +€50',
+          'NBT Evo (iDrive 6) — €150; on ID4/ID5 software the ID6 update with CarPlay included is €300',
           'iDrive 7 (MGU) — €220; Android Auto €200 on the same system (and now €250 on NBT Evo ID6)',
           'iDrive 8 / 8.5 — checked and priced per car',
           'No subscription, reversible like all coding',

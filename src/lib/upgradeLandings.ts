@@ -32,7 +32,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     ],
     modelsHeading: 'Which BMWs can get CarPlay',
     models: [
-      'NBT Evo (iDrive 5/6, roughly 2016–2019) — €150; ID4 software may need the ID6 update first (+€50)',
+      'NBT Evo (iDrive 5/6, roughly 2016–2019) — €150; on ID4 software the ID6 update comes first (€300, CarPlay activation included)',
       'MGU / iDrive 7 (G-series, roughly 2019+) — €220',
       'iDrive 8 / 8.5 — depends on software version; priced per car after VIN check',
       'Older CIC / NBT / EntryNav cars — usually need a head unit change; we confirm from VIN',
@@ -86,7 +86,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     modelsHeading: 'Where it applies',
     models: [
       'NBT Evo with the 10.25" widescreen (F-series, roughly 2016–2019)',
-      'ID5 software may need the ID6 update first (+€50)',
+      'ID5 software may need the ID6 update first (€300, CarPlay activation included)',
       'iDrive 7 (MGU) already shows CarPlay large; split-screen options vary by version',
       'Exact support confirmed from your VIN',
     ],
@@ -112,15 +112,16 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
   'bmw-id4-to-id6-upgrade': {
     slug: 'bmw-id4-to-id6-upgrade',
     galleryMatch: ['id6','id4','idrive update'],
-    metaTitle: 'BMW ID4 to ID6 Upgrade Ireland | NBT Evo, €50',
+    metaTitle: 'BMW ID4 to ID6 Upgrade Ireland | NBT Evo + CarPlay, €300',
     metaDescription:
-      'Update an NBT Evo BMW from ID4 or ID5 to the ID6 interface: the newer tile menu and the software level CarPlay needs. €50, usually done with CarPlay. Dublin & remote.',
+      'Update an NBT Evo BMW from ID4 or ID5 to the ID6 interface: the newer tile menu, with Apple CarPlay activation included. €300, or +€100 with a Japan → EU conversion. Dublin & remote.',
     serviceName: 'BMW iDrive ID4 to ID6 Upgrade',
     eyebrow: 'iDrive software · NBT Evo',
     h1: 'BMW iDrive ID4 → ID6 Upgrade',
     heroSub:
-      'Early NBT Evo cars shipped with the older ID4 or ID5 software. Updating the same head unit to ID6 gives you the newer tile-based menu, and it is often the step that makes CarPlay possible.',
-    price: { amount: 50, text: '€50 · usually done together with CarPlay activation' },
+      'Early NBT Evo cars shipped with the older ID4 or ID5 software. Updating the same head unit to ID6 gives you the newer tile-based menu — and Apple CarPlay is activated in the same job, included in the price.',
+    // Owner, 1 Nov 2026: €300 with CarPlay in it; +€100 on top of a Japan conversion.
+    price: { amount: 300, text: '€300 · Apple CarPlay activation included · €350 together with a Japan → EU conversion' },
     intro: [
       'ID4, ID5 and ID6 are software versions of the same NBT Evo head unit, not different hardware. Cars built around 2016–2017 often still run ID4, which looks dated and does not support CarPlay. Updating the software to ID6 brings the live-tile home screen and the newer menus, and opens the door to CarPlay activation.',
       'The update is done with dealer-level tools over an ENET connection — remotely with your own laptop, or at your car around Dublin. Your settings, radio presets and coding are checked afterwards.',
@@ -129,7 +130,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     includedHeading: 'What the update gives you',
     included: [
       'ID6 live-tile home screen and newer menus',
-      'The software level needed for CarPlay on most NBT Evo cars',
+      'Apple CarPlay activation — included in the price',
       'Done on your existing head unit — no new hardware',
       'Settings and coding checked after the update',
     ],
@@ -144,7 +145,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { title: 'Send your VIN', body: 'We confirm it is NBT Evo and which software it runs now.' },
       { title: 'Remote or visit', body: 'Your laptop and an ENET cable, or we come to the car around Dublin.' },
       { title: 'Update to ID6', body: 'The head unit is updated with dealer-level tools; this takes a while, so the car needs a stable battery supply.' },
-      { title: 'Add CarPlay if you like', body: 'Most people activate CarPlay in the same session.' },
+      { title: 'CarPlay activated', body: 'Apple CarPlay is switched on in the same session — it is part of the €300.' },
     ],
     faqs: [
       { q: 'How do I know if I have ID4, ID5 or ID6?', a: 'ID6 has a home screen of live tiles; ID4 and ID5 open on a list menu. The surest way is the VIN — send us the last 7 characters.' },
@@ -230,7 +231,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     ],
     includedHeading: 'Upgrades we do',
     included: [
-      'ID4 / ID5 → ID6 software update on NBT Evo (€50)',
+      'ID4 / ID5 → ID6 software update on NBT Evo, CarPlay included (€300)',
       'Apple CarPlay activation (NBT Evo €150 · iDrive 7 €220)',
       'Android Auto on iDrive 7 (€200), now also on NBT Evo ID6 (€250); iDrive 8 per car',
       'Navigation map updates',
