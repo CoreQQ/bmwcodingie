@@ -19,7 +19,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     price: { amount: 150, text: 'From €150 (NBT Evo) · €220 on iDrive 7 (MGU)' },
     intro: [
       'You do not need to be near Dublin to get CarPlay on a BMW. CarPlay activation is software work, so on most NBT Evo and iDrive 7 cars it can be done remotely: you connect a Windows laptop to the OBD port with an ENET cable (around €15 online), open a screen-share, and we activate, test and hand back the car in one session.',
-      'Before anything is booked we check your VIN. Roughly, BMWs from 2016 onwards with NBT Evo or iDrive 7 have good chances; older cars depend on which head unit was fitted, and some simply cannot run CarPlay without new hardware. If yours is one of those, we tell you straight away instead of selling you something that will not work.',
+      'Before anything is booked we check your VIN. BMWs from 2016 onwards — NBT Evo (roughly 2016–2019) or iDrive 7 (2020 onwards) — have good chances. On BMWs built before 2016 CarPlay cannot be activated, and we tell you that straight away instead of selling you something that will not work.',
       'Around Dublin, Kildare, Wicklow and Meath we can also come to the car — handy if you would rather not set up a laptop.',
     ],
     includedHeading: 'What you get',
@@ -33,9 +33,9 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     modelsHeading: 'Which BMWs can get CarPlay',
     models: [
       'NBT Evo (iDrive 5/6, roughly 2016–2019) — €150; on ID4 software the ID6 update comes first (€300, CarPlay activation included)',
-      'MGU / iDrive 7 (G-series, roughly 2019+) — €220',
+      'MGU / iDrive 7 (G-series, roughly 2020 onwards) — €220',
       'iDrive 8 / 8.5 — depends on software version; priced per car after VIN check',
-      'Older CIC / NBT / EntryNav cars — usually need a head unit change; we confirm from VIN',
+      'BMWs built before 2016 (CIC / NBT) — CarPlay cannot be activated',
     ],
     process: [
       { title: 'Send your VIN', body: 'The last 7 characters are enough. We tell you which head unit you have and whether CarPlay will work.' },
@@ -46,7 +46,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     faqs: [
       { q: 'Can CarPlay really be activated remotely?', a: 'On most NBT Evo and iDrive 7 cars, yes. You connect a Windows laptop to the car with an ENET cable and we work over a screen-share. If your car needs anything physical, we tell you before booking.' },
       { q: 'What do I need for a remote session?', a: 'A Windows laptop with a stable internet connection, an ENET (Ethernet-to-OBD) cable, and the car parked with a battery charger or the engine able to keep the voltage up. We send a short checklist beforehand.' },
-      { q: 'My BMW is from 2015 — will CarPlay work?', a: 'It depends on the head unit, not the year alone. Some 2015–2016 cars have NBT Evo and can be activated; others have NBT or EntryNav and cannot without new hardware. Your VIN tells us which.' },
+      { q: 'My BMW is from 2015 — will CarPlay work?', a: 'No — CarPlay cannot be activated on BMWs built before 2016. Hidden features, Video in Motion, maps and diagnostics still apply. From 2016 on, your VIN tells us whether your car can have it.' },
       { q: 'Is there a yearly fee?', a: 'No. It is a one-off activation with no subscription.' },
     ],
     related: [
@@ -241,9 +241,9 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     modelsHeading: 'By system',
     models: [
       'CIC (roughly 2008–2013): maps and coding; CarPlay needs a different head unit',
-      'NBT / iDrive 4 (roughly 2013–2016): maps and coding; CarPlay usually needs new hardware',
+      'NBT / iDrive 4 (roughly 2013–2016): maps and coding; CarPlay cannot be activated before 2016',
       'NBT Evo / iDrive 5–6 (roughly 2016–2019): ID6 update, CarPlay, fullscreen, maps',
-      'MGU / iDrive 7 (roughly 2019+): CarPlay, Android Auto, maps, coding',
+      'MGU / iDrive 7 (roughly 2020 onwards): CarPlay, Android Auto, maps, coding',
       'iDrive 8 / 8.5: checked per car — software version decides',
     ],
     process: [

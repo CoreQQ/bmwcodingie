@@ -4,8 +4,9 @@
 export type HeadUnit = 'nbt-evo' | 'mgu' | 'mgu-id8' | 'mgu-id85' | 'unknown';
 
 export const HEAD_UNITS: { id: HeadUnit; label: string; hint: string }[] = [
-  { id: 'nbt-evo', label: 'NBT Evo — iDrive 5 / 6', hint: 'Roughly 2013–2018 cars' },
-  { id: 'mgu', label: 'MGU — iDrive 7', hint: 'Roughly 2018–2021' },
+  // Owner, 2 Nov 2026: NBT Evo 2016–2019, MGU 2020 onwards; no CarPlay before 2016.
+  { id: 'nbt-evo', label: 'NBT Evo — iDrive 5 / 6', hint: 'Roughly 2016–2019 cars' },
+  { id: 'mgu', label: 'MGU — iDrive 7', hint: 'Roughly 2020 onwards' },
   { id: 'mgu-id8', label: 'MGU — iDrive 8', hint: 'Roughly 2021 onwards — priced per car' },
   { id: 'mgu-id85', label: 'MGU — iDrive 8.5', hint: 'Newest cars — prices start from' },
   { id: 'unknown', label: "I'm not sure", hint: 'We confirm it from your VIN' },

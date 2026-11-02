@@ -346,8 +346,8 @@ export const BLOG_POSTS: BlogPost[] = [
         bullets: [
           'CIC (≈2008–2012): comfort coding, diagnostics — no CarPlay',
           'NBT (≈2012–2016): VIM, hidden features, maps — no CarPlay',
-          'NBT Evo ID5/ID6 (2016+): full CarPlay activation, wireless on most ID6',
-          'MGU iDrive 7/8 (2018+): CarPlay + Android Auto, modern coding tooling',
+          'NBT Evo ID5/ID6 (≈2016–2019): full CarPlay activation, wireless on most ID6',
+          'MGU iDrive 7/8 (≈2020+): CarPlay + Android Auto, modern coding tooling',
         ],
       },
       {
@@ -632,7 +632,7 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2026-10-15',
     readMinutes: 5,
     intro: [
-      'Short version: BMWs built from around 2016 with iDrive 6 (NBT Evo) or anything newer can almost always have Apple CarPlay. Cars before that usually cannot without new hardware. The year is only a hint, though — the head unit decides, and two 2016 cars can have different ones. Here is how to tell what you have in under a minute.',
+      'Short version: BMWs built from 2016 with iDrive 6 (NBT Evo) or anything newer can almost always have Apple CarPlay. On BMWs built before 2016 it cannot be activated. From 2016 the head unit decides, and two 2016 cars can have different ones — here is how to tell what you have in under a minute.',
     ],
     sections: [
       {
@@ -641,10 +641,10 @@ export const BLOG_POSTS: BlogPost[] = [
           'These are the typical cases; the VIN confirms yours.',
         ],
         bullets: [
-          '2019 and newer (iDrive 7 / 8, the wide curved-style display): CarPlay is supported, often fitted from the factory. If it is missing or a trial expired, it can be activated — €220 on iDrive 7, iDrive 8 priced per car.',
+          '2020 and newer (iDrive 7 / 8, the wide curved-style display): CarPlay is supported, often fitted from the factory. If it is missing or a trial expired, it can be activated — €220 on iDrive 7, iDrive 8 priced per car.',
           '2016–2019 with the tile home screen (iDrive 6 / NBT Evo): supported. Many cars shipped with it locked or on a subscription; activation by coding is €150, permanent, wireless on most ID6 builds.',
           '2016–2017 with a list-style menu on a newer car: possibly NBT Evo running old ID4/ID5 software — the update to ID6 (€300, CarPlay activation included) usually makes CarPlay possible.',
-          '2013–2016 with NBT (iDrive 4/5 look) or any CIC car: no native CarPlay. Hidden features, navigation and diagnostics still apply, but CarPlay would need a different head unit.',
+          'Built before 2016 (NBT with the iDrive 4/5 look, or CIC): CarPlay cannot be activated. Hidden features, navigation and diagnostics still apply.',
         ],
       },
       {
