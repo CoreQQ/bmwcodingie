@@ -30,7 +30,7 @@ export const EXTRA_LANDINGS: Record<string, ServicePage> = {
     modelsHeading: 'Works on',
     models: [
       'All F-series (2010–2019) — full hidden-feature set',
-      'All G-series (2017+) — iDrive 7/8 feature unlocks',
+      'All G-series (2017+) — NBT Evo up to 2019, iDrive 7/8 feature unlocks from 2020',
       'E-series is not something we work on',
       'Exact list confirmed from your VIN before booking',
     ],

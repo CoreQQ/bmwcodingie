@@ -65,11 +65,11 @@ const CHASSIS: ChassisFacts[] = [
     short: 'F30 3 Series',
     codes: 'F30, F31, F34',
     years: '2012–2019',
-    headUnits: 'Business/NBT on early cars, NBT Evo (ID5/ID6) from the 2015 LCI',
+    headUnits: 'Business/NBT on early cars, NBT Evo (ID5/ID6) on 2016+ builds',
     genNote:
-      'The F30 is the most-coded BMW in Ireland. Pre-LCI cars on NBT take hidden features, Video in Motion and comfort coding; LCI cars with NBT Evo add full Apple CarPlay — including wireless on most ID6 builds. Digital speed, sport displays and folding-mirror coding work across the whole run.',
+      'The F30 is the most-coded BMW in Ireland. Pre-LCI cars on NBT take hidden features, Video in Motion and comfort coding; 2016+ cars with NBT Evo add full Apple CarPlay — including wireless on most ID6 builds. Digital speed, sport displays and folding-mirror coding work across the whole run.',
     popular: [
-      'Apple CarPlay activation on NBT Evo (2015+ LCI cars)',
+      'Apple CarPlay activation on NBT Evo (2016+ cars)',
       'Video in Motion — passenger media on the move (passenger use only)',
       'Sport displays and digital speed in the cluster',
       'Auto-folding mirrors on lock and one-touch windows',
@@ -78,7 +78,7 @@ const CHASSIS: ChassisFacts[] = [
     ],
     faq: {
       q: 'Can you activate CarPlay on my F30?',
-      a: 'If it is a 2015+ LCI car with NBT Evo (ID5/ID6), usually yes — including wireless on most ID6 builds. Pre-LCI NBT cars do not support native CarPlay, but plenty of other coding still applies. Send your year and VIN-derived build and we confirm.',
+      a: 'If it is a 2016+ car with NBT Evo (ID5/ID6), usually yes — including wireless on most ID6 builds. On F30s built before 2016 CarPlay cannot be activated, but plenty of other coding still applies. Send your year and VIN-derived build and we confirm.',
     },
     related: ['bmw-g20-coding', 'bmw-f32-coding', 'bmw-f10-coding'],
     upgrades: ['carplayEvo','id6','fullscreen','cluster6wb','maps','camera','japan','hidden'],
@@ -209,7 +209,7 @@ const CHASSIS: ChassisFacts[] = [
     short: 'G30 5 Series',
     codes: 'G30, G31',
     years: '2017–2023',
-    headUnits: 'NBT Evo (ID6) on 2017–2020 cars, MGU (iDrive 7) from the LCI',
+    headUnits: 'NBT Evo (ID6) on 2017–2019 cars, MGU (iDrive 7) from 2020',
     genNote:
       'The G30 splits into two worlds: pre-LCI cars run NBT Evo where we activate full wireless CarPlay, and LCI cars run iDrive 7 where coding focuses on Video in Motion, cluster layouts and convenience memory. Both take the comfort pack, and the G31 Touring tailgate behaviour is codeable too.',
     popular: [
