@@ -38,7 +38,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       'BMWs built before 2016 (CIC / NBT) — CarPlay cannot be activated',
     ],
     process: [
-      { title: 'Send your VIN', body: 'The last 7 characters are enough. We tell you which head unit you have and whether CarPlay will work.' },
+      { title: 'Send your VIN', body: 'All 17 characters — it is on your logbook and at the bottom of the windscreen. We tell you which head unit you have and whether CarPlay will work.' },
       { title: 'Pick remote or visit', body: 'Remote: a Windows laptop and ENET cable. Mobile visit: we come to the car around Dublin.' },
       { title: 'Activate and test', body: 'We activate CarPlay, pair your iPhone and check wired and wireless where supported.' },
       { title: 'Pay once it works', body: 'You see CarPlay running on your screen before you pay.' },
@@ -55,7 +55,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6 update' },
       { slug: 'remote-bmw-coding-ireland', label: 'how remote coding works' },
     ],
-    waMessage: 'Hi, I would like to check Apple CarPlay compatibility for my BMW. My VIN (last 7) is ',
+    waMessage: 'Hi, I would like to check Apple CarPlay compatibility for my BMW. My VIN is ',
     area: ['Ireland'],
   },
 
@@ -106,7 +106,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6 update' },
       { slug: 'bmw-android-auto-activation', label: 'Android Auto activation' },
     ],
-    waMessage: 'Hi, I would like fullscreen CarPlay on my BMW. My VIN (last 7) is ',
+    waMessage: 'Hi, I would like fullscreen CarPlay on my BMW. My VIN is ',
   },
 
   'bmw-id4-to-id6-upgrade': {
@@ -148,7 +148,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { title: 'CarPlay activated', body: 'Apple CarPlay is switched on in the same session — it is part of the €300.' },
     ],
     faqs: [
-      { q: 'How do I know if I have ID4, ID5 or ID6?', a: 'ID6 has a home screen of live tiles; ID4 and ID5 open on a list menu. The surest way is the VIN — send us the last 7 characters.' },
+      { q: 'How do I know if I have ID4, ID5 or ID6?', a: 'ID6 has a home screen of live tiles; ID4 and ID5 open on a list menu. The surest way is the VIN — send us all 17 characters.' },
       { q: 'Do I need ID6 for CarPlay?', a: 'On most NBT Evo cars running ID4, yes — CarPlay needs the newer software. ID5 cars can often be activated directly. We confirm from your VIN.' },
       { q: 'Can my NBT (iDrive 4) be upgraded to ID6?', a: 'No. NBT and NBT Evo are different hardware; ID6 only runs on NBT Evo. If you have NBT, we will tell you honestly what is and is not possible.' },
       { q: 'Is it reversible?', a: 'It is a software update to a newer official version. There is normally no reason to go back, and nothing physical is changed.' },
@@ -159,7 +159,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { slug: 'bmw-idrive-upgrade-ireland', label: 'all iDrive upgrade options' },
       { slug: 'bmw-map-updates-fsc-codes', label: 'navigation map updates' },
     ],
-    waMessage: 'Hi, I would like to update my BMW iDrive from ID4 to ID6. My VIN (last 7) is ',
+    waMessage: 'Hi, I would like to update my BMW iDrive from ID4 to ID6. My VIN is ',
   },
 
   'bmw-6wa-to-6wb-retrofit': {
@@ -211,7 +211,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6 update' },
       { slug: 'bmw-f30-coding', label: 'F30 coding' },
     ],
-    waMessage: 'Hi, I would like a 6WA to 6WB cluster retrofit on my BMW. My VIN (last 7) is ',
+    waMessage: 'Hi, I would like a 6WA to 6WB cluster retrofit on my BMW. My VIN is ',
   },
 
   'bmw-idrive-upgrade-ireland': {
@@ -227,7 +227,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       'Which upgrade makes sense depends entirely on which iDrive you have. Here is what is realistic for each generation — and what would need new hardware.',
     intro: [
       'BMW has used several head units over the years: CIC, NBT, NBT Evo, MGU (iDrive 7) and iDrive 8. Some upgrades are pure software and quick; others need different hardware and are not worth doing on every car. We would rather tell you that than sell you the wrong job.',
-      'Send the last 7 characters of your VIN and we will reply with the system you have and the upgrades that actually make sense for it, with prices.',
+      'Send your full VIN (17 characters) and we will reply with the system you have and the upgrades that actually make sense for it, with prices.',
     ],
     includedHeading: 'Upgrades we do',
     included: [
@@ -263,7 +263,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { slug: 'bmw-map-updates-fsc-codes', label: 'navigation map updates' },
       { slug: 'japan-import-bmw-conversion-ireland', label: 'Japan import conversion' },
     ],
-    waMessage: 'Hi, I would like to know which iDrive upgrades are possible on my BMW. My VIN (last 7) is ',
+    waMessage: 'Hi, I would like to know which iDrive upgrades are possible on my BMW. My VIN is ',
     area: ['Ireland'],
   },
 };

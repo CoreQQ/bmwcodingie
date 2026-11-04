@@ -613,7 +613,7 @@ export const BLOG_POSTS: BlogPost[] = [
         heading: 'How it is enabled',
         paragraphs: [
           'It is coding, done either together with CarPlay activation (from €150 on NBT Evo) or on a car that already has CarPlay. Remote over ENET anywhere in Ireland, or at your car around Dublin. We test it with your iPhone before the session ends.',
-          'The only thing we need first is the last 7 characters of your VIN, which tells us the head unit, the screen and the software level — and whether fullscreen is possible on your build at all.',
+          'The only thing we need first is your full VIN (17 characters), which tells us the head unit, the screen and the software level — and whether fullscreen is possible on your build at all.',
         ],
       },
     ],
@@ -651,7 +651,7 @@ export const BLOG_POSTS: BlogPost[] = [
         heading: 'Check the screen, not the badge',
         paragraphs: [
           'Turn the car on and look at the home screen. A grid of large tiles you can rearrange is iDrive 6 (NBT Evo) — CarPlay territory. A wide screen with swipeable widgets and a curved look is iDrive 7 or 8 — also fine. A vertical list of menu items (CD/Multimedia, Radio, Telephone, Navigation…) on a dark background is the older NBT or CIC family — generally no CarPlay.',
-          'Still not sure? The last 7 characters of your VIN tell us the exact head unit and software level in a minute, which is why every job we do starts there.',
+          'Still not sure? Your full VIN (17 characters) tells us the exact head unit and software level in a minute, which is why every job we do starts there.',
         ],
       },
       {

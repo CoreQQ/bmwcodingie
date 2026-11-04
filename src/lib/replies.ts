@@ -33,7 +33,7 @@ export const CANNED_REPLIES: CannedReply[] = [
   {
     key: 'checkcar',
     label: '🚗 Need car details',
-    text: `To confirm exactly what's possible on your car, send me: the model, the year, and ideally the VIN (last 7 characters are enough). I'll check your build and tell you straight what it supports and the price.`,
+    text: `To confirm exactly what's possible on your car, send me: the model, the year, and ideally the full VIN (all 17 characters — it's on the logbook and at the bottom of the windscreen). I'll check your build and tell you straight what it supports and the price.`,
   },
   {
     key: 'warranty',

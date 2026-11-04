@@ -151,7 +151,7 @@ export default async function ProjectsPage({ params }: { params: Promise<{ local
               <div className="flex flex-col items-start justify-between gap-5 p-7 md:flex-row md:items-center">
                 <div>
                   <h2 className="font-display text-2xl text-ink">Want the same on your BMW?</h2>
-                  <p className="mt-1 text-sm text-muted">Send the last 7 of your VIN — we reply with what your car supports and the price.</p>
+                  <p className="mt-1 text-sm text-muted">Send your full VIN (17 characters) — we reply with what your car supports and the price.</p>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-3">
                   <Link href="/#vin-check" className="btn-primary">Check my BMW</Link>

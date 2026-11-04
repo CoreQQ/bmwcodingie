@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { waHref } from '@/lib/waMessage';
 import { normalizePhone } from '@/lib/phone';
+import { cleanVin, isFullVin } from '@/lib/vin';
 import { trackGaEvent, trackGoogleConversion } from './GoogleAdsTag';
 import { trackMetaEvent } from './MetaPixel';
 
@@ -47,7 +48,7 @@ const SERVICE_GROUPS: { label: string; items: string[] }[] = [
 const SERVICES = SERVICE_GROUPS.flatMap((g) => g.items);
 
 /**
- * Compatibility check: last 7 of the VIN plus what they want. With a number
+ * Compatibility check: the full VIN plus what they want. With a number
  * it is sent through the site; without one it opens WhatsApp with everything
  * already typed, and Alex is told in the background either way.
  */
@@ -62,8 +63,8 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
   // Which field is wrong, so the message sits under the field and the rest stays quiet.
   const [error, setError] = useState<'vin' | 'model' | 'phone' | null>(null);
 
-  const clean = vin.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  const vinOk = clean.length === 7;
+  const clean = cleanVin(vin);
+  const vinOk = isFullVin(clean);
   const e164 = normalizePhone(phone);
 
   async function submit(e: React.FormEvent) {
@@ -85,7 +86,7 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
   // After sending, the same details pre-typed for WhatsApp so the chat can start at once.
   const waText =
     `Hi, I'd like to check my BMW.\n` +
-    `VIN (last 7): ${clean}\n` +
+    `VIN: ${clean}\n` +
     (model ? `Model: ${model}\n` : '') +
     `Interested in: ${service}`;
 
@@ -124,10 +125,11 @@ export function VinCheck({ whatsapp }: { whatsapp: string }) {
                     }}
                     required
                     aria-invalid={error === 'vin'}
-                    maxLength={9}
+                    maxLength={24}
                     autoCapitalize="characters"
                     autoComplete="off"
-                    placeholder="e.g. FK41749"
+                    spellCheck={false}
+                    placeholder="e.g. WBA8E9C59GK641749"
                     className={`${input} font-mono uppercase tracking-widest`}
                   />
                   {error === 'vin' && <p className="mt-2 text-sm text-red-400">{t('vinError')}</p>}
