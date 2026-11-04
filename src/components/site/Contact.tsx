@@ -11,6 +11,7 @@ import { getAttribution, getLanding, getTimeOnSite } from '@/lib/attribution';
 import { trackGaEvent, trackGoogleConversion } from './GoogleAdsTag';
 import { Link } from '@/i18n/navigation';
 import { SlotPicker } from './SlotPicker';
+import { cleanVin } from '@/lib/vin';
 
 export function Contact({
   settings,
@@ -104,7 +105,7 @@ export function Contact({
         body: JSON.stringify({
           ...form,
           name: form.name.trim() || 'Website customer',
-          message: [form.vin.trim() ? `VIN (last 7): ${form.vin.trim().toUpperCase()}` : '', form.message.trim()]
+          message: [cleanVin(form.vin) ? `VIN: ${cleanVin(form.vin)}` : '', form.message.trim()]
             .filter(Boolean)
             .join('\n'),
           ...(consult ? { slot_date: '', slot_time: '', consultation: true } : {}),
@@ -261,9 +262,10 @@ export function Contact({
                   <input
                     value={form.vin}
                     onChange={update('vin')}
-                    maxLength={9}
+                    maxLength={24}
                     autoCapitalize="characters"
-                    placeholder="e.g. FK41749"
+                    spellCheck={false}
+                    placeholder="e.g. WBA8E9C59GK641749"
                     className={`${inputCls} font-mono uppercase tracking-widest`}
                   />
                 </Field>

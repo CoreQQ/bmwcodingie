@@ -157,7 +157,7 @@ export default async function BlogPost({
                 <div className="flex flex-col items-start justify-between gap-5 p-7 md:flex-row md:items-center">
                   <div>
                     <h2 className="font-display text-2xl text-ink">Want to check your BMW? Send us your VIN.</h2>
-                    <p className="mt-1 text-sm text-muted">The last 7 characters are enough — we reply with what your car supports and the price.</p>
+                    <p className="mt-1 text-sm text-muted">Send all 17 characters — we reply with what your car supports and the price.</p>
                   </div>
                   <div className="flex shrink-0 flex-wrap gap-3">
                     <Link href="/#vin-check" className="btn-primary">Check my BMW</Link>
