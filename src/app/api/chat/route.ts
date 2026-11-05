@@ -5,6 +5,7 @@ import { SITE_CHAT_PROMPT } from '@/lib/assistantPrompt';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { notifyTelegram } from '@/lib/telegram';
 import { ensureClient, clientCode, phoneKey } from '@/lib/crm';
+import { withOfferNote } from '@/lib/offerNote';
 
 export const runtime = 'nodejs';
 
@@ -98,7 +99,7 @@ export async function POST(req: Request) {
           if (name && phoneKey(phone).length >= 7) {
             const bmw_model = String(inp.bmw_model ?? '').trim().slice(0, 160);
             const service = String(inp.service ?? '').trim().slice(0, 160);
-            const note = String(inp.note ?? '').trim().slice(0, 1000);
+            const note = withOfferNote(String(inp.note ?? '').trim().slice(0, 1000));
             const sb = getSupabaseAdmin();
             let id: number | undefined;
             let banned = false;

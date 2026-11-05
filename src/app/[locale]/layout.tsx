@@ -9,6 +9,7 @@ import { CallHours } from '@/components/site/CallHours';
 import { WhatsAppFloat } from '@/components/site/WhatsAppFloat';
 import { Announcement } from '@/components/site/Announcement';
 import { isMobileOnly } from '@/lib/transition';
+import { BF_ON, NOTICE_KEY, NOV11_ON, OFFER, OFFER_ON, XMAS_ON } from '@/lib/season';
 import { getHours } from '@/lib/stats';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { DEFAULT_HOURS, type HoursMap } from '@/lib/hours';
@@ -36,12 +37,13 @@ export default async function LocaleLayout({
   // instead of request headers, so the pages can be prerendered and cached.
   setRequestLocale(locale);
 
-  const [settings, catalog, reviews, tCookie, tNotice] = await Promise.all([
+  const [settings, catalog, reviews, tCookie, tNotice, tOffer] = await Promise.all([
     getSettings(),
     getCatalog(),
     getReviews(),
     getTranslations('CookieConsent'),
     getTranslations('Announcement'),
+    getTranslations(NOV11_ON ? 'ElevenEleven' : BF_ON ? 'BlackFriday' : 'Christmas'),
   ]);
 
   const mobileOnly = isMobileOnly();
@@ -180,16 +182,29 @@ export default async function LocaleLayout({
           after hydration shifted the whole page (CLS). Key matches Announcement. */}
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{if(localStorage.getItem('bmw-notice-mobile-live')!=='seen')document.documentElement.dataset.notice='1'}catch(e){document.documentElement.dataset.notice='1'}`,
+          __html: `try{if(localStorage.getItem(${JSON.stringify(OFFER_ON ? OFFER.noticeKey : NOTICE_KEY)})!=='seen')document.documentElement.dataset.notice='1'}catch(e){document.documentElement.dataset.notice='1'}`,
         }}
       />
-      <Announcement
-        title={tNotice('title')}
-        body={tNotice('body')}
-        cta={tNotice('cta')}
-        href="/find-us"
-        dismissLabel={tNotice('dismiss')}
-      />
+      {/* During an offer its notice replaces the "we come to you" one. */}
+      {OFFER_ON ? (
+        <Announcement
+          title={tOffer('title')}
+          body={tOffer('body')}
+          cta={tOffer('cta')}
+          href={NOV11_ON ? '/#eleven-eleven' : BF_ON ? '/#black-friday' : '/bmw-coding-price-calculator'}
+          dismissLabel={tNotice('dismiss')}
+          storageKey={OFFER.noticeKey}
+          variant={XMAS_ON ? 'xmas' : NOV11_ON ? 'nov11' : 'blackfriday'}
+        />
+      ) : (
+        <Announcement
+          title={tNotice('title')}
+          body={tNotice('body')}
+          cta={tNotice('cta')}
+          href="/find-us"
+          dismissLabel={tNotice('dismiss')}
+        />
+      )}
       {children}
       <SectionTime />
       <CallHours whatsapp={settings.whatsapp} />

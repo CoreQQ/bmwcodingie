@@ -1,5 +1,6 @@
 import { translateToRussian } from './translate';
 import { waLinkFor } from './phone';
+import { BF, BF_ON, NOV11, NOV11_ON, XMAS, XMAS_ON } from './season';
 
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT_ID = process.env.TG_CHAT_ID;
@@ -284,6 +285,11 @@ export function bookingLines(lead: Lead): string[] {
   if (lead.dwell) lines.push(`⏱ <b>On site:</b> ${esc(lead.dwell)} before booking`);
   if (lead.clientNote) lines.push(lead.clientNote);
   if (lead.repeatNote) lines.push(lead.repeatNote);
+  // The site shows them the offer price, so the bill must match it.
+  if (XMAS_ON) lines.push(`🎄 <b>Christmas offer:</b> −${XMAS.pct}% on the work (not the call-out), until ${XMAS.until}`);
+  if (BF_ON) lines.push(`🏷️ <b>Black Friday:</b> −${BF.pct}% on jobs done 27–30 Nov (not the call-out) · Wi-Fi antenna included with CarPlay`);
+  // 11.11 itself is written into the booking's message (offerNote.ts), so it survives the day.
+  if (NOV11_ON && !lead.message?.includes('11.11')) lines.push(`🛍️ <b>11.11:</b> −${NOV11.pct}% on the work if booked today and done by ${NOV11.doneBy}`);
   return lines;
 }
 

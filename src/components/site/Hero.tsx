@@ -3,6 +3,9 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { SiteSettings } from '@/lib/types';
 import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
+import { BF_ON, NOV11_ON, XMAS, XMAS_ON } from '@/lib/season';
+import { Snowfall, XmasGlow } from './Snowfall';
+import { SantaHat } from './SantaHat';
 
 // First screen per the owner's brief: what we do, the services in one line,
 // two actions (check your BMW, or WhatsApp), and four reasons to trust it.
@@ -17,10 +20,42 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
           is the whole point of the glass direction. */}
       <div className="mx-auto max-w-edge px-5 pb-14 pt-24 sm:pt-28 md:px-8 md:pb-24 md:pt-40">
         <div className="max-w-3xl">
-          <div className="mb-6 flex items-center gap-3">
-            <span className="m-stripe h-[3px] w-12" />
-            <span className="label text-muted">{t('eyebrow')}</span>
-          </div>
+          {XMAS_ON ? (
+            <a
+              href="/bmw-coding-price-calculator"
+              className="relative mb-6 inline-flex items-center gap-2 rounded-full border border-[#c8102e]/60 bg-[#c8102e]/15 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-[#c8102e]/25 sm:text-[13px]"
+            >
+              {XMAS.hat === 'badge' && (
+                <SantaHat className="pointer-events-none absolute -left-3 -top-4 w-8 -rotate-[18deg]" />
+              )}
+              <span aria-hidden="true">🎄</span> {t('xmasBadge')}
+            </a>
+          ) : BF_ON ? (
+            <a
+              href="#black-friday"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ffd23f]/70 bg-black/70 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-black sm:text-[13px]"
+            >
+              <span className="rounded-sm bg-[#ffd23f] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black">
+                Black Friday
+              </span>
+              {t('bfBadge')}
+            </a>
+          ) : NOV11_ON ? (
+            <a
+              href="#eleven-eleven"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ff7a1a]/70 bg-black/70 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-black sm:text-[13px]"
+            >
+              <span className="rounded-sm bg-[#ff7a1a] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black">
+                11.11
+              </span>
+              {t('nov11Badge')}
+            </a>
+          ) : (
+            <div className="mb-6 flex items-center gap-3">
+              <span className="m-stripe h-[3px] w-12" />
+              <span className="label text-muted">{t('eyebrow')}</span>
+            </div>
+          )}
 
           <h1 className="font-display text-[clamp(2.1rem,7.4vw,4.4rem)]">
             <span className="block">{t('title1')}</span>
@@ -67,6 +102,9 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
           </ul>
         </div>
       </div>
+      {/* After the content on purpose: the notice spacing rule targets #top's first child. */}
+      <XmasGlow />
+      <Snowfall />
     </section>
   );
 }

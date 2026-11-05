@@ -6,6 +6,7 @@ import { notifyTelegram, sendOwnerAlert } from './telegram';
 import { getHours, getSlotDuration, getBlockedDates } from './stats';
 import { windowsFor, windowsOverlap } from './hours';
 import { sendWhatsAppText } from './whatsapp';
+import { withOfferNote } from './offerNote';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -548,7 +549,7 @@ export async function generateWaReply(
                   contact,
                   bmw_model,
                   service,
-                  message: '',
+                  message: withOfferNote(''),
                   slot_date: day,
                   slot_time: time,
                   source: 'WhatsApp AI',
@@ -565,7 +566,7 @@ export async function generateWaReply(
               contact,
               bmw_model,
               service,
-              message: '',
+              message: withOfferNote(''),
               slot_date: day,
               slot_time: time,
               source: '🤖 WhatsApp AI — slot requested',
@@ -609,7 +610,7 @@ export async function generateWaReply(
           String(inp.name ?? '').trim().slice(0, 120) || profileName || `WhatsApp ${waId}`;
         const bmw_model = String(inp.bmw_model ?? '').trim().slice(0, 160);
         const service = String(inp.service ?? '').trim().slice(0, 160);
-        const note = String(inp.note ?? '').trim().slice(0, 1000);
+        const note = withOfferNote(String(inp.note ?? '').trim().slice(0, 1000));
         const isPhone = contact.startsWith('+');
         const open = await openLeadFor(sb, contact).catch(() => null);
         if (open) {

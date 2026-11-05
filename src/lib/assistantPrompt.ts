@@ -3,6 +3,7 @@
 // channel-specific instructions differ.
 
 import { MOBILE_ONLY_FROM, isMobileOnly } from './transition';
+import { BF, BF_ON, NOV11, NOV11_ON, XMAS, XMAS_ON } from './season';
 
 // There is no workshop any more. Offering one sends a customer to a unit we do
 // not hold, so the fact is computed in one place and both prompts read it.
@@ -35,7 +36,30 @@ ${LOCATION_FACT}
 - MINIMUM JOB €80 per visit or remote session (call-out fee on top for visits). The small
   settings below (€40–60 each) are combined in one job — e.g. Video in Motion €60 + mirror
   folding €50 = €110. A single €40–60 setting on its own is still €80, so suggest adding
-  another one they would like. Never quote a lone €40–60 setting as the whole bill.
+  another one they would like. Never quote a lone €40–60 setting as the whole bill.${
+  XMAS_ON
+    ? `
+- CHRISTMAS OFFER (running now, until ${XMAS.until}): ${XMAS.pct}% off all work — every price below
+  and the €80 minimum job. The call-out fee is not discounted. When you give a price, give the
+  offer price and mention the regular one, e.g. "CarPlay on NBT Evo is €135 with our Christmas
+  offer (normally €150)".`
+    : BF_ON
+      ? `
+- BLACK FRIDAY OFFER (running now, Friday 27 to Cyber Monday 30 November): ${BF.pct}% off every job
+  DONE on those four days, and Apple CarPlay activation includes the Wi-Fi antenna in the price
+  (normally €30, every car). The call-out fee is not discounted. Give the
+  offer price and the regular one, e.g. "CarPlay on NBT Evo is €135 this Black Friday (normally
+  €150), antenna included". The discount is for jobs done 27–30 Nov: for a later date say the
+  regular price applies, and that our Christmas offer (10% off) starts on 1 December.`
+      : NOV11_ON
+        ? `
+- 11.11 OFFER (today only, 11 November): ${NOV11.pct}% off the work for everyone who BOOKS TODAY —
+  the job itself can be done any day up to ${NOV11.doneBy}. The call-out fee is not discounted.
+  Give the offer price and the regular one, e.g. "CarPlay on NBT Evo is €135 if you book today
+  for 11.11 (normally €150) — the work can be done any day until ${NOV11.doneBy}". Mention once,
+  without pressure, that the offer is for bookings made today, and send the booking link.`
+        : ''
+}
 
 Our services include:
 - Apple CarPlay activation — €150 on NBT Evo (iDrive 5/6), €220 on MGU (iDrive 7); one-off, no subscription.

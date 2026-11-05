@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Logo } from './Logo';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { Garland } from './Snowfall';
 
 function NavItem({
   href,
@@ -53,12 +54,13 @@ export function Header() {
       <div className="m-stripe h-[3px] w-full" aria-hidden="true" />
 
       <div
-        className={`transition-all duration-300 ${
+        className={`relative transition-all duration-300 ${
           scrolled
             ? 'border-b border-white/5 bg-graphite-900/85 backdrop-blur-xl'
             : 'bg-transparent'
         }`}
       >
+        <Garland />
         <div className="mx-auto flex max-w-edge items-center justify-between px-4 py-3 md:px-8 md:py-4">
           {/* Wordmark */}
           <Link href="/" className="group inline-flex items-center">

@@ -6,6 +6,8 @@ import { Header } from '@/components/site/Header';
 import { Preloader } from '@/components/site/Preloader';
 import { ScrollProgress } from '@/components/site/ScrollProgress';
 import { Hero } from '@/components/site/Hero';
+import { BlackFridayPoster } from '@/components/site/BlackFridayPoster';
+import { ElevenElevenPoster } from '@/components/site/ElevenElevenPoster';
 import { AndroidAutoSpotlight } from '@/components/site/AndroidAutoSpotlight';
 import { Gallery } from '@/components/site/Gallery';
 import { Reviews } from '@/components/site/Reviews';
@@ -70,6 +72,8 @@ export default async function HomePage({
         {/* The owner's brief: every block leads to one of three actions —
             WhatsApp, the VIN check or booking. Order as specified. */}
         <Hero settings={settings} />
+        <ElevenElevenPoster whatsapp={settings.whatsapp} />
+        <BlackFridayPoster whatsapp={settings.whatsapp} />
         <AndroidAutoSpotlight whatsapp={settings.whatsapp} />
         <VinCheck whatsapp={settings.whatsapp} />
         <PopularServices whatsapp={settings.whatsapp} />
