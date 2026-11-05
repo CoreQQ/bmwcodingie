@@ -44,6 +44,8 @@ export const CODING_LIST: CodingCategory[] = [
       'Cluster start-up (needle sweep) animation',
       'Boot / start-up logo and welcome screen tweaks',
       'Efficient / Sport / Comfort display styling',
+      'Extra apps on iDrive 7 — not BMW’s own apps, list on request',
+      'CarPlay / Android Auto navigation in the instrument cluster (iDrive 7)',
     ],
   },
   {
@@ -80,6 +82,7 @@ export const CODING_LIST: CodingCategory[] = [
       'Climate / AC last-state memory',
       'Windscreen wiper and washer behaviour',
       'Seat heating memory and levels',
+      'Remote engine start (where the car supports it — confirmed from your VIN)',
     ],
   },
   {
@@ -132,5 +135,5 @@ export const CODING_LIST: CodingCategory[] = [
 export const CODING_META = {
   title: 'BMW Coding List | Codeable Features & Hidden Functions — Dublin & Ireland',
   description:
-    'A full list of BMW coding options and hidden features we can enable on F- and G-series cars — CarPlay, Android Auto, ambient lighting, sport displays, comfort features, cruise control and more. In Dublin and across Ireland.',
+    'A full list of BMW coding options and hidden features we can enable on F- and G-series cars — CarPlay, Android Auto, iDrive 7 apps, remote engine start, ambient lighting, sport displays, comfort features, cruise control and more. In Dublin and across Ireland.',
 };

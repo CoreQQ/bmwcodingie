@@ -14,7 +14,7 @@ import { trackMetaEvent } from './MetaPixel';
 const SERVICE_GROUPS: { label: string; items: string[] }[] = [
   {
     label: 'Phone & screen',
-    items: ['Apple CarPlay', 'Fullscreen CarPlay', 'Android Auto', 'Video in Motion (passenger use)'],
+    items: ['Apple CarPlay', 'Fullscreen CarPlay', 'Android Auto', 'Extra apps on iDrive 7', 'Video in Motion (passenger use)'],
   },
   {
     label: 'Import & navigation',
@@ -25,6 +25,7 @@ const SERVICE_GROUPS: { label: string; items: string[] }[] = [
     items: [
       'Hidden features / custom coding',
       'Folding mirrors / Comfort Access',
+      'Remote engine start',
       'Lighting (welcome, DRL, indicators)',
       'Sport displays / digital speed',
       'Start/Stop, seatbelt & reminders',
