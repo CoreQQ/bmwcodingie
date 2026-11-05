@@ -9,7 +9,7 @@ import { CallHours } from '@/components/site/CallHours';
 import { WhatsAppFloat } from '@/components/site/WhatsAppFloat';
 import { Announcement } from '@/components/site/Announcement';
 import { isMobileOnly } from '@/lib/transition';
-import { BF_ON, NOTICE_KEY, OFFER, OFFER_ON, XMAS_ON } from '@/lib/season';
+import { BF_ON, NOTICE_KEY, NOV11_ON, OFFER, OFFER_ON, XMAS_ON } from '@/lib/season';
 import { getHours } from '@/lib/stats';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { DEFAULT_HOURS, type HoursMap } from '@/lib/hours';
@@ -43,7 +43,7 @@ export default async function LocaleLayout({
     getReviews(),
     getTranslations('CookieConsent'),
     getTranslations('Announcement'),
-    getTranslations(BF_ON ? 'BlackFriday' : 'Christmas'),
+    getTranslations(NOV11_ON ? 'ElevenEleven' : BF_ON ? 'BlackFriday' : 'Christmas'),
   ]);
 
   const mobileOnly = isMobileOnly();
@@ -191,10 +191,10 @@ export default async function LocaleLayout({
           title={tOffer('title')}
           body={tOffer('body')}
           cta={tOffer('cta')}
-          href={BF_ON ? '/#black-friday' : '/bmw-coding-price-calculator'}
+          href={NOV11_ON ? '/#eleven-eleven' : BF_ON ? '/#black-friday' : '/bmw-coding-price-calculator'}
           dismissLabel={tNotice('dismiss')}
           storageKey={OFFER.noticeKey}
-          variant={XMAS_ON ? 'xmas' : 'blackfriday'}
+          variant={XMAS_ON ? 'xmas' : NOV11_ON ? 'nov11' : 'blackfriday'}
         />
       ) : (
         <Announcement

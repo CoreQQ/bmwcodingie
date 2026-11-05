@@ -47,7 +47,8 @@
     "servicesLink": "Visos paslaugos",
     "projectsLink": "Mūsų darbai",
     "xmasBadge": "Kalėdinis pasiūlymas: −10% visiems darbams iki sausio 6 d.",
-    "bfBadge": "−10% visiems darbams, Pn 27 – Pr 30 lapkričio"
+    "bfBadge": "−10% visiems darbams, Pn 27 – Pr 30 lapkričio",
+    "nov11Badge": "−10% užsiregistravus šiandien · darbas iki lapkričio 26 d."
   },
   "AndroidAutoNew": {
     "badge": "Naujiena",
@@ -340,6 +341,21 @@
     "book": "Registruotis Black Friday laikui",
     "whatsapp": "Rašyti WhatsApp",
     "waMessage": "Sveiki! Norėčiau CarPlay pagal Black Friday pasiūlymą. Mano BMW — "
+  },
+  "ElevenEleven": {
+    "title": "11.11: −10% darbui, jei užsiregistruojate šiandien",
+    "body": "Užsiregistruokite lapkričio 11 d. ir gaukite 10% nuolaidą darbui — patį darbą galima atlikti bet kurią dieną iki lapkričio 26 d. Atvykimui nuolaida netaikoma.",
+    "cta": "Plačiau",
+    "posterDates": "Trečiadienis, lapkričio 11 d. · tik vieną dieną",
+    "posterSub": "Užsiregistruokite šiandien ir gaukite 10% nuolaidą darbui — CarPlay, kodavimas, Japan → EU konversijos, papildoma įranga ir diagnostika. Patį darbą galima atlikti bet kurią dieną iki lapkričio 26 d.",
+    "examplesLabel": "Užsiregistravus šiandien",
+    "exCarplay": "Apple CarPlay · NBT Evo",
+    "exJapan": "Japan → EU · NBT Evo",
+    "exId6": "ID4 → ID6 su CarPlay",
+    "finePrint": "Registracijoms, atliktoms lapkričio 11 d., kai darbas atliekamas iki lapkričio 26 d. Atvykimui nuolaida netaikoma.",
+    "book": "Registruotis šiandien",
+    "whatsapp": "Rašyti WhatsApp",
+    "waMessage": "Sveiki — noriu užsiregistruoti su 11.11 pasiūlymu. Mano BMW — "
   },
   "GoogleReviews": {
     "count": "{count} atsiliepimai Google",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Gift, Tag, Truck, X } from 'lucide-react';
+import { Gift, ShoppingBag, Tag, Truck, X } from 'lucide-react';
 import { NOTICE_KEY } from '@/lib/season';
 
 /**
@@ -24,9 +24,9 @@ export function Announcement({
   href: string;
   dismissLabel: string;
   storageKey?: string;
-  /** An offer instead of the van: Christmas (gift, red edge) or Black
-   *  Friday (price tag, yellow edge). */
-  variant?: 'xmas' | 'blackfriday';
+  /** An offer instead of the van: Christmas (gift, red edge), Black
+   *  Friday (price tag, yellow edge) or 11.11 (bag, orange edge). */
+  variant?: 'xmas' | 'blackfriday' | 'nov11';
 }) {
   const KEY = storageKey;
   const [show, setShow] = useState(false);
@@ -75,13 +75,21 @@ export function Announcement({
     >
       <div
         className={`${atTop ? 'pointer-events-auto' : ''} mx-auto flex max-w-edge items-start gap-3 rounded-[16px] border bg-[rgba(12,15,20,0.88)] px-4 py-3 shadow-lg backdrop-blur-md md:p-4 ${
-          variant === 'xmas' ? 'border-[#c8102e]/60' : variant === 'blackfriday' ? 'border-[#ffd23f]/60' : 'border-white/15'
+          variant === 'xmas'
+            ? 'border-[#c8102e]/60'
+            : variant === 'blackfriday'
+              ? 'border-[#ffd23f]/60'
+              : variant === 'nov11'
+                ? 'border-[#ff7a1a]/60'
+                : 'border-white/15'
         }`}
       >
         {variant === 'xmas' ? (
           <Gift size={18} className="mt-0.5 shrink-0 text-[#ff5a6a]" />
         ) : variant === 'blackfriday' ? (
           <Tag size={18} className="mt-0.5 shrink-0 text-[#ffd23f]" />
+        ) : variant === 'nov11' ? (
+          <ShoppingBag size={18} className="mt-0.5 shrink-0 text-[#ff7a1a]" />
         ) : (
           <Truck size={18} className="mt-0.5 shrink-0 text-bmw" />
         )}

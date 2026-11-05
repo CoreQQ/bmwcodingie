@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { SiteSettings } from '@/lib/types';
 import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
-import { BF_ON, XMAS, XMAS_ON } from '@/lib/season';
+import { BF_ON, NOV11_ON, XMAS, XMAS_ON } from '@/lib/season';
 import { Snowfall, XmasGlow } from './Snowfall';
 import { SantaHat } from './SantaHat';
 
@@ -39,6 +39,16 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
                 Black Friday
               </span>
               {t('bfBadge')}
+            </a>
+          ) : NOV11_ON ? (
+            <a
+              href="#eleven-eleven"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ff7a1a]/70 bg-black/70 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-black sm:text-[13px]"
+            >
+              <span className="rounded-sm bg-[#ff7a1a] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black">
+                11.11
+              </span>
+              {t('nov11Badge')}
             </a>
           ) : (
             <div className="mb-6 flex items-center gap-3">

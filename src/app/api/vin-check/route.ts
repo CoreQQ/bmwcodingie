@@ -4,6 +4,7 @@ import { notifyTelegram } from '@/lib/telegram';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import { normalizePhone } from '@/lib/phone';
 import { cleanVin, isFullVin } from '@/lib/vin';
+import { withOfferNote } from '@/lib/offerNote';
 
 export const runtime = 'nodejs';
 
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
   // The form requires a valid number; a request without one is not a lead.
   if (!phone) return NextResponse.json({ ok: false, error: 'phone' }, { status: 400 });
 
-  const message = `VIN check · ${isFullVin(vin) ? 'VIN' : 'part of VIN'}: ${vin}${page ? ` · from ${page}` : ''}`;
+  const message = withOfferNote(`VIN check · ${isFullVin(vin) ? 'VIN' : 'part of VIN'}: ${vin}${page ? ` · from ${page}` : ''}`);
   const lead = {
     name: model ? `VIN check · ${model}` : 'VIN check',
     contact: phone,

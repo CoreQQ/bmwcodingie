@@ -6,6 +6,7 @@ import { notifyTelegram } from '@/lib/telegram';
 import { repeatCustomerNote, ensureClient, clientCode } from '@/lib/crm';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import { requestCountry, isServiceArea } from '@/lib/geo';
+import { withOfferNote } from '@/lib/offerNote';
 
 export const runtime = 'nodejs';
 
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
   const service =
     String(body.service ?? '').trim().slice(0, 160) ||
     (body.consultation ? 'Consultation / question' : '');
-  const message = String(body.message ?? '').trim().slice(0, 2000);
+  const message = withOfferNote(String(body.message ?? '').trim().slice(0, 2000));
   const source = String(body.source ?? '').trim().slice(0, 160) || null;
   const how_heard = String(body.how_heard ?? '').trim().slice(0, 60) || null;
   const contact_pref = String(body.contact_pref ?? '').trim().slice(0, 120) || null;

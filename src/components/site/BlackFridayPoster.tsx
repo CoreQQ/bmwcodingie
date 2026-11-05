@@ -33,11 +33,14 @@ export async function BlackFridayPoster({ whatsapp }: { whatsapp: string }) {
               <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: ACCENT }}>
                 {t('posterDates')}
               </p>
-              <h2 className="mt-3 font-display text-[clamp(3rem,11vw,6.2rem)] font-bold uppercase leading-[0.86] tracking-[-0.03em] text-white">
-                Black
-                <br />
-                Friday
-                <span className="mt-1 block" style={{ color: ACCENT }}>
+              {/* The size sits on the inner span: globals.css caps every h2.font-display. */}
+              <h2 className="mt-3 font-display font-bold uppercase tracking-[-0.03em] text-white">
+                <span className="block text-[clamp(3rem,15vw,6.2rem)] leading-[0.86]">
+                  Black
+                  <br />
+                  Friday
+                </span>
+                <span className="mt-1 block text-[clamp(3rem,15vw,6.2rem)] leading-[0.86]" style={{ color: ACCENT }}>
                   −{BF.pct}%
                 </span>
               </h2>

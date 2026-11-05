@@ -47,7 +47,8 @@
     "servicesLink": "Toate serviciile",
     "projectsLink": "Lucrări reale",
     "xmasBadge": "Ofertă de Crăciun: −10% la toate lucrările până pe 6 ianuarie",
-    "bfBadge": "−10% la toate lucrările, vin 27 – lun 30 noiembrie"
+    "bfBadge": "−10% la toate lucrările, vin 27 – lun 30 noiembrie",
+    "nov11Badge": "−10% dacă rezervi azi · lucrare până pe 26 noiembrie"
   },
   "AndroidAutoNew": {
     "badge": "Nou",
@@ -340,6 +341,21 @@
     "book": "Rezervă un loc de Black Friday",
     "whatsapp": "Scrie-ne pe WhatsApp",
     "waMessage": "Bună! Aș vrea oferta Black Friday pentru CarPlay. BMW-ul meu este "
+  },
+  "ElevenEleven": {
+    "title": "11.11: 10% reducere la manoperă dacă rezervi azi",
+    "body": "Rezervă pe 11 noiembrie și primești 10% reducere la manoperă — lucrarea se poate face în orice zi până pe 26 noiembrie. Deplasarea nu are reducere.",
+    "cta": "Vezi oferta",
+    "posterDates": "Miercuri, 11 noiembrie · o singură zi",
+    "posterSub": "Rezervă azi și primești 10% reducere la manoperă — CarPlay, codări, conversii Japan → EU, retrofituri și diagnoză. Lucrarea se poate face în orice zi până pe 26 noiembrie.",
+    "examplesLabel": "Dacă rezervi azi",
+    "exCarplay": "Apple CarPlay · NBT Evo",
+    "exJapan": "Japan → EU · NBT Evo",
+    "exId6": "ID4 → ID6 cu CarPlay",
+    "finePrint": "Pentru rezervările făcute pe 11 noiembrie, cu lucrarea făcută până pe 26 noiembrie. Deplasarea nu are reducere.",
+    "book": "Rezervă azi",
+    "whatsapp": "Scrie-ne pe WhatsApp",
+    "waMessage": "Bună — aș vrea să rezerv cu oferta 11.11. BMW-ul meu este un "
   },
   "GoogleReviews": {
     "count": "{count} recenzii pe Google",

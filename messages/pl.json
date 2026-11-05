@@ -47,7 +47,8 @@
     "servicesLink": "Wszystkie usługi",
     "projectsLink": "Nasze realizacje",
     "xmasBadge": "Oferta świąteczna: −10% na wszystkie prace do 6 stycznia",
-    "bfBadge": "−10% na wszystkie prace, pt 27 – pn 30 listopada"
+    "bfBadge": "−10% na wszystkie prace, pt 27 – pn 30 listopada",
+    "nov11Badge": "−10% przy rezerwacji dziś · praca do 26 listopada"
   },
   "AndroidAutoNew": {
     "badge": "Nowość",
@@ -340,6 +341,21 @@
     "book": "Zarezerwuj termin Black Friday",
     "whatsapp": "Napisz na WhatsApp",
     "waMessage": "Dzień dobry! Chcę CarPlay w promocji Black Friday. Moje BMW to "
+  },
+  "ElevenEleven": {
+    "title": "11.11: 10% taniej za pracę przy rezerwacji dziś",
+    "body": "Zarezerwuj 11 listopada i zyskaj 10% zniżki na pracę — samą usługę można wykonać dowolnego dnia do 26 listopada. Dojazd bez zniżki.",
+    "cta": "Zobacz ofertę",
+    "posterDates": "Środa, 11 listopada · tylko jeden dzień",
+    "posterSub": "Zarezerwuj dziś i zyskaj 10% zniżki na pracę — CarPlay, kodowanie, konwersje Japan → EU, doposażenia i diagnostyka. Samą usługę można wykonać dowolnego dnia do 26 listopada.",
+    "examplesLabel": "Przy rezerwacji dziś",
+    "exCarplay": "Apple CarPlay · NBT Evo",
+    "exJapan": "Japan → EU · NBT Evo",
+    "exId6": "ID4 → ID6 z CarPlay",
+    "finePrint": "Dla rezerwacji złożonych 11 listopada, z pracą wykonaną do 26 listopada. Dojazd bez zniżki.",
+    "book": "Zarezerwuj dziś",
+    "whatsapp": "Napisz na WhatsApp",
+    "waMessage": "Dzień dobry — chcę zarezerwować w ofercie 11.11. Moje BMW to "
   },
   "GoogleReviews": {
     "count": "{count} opinii w Google",

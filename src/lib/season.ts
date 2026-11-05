@@ -1,14 +1,14 @@
-// Seasonal offers: Black Friday → Cyber Monday, then Christmas.
+// Seasonal offers: 11.11, Black Friday → Cyber Monday, then Christmas.
 //
-// NEXT_PUBLIC_SEASON ('blackfriday' | 'xmas' | '') is fixed at build time —
+// NEXT_PUBLIC_SEASON ('nov11' | 'blackfriday' | 'xmas' | '') is fixed at build time —
 // next.config.js derives it from today's Irish date and season-dates.json,
 // and a Vercel env var overrides it. Being inlined, the server render and
 // the browser always agree (no date checks in a first render — that is how
 // hydration breaks). The offer changes when the site is rebuilt on the day.
 
-export type Season = 'blackfriday' | 'xmas' | '';
+export type Season = 'nov11' | 'blackfriday' | 'xmas' | '';
 const RAW = process.env.NEXT_PUBLIC_SEASON;
-export const SEASON: Season = RAW === 'blackfriday' || RAW === 'xmas' ? RAW : '';
+export const SEASON: Season = RAW === 'nov11' || RAW === 'blackfriday' || RAW === 'xmas' ? RAW : '';
 
 /** A discount offer is running (either season). */
 export const OFFER_ON = SEASON !== '';
@@ -16,6 +16,8 @@ export const OFFER_ON = SEASON !== '';
 export const XMAS_ON = SEASON === 'xmas';
 /** Black Friday look and its CarPlay deal (Wi-Fi antenna included). */
 export const BF_ON = SEASON === 'blackfriday';
+/** 11.11: a one-day booking offer. */
+export const NOV11_ON = SEASON === 'nov11';
 
 // localStorage keys of the floating notice (Announcement) — here, not in the
 // client component, because the layout's pre-paint script needs the strings.
@@ -23,6 +25,7 @@ export const BF_ON = SEASON === 'blackfriday';
 export const NOTICE_KEY = 'bmw-notice-mobile-live';
 export const XMAS_NOTICE_KEY = 'bmw-notice-xmas-2026';
 export const BF_NOTICE_KEY = 'bmw-notice-blackfriday-2026';
+export const NOV11_NOTICE_KEY = 'bmw-notice-1111-2026';
 
 export const XMAS = {
   pct: 10,
@@ -47,8 +50,19 @@ export const BF = {
   dates: '27–30 November',
 } as const;
 
+/** 11.11 (owner, 5 Nov): 10% off the work for anyone who BOOKS on 11
+ *  November; the job itself can be done any day up to 26 November, so it
+ *  never runs into Black Friday. The call-out is not discounted. */
+export const NOV11 = {
+  pct: 10,
+  until: '11 November',
+  doneBy: '26 November',
+} as const;
+
 /** What the price displays, the calculator, the assistants and the bot say. */
-export const OFFER = BF_ON
+export const OFFER = NOV11_ON
+  ? { name: '11.11', emoji: '🛍️', pct: NOV11.pct, until: NOV11.until, accent: '#ff7a1a', tag: 'filled' as const, noticeKey: NOV11_NOTICE_KEY }
+  : BF_ON
   ? { name: 'Black Friday', emoji: '🏷️', pct: BF.pct, until: BF.until, accent: '#ffd23f', tag: 'filled' as const, noticeKey: BF_NOTICE_KEY }
   : { name: 'Christmas', emoji: '🎄', pct: XMAS.pct, until: XMAS.until, accent: '#ff5a6a', tag: XMAS.tag, noticeKey: XMAS_NOTICE_KEY };
 

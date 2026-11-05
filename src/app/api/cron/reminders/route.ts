@@ -239,7 +239,8 @@ export async function GET(req: Request) {
       ([, r]) => Array.isArray(r) && today >= (r as string[])[0] && today <= (r as string[])[1],
     )?.[0] as string | undefined) ?? '';
   if (due !== SEASON) {
-    const label = (x: string) => (x === 'blackfriday' ? 'Black Friday' : x === 'xmas' ? 'Christmas' : 'no offer');
+    const label = (x: string) =>
+      x === 'nov11' ? '11.11' : x === 'blackfriday' ? 'Black Friday' : x === 'xmas' ? 'Christmas' : 'no offer';
     await sendOwnerMessage(
       `⚠️ <b>The site shows ${label(SEASON)}, but today should be ${label(due)}.</b> It needs a redeploy (Vercel → Deployments → Redeploy) — or tell Claude.`,
     );

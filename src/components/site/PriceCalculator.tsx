@@ -14,7 +14,7 @@ import {
   isBundledOut,
   type HeadUnit,
 } from '@/lib/pricing';
-import { BF_ON, OFFER, OFFER_ON, offerPrice } from '@/lib/season';
+import { BF_ON, NOV11, NOV11_ON, OFFER, OFFER_ON, offerPrice } from '@/lib/season';
 
 // Instant estimate so visitors never have to ask "how much?" — the number one
 // reason people leave a service site. Prices come from src/lib/pricing.ts, the
@@ -90,7 +90,9 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
       lines.push({
         label: BF_ON
           ? `${OFFER.emoji} Black Friday −${OFFER.pct}% (jobs done 27–30 Nov)`
-          : `${OFFER.emoji} ${OFFER.name} offer −${OFFER.pct}% (until ${OFFER.until})`,
+          : NOV11_ON
+            ? `${OFFER.emoji} 11.11 −${OFFER.pct}% (book today, work done by ${NOV11.doneBy})`
+            : `${OFFER.emoji} ${OFFER.name} offer −${OFFER.pct}% (until ${OFFER.until})`,
         amount: -discount,
       });
     }
