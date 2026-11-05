@@ -3,7 +3,16 @@
 // channel-specific instructions differ.
 
 import { MOBILE_ONLY_FROM, isMobileOnly } from './transition';
-import { BF, BF_ON, NOV11, NOV11_ON, XMAS, XMAS_ON } from './season';
+import { BF, BF_ON, BF_SOON, NOV11, NOV11_ON, NOV11_SOON, XMAS, XMAS_ON } from './season';
+
+// Offers announced on the site but not running yet: the assistant may mention
+// them, but today's prices are the regular ones.
+const SOON_FACTS = [
+  NOV11_SOON &&
+    `11.11 — ${NOV11.pct}% off the work for bookings made ON 11 November, with the job done any day up to ${NOV11.doneBy}`,
+  BF_SOON &&
+    `Black Friday — ${BF.pct}% off jobs DONE on ${BF.dates} (Friday to Cyber Monday), and Apple CarPlay activation includes the Wi-Fi antenna; slots on those days can be booked now`,
+].filter(Boolean) as string[];
 
 // There is no workshop any more. Offering one sends a customer to a unit we do
 // not hold, so the fact is computed in one place and both prompts read it.
@@ -59,6 +68,13 @@ ${LOCATION_FACT}
   for 11.11 (normally €150) — the work can be done any day until ${NOV11.doneBy}". Mention once,
   without pressure, that the offer is for bookings made today, and send the booking link.`
         : ''
+}${
+  SOON_FACTS.length
+    ? `
+- COMING SOON (not running yet — every price today is the regular one): ${SOON_FACTS.join('; ')}.
+  The call-out fee is never discounted. Mention it once when it helps — they ask about price or
+  are flexible on dates — and never give an offer price as today's price.`
+    : ''
 }
 
 Our services include:

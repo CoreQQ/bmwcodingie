@@ -46,9 +46,13 @@
     "quoteLink": "Gauti kainą",
     "servicesLink": "Visos paslaugos",
     "projectsLink": "Mūsų darbai",
-    "xmasBadge": "Kalėdinis pasiūlymas: −10% visiems darbams iki sausio 6 d.",
-    "bfBadge": "−10% visiems darbams, Pn 27 – Pr 30 lapkričio",
-    "nov11Badge": "−10% užsiregistravus šiandien · darbas iki lapkričio 26 d."
+    "xmasBadge": "Kalėdinis pasiūlymas: −10% visiems darbams",
+    "bfBadge": "−10% visiems darbams",
+    "nov11Badge": "−10% užsiregistravus šiandien",
+    "xmasBadgeDates": "iki sausio 6 d.",
+    "bfBadgeDates": "lapkričio 27–30 d.",
+    "nov11BadgeDates": "darbas iki lapkričio 26 d.",
+    "soonBadge": "−10% — jau greitai"
   },
   "AndroidAutoNew": {
     "badge": "Naujiena",
@@ -329,10 +333,10 @@
     "cta": "Žiūrėti kainas"
   },
   "BlackFriday": {
-    "title": "Black Friday: −10% visiems darbams, lapkričio 27–30 d.",
+    "title": "Black Friday: −10% visiems darbams",
     "body": "Nuo penktadienio, lapkričio 27 d., iki Cyber Monday, lapkričio 30 d.: −10% bet kuriam šiomis dienomis atliktam darbui, o į Apple CarPlay aktyvavimą įskaičiuota Wi-Fi antena. Atvykimo mokesčiui nuolaida netaikoma.",
     "cta": "Žiūrėti pasiūlymą",
-    "posterDates": "Pn 27 – Cyber Monday, lapkričio 30",
+    "posterDates": "Black Friday → Cyber Monday",
     "posterSub": "−10% bet kuriam darbui per šias keturias dienas: CarPlay, kodavimas, japoniškų automobilių konversija į EU, retrofitai ir diagnostika.",
     "carplayLabel": "Apple CarPlay aktyvavimas",
     "carplayMgu": "su NBT Evo · €{now} su iDrive 7 (MGU), įprastai €{was}",
@@ -346,7 +350,7 @@
     "title": "11.11: −10% darbui, jei užsiregistruojate šiandien",
     "body": "Užsiregistruokite lapkričio 11 d. ir gaukite 10% nuolaidą darbui — patį darbą galima atlikti bet kurią dieną iki lapkričio 26 d. Atvykimui nuolaida netaikoma.",
     "cta": "Plačiau",
-    "posterDates": "Trečiadienis, lapkričio 11 d. · tik vieną dieną",
+    "posterDates": "Tik šiandien",
     "posterSub": "Užsiregistruokite šiandien ir gaukite 10% nuolaidą darbui — CarPlay, kodavimas, Japan → EU konversijos, papildoma įranga ir diagnostika. Patį darbą galima atlikti bet kurią dieną iki lapkričio 26 d.",
     "examplesLabel": "Užsiregistravus šiandien",
     "exCarplay": "Apple CarPlay · NBT Evo",
@@ -356,6 +360,16 @@
     "book": "Registruotis šiandien",
     "whatsapp": "Rašyti WhatsApp",
     "waMessage": "Sveiki — noriu užsiregistruoti su 11.11 pasiūlymu. Mano BMW — "
+  },
+  "OffersSoon": {
+    "label": "Jau greitai",
+    "nov11Body": "Užsiregistruokite 11.11 ir gaukite 10% nuolaidą darbui — patį darbą galima atlikti vėliau šį mėnesį.",
+    "nov11Cta": "Priminti per WhatsApp",
+    "nov11Wa": "Sveiki — prašau priminti man apie 11.11 pasiūlymą. Mano BMW — ",
+    "nov11Fine": "Registracijoms, atliktoms 2026 m. lapkričio 11 d., kai darbas atliekamas iki lapkričio 26 d. Atvykimui nuolaida netaikoma.",
+    "bfBody": "−10% kiekvienam darbui nuo Black Friday iki Cyber Monday — o Wi-Fi antena įskaičiuota į CarPlay kainą. Registruotis šioms dienoms galima jau dabar.",
+    "bfCta": "Registruotis Black Friday",
+    "bfFine": "Darbams, atliktiems 2026 m. lapkričio 27–30 d. Atvykimui nuolaida netaikoma."
   },
   "GoogleReviews": {
     "count": "{count} atsiliepimai Google",

@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { SiteSettings } from '@/lib/types';
 import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
-import { BF_ON, NOV11_ON, XMAS, XMAS_ON } from '@/lib/season';
+import { BF_ON, BF_SOON, NOV11_ON, NOV11_SOON, XMAS, XMAS_ON } from '@/lib/season';
 import { Snowfall, XmasGlow } from './Snowfall';
 import { SantaHat } from './SantaHat';
 
@@ -29,6 +29,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
                 <SantaHat className="pointer-events-none absolute -left-3 -top-4 w-8 -rotate-[18deg]" />
               )}
               <span aria-hidden="true">🎄</span> {t('xmasBadge')}
+              <span className="text-[9px] font-normal text-muted">{t('xmasBadgeDates')}</span>
             </a>
           ) : BF_ON ? (
             <a
@@ -39,6 +40,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
                 Black Friday
               </span>
               {t('bfBadge')}
+              <span className="text-[9px] font-normal text-muted">{t('bfBadgeDates')}</span>
             </a>
           ) : NOV11_ON ? (
             <a
@@ -49,6 +51,22 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
                 11.11
               </span>
               {t('nov11Badge')}
+              <span className="text-[9px] font-normal text-muted">{t('nov11BadgeDates')}</span>
+            </a>
+          ) : NOV11_SOON || BF_SOON ? (
+            <a
+              href="#offers-soon"
+              className="mb-6 inline-flex flex-wrap items-center gap-2 rounded-full border border-white/20 bg-black/70 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-black sm:text-[13px]"
+            >
+              {NOV11_SOON && (
+                <span className="rounded-sm bg-[#ff7a1a] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black">11.11</span>
+              )}
+              {BF_SOON && (
+                <span className="rounded-sm bg-[#ffd23f] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black">
+                  Black Friday
+                </span>
+              )}
+              {t('soonBadge')}
             </a>
           ) : (
             <div className="mb-6 flex items-center gap-3">

@@ -19,6 +19,12 @@ export const BF_ON = SEASON === 'blackfriday';
 /** 11.11: a one-day booking offer. */
 export const NOV11_ON = SEASON === 'nov11';
 
+// Offers announced ahead of their dates (owner, 5 Nov: "people need to see
+// it's coming"). Teasers only — no price on the site changes until the day.
+const SOON = (process.env.NEXT_PUBLIC_UPCOMING ?? '').split(',');
+export const NOV11_SOON = SOON.includes('nov11');
+export const BF_SOON = SOON.includes('blackfriday');
+
 // localStorage keys of the floating notice (Announcement) — here, not in the
 // client component, because the layout's pre-paint script needs the strings.
 // Bump a key when the wording changes so a dismissal never hides a newer one.
