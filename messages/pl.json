@@ -46,9 +46,13 @@
     "quoteLink": "Zapytaj o cenę",
     "servicesLink": "Wszystkie usługi",
     "projectsLink": "Nasze realizacje",
-    "xmasBadge": "Oferta świąteczna: −10% na wszystkie prace do 6 stycznia",
-    "bfBadge": "−10% na wszystkie prace, pt 27 – pn 30 listopada",
-    "nov11Badge": "−10% przy rezerwacji dziś · praca do 26 listopada"
+    "xmasBadge": "Oferta świąteczna: −10% na wszystkie prace",
+    "bfBadge": "−10% na wszystkie prace",
+    "nov11Badge": "−10% przy rezerwacji dziś",
+    "xmasBadgeDates": "do 6 stycznia",
+    "bfBadgeDates": "27–30 listopada",
+    "nov11BadgeDates": "praca do 26 listopada",
+    "soonBadge": "−10% — już wkrótce"
   },
   "AndroidAutoNew": {
     "badge": "Nowość",
@@ -329,10 +333,10 @@
     "cta": "Zobacz ceny"
   },
   "BlackFriday": {
-    "title": "Black Friday: −10% na wszystkie prace, 27–30 listopada",
+    "title": "Black Friday: −10% na wszystkie prace",
     "body": "Od piątku 27 do Cyber Monday 30 listopada: −10% na każdą pracę wykonaną w te dni, a aktywacja Apple CarPlay obejmuje antenę Wi-Fi. Opłata za dojazd bez rabatu.",
     "cta": "Zobacz ofertę",
-    "posterDates": "Pt 27 – Cyber Monday 30 listopada",
+    "posterDates": "Black Friday → Cyber Monday",
     "posterSub": "−10% na każdą pracę wykonaną w te cztery dni: CarPlay, kodowanie, konwersje aut z Japonii na EU, retrofity i diagnostyka.",
     "carplayLabel": "Aktywacja Apple CarPlay",
     "carplayMgu": "na NBT Evo · €{now} na iDrive 7 (MGU), zwykle €{was}",
@@ -346,7 +350,7 @@
     "title": "11.11: 10% taniej za pracę przy rezerwacji dziś",
     "body": "Zarezerwuj 11 listopada i zyskaj 10% zniżki na pracę — samą usługę można wykonać dowolnego dnia do 26 listopada. Dojazd bez zniżki.",
     "cta": "Zobacz ofertę",
-    "posterDates": "Środa, 11 listopada · tylko jeden dzień",
+    "posterDates": "Tylko dziś",
     "posterSub": "Zarezerwuj dziś i zyskaj 10% zniżki na pracę — CarPlay, kodowanie, konwersje Japan → EU, doposażenia i diagnostyka. Samą usługę można wykonać dowolnego dnia do 26 listopada.",
     "examplesLabel": "Przy rezerwacji dziś",
     "exCarplay": "Apple CarPlay · NBT Evo",
@@ -356,6 +360,16 @@
     "book": "Zarezerwuj dziś",
     "whatsapp": "Napisz na WhatsApp",
     "waMessage": "Dzień dobry — chcę zarezerwować w ofercie 11.11. Moje BMW to "
+  },
+  "OffersSoon": {
+    "label": "Już wkrótce",
+    "nov11Body": "Zarezerwuj 11.11 i zyskaj 10% zniżki na pracę — samą usługę można wykonać później w tym miesiącu.",
+    "nov11Cta": "Przypomnij mi na WhatsApp",
+    "nov11Wa": "Dzień dobry — proszę przypomnieć mi o ofercie 11.11. Moje BMW to ",
+    "nov11Fine": "Dla rezerwacji złożonych 11 listopada 2026, z pracą wykonaną do 26 listopada. Dojazd bez zniżki.",
+    "bfBody": "−10% na każdą pracę od Black Friday do Cyber Monday — a antena Wi-Fi jest w cenie CarPlay. Terminy na te dni można rezerwować już teraz.",
+    "bfCta": "Zarezerwuj termin na Black Friday",
+    "bfFine": "Dla prac wykonanych 27–30 listopada 2026. Dojazd bez zniżki."
   },
   "GoogleReviews": {
     "count": "{count} opinii w Google",

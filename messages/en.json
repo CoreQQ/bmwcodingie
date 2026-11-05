@@ -46,9 +46,13 @@
     "quoteLink": "Request a quote",
     "servicesLink": "View all services",
     "projectsLink": "Real projects",
-    "xmasBadge": "Christmas offer: −10% on all work until 6 January",
-    "bfBadge": "−10% on all work, Fri 27 – Mon 30 Nov",
-    "nov11Badge": "−10% if you book today · work done by 26 Nov"
+    "xmasBadge": "Christmas offer: −10% on all work",
+    "bfBadge": "−10% on all work",
+    "nov11Badge": "−10% if you book today",
+    "xmasBadgeDates": "until 6 Jan",
+    "bfBadgeDates": "27–30 Nov",
+    "nov11BadgeDates": "work by 26 Nov",
+    "soonBadge": "−10% — coming soon"
   },
   "AndroidAutoNew": {
     "badge": "New",
@@ -329,10 +333,10 @@
     "cta": "See the prices"
   },
   "BlackFriday": {
-    "title": "Black Friday: 10% off all work, 27–30 November",
+    "title": "Black Friday: 10% off all work",
     "body": "Friday 27 to Cyber Monday 30 November: 10% off every job done on those days, and Apple CarPlay activation includes the Wi-Fi antenna. The call-out fee is not discounted.",
     "cta": "See the deal",
-    "posterDates": "Fri 27 – Cyber Monday 30 November",
+    "posterDates": "Black Friday → Cyber Monday",
     "posterSub": "10% off every job done on these four days: CarPlay, coding, Japan → EU conversions, retrofits and diagnostics.",
     "carplayLabel": "Apple CarPlay activation",
     "carplayMgu": "on NBT Evo · €{now} on iDrive 7 (MGU), normally €{was}",
@@ -346,7 +350,7 @@
     "title": "11.11: 10% off the work when you book today",
     "body": "Book on 11 November and get 10% off the work — the job itself can be done any day until 26 November. The call-out fee is not discounted.",
     "cta": "See the deal",
-    "posterDates": "Wednesday 11 November · one day only",
+    "posterDates": "Today only",
     "posterSub": "Book today and get 10% off the work — CarPlay, coding, Japan → EU conversions, retrofits and diagnostics. The job itself can be done any day until 26 November.",
     "examplesLabel": "Booked today",
     "exCarplay": "Apple CarPlay · NBT Evo",
@@ -356,6 +360,16 @@
     "book": "Book today",
     "whatsapp": "WhatsApp us",
     "waMessage": "Hi — I'd like to book with the 11.11 offer. My BMW is a "
+  },
+  "OffersSoon": {
+    "label": "Coming soon",
+    "nov11Body": "Book on 11.11 and get 10% off the work — the job itself can be done later in the month.",
+    "nov11Cta": "Remind me on WhatsApp",
+    "nov11Wa": "Hi — please remind me about the 11.11 offer. My BMW is a ",
+    "nov11Fine": "For bookings made on 11 November 2026, with the work done by 26 November. The call-out fee is not discounted.",
+    "bfBody": "10% off every job done from Black Friday to Cyber Monday — and the Wi-Fi antenna is included with CarPlay. Slots can be booked now.",
+    "bfCta": "Book a Black Friday slot",
+    "bfFine": "For jobs done on 27–30 November 2026. The call-out fee is not discounted."
   },
   "GoogleReviews": {
     "count": "{count} reviews on Google",

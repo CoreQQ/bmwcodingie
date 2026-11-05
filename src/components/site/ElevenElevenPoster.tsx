@@ -70,7 +70,7 @@ export async function ElevenElevenPoster({ whatsapp }: { whatsapp: string }) {
                   </a>
                 </div>
               </div>
-              <p className="mt-3 text-[12px] leading-relaxed text-faint">{t('finePrint')}</p>
+              <p className="mt-3 text-[10px] leading-snug text-faint">{t('finePrint')}</p>
             </div>
           </div>
         </div>

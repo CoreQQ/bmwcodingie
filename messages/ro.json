@@ -46,9 +46,13 @@
     "quoteLink": "Cere o ofertă",
     "servicesLink": "Toate serviciile",
     "projectsLink": "Lucrări reale",
-    "xmasBadge": "Ofertă de Crăciun: −10% la toate lucrările până pe 6 ianuarie",
-    "bfBadge": "−10% la toate lucrările, vin 27 – lun 30 noiembrie",
-    "nov11Badge": "−10% dacă rezervi azi · lucrare până pe 26 noiembrie"
+    "xmasBadge": "Ofertă de Crăciun: −10% la toate lucrările",
+    "bfBadge": "−10% la toate lucrările",
+    "nov11Badge": "−10% dacă rezervi azi",
+    "xmasBadgeDates": "până pe 6 ianuarie",
+    "bfBadgeDates": "27–30 noiembrie",
+    "nov11BadgeDates": "lucrare până pe 26 noiembrie",
+    "soonBadge": "−10% — în curând"
   },
   "AndroidAutoNew": {
     "badge": "Nou",
@@ -329,10 +333,10 @@
     "cta": "Vezi prețurile"
   },
   "BlackFriday": {
-    "title": "Black Friday: −10% la toate lucrările, 27–30 noiembrie",
+    "title": "Black Friday: −10% la toate lucrările",
     "body": "De vineri 27 până în Cyber Monday 30 noiembrie: −10% la orice lucrare făcută în aceste zile, iar activarea Apple CarPlay include antena Wi-Fi. Taxa de deplasare nu se reduce.",
     "cta": "Vezi oferta",
-    "posterDates": "Vin 27 – Cyber Monday 30 noiembrie",
+    "posterDates": "Black Friday → Cyber Monday",
     "posterSub": "−10% la orice lucrare făcută în aceste patru zile: CarPlay, codare, conversii Japonia → UE, retrofituri și diagnoză.",
     "carplayLabel": "Activare Apple CarPlay",
     "carplayMgu": "pe NBT Evo · €{now} pe iDrive 7 (MGU), de obicei €{was}",
@@ -346,7 +350,7 @@
     "title": "11.11: 10% reducere la manoperă dacă rezervi azi",
     "body": "Rezervă pe 11 noiembrie și primești 10% reducere la manoperă — lucrarea se poate face în orice zi până pe 26 noiembrie. Deplasarea nu are reducere.",
     "cta": "Vezi oferta",
-    "posterDates": "Miercuri, 11 noiembrie · o singură zi",
+    "posterDates": "Doar azi",
     "posterSub": "Rezervă azi și primești 10% reducere la manoperă — CarPlay, codări, conversii Japan → EU, retrofituri și diagnoză. Lucrarea se poate face în orice zi până pe 26 noiembrie.",
     "examplesLabel": "Dacă rezervi azi",
     "exCarplay": "Apple CarPlay · NBT Evo",
@@ -356,6 +360,16 @@
     "book": "Rezervă azi",
     "whatsapp": "Scrie-ne pe WhatsApp",
     "waMessage": "Bună — aș vrea să rezerv cu oferta 11.11. BMW-ul meu este un "
+  },
+  "OffersSoon": {
+    "label": "În curând",
+    "nov11Body": "Rezervă pe 11.11 și primești 10% reducere la manoperă — lucrarea se poate face mai târziu în această lună.",
+    "nov11Cta": "Amintește-mi pe WhatsApp",
+    "nov11Wa": "Bună — vă rog să-mi amintiți de oferta 11.11. BMW-ul meu este un ",
+    "nov11Fine": "Pentru rezervările făcute pe 11 noiembrie 2026, cu lucrarea făcută până pe 26 noiembrie. Deplasarea nu are reducere.",
+    "bfBody": "−10% la fiecare lucrare de Black Friday până de Cyber Monday — iar antena Wi-Fi e inclusă la CarPlay. Poți rezerva de pe acum.",
+    "bfCta": "Rezervă pentru Black Friday",
+    "bfFine": "Pentru lucrările făcute pe 27–30 noiembrie 2026. Deplasarea nu are reducere."
   },
   "GoogleReviews": {
     "count": "{count} recenzii pe Google",

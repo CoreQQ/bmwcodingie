@@ -16,9 +16,20 @@ function seasonForToday() {
 }
 const SEASON = process.env.NEXT_PUBLIC_SEASON ?? seasonForToday();
 
+// Offers announced as "coming soon": the third date in season-dates.json is
+// the first day the teaser shows; it stops when the offer itself starts.
+function upcomingForToday() {
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' });
+  return Object.entries(SEASON_DATES)
+    .filter(([, r]) => Array.isArray(r) && r[2] && today >= r[2] && today < r[0])
+    .map(([name]) => name)
+    .join(',');
+}
+const UPCOMING = process.env.NEXT_PUBLIC_UPCOMING ?? upcomingForToday();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: { NEXT_PUBLIC_SEASON: SEASON === 'none' ? '' : SEASON },
+  env: { NEXT_PUBLIC_SEASON: SEASON === 'none' ? '' : SEASON, NEXT_PUBLIC_UPCOMING: UPCOMING === 'none' ? '' : UPCOMING },
   // Baseline security headers. No X-Frame-Options: the Telegram Mini App
   // (/miniapp) must stay embeddable in Telegram Web's iframe.
   async headers() {
