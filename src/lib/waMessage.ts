@@ -4,6 +4,9 @@
 const DEFAULT_MESSAGE = 'Hi, I would like to check what coding/retrofit options are available for my BMW.';
 
 const BY_PAGE: [RegExp, string][] = [
+  // Home tiles with no page of their own; checked before /idrive/ and /remote/.
+  [/idrive7-apps/, "Hi, I'm interested in the extra apps for my iDrive 7."],
+  [/remote-start/, "Hi, I'm interested in remote engine start for my BMW."],
   [/japan/, "Hi, I'm interested in Japan to EU conversion for my BMW."],
   [/carplay/, 'Hi, I would like to check Apple CarPlay compatibility for my BMW.'],
   [/android-auto/, 'Hi, I would like to check Android Auto for my BMW.'],

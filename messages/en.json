@@ -420,7 +420,20 @@
     "clusterEyebrow": "Still on analogue dials?",
     "clusterI1": "Full digital cluster in place of the dials",
     "clusterI2": "Comfort, Sport and Eco Pro layouts",
-    "clusterI3": "Your car's own mileage kept — never altered"
+    "clusterI3": "Your car's own mileage kept — never altered",
+    "appsTitle": "iDrive 7 Apps",
+    "appsDesc": "Extra apps on your iDrive screen",
+    "appsEyebrow": "Want more on the screen?",
+    "appsI1": "Extra apps on iDrive 7 — not BMW’s own",
+    "appsI2": "Alex sends you the list before booking",
+    "appsI3": "+€100 with the Japan → EU conversion",
+    "remoteTitle": "Remote Engine Start",
+    "remoteDesc": "From the key or the app",
+    "remoteEyebrow": "Cold morning?",
+    "remoteI1": "Start from the key — from €250",
+    "remoteI2": "Start from the app — from €300",
+    "remoteI3": "Where the car supports it — confirmed from your VIN",
+    "remotePrice": "From €250"
   },
   "Japan": {
     "eyebrow": "Japanese import BMW?",

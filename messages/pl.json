@@ -420,7 +420,20 @@
     "clusterEyebrow": "Nadal analogowe zegary?",
     "clusterI1": "Pełne cyfrowe zegary zamiast wskazówek",
     "clusterI2": "Tryby Comfort, Sport i Eco Pro",
-    "clusterI3": "Przebieg Twojego auta bez zmian — nigdy go nie ruszamy"
+    "clusterI3": "Przebieg Twojego auta bez zmian — nigdy go nie ruszamy",
+    "appsTitle": "Aplikacje iDrive 7",
+    "appsDesc": "Dodatkowe aplikacje na ekranie iDrive",
+    "appsEyebrow": "Chcesz więcej na ekranie?",
+    "appsI1": "Dodatkowe aplikacje na iDrive 7 — nie fabryczne BMW",
+    "appsI2": "Alex wyśle listę przed rezerwacją",
+    "appsI3": "+€100 razem z konwersją Japan → EU",
+    "remoteTitle": "Zdalny start silnika",
+    "remoteDesc": "Z kluczyka lub z aplikacji",
+    "remoteEyebrow": "Zimny poranek?",
+    "remoteI1": "Start z kluczyka — od €250",
+    "remoteI2": "Start z aplikacji — od €300",
+    "remoteI3": "Jeśli auto to obsługuje — potwierdzamy po VIN",
+    "remotePrice": "Od €250"
   },
   "Japan": {
     "eyebrow": "BMW z Japonii?",

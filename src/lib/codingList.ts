@@ -82,7 +82,7 @@ export const CODING_LIST: CodingCategory[] = [
       'Climate / AC last-state memory',
       'Windscreen wiper and washer behaviour',
       'Seat heating memory and levels',
-      'Remote engine start (where the car supports it — confirmed from your VIN)',
+      'Remote engine start — from the key (from €250) or the app (from €300), where the car supports it',
     ],
   },
   {
