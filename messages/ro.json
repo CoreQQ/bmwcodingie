@@ -344,7 +344,8 @@
     "finePrint": "Pentru lucrări făcute pe 27–30 noiembrie. Taxa de deplasare nu se reduce.",
     "book": "Rezervă un loc de Black Friday",
     "whatsapp": "Scrie-ne pe WhatsApp",
-    "waMessage": "Bună! Aș vrea oferta Black Friday pentru CarPlay. BMW-ul meu este "
+    "waMessage": "Bună! Aș vrea oferta Black Friday pentru CarPlay. BMW-ul meu este ",
+    "carplayLabelSoon": "Apple CarPlay de Black Friday"
   },
   "ElevenEleven": {
     "title": "11.11: 10% reducere la manoperă dacă rezervi azi",
@@ -359,7 +360,8 @@
     "finePrint": "Pentru rezervările făcute pe 11 noiembrie, cu lucrarea făcută până pe 26 noiembrie. Deplasarea nu are reducere.",
     "book": "Rezervă azi",
     "whatsapp": "Scrie-ne pe WhatsApp",
-    "waMessage": "Bună — aș vrea să rezerv cu oferta 11.11. BMW-ul meu este un "
+    "waMessage": "Bună — aș vrea să rezerv cu oferta 11.11. BMW-ul meu este un ",
+    "examplesLabelSoon": "Dacă rezervi pe 11.11"
   },
   "OffersSoon": {
     "label": "În curând",
@@ -369,7 +371,10 @@
     "nov11Fine": "Pentru rezervările făcute pe 11 noiembrie 2026, cu lucrarea făcută până pe 26 noiembrie. Deplasarea nu are reducere.",
     "bfBody": "−10% la fiecare lucrare de Black Friday până de Cyber Monday — iar antena Wi-Fi e inclusă la CarPlay. Poți rezerva de pe acum.",
     "bfCta": "Rezervă pentru Black Friday",
-    "bfFine": "Pentru lucrările făcute pe 27–30 noiembrie 2026. Deplasarea nu are reducere."
+    "bfFine": "Pentru lucrările făcute pe 27–30 noiembrie 2026. Deplasarea nu are reducere.",
+    "nov11Notice": "Vine 11.11: −10% la manoperă",
+    "bfNotice": "Vine Black Friday: −10% la toate lucrările",
+    "noticeCta": "Vezi oferta"
   },
   "GoogleReviews": {
     "count": "{count} recenzii pe Google",

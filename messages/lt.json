@@ -344,7 +344,8 @@
     "finePrint": "Taikoma darbams, atliktiems lapkričio 27–30 d. Atvykimo mokesčiui nuolaida netaikoma.",
     "book": "Registruotis Black Friday laikui",
     "whatsapp": "Rašyti WhatsApp",
-    "waMessage": "Sveiki! Norėčiau CarPlay pagal Black Friday pasiūlymą. Mano BMW — "
+    "waMessage": "Sveiki! Norėčiau CarPlay pagal Black Friday pasiūlymą. Mano BMW — ",
+    "carplayLabelSoon": "Apple CarPlay per Black Friday"
   },
   "ElevenEleven": {
     "title": "11.11: −10% darbui, jei užsiregistruojate šiandien",
@@ -359,7 +360,8 @@
     "finePrint": "Registracijoms, atliktoms lapkričio 11 d., kai darbas atliekamas iki lapkričio 26 d. Atvykimui nuolaida netaikoma.",
     "book": "Registruotis šiandien",
     "whatsapp": "Rašyti WhatsApp",
-    "waMessage": "Sveiki — noriu užsiregistruoti su 11.11 pasiūlymu. Mano BMW — "
+    "waMessage": "Sveiki — noriu užsiregistruoti su 11.11 pasiūlymu. Mano BMW — ",
+    "examplesLabelSoon": "Užsiregistravus 11.11"
   },
   "OffersSoon": {
     "label": "Jau greitai",
@@ -369,7 +371,10 @@
     "nov11Fine": "Registracijoms, atliktoms 2026 m. lapkričio 11 d., kai darbas atliekamas iki lapkričio 26 d. Atvykimui nuolaida netaikoma.",
     "bfBody": "−10% kiekvienam darbui nuo Black Friday iki Cyber Monday — o Wi-Fi antena įskaičiuota į CarPlay kainą. Registruotis šioms dienoms galima jau dabar.",
     "bfCta": "Registruotis Black Friday",
-    "bfFine": "Darbams, atliktiems 2026 m. lapkričio 27–30 d. Atvykimui nuolaida netaikoma."
+    "bfFine": "Darbams, atliktiems 2026 m. lapkričio 27–30 d. Atvykimui nuolaida netaikoma.",
+    "nov11Notice": "Jau greitai 11.11: −10% darbui",
+    "bfNotice": "Jau greitai Black Friday: −10% visiems darbams",
+    "noticeCta": "Plačiau"
   },
   "GoogleReviews": {
     "count": "{count} atsiliepimai Google",

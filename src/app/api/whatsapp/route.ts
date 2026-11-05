@@ -17,6 +17,7 @@ import { isRateLimited } from '@/lib/rateLimit';
 import { ensureClient } from '@/lib/crm';
 import { generateWaReply } from '@/lib/waAgent';
 import { markContactHandled } from '@/lib/agenda';
+import { announceDeployOnce } from '@/lib/deployPing';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -73,7 +74,7 @@ export async function GET(req: Request) {
       ok: true,
       // Deploy marker: bump it in a redeploy-only commit, then check it here
       // to know the new build (and new env values) are live.
-      v: 108,
+      v: 109,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
@@ -151,6 +152,7 @@ function authorised(req: Request, raw: string): boolean {
 export async function POST(req: Request) {
   const raw = await req.text();
   if (!authorised(req, raw)) return new Response('Unauthorized', { status: 401 });
+  await announceDeployOnce();
 
   // Dualhook's own management events (account_update, template status…) come
   // with this header. Only the dashboard's Test Ping and anything that smells

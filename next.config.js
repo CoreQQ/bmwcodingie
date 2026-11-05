@@ -27,9 +27,22 @@ function upcomingForToday() {
 }
 const UPCOMING = process.env.NEXT_PUBLIC_UPCOMING ?? upcomingForToday();
 
+// What this build is, for the "site updated" line in Telegram (deployPing.ts):
+// the commit, and its first line minus git's "Merge branch '…': " prefix.
+const BUILD_SHA = process.env.VERCEL_GIT_COMMIT_SHA || '';
+const BUILD_NOTE = (process.env.VERCEL_GIT_COMMIT_MESSAGE || '')
+  .split('\n')[0]
+  .replace(/^Merge branch '[^']*'(?: into \S+)?:?\s*/, '')
+  .slice(0, 200);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: { NEXT_PUBLIC_SEASON: SEASON === 'none' ? '' : SEASON, NEXT_PUBLIC_UPCOMING: UPCOMING === 'none' ? '' : UPCOMING },
+  env: {
+    NEXT_PUBLIC_SEASON: SEASON === 'none' ? '' : SEASON,
+    NEXT_PUBLIC_UPCOMING: UPCOMING === 'none' ? '' : UPCOMING,
+    BUILD_SHA,
+    BUILD_NOTE,
+  },
   // Baseline security headers. No X-Frame-Options: the Telegram Mini App
   // (/miniapp) must stay embeddable in Telegram Web's iframe.
   async headers() {

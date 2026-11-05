@@ -344,7 +344,8 @@
     "finePrint": "Dotyczy prac wykonanych 27–30 listopada. Opłata za dojazd bez rabatu.",
     "book": "Zarezerwuj termin Black Friday",
     "whatsapp": "Napisz na WhatsApp",
-    "waMessage": "Dzień dobry! Chcę CarPlay w promocji Black Friday. Moje BMW to "
+    "waMessage": "Dzień dobry! Chcę CarPlay w promocji Black Friday. Moje BMW to ",
+    "carplayLabelSoon": "Apple CarPlay w Black Friday"
   },
   "ElevenEleven": {
     "title": "11.11: 10% taniej za pracę przy rezerwacji dziś",
@@ -359,7 +360,8 @@
     "finePrint": "Dla rezerwacji złożonych 11 listopada, z pracą wykonaną do 26 listopada. Dojazd bez zniżki.",
     "book": "Zarezerwuj dziś",
     "whatsapp": "Napisz na WhatsApp",
-    "waMessage": "Dzień dobry — chcę zarezerwować w ofercie 11.11. Moje BMW to "
+    "waMessage": "Dzień dobry — chcę zarezerwować w ofercie 11.11. Moje BMW to ",
+    "examplesLabelSoon": "Przy rezerwacji 11.11"
   },
   "OffersSoon": {
     "label": "Już wkrótce",
@@ -369,7 +371,10 @@
     "nov11Fine": "Dla rezerwacji złożonych 11 listopada 2026, z pracą wykonaną do 26 listopada. Dojazd bez zniżki.",
     "bfBody": "−10% na każdą pracę od Black Friday do Cyber Monday — a antena Wi-Fi jest w cenie CarPlay. Terminy na te dni można rezerwować już teraz.",
     "bfCta": "Zarezerwuj termin na Black Friday",
-    "bfFine": "Dla prac wykonanych 27–30 listopada 2026. Dojazd bez zniżki."
+    "bfFine": "Dla prac wykonanych 27–30 listopada 2026. Dojazd bez zniżki.",
+    "nov11Notice": "Już wkrótce 11.11: −10% na pracę",
+    "bfNotice": "Już wkrótce Black Friday: −10% na wszystkie prace",
+    "noticeCta": "Zobacz ofertę"
   },
   "GoogleReviews": {
     "count": "{count} opinii w Google",

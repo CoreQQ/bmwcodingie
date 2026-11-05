@@ -8,7 +8,6 @@ import { ScrollProgress } from '@/components/site/ScrollProgress';
 import { Hero } from '@/components/site/Hero';
 import { BlackFridayPoster } from '@/components/site/BlackFridayPoster';
 import { ElevenElevenPoster } from '@/components/site/ElevenElevenPoster';
-import { OffersSoon } from '@/components/site/OffersSoon';
 import { AndroidAutoSpotlight } from '@/components/site/AndroidAutoSpotlight';
 import { Gallery } from '@/components/site/Gallery';
 import { Reviews } from '@/components/site/Reviews';
@@ -75,7 +74,6 @@ export default async function HomePage({
         <Hero settings={settings} />
         <ElevenElevenPoster whatsapp={settings.whatsapp} />
         <BlackFridayPoster whatsapp={settings.whatsapp} />
-        <OffersSoon whatsapp={settings.whatsapp} />
         <AndroidAutoSpotlight whatsapp={settings.whatsapp} />
         <VinCheck whatsapp={settings.whatsapp} />
         <PopularServices whatsapp={settings.whatsapp} />

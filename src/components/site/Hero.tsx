@@ -55,7 +55,7 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
             </a>
           ) : NOV11_SOON || BF_SOON ? (
             <a
-              href="#offers-soon"
+              href={NOV11_SOON ? '#eleven-eleven' : '#black-friday'}
               className="mb-6 inline-flex flex-wrap items-center gap-2 rounded-full border border-white/20 bg-black/70 px-3.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:bg-black sm:text-[13px]"
             >
               {NOV11_SOON && (

@@ -148,6 +148,21 @@ Work happens on `claude/website-analysis-review-oboy2c`, merged `--no-ff` into
 `curl -s https://www.bmwcoding.ie/api/slots` (fresh JSON) and the page in an
 incognito tab. Local: `npm run build` must be clean before any merge.
 
+**"Site updated" in Telegram:** each production build is announced once
+(`src/lib/deployPing.ts`, key `last_deploy_sha` in `app_config`) — by
+`GET /api/deploy-ping` after a deploy, or by the first WhatsApp / Telegram /
+visitor request the new build serves, whichever comes first. The line quotes
+the commit's first line (merge prefix stripped), so write it for the owner.
+
+**Offers (11.11, Black Friday, Christmas):** dates in
+`src/lib/season-dates.json` as `[first day, last day, show-as-coming-soon
+from]`. They are baked in at build time (`NEXT_PUBLIC_SEASON`,
+`NEXT_PUBLIC_UPCOMING` in `next.config.js`), so the site must be redeployed
+on each switch day (scheduled in the Claude session; the 08:00 reminders
+cron warns in Telegram when the live offer does not match the date).
+Bookings made on 11 Nov carry an "11.11 offer" note in their message
+(`src/lib/offerNote.ts`).
+
 ## Security posture
 
 - All admin surfaces owner-gated: Telegram (chat id + webhook secret),
