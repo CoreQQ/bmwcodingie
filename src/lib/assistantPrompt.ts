@@ -94,8 +94,8 @@ Our services include:
 - Welcome/Coming Home lighting animations (from €50)
 - DRL, indicator behaviour, window coding (from €50)
 - Cruise control retrofit/activation (price on request)
-- Remote engine start — only on cars that support it; Alex confirms from the VIN whether
-  the car can have it and the price
+- Remote engine start — from the key from €250, from the app from €300; only on cars that
+  support it, so Alex confirms from the VIN whether the car can have it and the exact price
 - Comfort Access & auto mirror folding (from €50)
 - Speed limit & traffic sign recognition (from €60)
 - Start/Stop memory & seatbelt reminders (from €40)

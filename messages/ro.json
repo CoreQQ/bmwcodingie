@@ -420,7 +420,20 @@
     "clusterEyebrow": "Încă ai bord cu ace?",
     "clusterI1": "Bord complet digital în locul acelor",
     "clusterI2": "Afișaje Comfort, Sport și Eco Pro",
-    "clusterI3": "Kilometrajul mașinii rămâne același — nu îl modificăm niciodată"
+    "clusterI3": "Kilometrajul mașinii rămâne același — nu îl modificăm niciodată",
+    "appsTitle": "Aplicații iDrive 7",
+    "appsDesc": "Aplicații în plus pe ecranul iDrive",
+    "appsEyebrow": "Vrei mai mult pe ecran?",
+    "appsI1": "Aplicații în plus pe iDrive 7 — nu cele BMW",
+    "appsI2": "Alex îți trimite lista înainte de rezervare",
+    "appsI3": "+€100 împreună cu conversia Japan → EU",
+    "remoteTitle": "Pornire de la distanță",
+    "remoteDesc": "De pe cheie sau din aplicație",
+    "remoteEyebrow": "Dimineață rece?",
+    "remoteI1": "Pornire de pe cheie — de la €250",
+    "remoteI2": "Pornire din aplicație — de la €300",
+    "remoteI3": "Dacă mașina permite — confirmăm după VIN",
+    "remotePrice": "De la €250"
   },
   "Japan": {
     "eyebrow": "BMW din Japonia?",

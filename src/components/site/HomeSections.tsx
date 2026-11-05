@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Gauge, Languages, LayoutGrid, MessageCircle, Smartphone, Sparkles, Stethoscope } from 'lucide-react';
+import { ArrowRight, Blocks, Check, Gauge, KeyRound, Languages, LayoutGrid, MessageCircle, Smartphone, Sparkles, Stethoscope } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { BLOG_POSTS } from '@/lib/blog';
@@ -32,6 +32,9 @@ const POPULAR = [
   { key: 'idrive', href: '/bmw-id4-to-id6-upgrade', wa: '/idrive', accent: '#4f8cff', Icon: LayoutGrid },
   { key: 'cluster', href: '/bmw-6wa-to-6wb-retrofit', wa: '/6wb', accent: '#2dd4bf', Icon: Gauge },
   { key: 'diagnostics', href: '/bmw-diagnostics-dublin', wa: '/diagnostics', accent: '#ffb020', Icon: Stethoscope },
+  // Owner, 5 Nov: shown as options of their own. No page yet, so "More info" opens the coding list.
+  { key: 'apps', href: '/bmw-coding-list', wa: '/idrive7-apps', accent: '#f472b6', Icon: Blocks },
+  { key: 'remote', href: '/bmw-coding-list', wa: '/remote-start', accent: '#fb923c', Icon: KeyRound },
 ] as const;
 
 /** "From €150" → a small "From" and a big "€150"; anything without an amount
@@ -65,19 +68,25 @@ export async function PopularServices({ whatsapp }: { whatsapp: string }) {
     idrive: { eyebrow: t('idriveEyebrow'), points: [t('idriveI1'), t('idriveI2'), t('idriveI3')], price: '€300' },
     cluster: { eyebrow: t('clusterEyebrow'), points: [t('clusterI1'), t('clusterI2'), t('clusterI3')], price: tf('retrofitsPrice') },
     diagnostics: { eyebrow: tf('diagEyebrow'), points: [tf('diagI1'), tf('diagI3'), tf('diagI5')], price: tf('diagPrice') },
+    // €200 on their own, +€100 with the Japan conversion (pricing.ts).
+    apps: { eyebrow: t('appsEyebrow'), points: [t('appsI1'), t('appsI2'), t('appsI3')], price: '€200' },
+    remote: { eyebrow: t('remoteEyebrow'), points: [t('remoteI1'), t('remoteI2'), t('remoteI3')], price: t('remotePrice') },
   };
   return (
     <section id="services" className="relative border-t border-white/5 py-16 md:py-24">
       <div className="mx-auto max-w-edge px-5 md:px-8">
         <SectionHead eyebrow={t('eyebrow')} heading={t('heading')} />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {POPULAR.map(({ key, href, wa, accent, Icon }) => {
+        {/* Eight tiles: three per row on desktop, with the last two sharing the third row. */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+          {POPULAR.map(({ key, href, wa, accent, Icon }, i) => {
             const c = copy[key];
             const title = t(`${key}Title`);
             return (
               <article
                 key={key}
-                className="relative flex flex-col overflow-hidden rounded-[24px] border border-white/10 bg-[#0d1013]/80 p-6 backdrop-blur-sm transition-colors duration-200 hover:border-white/20 md:p-7"
+                className={`relative flex flex-col overflow-hidden rounded-[24px] border border-white/10 bg-[#0d1013]/80 p-6 backdrop-blur-sm transition-colors duration-200 hover:border-white/20 md:p-7 ${
+                  i >= POPULAR.length - 2 ? 'lg:col-span-3' : 'lg:col-span-2'
+                }`}
               >
                 <div
                   aria-hidden="true"

@@ -70,6 +70,14 @@ export const PRICE_ITEMS: PriceItem[] = [
     price: { 'nbt-evo': null, mgu: 150, 'mgu-id8': null, 'mgu-id85': null },
   },
   {
+    // Owner, 5 Nov 2026: from the key €250, from the app €300.
+    id: 'remote-start',
+    label: 'Remote engine start',
+    note: 'From the key from €250 · from the app from €300 — where the car supports it, confirmed from your VIN',
+    price: { 'nbt-evo': 250, mgu: 250, 'mgu-id8': null, 'mgu-id85': null },
+    from: true,
+  },
+  {
     id: 'navigation',
     label: 'Navigation activation',
     note: 'iDrive 8.5 — the full nav retrofit, licences included',

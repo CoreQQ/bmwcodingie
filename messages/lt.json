@@ -420,7 +420,20 @@
     "clusterEyebrow": "Vis dar rodyklinis skydelis?",
     "clusterI1": "Pilnas skaitmeninis skydelis vietoje rodyklių",
     "clusterI2": "Comfort, Sport ir Eco Pro vaizdai",
-    "clusterI3": "Rida lieka jūsų automobilio — niekada nekeičiama"
+    "clusterI3": "Rida lieka jūsų automobilio — niekada nekeičiama",
+    "appsTitle": "iDrive 7 programėlės",
+    "appsDesc": "Papildomos programėlės iDrive ekrane",
+    "appsEyebrow": "Norite daugiau ekrane?",
+    "appsI1": "Papildomos programėlės iDrive 7 — ne gamyklinės BMW",
+    "appsI2": "Alex atsiųs sąrašą prieš registraciją",
+    "appsI3": "+€100 kartu su Japan → EU konversija",
+    "remoteTitle": "Nuotolinis variklio užvedimas",
+    "remoteDesc": "Su raktu arba per programėlę",
+    "remoteEyebrow": "Šaltas rytas?",
+    "remoteI1": "Užvedimas su raktu — nuo €250",
+    "remoteI2": "Užvedimas per programėlę — nuo €300",
+    "remoteI3": "Jei automobilis palaiko — patvirtiname pagal VIN",
+    "remotePrice": "Nuo €250"
   },
   "Japan": {
     "eyebrow": "BMW iš Japonijos?",
