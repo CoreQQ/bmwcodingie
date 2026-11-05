@@ -4,6 +4,7 @@ import { isServiceArea } from '@/lib/geo';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { notifyVisitor } from '@/lib/telegram';
 import { parseUserAgent } from '@/lib/parseUserAgent';
+import { announceDeployOnce } from '@/lib/deployPing';
 
 export const runtime = 'nodejs';
 
@@ -37,6 +38,7 @@ async function geolocate(ip: string): Promise<Geo> {
 }
 
 export async function POST(req: Request) {
+  await announceDeployOnce();
   // One ping per session per visitor is normal — anything chatty is abuse
   // aimed at flooding the owner's Telegram.
   if (isRateLimited(`visit:${clientIp(req)}`, 4, 10 * 60 * 1000)) {

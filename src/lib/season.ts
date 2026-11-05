@@ -32,6 +32,8 @@ export const NOTICE_KEY = 'bmw-notice-mobile-live';
 export const XMAS_NOTICE_KEY = 'bmw-notice-xmas-2026';
 export const BF_NOTICE_KEY = 'bmw-notice-blackfriday-2026';
 export const NOV11_NOTICE_KEY = 'bmw-notice-1111-2026';
+export const NOV11_SOON_NOTICE_KEY = 'bmw-notice-1111-soon-2026';
+export const BF_SOON_NOTICE_KEY = 'bmw-notice-blackfriday-soon-2026';
 
 export const XMAS = {
   pct: 10,

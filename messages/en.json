@@ -344,7 +344,8 @@
     "finePrint": "For jobs done on 27–30 November. The call-out fee is not discounted.",
     "book": "Book a Black Friday slot",
     "whatsapp": "WhatsApp us",
-    "waMessage": "Hi — I'd like the Black Friday CarPlay deal. My BMW is a "
+    "waMessage": "Hi — I'd like the Black Friday CarPlay deal. My BMW is a ",
+    "carplayLabelSoon": "Apple CarPlay on Black Friday"
   },
   "ElevenEleven": {
     "title": "11.11: 10% off the work when you book today",
@@ -359,7 +360,8 @@
     "finePrint": "For bookings made on 11 November, with the work done by 26 November. The call-out fee is not discounted.",
     "book": "Book today",
     "whatsapp": "WhatsApp us",
-    "waMessage": "Hi — I'd like to book with the 11.11 offer. My BMW is a "
+    "waMessage": "Hi — I'd like to book with the 11.11 offer. My BMW is a ",
+    "examplesLabelSoon": "If you book on 11.11"
   },
   "OffersSoon": {
     "label": "Coming soon",
@@ -369,7 +371,10 @@
     "nov11Fine": "For bookings made on 11 November 2026, with the work done by 26 November. The call-out fee is not discounted.",
     "bfBody": "10% off every job done from Black Friday to Cyber Monday — and the Wi-Fi antenna is included with CarPlay. Slots can be booked now.",
     "bfCta": "Book a Black Friday slot",
-    "bfFine": "For jobs done on 27–30 November 2026. The call-out fee is not discounted."
+    "bfFine": "For jobs done on 27–30 November 2026. The call-out fee is not discounted.",
+    "nov11Notice": "11.11 is coming: 10% off the work",
+    "bfNotice": "Black Friday is coming: 10% off all work",
+    "noticeCta": "See the offer"
   },
   "GoogleReviews": {
     "count": "{count} reviews on Google",

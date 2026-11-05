@@ -42,6 +42,7 @@ import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import { CHEAT_SHEET, CHEAT_DISCLAIMER, findCheat, formatCheat } from '@/lib/cheatsheet';
 import type { Booking } from '@/lib/types';
 import { isRateLimited } from '@/lib/rateLimit';
+import { announceDeployOnce } from '@/lib/deployPing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -384,6 +385,7 @@ export async function POST(req: Request) {
     const got = req.headers.get('x-telegram-bot-api-secret-token');
     if (got !== WEBHOOK_SECRET) return NextResponse.json({ ok: false }, { status: 401 });
   }
+  await announceDeployOnce();
 
   let update: {
     update_id?: number;

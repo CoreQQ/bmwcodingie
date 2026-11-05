@@ -1,7 +1,7 @@
-import { MessageCircle, Wifi } from 'lucide-react';
+import { CalendarClock, MessageCircle, Wifi } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { PRICE_ITEMS } from '@/lib/pricing';
-import { BF, BF_ON, offerPrice } from '@/lib/season';
+import { BF, BF_ON, BF_SOON, offerPrice } from '@/lib/season';
 import { waHref } from '@/lib/waMessage';
 
 // The Black Friday "poster" under the home hero: one loud statement (−10% on
@@ -12,8 +12,11 @@ import { waHref } from '@/lib/waMessage';
 const ACCENT = '#ffd23f';
 
 export async function BlackFridayPoster({ whatsapp }: { whatsapp: string }) {
-  if (!BF_ON) return null;
-  const t = await getTranslations('BlackFriday');
+  // Shown ahead of the dates too (owner: from 12 Nov) as an announcement —
+  // booking a slot for 27–30 Nov now is fine, the discount is by job date.
+  if (!BF_ON && !BF_SOON) return null;
+  const soon = !BF_ON;
+  const [t, tSoon] = await Promise.all([getTranslations('BlackFriday'), getTranslations('OffersSoon')]);
   const carplay = PRICE_ITEMS.find((i) => i.id === 'carplay')?.price;
   const nbt = carplay?.['nbt-evo'] ?? 150;
   const mgu = carplay?.mgu ?? 220;
@@ -30,8 +33,9 @@ export async function BlackFridayPoster({ whatsapp }: { whatsapp: string }) {
           />
           <div className="relative grid gap-8 p-6 md:grid-cols-12 md:items-center md:gap-10 md:p-10">
             <div className="min-w-0 md:col-span-7">
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: ACCENT }}>
-                {t('posterDates')}
+              <p className="flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: ACCENT }}>
+                {soon && <CalendarClock size={13} aria-hidden="true" />}
+                {soon ? tSoon('label') : t('posterDates')}
               </p>
               {/* The size sits on the inner span: globals.css caps every h2.font-display. */}
               <h2 className="mt-3 font-display font-bold uppercase tracking-[-0.03em] text-white">
@@ -44,12 +48,12 @@ export async function BlackFridayPoster({ whatsapp }: { whatsapp: string }) {
                   −{BF.pct}%
                 </span>
               </h2>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-muted">{t('posterSub')}</p>
+              <p className="mt-5 max-w-md text-base leading-relaxed text-muted">{soon ? tSoon('bfBody') : t('posterSub')}</p>
             </div>
 
             <div className="min-w-0 md:col-span-5">
               <div className="rounded-[22px] border border-white/10 bg-[#111316] p-6">
-                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">{t('carplayLabel')}</p>
+                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">{soon ? t('carplayLabelSoon') : t('carplayLabel')}</p>
                 <p className="mt-2 flex flex-wrap items-baseline gap-x-3 font-display text-white">
                   <span className="text-6xl font-bold leading-none">€{offerPrice(nbt)}</span>
                   <s className="text-2xl text-faint decoration-2" style={{ textDecorationColor: ACCENT }}>
@@ -70,7 +74,7 @@ export async function BlackFridayPoster({ whatsapp }: { whatsapp: string }) {
                   </a>
                 </div>
               </div>
-              <p className="mt-3 text-[10px] leading-snug text-faint">{t('finePrint')}</p>
+              <p className="mt-3 text-[10px] leading-snug text-faint">{soon ? tSoon('bfFine') : t('finePrint')}</p>
             </div>
           </div>
         </div>

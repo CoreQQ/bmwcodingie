@@ -9,7 +9,18 @@ import { CallHours } from '@/components/site/CallHours';
 import { WhatsAppFloat } from '@/components/site/WhatsAppFloat';
 import { Announcement } from '@/components/site/Announcement';
 import { isMobileOnly } from '@/lib/transition';
-import { BF_ON, NOTICE_KEY, NOV11_ON, OFFER, OFFER_ON, XMAS_ON } from '@/lib/season';
+import {
+  BF_ON,
+  BF_SOON,
+  BF_SOON_NOTICE_KEY,
+  NOTICE_KEY,
+  NOV11_ON,
+  NOV11_SOON,
+  NOV11_SOON_NOTICE_KEY,
+  OFFER,
+  OFFER_ON,
+  XMAS_ON,
+} from '@/lib/season';
 import { getHours } from '@/lib/stats';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { DEFAULT_HOURS, type HoursMap } from '@/lib/hours';
@@ -37,14 +48,32 @@ export default async function LocaleLayout({
   // instead of request headers, so the pages can be prerendered and cached.
   setRequestLocale(locale);
 
-  const [settings, catalog, reviews, tCookie, tNotice, tOffer] = await Promise.all([
+  const [settings, catalog, reviews, tCookie, tNotice, tOffer, tSoon] = await Promise.all([
     getSettings(),
     getCatalog(),
     getReviews(),
     getTranslations('CookieConsent'),
     getTranslations('Announcement'),
     getTranslations(NOV11_ON ? 'ElevenEleven' : BF_ON ? 'BlackFriday' : 'Christmas'),
+    getTranslations('OffersSoon'),
   ]);
+
+  // The floating notice: the running offer, else the next one coming, else
+  // the "we come to you" card. Each has its own dismissal key.
+  const notice = OFFER_ON
+    ? {
+        title: tOffer('title'),
+        body: tOffer('body'),
+        cta: tOffer('cta'),
+        href: NOV11_ON ? '/#eleven-eleven' : BF_ON ? '/#black-friday' : '/bmw-coding-price-calculator',
+        storageKey: OFFER.noticeKey,
+        variant: (XMAS_ON ? 'xmas' : NOV11_ON ? 'nov11' : 'blackfriday') as 'xmas' | 'nov11' | 'blackfriday',
+      }
+    : NOV11_SOON
+      ? { title: tSoon('nov11Notice'), body: tSoon('nov11Fine'), cta: tSoon('noticeCta'), href: '/#eleven-eleven', storageKey: NOV11_SOON_NOTICE_KEY, variant: 'nov11' as const }
+      : BF_SOON
+        ? { title: tSoon('bfNotice'), body: tSoon('bfFine'), cta: tSoon('noticeCta'), href: '/#black-friday', storageKey: BF_SOON_NOTICE_KEY, variant: 'blackfriday' as const }
+        : null;
 
   const mobileOnly = isMobileOnly();
 
@@ -182,19 +211,19 @@ export default async function LocaleLayout({
           after hydration shifted the whole page (CLS). Key matches Announcement. */}
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{if(localStorage.getItem(${JSON.stringify(OFFER_ON ? OFFER.noticeKey : NOTICE_KEY)})!=='seen')document.documentElement.dataset.notice='1'}catch(e){document.documentElement.dataset.notice='1'}`,
+          __html: `try{if(localStorage.getItem(${JSON.stringify(notice ? notice.storageKey : NOTICE_KEY)})!=='seen')document.documentElement.dataset.notice='1'}catch(e){document.documentElement.dataset.notice='1'}`,
         }}
       />
-      {/* During an offer its notice replaces the "we come to you" one. */}
-      {OFFER_ON ? (
+      {/* During an offer, or before one, its notice replaces the "we come to you" one. */}
+      {notice ? (
         <Announcement
-          title={tOffer('title')}
-          body={tOffer('body')}
-          cta={tOffer('cta')}
-          href={NOV11_ON ? '/#eleven-eleven' : BF_ON ? '/#black-friday' : '/bmw-coding-price-calculator'}
+          title={notice.title}
+          body={notice.body}
+          cta={notice.cta}
+          href={notice.href}
           dismissLabel={tNotice('dismiss')}
-          storageKey={OFFER.noticeKey}
-          variant={XMAS_ON ? 'xmas' : NOV11_ON ? 'nov11' : 'blackfriday'}
+          storageKey={notice.storageKey}
+          variant={notice.variant}
         />
       ) : (
         <Announcement
