@@ -67,7 +67,7 @@ for every chat" (`/wa off all`).
 **A missing table/column never breaks the site**: the booking insert drops
 unknown columns and retries; other readers fall back to defaults.
 
-## Telegram bot commands (rebuilt 20 Oct 2026 — 8 in the menu)
+## Telegram bot commands (rebuilt 20 Oct 2026 — 9 in the menu)
 
 - `/agenda` — today, tomorrow, enquiries waiting >24h, and **WhatsApp chats
   nobody answered** (button → list with 🤖 answer now / 💬 open / ✅ handled).
@@ -82,10 +82,14 @@ unknown columns and retries; other readers fall back to defaults.
   that customer (only within 24h of their last message; only TG_OWNER_ID's replies).
 - `/reply [key]` — canned replies + ⭐ review request (`/review Name Service` still works).
 - `/invoice` — PDF wizard (`/cancel`; a draft idle for 30 min expires).
+- `/prices` — every coding price in one message, by system, with the
+  combinations, extras, rules and current/upcoming offers. Built from
+  `src/lib/pricing.ts` (`src/lib/priceList.ts`), so it always matches the site.
+  Also 💶 in `/tools` and on the reply keyboard (`/prices`, `/quotes` work).
 - `/tools` — 🇯🇵 `/jp` address · 🔧 `/cheat [query|add|del]` · 📊 `/stats` ·
   📆 `/calendar` · ⛔️ `/banlist` (`/ban C-007 reason`, `/unban`).
 - `/setup` re-registers the menu and the reply keyboard (⏰ Agenda · 📅 Bookings ·
-  💰 Paid · 🧰 Tools).
+  💰 Paid · 💶 Prices · 🧰 Tools).
 
 Automatic messages: booking/VIN/chat leads, one WhatsApp mirror per customer
 message (a specific-time request is a line in it, not a separate alert), 🚨

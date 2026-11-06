@@ -40,6 +40,7 @@ import { findClients, formatClient, resolveClient, ensureClient, clientCode } fr
 import { customWindow, windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import { CHEAT_SHEET, CHEAT_DISCLAIMER, findCheat, formatCheat } from '@/lib/cheatsheet';
+import { PRICE_LIST_KEYBOARD, priceListText } from '@/lib/priceList';
 import type { Booking } from '@/lib/types';
 import { isRateLimited } from '@/lib/rateLimit';
 import { announceDeployOnce } from '@/lib/deployPing';
@@ -244,6 +245,7 @@ async function sendReviewTemplates(sb: SupabaseClient, rest: string): Promise<vo
 const TOOLS_KEYBOARD = {
   inline_keyboard: [
     [{ text: '🇯🇵 Japanese address', callback_data: 'tool:jp' }],
+    [{ text: '💶 All prices', callback_data: 'tool:prices' }],
     [{ text: '🔧 Coding cheat-sheet', callback_data: 'tool:cheat' }],
     [{ text: '📊 Stats', callback_data: 'tool:stats' }],
     [{ text: '📆 Calendar link', callback_data: 'tool:cal' }],
@@ -426,6 +428,7 @@ export async function POST(req: Request) {
       '📅 Bookings': '/bookings',
       '💰 Paid': '/paid',
       '🧰 Tools': '/tools',
+      '💶 Prices': '/prices',
       '💰 Money': '/paid',
       '📊 Stats': '/stats',
       '💶 Paid': '/paid',
@@ -595,6 +598,11 @@ export async function POST(req: Request) {
       await sendCalendarLink();
       return ok();
     }
+    // Every coding price in one message (also 💶 in the keyboard and /tools).
+    if (/^\/(prices?|quotes?)(@\w+)?\b/i.test(text)) {
+      await sendOwnerWithMarkup(priceListText(), PRICE_LIST_KEYBOARD);
+      return ok();
+    }
     if (/^\/tools(@\w+)?\b/.test(text)) {
       await sendOwnerWithMarkup('🧰 <b>Tools</b> — tap one.\nBan someone: <code>/ban C-007 reason</code> · <code>/unban C-007</code>', TOOLS_KEYBOARD);
       return ok();
@@ -712,7 +720,7 @@ export async function POST(req: Request) {
         {
           keyboard: [
             [{ text: '⏰ Agenda' }, { text: '📅 Bookings' }],
-            [{ text: '💰 Paid' }, { text: '🧰 Tools' }],
+            [{ text: '💰 Paid' }, { text: '💶 Prices' }, { text: '🧰 Tools' }],
           ],
           resize_keyboard: true,
           is_persistent: true,
@@ -1066,13 +1074,14 @@ export async function POST(req: Request) {
   }
 
   // /tools buttons and the review templates from /reply.
-  const tool = /^tool:(jp|cheat|stats|cal|ban)$/.exec(cq.data);
+  const tool = /^tool:(jp|prices|cheat|stats|cal|ban)$/.exec(cq.data);
   if (tool) {
     await answerCallback(cq.id);
     if (tool[1] === 'jp') {
       const { text, keyboard } = jpAddressMessage();
       await sendOwnerMessage(text, keyboard as never);
-    } else if (tool[1] === 'cheat') await sendCheatIndex(sb);
+    } else if (tool[1] === 'prices') await sendOwnerWithMarkup(priceListText(), PRICE_LIST_KEYBOARD);
+    else if (tool[1] === 'cheat') await sendCheatIndex(sb);
     else if (tool[1] === 'stats') await sendStats(sb);
     else if (tool[1] === 'cal') await sendCalendarLink();
     else await sendBanlist(sb);
