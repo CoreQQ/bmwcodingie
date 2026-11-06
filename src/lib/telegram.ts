@@ -118,7 +118,7 @@ async function tgCall(method: string, payload: Record<string, unknown>, attempt 
  * Called by the owner's /setup command so BotFather isn't needed.
  */
 export async function registerBotCommands(): Promise<boolean> {
-  // Eight commands, in the order a working day needs them. Everything else
+  // Nine commands, in the order a working day needs them. Everything else
   // (/jp, /cheat, /stats, /calendar, /banlist) sits behind /tools; old names
   // (/client, /log, /review, /ai) still work but are not listed.
   const commands = [
@@ -129,6 +129,7 @@ export async function registerBotCommands(): Promise<boolean> {
     { command: 'wa', description: '💬 WhatsApp: кто ждёт, ассистент вкл/выкл' },
     { command: 'reply', description: '📋 Готовые ответы и запрос отзыва' },
     { command: 'invoice', description: '🧾 Счёт PDF' },
+    { command: 'prices', description: '💶 Все цены на кодирование в одном месте' },
     { command: 'tools', description: '🧰 Японский адрес, шпаргалка, статистика, календарь, бан-лист' },
   ];
   // Register for private chats, all groups, and (explicitly) the owner's
