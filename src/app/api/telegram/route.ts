@@ -28,6 +28,7 @@ import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib
 import { answerPendingWaMessage } from '@/lib/waAgent';
 import {
   buildAgenda,
+  buildEnquiries,
   buildLeadCard,
   buildPendingWa,
   markContactHandled,
@@ -429,6 +430,7 @@ export async function POST(req: Request) {
       '💰 Paid': '/paid',
       '🧰 Tools': '/tools',
       '💶 Prices': '/prices',
+      '📥 Quotes': '/quotes',
       '💰 Money': '/paid',
       '📊 Stats': '/stats',
       '💶 Paid': '/paid',
@@ -598,8 +600,14 @@ export async function POST(req: Request) {
       await sendCalendarLink();
       return ok();
     }
+    // Every enquiry (quote request) in one place, until it is booked or lost.
+    if (/^\/(quotes?|enquiries|leads)(@\w+)?\b/i.test(text)) {
+      const { text: out, keyboard } = await buildEnquiries(sb);
+      await sendOwnerMessage(out, keyboard);
+      return ok();
+    }
     // Every coding price in one message (also 💶 in the keyboard and /tools).
-    if (/^\/(prices?|quotes?)(@\w+)?\b/i.test(text)) {
+    if (/^\/prices?(@\w+)?\b/i.test(text)) {
       await sendOwnerWithMarkup(priceListText(), PRICE_LIST_KEYBOARD);
       return ok();
     }
@@ -719,7 +727,7 @@ export async function POST(req: Request) {
           : '❌ Не удалось обновить меню — попробуй ещё раз через минуту.',
         {
           keyboard: [
-            [{ text: '⏰ Agenda' }, { text: '📅 Bookings' }],
+            [{ text: '⏰ Agenda' }, { text: '📥 Quotes' }, { text: '📅 Bookings' }],
             [{ text: '💰 Paid' }, { text: '💶 Prices' }, { text: '🧰 Tools' }],
           ],
           resize_keyboard: true,
@@ -1209,14 +1217,54 @@ export async function POST(req: Request) {
     return ok();
   }
 
+  // The enquiries list (and its pages).
+  const quotesPage = /^quotes(?::(\d+))?$/.exec(cq.data);
+  if (quotesPage) {
+    const { text: out, keyboard } = await buildEnquiries(sb, Number(quotesPage[1] ?? 0));
+    await editMessage(chatId, messageId, out, keyboard);
+    await answerCallback(cq.id);
+    return ok();
+  }
+
+  // 🏁 Booked / 👎 No deal on an enquiry card: closes every open enquiry from
+  // that person (no slot, still pending) and goes back to the list.
+  const quoteClose = /^q(won|lost):(\d+)$/.exec(cq.data);
+  if (quoteClose) {
+    const status = quoteClose[1] === 'won' ? 'won' : 'lost';
+    const id = Number(quoteClose[2]);
+    const { data: row } = await sb.from('bookings').select('contact').eq('id', id).maybeSingle();
+    await sb.from('bookings').update({ status, handled: true }).eq('id', id);
+    const contact = (row as { contact?: string } | null)?.contact;
+    if (contact) {
+      await sb
+        .from('bookings')
+        .update({ status, handled: true })
+        .eq('contact', contact)
+        .eq('status', 'pending')
+        .is('slot_date', null)
+        .then(() => undefined, () => undefined);
+    }
+    const { text: out, keyboard } = await buildEnquiries(sb);
+    await editMessage(chatId, messageId, out, keyboard);
+    await answerCallback(cq.id, status === 'won' ? 'Booked 🏁' : 'Closed — no deal');
+    return ok();
+  }
+
   // "Answered" on a lead card: this person (every enquiry from the number) is done.
-  const leadDone = /^leaddone:(\d+)$/.exec(cq.data);
+  const leadDone = /^leaddone:(\d+)(:q)?$/.exec(cq.data);
   if (leadDone) {
     const id = Number(leadDone[1]);
     const { data: row } = await sb.from('bookings').select('contact').eq('id', id).maybeSingle();
     const contact = (row as { contact?: string } | null)?.contact ?? '';
     const n = (await markContactHandled(sb, contact).catch(() => 0)) || 0;
     if (!n) await sb.from('bookings').update({ handled: true }).eq('id', id);
+    if (leadDone[2]) {
+      // From the enquiries list it moves to "answered — waiting on them", not away.
+      const { text: out, keyboard } = await buildEnquiries(sb);
+      await editMessage(chatId, messageId, out, keyboard);
+      await answerCallback(cq.id, 'Answered — now waiting on them ✓');
+      return ok();
+    }
     const agenda = await buildAgenda(sb);
     await editMessage(
       chatId,
@@ -1228,19 +1276,16 @@ export async function POST(req: Request) {
     return ok();
   }
 
-  const leadOpen = /^lead:(\d+)$/.exec(cq.data);
+  const leadOpen = /^lead:(\d+)(:q)?$/.exec(cq.data);
   if (leadOpen) {
-    const { data } = await sb
-      .from('bookings')
-      .select('id, name, contact, service, bmw_model, message, slot_date, slot_time, status, created_at')
-      .eq('id', Number(leadOpen[1]))
-      .maybeSingle();
+    // '*' so the card also gets handled/source, and a pending migration cannot break it.
+    const { data } = await sb.from('bookings').select('*').eq('id', Number(leadOpen[1])).maybeSingle();
     const lead = data as AgendaLead | null;
     if (!lead) {
       await answerCallback(cq.id, 'That enquiry is gone.');
       return ok();
     }
-    const card = buildLeadCard(lead);
+    const card = buildLeadCard(lead, leadOpen[2] ? 'quotes' : 'agenda');
     await editMessage(chatId, messageId, card.text, card.keyboard);
     await answerCallback(cq.id);
     return ok();
@@ -1259,7 +1304,7 @@ export async function POST(req: Request) {
     return ok();
   }
 
-  const free = /^bkfree:(\d+)$/.exec(cq.data);
+  const free = /^bkfree:(\d+)(:q)?$/.exec(cq.data);
   if (free) {
     const id = Number(free[1]);
     const { data: row } = await sb.from('bookings').select('slot_date, contact').eq('id', id).single();
@@ -1277,8 +1322,14 @@ export async function POST(req: Request) {
         .is('slot_date', null)
         .then(() => undefined, () => undefined);
     }
-    await answerCallback(cq.id, 'Slot freed ✓');
     const date = (row?.slot_date as string | null) ?? null;
+    if (free[2]) {
+      await answerCallback(cq.id, 'Dismissed ✓');
+      const { text: out, keyboard } = await buildEnquiries(sb);
+      await editMessage(chatId, messageId, out, keyboard);
+      return ok();
+    }
+    await answerCallback(cq.id, 'Slot freed ✓');
     if (!date) {
       const agenda = await buildAgenda(sb);
       await editMessage(chatId, messageId, agenda.text, agenda.keyboard);
