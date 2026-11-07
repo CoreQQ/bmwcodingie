@@ -67,10 +67,16 @@ for every chat" (`/wa off all`).
 **A missing table/column never breaks the site**: the booking insert drops
 unknown columns and retries; other readers fall back to defaults.
 
-## Telegram bot commands (rebuilt 20 Oct 2026 — 9 in the menu)
+## Telegram bot commands (rebuilt 20 Oct 2026 — 10 in the menu)
 
 - `/agenda` — today, tomorrow, enquiries waiting >24h, and **WhatsApp chats
   nobody answered** (button → list with 🤖 answer now / 💬 open / ✅ handled).
+- `/quotes` — **every enquiry (quote request) in one place** until it is closed:
+  🆕 not answered yet → 💬 answered, waiting on the customer → 🏁 Booked
+  (`status='won'`) or 👎 No deal (`status='lost'`). Enquiries = `bookings`
+  rows with no slot, `status='pending'`, last 30 days, one line per person.
+  Card: number, WhatsApp, chat log, ✅ Answered, 📋 follow-up text, ✖️ Dismiss.
+  The agenda shows the counts and a 📥 button. `/enquiries`, `/leads` work too.
 - `/bookings` — dates → day view (free windows; per booking 💶 Paid, 🕓 Move, 🗑 Free).
 - `/find <name|number|service>` — clients (history + C-code), WhatsApp chats
   (📖 read), enquiries. `/client` is an alias.
@@ -85,11 +91,11 @@ unknown columns and retries; other readers fall back to defaults.
 - `/prices` — every coding price in one message, by system, with the
   combinations, extras, rules and current/upcoming offers. Built from
   `src/lib/pricing.ts` (`src/lib/priceList.ts`), so it always matches the site.
-  Also 💶 in `/tools` and on the reply keyboard (`/prices`, `/quotes` work).
+  Also 💶 in `/tools` and on the reply keyboard.
 - `/tools` — 🇯🇵 `/jp` address · 🔧 `/cheat [query|add|del]` · 📊 `/stats` ·
   📆 `/calendar` · ⛔️ `/banlist` (`/ban C-007 reason`, `/unban`).
 - `/setup` re-registers the menu and the reply keyboard (⏰ Agenda · 📅 Bookings ·
-  💰 Paid · 💶 Prices · 🧰 Tools).
+  📥 Quotes · 💰 Paid · 💶 Prices · 🧰 Tools).
 
 Automatic messages: booking/VIN/chat leads, one WhatsApp mirror per customer
 message (a specific-time request is a line in it, not a separate alert), 🚨

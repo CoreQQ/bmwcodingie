@@ -118,11 +118,12 @@ async function tgCall(method: string, payload: Record<string, unknown>, attempt 
  * Called by the owner's /setup command so BotFather isn't needed.
  */
 export async function registerBotCommands(): Promise<boolean> {
-  // Nine commands, in the order a working day needs them. Everything else
+  // Ten commands, in the order a working day needs them. Everything else
   // (/jp, /cheat, /stats, /calendar, /banlist) sits behind /tools; old names
   // (/client, /log, /review, /ai) still work but are not listed.
   const commands = [
     { command: 'agenda', description: '⏰ Сегодня, завтра и кто ждёт ответа' },
+    { command: 'quotes', description: '📥 Заявки: все запросы цены, пока не закрыты' },
     { command: 'bookings', description: '📅 Записи по дням: подтвердить, перенести, оплата' },
     { command: 'find', description: '🔎 Найти клиента, заявку или чат: имя, номер, услуга' },
     { command: 'paid', description: '💰 Деньги: /paid 120 Имя Услуга · итоги' },

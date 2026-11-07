@@ -16,6 +16,8 @@ export type AgendaLead = {
   slot_time?: string | null;
   status?: string;
   created_at?: string;
+  handled?: boolean;
+  source?: string | null;
 };
 
 const esc = (s: string) =>
@@ -183,7 +185,7 @@ export async function buildAgenda(
   const today = dayKey(0);
   const tomorrow = dayKey(1);
 
-  const [{ data: slotData }, waiting, waPending] = await Promise.all([
+  const [{ data: slotData }, waiting, waPending, enquiries] = await Promise.all([
     sb
       .from('bookings')
       .select('id, name, contact, service, slot_date, slot_time, status')
@@ -192,8 +194,10 @@ export async function buildAgenda(
       .order('slot_time', { ascending: true }),
     waitingLeads(sb),
     unansweredChats(sb).catch(() => [] as PendingChat[]),
+    openEnquiries(sb).catch((): Enquiries => ({ fresh: [], answered: [], extras: new Map() })),
   ]);
   const rows = (slotData ?? []) as AgendaLead[];
+  const openCount = enquiries.fresh.length + enquiries.answered.length;
 
   const icon = (s?: string) => (s === 'confirmed' ? '✅' : '⏳');
   const fmt = (list: AgendaLead[]) =>
@@ -213,6 +217,9 @@ export async function buildAgenda(
   if (waPending.length) {
     lines.push('', `💬 <b>WhatsApp:</b> ${waPending.length} ${waPending.length === 1 ? 'person is' : 'people are'} waiting for a reply.`);
   }
+  if (openCount) {
+    lines.push('', `📥 <b>Enquiries:</b> ${enquiries.fresh.length} not answered · ${enquiries.answered.length} waiting on the customer.`);
+  }
   if (waiting.leads.length) {
     lines.push('', '⚠️ <b>Enquiries waiting for your reply over 24h:</b>');
     lines.push('  Tap a name to open it.');
@@ -220,6 +227,7 @@ export async function buildAgenda(
 
   const buttons: InlineButton[][] = [];
   if (waPending.length) buttons.push([{ text: `⏳ WhatsApp waiting (${waPending.length})`, callback_data: 'wapend' }]);
+  if (openCount) buttons.push([{ text: `📥 All enquiries (${openCount})`, callback_data: 'quotes' }]);
   if (waiting.leads.length) {
     for (const b of waiting.leads) {
       const more = waiting.extras.get(b.id) ?? 0;
@@ -232,25 +240,146 @@ export async function buildAgenda(
   return {
     text: lines.join('\n'),
     keyboard: buttons.length ? { inline_keyboard: buttons } : undefined,
-    empty: rows.length === 0 && waiting.leads.length === 0 && waPending.length === 0,
+    empty: rows.length === 0 && waiting.leads.length === 0 && waPending.length === 0 && openCount === 0,
   };
 }
 
-/** One enquiry in full, with everything needed to act on it. */
-export function buildLeadCard(b: AgendaLead): { text: string; keyboard: InlineKeyboard } {
+// ── Enquiries: every quote request in one place ──────────────────
+// Owner, 7 Nov: "lots of them, and they get lost". The agenda only shows
+// enquiries unanswered for over a day, and one drops off as soon as he
+// replies — but a quote he sent is not a job yet. Here each enquiry (a lead
+// with no slot) stays until he closes it: 🆕 not answered yet, then 💬
+// answered and waiting on the customer, until 🏁 Booked or 👎 No deal.
+
+/** How long an open enquiry stays on the list before it is considered dead. */
+const ENQUIRY_DAYS = 30;
+const ENQUIRY_PAGE = 20;
+
+export type Enquiries = { fresh: AgendaLead[]; answered: AgendaLead[]; extras: Map<number, number> };
+
+function personKey(b: AgendaLead): string {
+  const phone = (b.contact ?? '').replace(/\D/g, '');
+  return phone.length >= 7 ? phone : (b.name ?? '').trim().toLowerCase() || `#${b.id}`;
+}
+
+export async function openEnquiries(sb: SupabaseClient): Promise<Enquiries> {
+  const since = new Date(Date.now() - ENQUIRY_DAYS * 86400000).toISOString();
+  // select('*') so a column a pending migration has not added yet never breaks the list.
+  const { data } = await sb
+    .from('bookings')
+    .select('*')
+    .eq('status', 'pending')
+    .is('slot_date', null)
+    .gt('created_at', since)
+    .order('created_at', { ascending: true })
+    .limit(400);
+  const rows = (data ?? []) as AgendaLead[];
+  // One line per person; they are "new" while any of their enquiries is unanswered.
+  const unanswered = new Set(rows.filter((r) => !r.handled).map(personKey));
+  const { leads, extras } = collapse(rows);
+  const at = (l: AgendaLead) => l.created_at ?? '';
+  // Not answered: longest wait first. Answered: most recent first.
+  const fresh = leads.filter((l) => unanswered.has(personKey(l))).sort((a, b) => at(a).localeCompare(at(b)));
+  const answered = leads.filter((l) => !unanswered.has(personKey(l))).sort((a, b) => at(b).localeCompare(at(a)));
+  return { fresh, answered, extras };
+}
+
+/** VIN-check leads carry "VIN check · <model>" as the name; show whose number it is instead. */
+const isVinLead = (b: AgendaLead) => (b.name ?? '').startsWith('VIN check');
+function displayName(b: AgendaLead): string {
+  if (!isVinLead(b)) return (b.name ?? '').trim() || 'No name';
+  const tail = (b.contact ?? '').replace(/\D/g, '').slice(-4);
+  return tail ? `VIN check (…${tail})` : 'VIN check';
+}
+
+/** Where the enquiry came from, from what each channel stores. */
+function channel(b: AgendaLead): string {
+  const src = (b.source ?? '').toLowerCase();
+  if ((b.name ?? '').startsWith('VIN check') || src.includes('vin')) return '🔎 VIN check';
+  if (src.includes('whatsapp')) return '💬 WhatsApp';
+  if (src.includes('chat')) return '🤖 site chat';
+  return '🌐 site';
+}
+
+export async function buildEnquiries(sb: SupabaseClient, page = 0): Promise<{ text: string; keyboard: InlineKeyboard }> {
+  const [{ fresh, answered, extras }, waPending] = await Promise.all([
+    openEnquiries(sb),
+    unansweredChats(sb).catch(() => [] as PendingChat[]),
+  ]);
+  const all = [...fresh, ...answered];
+  const pages = Math.max(1, Math.ceil(all.length / ENQUIRY_PAGE));
+  const p = Math.min(Math.max(0, page), pages - 1);
+  const start = p * ENQUIRY_PAGE;
+  const shown = all.slice(start, start + ENQUIRY_PAGE);
+
+  const lines = [`📥 <b>Enquiries</b> — ${all.length} open`, '━━━━━━━━━━━━━━━━━━━'];
+  if (!all.length) lines.push('Nobody is waiting on a quote. ✅');
+  shown.forEach((b, i) => {
+    const n = start + i + 1;
+    if (n === 1 && fresh.length) lines.push(`🆕 <b>Not answered yet</b> (${fresh.length})`);
+    if (n === fresh.length + 1 && answered.length) lines.push('', `💬 <b>Answered — waiting on them</b> (${answered.length})`);
+    const more = extras.get(b.id) ?? 0;
+    const bits = [b.bmw_model, b.service].filter(Boolean).map((x) => esc(String(x).slice(0, 40)));
+    lines.push(
+      `${n}. <b>${esc(displayName(b).slice(0, 30))}</b>${bits.length ? ` · ${bits.join(' · ')}` : ''}` +
+        `${b.created_at ? ` · ${ago(b.created_at)}` : ''} · ${channel(b)}${more ? ` · +${more} more` : ''}`,
+    );
+  });
+  if (pages > 1) lines.push('', `Page ${p + 1} of ${pages}.`);
+  if (all.length) lines.push('', 'Tap a number to open it.');
+  if (waPending.length) lines.push(`💬 Plus ${waPending.length} WhatsApp ${waPending.length === 1 ? 'chat' : 'chats'} waiting for a reply.`);
+
+  const buttons: InlineButton[][] = [];
+  for (let i = 0; i < shown.length; i += 5) {
+    buttons.push(
+      shown.slice(i, i + 5).map((b, j) => {
+        const n = start + i + j + 1;
+        return { text: `${n <= fresh.length ? '🆕' : '💬'} ${n}`, callback_data: `lead:${b.id}:q` };
+      }),
+    );
+  }
+  const nav: InlineButton[] = [];
+  if (p > 0) nav.push({ text: '◀︎ Back', callback_data: `quotes:${p - 1}` });
+  if (p < pages - 1) nav.push({ text: 'More ▶︎', callback_data: `quotes:${p + 1}` });
+  if (nav.length) buttons.push(nav);
+  if (waPending.length) buttons.push([{ text: `⏳ WhatsApp waiting (${waPending.length})`, callback_data: 'wapend' }]);
+  buttons.push([{ text: '🔄 Refresh', callback_data: `quotes:${p}` }]);
+  return { text: lines.join('\n'), keyboard: { inline_keyboard: buttons } };
+}
+
+/** A polite nudge for someone who got a price and went quiet. */
+function followUpText(b: AgendaLead): string {
+  const first = isVinLead(b) ? 'there' : (b.name ?? '').trim().split(/\s+/)[0] || 'there';
+  const what = b.service ? b.service : 'your enquiry';
+  const car = b.bmw_model ? ` for your ${b.bmw_model}` : '';
+  return (
+    `Hi ${first}, it's Alex from BMW Coding IE — just following up on ${what}${car}. ` +
+    `Would you like to go ahead? You can pick a time that suits you here: https://www.bmwcoding.ie/#contact`
+  );
+}
+
+/** One enquiry in full, with everything needed to act on it. Opened from the
+ *  agenda or from the enquiries list (`from: 'quotes'`), and returns there. */
+export function buildLeadCard(b: AgendaLead, from: 'agenda' | 'quotes' = 'agenda'): { text: string; keyboard: InlineKeyboard } {
   const phone = (b.contact ?? '').replace(/[^\d+]/g, '');
   const waiting = b.created_at
     ? Math.floor((Date.now() - new Date(b.created_at).getTime()) / 3600000)
     : null;
 
-  const lines = [`⏳ <b>${esc(b.name)}</b>`, '━━━━━━━━━━━━━━━━━━━'];
+  const lines = [`${b.handled ? '💬' : '⏳'} <b>${esc(b.name)}</b>`, '━━━━━━━━━━━━━━━━━━━'];
   lines.push(`📞 <code>${esc(b.contact ?? '')}</code>`);
   if (b.bmw_model) lines.push(`🚙 ${esc(b.bmw_model)}`);
   if (b.service) lines.push(`🔧 ${esc(b.service)}`);
   if (b.slot_date) lines.push(`📅 ${esc(b.slot_date)} ${esc(b.slot_time ?? '')}`.trimEnd());
   if (b.message) lines.push(`💬 ${esc(b.message)}`);
+  if (from === 'quotes') lines.push(`📣 ${channel(b)}`);
   if (waiting !== null) {
-    lines.push('', `Waiting <b>${waiting}h</b> for a reply.`);
+    lines.push(
+      '',
+      b.handled
+        ? `Answered — enquiry is <b>${waiting < 48 ? `${waiting}h` : `${Math.floor(waiting / 24)} days`}</b> old, no decision yet.`
+        : `Waiting <b>${waiting}h</b> for a reply.`,
+    );
   }
 
   const buttons: InlineButton[][] = [];
@@ -261,11 +390,22 @@ export function buildLeadCard(b: AgendaLead): { text: string; keyboard: InlineKe
     ]);
     buttons.push([{ text: '📖 Read the chat', callback_data: `leadlog:${b.id}` }]);
   }
-  buttons.push([
-    { text: '✅ Answered', callback_data: `leaddone:${b.id}` },
-    { text: '✖️ Dismiss', callback_data: `bkfree:${b.id}` },
-  ]);
-  buttons.push([{ text: '← Back to agenda', callback_data: 'agenda' }]);
+  if (from === 'quotes') {
+    if (!b.handled) buttons.push([{ text: '✅ Answered — sent a price', callback_data: `leaddone:${b.id}:q` }]);
+    buttons.push([
+      { text: '🏁 Booked', callback_data: `qwon:${b.id}` },
+      { text: '👎 No deal', callback_data: `qlost:${b.id}` },
+    ]);
+    if (b.handled) buttons.push([{ text: '📋 Follow-up text', copy_text: { text: followUpText(b) } }]);
+    buttons.push([{ text: '✖️ Dismiss (spam / duplicate)', callback_data: `bkfree:${b.id}:q` }]);
+    buttons.push([{ text: '← Back to enquiries', callback_data: 'quotes' }]);
+  } else {
+    buttons.push([
+      { text: '✅ Answered', callback_data: `leaddone:${b.id}` },
+      { text: '✖️ Dismiss', callback_data: `bkfree:${b.id}` },
+    ]);
+    buttons.push([{ text: '← Back to agenda', callback_data: 'agenda' }]);
+  }
 
   return { text: lines.join('\n'), keyboard: { inline_keyboard: buttons } };
 }
