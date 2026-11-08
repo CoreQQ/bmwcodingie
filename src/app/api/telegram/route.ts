@@ -10,8 +10,11 @@ import {
   editMessage,
   isOwner,
   registerBotCommands,
+  replyInThread,
   sendOwnerMessage,
   sendOwnerWithMarkup,
+  setupTopics,
+  TOPICS,
   type BookingRow,
   type Lead,
 } from '@/lib/telegram';
@@ -397,11 +400,13 @@ export async function POST(req: Request) {
       chat: { id: number };
       from?: { id: number };
       reply_to_message?: { text?: string; caption?: string };
+      message_thread_id?: number;
+      is_topic_message?: boolean;
     };
     callback_query?: {
       id: string;
       data?: string;
-      message?: { message_id: number; chat: { id: number } };
+      message?: { message_id: number; chat: { id: number }; message_thread_id?: number; is_topic_message?: boolean };
     };
   };
   try {
@@ -417,6 +422,11 @@ export async function POST(req: Request) {
   }
 
   const sb = getSupabaseAdmin();
+
+  // With the group split into topics, every answer goes back to the topic
+  // the owner wrote or tapped in (General when none).
+  const origin = update.message ?? update.callback_query?.message;
+  replyInThread(origin?.is_topic_message ? origin.message_thread_id : undefined);
 
   // ── Owner messages: commands + invoice wizard input ────────────
   const msg = update.message;
@@ -600,6 +610,23 @@ export async function POST(req: Request) {
       await sendCalendarLink();
       return ok();
     }
+    // Split the group into topics: one chat per kind of message.
+    if (/^\/topics(@\w+)?\b/.test(text)) {
+      const r = await setupTopics();
+      if (!r.ok) {
+        await sendOwnerMessage(
+          r.why === 'not-forum'
+            ? '🗂 Сначала включите темы в группе: откройте группу → ✏️ Изменить → <b>Темы</b> (Topics) → вкл. Потом снова отправьте /topics.'
+            : '❌ Не получилось создать темы. Проверьте, что бот — администратор с правом «Управление темами», и отправьте /topics ещё раз.',
+        );
+        return ok();
+      }
+      const lines = ['🗂 <b>Topics</b>' + (r.created.length ? ` — created ${r.created.length}` : ' — all in place'), ''];
+      for (const t of TOPICS) lines.push(`<b>${t.name}</b> — ${t.about}`);
+      lines.push('', 'Commands work in any topic, and the answer comes back where you typed. You can rename or reorder the topics in Telegram — the bot keeps finding them.');
+      await sendOwnerMessage(lines.join('\n'));
+      return ok();
+    }
     // Every enquiry (quote request) in one place, until it is booked or lost.
     if (/^\/(quotes?|enquiries|leads)(@\w+)?\b/i.test(text)) {
       const { text: out, keyboard } = await buildEnquiries(sb);
@@ -612,7 +639,7 @@ export async function POST(req: Request) {
       return ok();
     }
     if (/^\/tools(@\w+)?\b/.test(text)) {
-      await sendOwnerWithMarkup('🧰 <b>Tools</b> — tap one.\nBan someone: <code>/ban C-007 reason</code> · <code>/unban C-007</code>', TOOLS_KEYBOARD);
+      await sendOwnerWithMarkup('🧰 <b>Tools</b> — tap one.\nBan someone: <code>/ban C-007 reason</code> · <code>/unban C-007</code>\nSplit the group into topics: /topics', TOOLS_KEYBOARD);
       return ok();
     }
     if (/^\/wa(@\w+)?\b/.test(text)) {

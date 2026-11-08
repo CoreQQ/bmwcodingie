@@ -154,9 +154,11 @@ export async function GET(req: Request) {
 
   const outreach =
     "Hi! Good news: Android Auto now works on NBT Evo (iDrive 6) BMWs. It's €250, still in beta (done at your own risk), and you only pay if you see it working. Want me to check your car? Send me your full VIN (17 characters).";
-  const sent = await sendOwnerWithMarkup(text, {
-    inline_keyboard: [[{ text: '📋 Copy message for them', copy_text: { text: outreach } }]],
-  });
+  const sent = await sendOwnerWithMarkup(
+    text,
+    { inline_keyboard: [[{ text: '📋 Copy message for them', copy_text: { text: outreach } }]] },
+    'leads',
+  );
 
   return NextResponse.json({ ok: true, sent, total: list.length, nbt: nbt.length, unknown: unknown.length, newer: newer.length, shown });
 }

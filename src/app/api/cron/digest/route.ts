@@ -132,6 +132,6 @@ export async function GET(req: Request) {
     ...(waiting.length ? [[{ text: `⏳ WhatsApp waiting (${waiting.length})`, callback_data: 'wapend' }]] : []),
     [{ text: '⏰ Agenda', callback_data: 'agenda' }],
   ];
-  await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: buttons });
+  await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: buttons }, 'bookings');
   return NextResponse.json({ ok: true });
 }

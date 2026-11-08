@@ -74,7 +74,7 @@ export async function GET(req: Request) {
       ok: true,
       // Deploy marker: bump it in a redeploy-only commit, then check it here
       // to know the new build (and new env values) are live.
-      v: 111,
+      v: 112,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
@@ -161,11 +161,13 @@ export async function POST(req: Request) {
   if (dhEvent) {
     const trouble = /disconnect|offboard|health|alert|restrict|ban|violat|review|fail|error|expir|inactiv/i.test(dhEvent + ' ' + raw.slice(0, 2000));
     if (dhEvent === 'test_ping') {
-      waitUntil(sendOwnerWithMarkup('✅ <b>Dualhook → site</b>: test ping received. Webhook wiring works.').catch(() => undefined));
+      waitUntil(sendOwnerWithMarkup('✅ <b>Dualhook → site</b>: test ping received. Webhook wiring works.', undefined, 'site').catch(() => undefined));
     } else if (trouble) {
       waitUntil(
         sendOwnerWithMarkup(
           `⚠️ <b>Dualhook event</b> <code>${esc(dhEvent)}</code>\n<pre>${esc(raw.slice(0, 1200))}</pre>`,
+          undefined,
+          'urgent',
         ).catch(() => undefined),
       );
     }
@@ -203,6 +205,8 @@ async function handleUpdate(update: WaUpdate): Promise<void> {
           await sendOwnerWithMarkup(
             `⚙️ <b>WhatsApp messages arrive for phone_number_id</b> <code>${esc(incomingPhone)}</code>, but the site is set to <code>${esc(ourPhone)}</code>. ` +
               'If you re-connected the number, update WHATSAPP_PHONE_ID (and the API key) in Vercel — until then replies cannot be sent automatically.',
+            undefined,
+            'urgent',
           ).catch(() => undefined);
         }
       }
@@ -229,6 +233,7 @@ async function handleUpdate(update: WaUpdate): Promise<void> {
             await sendOwnerWithMarkup(
               `⚠️ <b>WhatsApp bot error</b> · <code>+${msg.from}</code>\n<code>${esc(err.slice(0, 300))}</code>\nThe customer got no reply — answer them yourself.`,
               { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${msg.from}` }]] },
+              'urgent',
             ).catch(() => undefined);
           }
         }
@@ -276,6 +281,7 @@ async function handleStatus(sb: SupabaseClient | null, st: WaStatus): Promise<vo
       text ? `\n\nThe message:\n<pre>${esc(text.slice(0, 1500))}</pre>` : ''
     }`,
     to ? { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${to}` }]] } : undefined,
+    'urgent',
   );
 }
 
@@ -316,7 +322,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     // No database: still never lose the lead.
     await sendOwnerWithMarkup(`💬 <b>WhatsApp</b> · ${label}<code>${who}</code>\n«${esc(text || describe(msg))}»\n⚠️ Database not configured — reply yourself.`, {
       inline_keyboard: [numberRow],
-    });
+    }, 'urgent');
     return;
   }
 
@@ -364,6 +370,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
         !paused && !aiOff ? 'It asked them to resend one photo at a time.' : 'Open WhatsApp to see it.'
       }</i>`,
       { inline_keyboard: [controls, numberRow] },
+      'whatsapp',
     );
     return;
   }
@@ -381,7 +388,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     }
     await sendOwnerWithMarkup(`${head}\n📎 <i>sent ${describe(msg)} — open WhatsApp to see it. The assistant told them you'll look.</i>`, {
       inline_keyboard: [controls, numberRow],
-    });
+    }, 'whatsapp');
     return;
   }
 
@@ -439,5 +446,6 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   if (skipped) lines.push(skipped);
   if (askedTime) lines.push(`⏰ <b>Asked for a specific time: ${esc(askedTime)}</b> — the assistant told them you confirm times yourself.`);
   const copyRow = sendError ? [[{ text: '📋 Copy answer', copy_text: { text: reply.slice(0, 256) } }]] : [];
-  await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: [...copyRow, controls, numberRow] });
+  // The customer got no answer → 🚨 Срочно; otherwise the WhatsApp topic.
+  await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: [...copyRow, controls, numberRow] }, aiError || sendError ? 'urgent' : 'whatsapp');
 }

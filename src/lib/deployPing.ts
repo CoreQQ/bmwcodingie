@@ -30,6 +30,8 @@ export async function announceDeploy(): Promise<'sent' | 'same' | 'skip'> {
     `🚀 <b>Site updated</b> — the new version is live${NOTE ? `: <i>${esc(NOTE)}</i>` : '.'}\n` +
       `https://www.bmwcoding.ie\n` +
       `<i>Still looks old? Close the page and open it again.</i>`,
+    undefined,
+    'site',
   );
   return 'sent';
 }

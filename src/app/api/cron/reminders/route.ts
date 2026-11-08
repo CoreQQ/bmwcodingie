@@ -99,7 +99,7 @@ export async function GET(req: Request) {
   // The morning view lives in lib/agenda so the bot can rebuild the same
   // screen when the owner navigates back out of an enquiry.
   const agenda = await buildAgenda(sb);
-  if (!agenda.empty) await sendOwnerWithMarkup(agenda.text, agenda.keyboard);
+  if (!agenda.empty) await sendOwnerWithMarkup(agenda.text, agenda.keyboard, 'bookings');
 
   // ── Appointment reminders ─────────────────────────────────────────
   // Sent the morning before, so the customer always gets 12+ hours' notice and
@@ -206,6 +206,7 @@ export async function GET(req: Request) {
             },
           ]),
         },
+        'bookings',
       );
     }
   }
@@ -227,6 +228,7 @@ export async function GET(req: Request) {
             { text: `📋 Ask ${j.name.split(' ')[0]} for a review`, copy_text: { text: reviewAsk(j.name, j.service) } },
           ]),
         },
+        'bookings',
       );
     }
   }
@@ -243,6 +245,8 @@ export async function GET(req: Request) {
       x === 'nov11' ? '11.11' : x === 'blackfriday' ? 'Black Friday' : x === 'xmas' ? 'Christmas' : 'no offer';
     await sendOwnerMessage(
       `⚠️ <b>The site shows ${label(SEASON)}, but today should be ${label(due)}.</b> It needs a redeploy (Vercel → Deployments → Redeploy) — or tell Claude.`,
+      undefined,
+      'site',
     );
   }
 
