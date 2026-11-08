@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
+import { autoTopics, sendOwnerMessage, sendOwnerWithMarkup } from '@/lib/telegram';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import type { Booking } from '@/lib/types';
 import { buildAgenda } from '@/lib/agenda';
@@ -249,6 +249,9 @@ export async function GET(req: Request) {
       'site',
     );
   }
+
+  // If Topics were switched on and nobody has written since, set them up now.
+  await autoTopics().catch(() => undefined);
 
   await pingIndexNow();
 
