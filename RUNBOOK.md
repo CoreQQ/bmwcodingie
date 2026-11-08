@@ -107,7 +107,9 @@ updated", offer-mismatch warning, events). Each send names its topic
 (`sendOwnerMessage(text, kb, topic)` etc.); command replies go back to the
 topic the owner typed in (`replyInThread`, AsyncLocalStorage). Topics can be
 renamed or reordered in Telegram; a deleted one falls back to General, and
-`/topics` recreates whatever is missing.
+`/topics` recreates whatever is missing. Bots cannot switch Topics on: the
+owner flips it once in the group settings, and the bot creates its topics by
+itself on the next update (or at the 08:00 cron) — `autoTopics()`.
 
 Automatic messages: booking/VIN/chat leads, one WhatsApp mirror per customer
 message (a specific-time request is a line in it, not a separate alert), 🚨
@@ -171,7 +173,10 @@ Work happens on `claude/website-analysis-review-oboy2c`, merged `--no-ff` into
 incognito tab. Local: `npm run build` must be clean before any merge.
 
 **"Site updated" in Telegram:** each production build is announced once
-(`src/lib/deployPing.ts`, key `last_deploy_sha` in `app_config`) — by
+(`src/lib/deployPing.ts`, key `last_deploy` = "<build time>:<commit>" in
+`app_config`; only a NEWER build may write it — on 8 Nov an old and a new
+build answering at once kept overwriting each other and sent the line every
+few seconds) — by
 `GET /api/deploy-ping` after a deploy, or by the first WhatsApp / Telegram /
 visitor request the new build serves, whichever comes first. The line quotes
 the commit's first line (merge prefix stripped), so write it for the owner.

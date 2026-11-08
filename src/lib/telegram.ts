@@ -85,6 +85,34 @@ export async function setupTopics(): Promise<{ ok: true; map: TopicMap; created:
   return { ok: true, map, created };
 }
 
+/**
+ * The owner only switches Topics on in Telegram (bots cannot do that part);
+ * the bot notices on the next update — or the morning cron — creates the
+ * topics itself and says so in General. Does nothing once they all exist.
+ */
+let autoTopicsRunning: Promise<void> | null = null;
+export async function autoTopics(): Promise<void> {
+  const have = await loadTopics();
+  if (TOPICS.every((t) => have[t.key])) return;
+  if (autoTopicsRunning) return autoTopicsRunning;
+  autoTopicsRunning = (async () => {
+    const r = await setupTopics();
+    if (r.ok && r.created.length) {
+      await tgCall('sendMessage', {
+        chat_id: TG_CHAT_ID,
+        parse_mode: 'HTML',
+        text:
+          `🗂 <b>Topics are set up</b> — from now on each kind of message has its own chat:\n` +
+          TOPICS.map((t) => `<b>${t.name}</b> — ${t.about}`).join('\n') +
+          `\n\nCommands work in any topic, and the answer comes back where you typed. Rename or reorder them as you like.`,
+      });
+    }
+  })().finally(() => {
+    autoTopicsRunning = null;
+  });
+  return autoTopicsRunning;
+}
+
 // Inside a bot update (a command, a button) the answer goes back to the topic
 // the owner is in; automatic messages go to their own topic.
 const threadContext = new AsyncLocalStorage<{ thread?: number }>();

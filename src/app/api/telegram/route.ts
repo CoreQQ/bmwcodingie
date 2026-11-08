@@ -10,6 +10,7 @@ import {
   editMessage,
   isOwner,
   registerBotCommands,
+  autoTopics,
   replyInThread,
   sendOwnerMessage,
   sendOwnerWithMarkup,
@@ -397,7 +398,7 @@ export async function POST(req: Request) {
     update_id?: number;
     message?: {
       text?: string;
-      chat: { id: number };
+      chat: { id: number; is_forum?: boolean };
       from?: { id: number };
       reply_to_message?: { text?: string; caption?: string };
       message_thread_id?: number;
@@ -406,7 +407,7 @@ export async function POST(req: Request) {
     callback_query?: {
       id: string;
       data?: string;
-      message?: { message_id: number; chat: { id: number }; message_thread_id?: number; is_topic_message?: boolean };
+      message?: { message_id: number; chat: { id: number; is_forum?: boolean }; message_thread_id?: number; is_topic_message?: boolean };
     };
   };
   try {
@@ -427,6 +428,8 @@ export async function POST(req: Request) {
   // the owner wrote or tapped in (General when none).
   const origin = update.message ?? update.callback_query?.message;
   replyInThread(origin?.is_topic_message ? origin.message_thread_id : undefined);
+  // Topics just switched on in the group → the bot creates its topics itself.
+  if (origin?.chat?.is_forum && isOwner(origin.chat.id)) await autoTopics().catch(() => undefined);
 
   // ── Owner messages: commands + invoice wizard input ────────────
   const msg = update.message;

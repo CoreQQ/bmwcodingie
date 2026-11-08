@@ -30,6 +30,9 @@ const UPCOMING = process.env.NEXT_PUBLIC_UPCOMING ?? upcomingForToday();
 // What this build is, for the "site updated" line in Telegram (deployPing.ts):
 // the commit, and its first line minus git's "Merge branch '…': " prefix.
 const BUILD_SHA = process.env.VERCEL_GIT_COMMIT_SHA || '';
+// When it was built: an older build that is still answering must never
+// announce itself over a newer one (deployPing.ts compares these).
+const BUILD_TIME = String(Date.now()).padStart(13, '0');
 const BUILD_NOTE = (process.env.VERCEL_GIT_COMMIT_MESSAGE || '')
   .split('\n')[0]
   .replace(/^Merge branch '[^']*'(?: into \S+)?:?\s*/, '')
@@ -42,6 +45,7 @@ const nextConfig = {
     NEXT_PUBLIC_UPCOMING: UPCOMING === 'none' ? '' : UPCOMING,
     BUILD_SHA,
     BUILD_NOTE,
+    BUILD_TIME,
   },
   // Baseline security headers. No X-Frame-Options: the Telegram Mini App
   // (/miniapp) must stay embeddable in Telegram Web's iframe.
