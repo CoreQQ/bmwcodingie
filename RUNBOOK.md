@@ -97,6 +97,18 @@ unknown columns and retries; other readers fall back to defaults.
 - `/setup` re-registers the menu and the reply keyboard (⏰ Agenda · 📅 Bookings ·
   📥 Quotes · 💰 Paid · 💶 Prices · 🧰 Tools).
 
+**Group topics** (8 Nov): with Topics switched on in the group, `/topics`
+creates six topics and stores their thread ids in `app_config.tg_topics`:
+📥 Заявки (enquiries without a time) · 💬 WhatsApp (mirrors; 🚨 when the
+customer got no answer) · 🚨 Срочно (handover alerts, delivery/bot errors,
+Dualhook trouble) · 📅 Записи и день (booking requests with a time, morning
+agenda, reminders, digest) · 👀 Посетители · 🚀 Сайт и система ("Site
+updated", offer-mismatch warning, events). Each send names its topic
+(`sendOwnerMessage(text, kb, topic)` etc.); command replies go back to the
+topic the owner typed in (`replyInThread`, AsyncLocalStorage). Topics can be
+renamed or reordered in Telegram; a deleted one falls back to General, and
+`/topics` recreates whatever is missing.
+
 Automatic messages: booking/VIN/chat leads, one WhatsApp mirror per customer
 message (a specific-time request is a line in it, not a separate alert), 🚨
 pinned alert only when a customer asks for a person or is fed up, morning

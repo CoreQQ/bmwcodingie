@@ -1,6 +1,8 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { translateToRussian } from './translate';
 import { waLinkFor } from './phone';
 import { BF, BF_ON, NOV11, NOV11_ON, XMAS, XMAS_ON } from './season';
+import { getSupabaseAdmin } from './supabase';
 
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT_ID = process.env.TG_CHAT_ID;
@@ -19,6 +21,86 @@ export type InlineButton =
   | { text: string; copy_text: { text: string } }
   | { text: string; url: string };
 export type InlineKeyboard = { inline_keyboard: InlineButton[][] };
+
+// ─── Group topics (owner, 8 Nov: separate chats per task) ───
+// With Topics switched on in the group, each kind of message goes to its own
+// topic. /topics creates them and stores their thread ids in app_config; until
+// then — or if a topic is deleted — everything lands in General, as before.
+
+export type Topic = 'leads' | 'whatsapp' | 'urgent' | 'bookings' | 'visitors' | 'site';
+
+export const TOPICS: { key: Topic; name: string; color: number; about: string }[] = [
+  { key: 'leads', name: '📥 Заявки', color: 7322096, about: 'New enquiries from the site, the VIN check, the site chat and the WhatsApp assistant. /quotes lists every open one.' },
+  { key: 'whatsapp', name: '💬 WhatsApp', color: 9367192, about: 'Every customer message and the assistant’s answer. Swipe-reply to one to answer that customer.' },
+  { key: 'urgent', name: '🚨 Срочно', color: 16478047, about: 'Someone asked for you, the assistant failed, or a message could not be delivered.' },
+  { key: 'bookings', name: '📅 Записи и день', color: 16766590, about: 'Booking requests with a time, the morning agenda, reminders and the evening digest.' },
+  { key: 'visitors', name: '👀 Посетители', color: 13338331, about: 'One line per visitor on the site.' },
+  { key: 'site', name: '🚀 Сайт и система', color: 16749490, about: '“Site updated”, offer switches and technical notices.' },
+];
+
+const TOPICS_KEY = 'tg_topics';
+type TopicMap = Partial<Record<Topic, number>>;
+let topicCache: { at: number; map: TopicMap } | null = null;
+
+export async function loadTopics(fresh = false): Promise<TopicMap> {
+  if (!fresh && topicCache && Date.now() - topicCache.at < 60_000) return topicCache.map;
+  let map: TopicMap = {};
+  try {
+    const sb = getSupabaseAdmin();
+    if (sb) {
+      const { data } = await sb.from('app_config').select('value').eq('key', TOPICS_KEY).maybeSingle();
+      map = JSON.parse((data as { value?: string } | null)?.value || '{}') as TopicMap;
+    }
+  } catch {
+    map = {};
+  }
+  topicCache = { at: Date.now(), map };
+  return map;
+}
+
+/**
+ * Create the topics that are missing (the group must have Topics switched on
+ * and the bot the "Manage topics" right). Returns the map, or why it could not.
+ */
+export async function setupTopics(): Promise<{ ok: true; map: TopicMap; created: Topic[] } | { ok: false; why: string }> {
+  if (!telegramConfigured) return { ok: false, why: 'Telegram is not configured.' };
+  const chat = (await tgCall('getChat', { chat_id: TG_CHAT_ID })) as { result?: { is_forum?: boolean } } | null;
+  if (!chat?.result?.is_forum) return { ok: false, why: 'not-forum' };
+  const map = { ...(await loadTopics(true)) };
+  const created: Topic[] = [];
+  for (const t of TOPICS) {
+    if (map[t.key]) continue;
+    const res = (await tgCall('createForumTopic', { chat_id: TG_CHAT_ID, name: t.name, icon_color: t.color })) as {
+      result?: { message_thread_id?: number };
+    } | null;
+    const id = res?.result?.message_thread_id;
+    if (!id) return { ok: false, why: 'create-failed' };
+    map[t.key] = id;
+    created.push(t.key);
+    await tgCall('sendMessage', { chat_id: TG_CHAT_ID, message_thread_id: id, text: `${t.name}\n${t.about}` });
+  }
+  const sb = getSupabaseAdmin();
+  if (sb) await sb.from('app_config').upsert({ key: TOPICS_KEY, value: JSON.stringify(map) });
+  topicCache = { at: Date.now(), map };
+  return { ok: true, map, created };
+}
+
+// Inside a bot update (a command, a button) the answer goes back to the topic
+// the owner is in; automatic messages go to their own topic.
+const threadContext = new AsyncLocalStorage<{ thread?: number }>();
+
+/** Called by the webhook for each update, with the topic it came from (or none). */
+export function replyInThread(thread?: number): void {
+  threadContext.enterWith({ thread });
+}
+
+async function threadFor(topic?: Topic): Promise<number | undefined> {
+  const ctx = threadContext.getStore();
+  if (ctx) return ctx.thread;
+  return topic ? (await loadTopics())[topic] : undefined;
+}
+
+const withThread = (thread?: number) => (thread ? { message_thread_id: thread } : {});
 
 /** Low-level call to a Bot API method. Never throws; returns the parsed JSON or null. */
 /** Cut to at most `max` UTF-16 units without splitting an emoji in half —
@@ -80,6 +162,11 @@ async function tgCall(method: string, payload: Record<string, unknown>, attempt 
         return tgCall(method, payload, 1);
       }
       if (res.status === 400) {
+        // A topic that was deleted or closed: deliver to General instead.
+        if (payload.message_thread_id && /thread|topic/i.test(detail)) {
+          const { message_thread_id: _gone, ...rest } = payload;
+          return tgCall(method, rest, 1);
+        }
         // The group became a supergroup (it happens when the bot is made an
         // admin) and got a new id: deliver there now, and say so loudly —
         // TG_CHAT_ID must be updated or commands from the group are ignored.
@@ -146,13 +233,14 @@ export async function registerBotCommands(): Promise<boolean> {
 }
 
 /** Shared sender — never throws, returns false on any failure. */
-async function sendTelegramMessage(text: string, replyMarkup?: InlineKeyboard): Promise<boolean> {
+async function sendTelegramMessage(text: string, replyMarkup?: InlineKeyboard, topic?: Topic): Promise<boolean> {
   if (!telegramConfigured) {
     console.warn('[telegram] TG_TOKEN / TG_CHAT_ID not set — skipping notification');
     return false;
   }
   const ok = await tgCall('sendMessage', {
     chat_id: TG_CHAT_ID,
+    ...withThread(await threadFor(topic)),
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
@@ -320,7 +408,8 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
   const wa = waLinkFor(lead.contact);
   if (wa) rows.push([{ text: '💬 Open in WhatsApp', url: wa }]);
   if (lead.id && slot) rows.push(...bookingKeyboard(lead.id, lead.name, slot, lead.public_token, lead.visitType).inline_keyboard);
-  return sendTelegramMessage(lines.join('\n'), rows.length ? { inline_keyboard: rows } : undefined);
+  // A request with a time is a booking to confirm; without one it is an enquiry.
+  return sendTelegramMessage(lines.join('\n'), rows.length ? { inline_keyboard: rows } : undefined, slot ? 'bookings' : 'leads');
 }
 
 // ─── Webhook helpers (used by /api/telegram) ───
@@ -472,19 +561,20 @@ export function buildBookingsDay(
 }
 
 /** Send a fresh message to the owner chat (used by the /bookings command). */
-export async function sendOwnerMessage(text: string, keyboard?: InlineKeyboard): Promise<boolean> {
-  return sendTelegramMessage(text, keyboard);
+export async function sendOwnerMessage(text: string, keyboard?: InlineKeyboard, topic?: Topic): Promise<boolean> {
+  return sendTelegramMessage(text, keyboard, topic);
 }
 
 /** Send a message to the owner chat with any reply_markup (inline keyboard,
  *  reply keyboard, or { remove_keyboard: true }). */
-export async function sendOwnerWithMarkup(text: string, replyMarkup?: object): Promise<boolean> {
+export async function sendOwnerWithMarkup(text: string, replyMarkup?: object, topic?: Topic): Promise<boolean> {
   if (!telegramConfigured) {
     console.warn('[telegram] not configured — skipping message');
     return false;
   }
   const ok = await tgCall('sendMessage', {
     chat_id: TG_CHAT_ID,
+    ...withThread(await threadFor(topic)),
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
@@ -503,6 +593,7 @@ export async function sendOwnerAlert(body: string, replyMarkup?: object): Promis
   const banner = '🚨🚨🚨 <b>ALEX — THIS ONE NEEDS YOU</b> 🚨🚨🚨';
   const res = (await tgCall('sendMessage', {
     chat_id: TG_CHAT_ID,
+    ...withThread(await threadFor('urgent')),
     text: `${banner}\n${'─'.repeat(18)}\n${body}`,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
@@ -535,6 +626,8 @@ export async function sendOwnerDocument(
   try {
     const form = new FormData();
     form.append('chat_id', String(TG_CHAT_ID));
+    const thread = await threadFor();
+    if (thread) form.append('message_thread_id', String(thread));
     if (caption) form.append('caption', caption);
     form.append('document', new Blob([bytes as unknown as BlobPart], { type: 'application/pdf' }), filename);
     const res = await fetch(`${API}/sendDocument`, { method: 'POST', body: form });
@@ -616,7 +709,7 @@ export async function notifyVisitor(v: VisitorPing): Promise<boolean> {
   if (v.city) lines.push(`🏙 <b>City:</b> ${esc(v.city)}`);
   if (v.isp) lines.push(`🏢 <b>Provider:</b> ${esc(v.isp)}`);
   lines.push(`🌐 <b>IP:</b> <code>${esc(v.ip || 'unknown')}</code>`);
-  return sendTelegramMessage(lines.join('\n'));
+  return sendTelegramMessage(lines.join('\n'), undefined, 'visitors');
 }
 
 /** Generic event notification (admin login, server error, file upload, …). */
@@ -635,5 +728,5 @@ export async function notifyEvent(opts: {
     if (val) lines.push(`<b>${esc(k)}:</b> ${esc(val)}`);
   }
   if (opts.note) lines.push('', `<i>${esc(opts.note)}</i>`);
-  return sendTelegramMessage(lines.join('\n'));
+  return sendTelegramMessage(lines.join('\n'), undefined, 'site');
 }
