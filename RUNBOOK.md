@@ -172,6 +172,12 @@ Work happens on `claude/website-analysis-review-oboy2c`, merged `--no-ff` into
 `curl -s https://www.bmwcoding.ie/api/slots` (fresh JSON) and the page in an
 incognito tab. Local: `npm run build` must be clean before any merge.
 
+**Flaky build:** `next/font/google` downloads Sora and DM Sans from Google at
+build time, and now and then that fails ("An error occurred in `next/font`
+… Cannot read properties of null (reading '1')"). The site keeps the previous
+version; `npm run build` retries once after 20 s (package.json), which is
+what fixes it every time.
+
 **"Site updated" in Telegram:** each production build is announced once
 (`src/lib/deployPing.ts`, key `last_deploy` = "<build time>:<commit>" in
 `app_config`; only a NEWER build may write it — on 8 Nov an old and a new
