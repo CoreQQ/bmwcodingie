@@ -27,7 +27,7 @@ const LOCATION_FACT = isMobileOnly()
   mobile visit or remote coding — never a workshop visit. Frame it as an improvement, which it is:
   they no longer have to drive to us. Never call it a closure.`;
 
-const CORE_FACTS = `Key facts about us:
+export const CORE_FACTS = `Key facts about us:
 - We offer dealer-level BMW coding, diagnostics and retrofits across Dublin, Kildare, Wicklow, Meath and Louth
 ${LOCATION_FACT}
 - Services available in person or remotely over ENET (customer needs a laptop + ENET cable)
