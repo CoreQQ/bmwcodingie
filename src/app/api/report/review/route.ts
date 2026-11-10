@@ -95,24 +95,49 @@ export async function GET(req: Request) {
     });
   }
 
-  // part=wa — recent conversations, newest chats first.
-  const { data: msgs } = await sb
-    .from('wa_messages')
-    .select('wa_id, role, via, content, created_at')
-    .gt('created_at', since)
-    .order('created_at', { ascending: true })
-    .limit(6000);
+  // part=wa — recent conversations, newest chats first. Supabase returns at
+  // most 1000 rows per request, so read newest-first in pages.
+  type Row = { wa_id: string; role: string; via: string | null; content: string; created_at: string };
+  const rows: Row[] = [];
+  for (let page = 0; page < 8; page++) {
+    const { data } = await sb
+      .from('wa_messages')
+      .select('wa_id, role, via, content, created_at')
+      .gt('created_at', since)
+      .order('created_at', { ascending: false })
+      .range(page * 1000, page * 1000 + 999);
+    const got = (data ?? []) as Row[];
+    rows.push(...got);
+    if (got.length < 1000) break;
+  }
+  rows.reverse();
+  const perDay: Record<string, { customer: number; ai: number; owner: number }> = {};
   const chats = new Map<string, { at: string; who: string; text: string }[]>();
-  for (const m of (msgs ?? []) as { wa_id: string; role: string; via: string | null; content: string; created_at: string }[]) {
+  for (const m of rows) {
+    const who = m.via === 'customer' ? 'C' : m.via === 'owner' ? 'ALEX' : 'AI';
+    const d = day(m.created_at);
+    perDay[d] ??= { customer: 0, ai: 0, owner: 0 };
+    perDay[d][who === 'C' ? 'customer' : who === 'AI' ? 'ai' : 'owner'] += 1;
     const id = crypto.createHash('sha256').update(m.wa_id).digest('hex').slice(0, 6);
     if (!chats.has(id)) chats.set(id, []);
-    chats.get(id)!.push({ at: m.created_at.slice(5, 16).replace('T', ' '), who: m.via === 'customer' ? 'C' : m.via === 'owner' ? 'ALEX' : 'AI', text: mask(m.content ?? '').slice(0, 1200) });
+    chats.get(id)!.push({ at: m.created_at.slice(5, 16).replace('T', ' '), who, text: mask(m.content ?? '').slice(0, 900) });
   }
+  const from = url.searchParams.get('from') || '';
   const list = [...chats.entries()]
     .map(([id, messages]) => ({ id, messages }))
-    .filter((c) => c.messages.some((m) => m.who === 'AI'))
+    // Chats where the assistant spoke, or a customer wrote and nobody answered.
+    .filter((c) => c.messages.some((m) => m.who === 'AI') || !c.messages.some((m) => m.who === 'ALEX'))
+    .filter((c) => !from || c.messages[c.messages.length - 1].at >= from)
     .sort((a, b) => (a.messages[a.messages.length - 1].at < b.messages[b.messages.length - 1].at ? 1 : -1));
   const offset = Number(url.searchParams.get('offset')) || 0;
-  const limit = Math.min(Number(url.searchParams.get('limit')) || 25, 60);
-  return NextResponse.json({ ok: true, chats: list.length, shown: list.slice(offset, offset + limit) });
+  const limit = Math.min(Number(url.searchParams.get('limit')) || 25, 80);
+  const { data: cfg } = await sb.from('app_config').select('value').eq('key', 'wa_ai_owner').maybeSingle();
+  return NextResponse.json({
+    ok: true,
+    rows: rows.length,
+    assistantSwitch: (cfg as { value?: string } | null)?.value ?? '(unset = on)',
+    perDay,
+    chats: list.length,
+    shown: list.slice(offset, offset + limit),
+  });
 }
