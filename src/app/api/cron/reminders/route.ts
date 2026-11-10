@@ -36,6 +36,15 @@ function whereLine(visitType?: string | null, visitAddress?: string | null): str
 }
 
 export const runtime = 'nodejs';
+
+// Customers got "booked in tomorrow, 2026-10-24 … for Other / not sure".
+/** "Sat 24 Oct" instead of the database date. */
+const niceDay = (ymd: string | null | undefined) => {
+  const d = new Date(`${ymd}T12:00:00`);
+  return Number.isNaN(d.getTime()) ? String(ymd ?? '') : d.toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short' });
+};
+/** " for Apple CarPlay" — or nothing when the form's "Other / not sure" was picked. */
+const forService = (service: string | null | undefined) => (service && !/^other\b|not sure/i.test(service) ? ` for ${service}` : '');
 // Never prerender: without CRON_SECRET the handler reads nothing from the
 // request, so Next built it as a static page — it ran once per deploy (the
 // "duplicate agenda" messages) and the real 08:00 call got the cached copy.
@@ -145,8 +154,8 @@ export async function GET(req: Request) {
     for (const b of due) {
       const first = (b.name || '').split(/\s+/)[0] || 'there';
       const msg =
-        `Hi ${first} 👋 Reminder: your BMW is booked in tomorrow, ${b.slot_date} at ${b.slot_time}` +
-        `${b.service ? ` for ${b.service}` : ''}.\n\n` +
+        `Hi ${first} 👋 Reminder: your BMW is booked in tomorrow, ${niceDay(b.slot_date)} at ${b.slot_time}` +
+        `${forService(b.service)}.\n\n` +
         `${whereLine(b.visit_type, b.visit_address)}\n\n` +
         `If anything changed, just reply here and we'll sort it.`;
 
@@ -200,7 +209,7 @@ export async function GET(req: Request) {
               copy_text: {
                 text:
                   `Hi ${(b.name || '').split(/\s+/)[0] || 'there'} 👋 Reminder: your BMW is booked in tomorrow, ` +
-                  `${b.slot_date} at ${b.slot_time}${b.service ? ` for ${b.service}` : ''}. ` +
+                  `${niceDay(b.slot_date)} at ${b.slot_time}${forService(b.service)}. ` +
                   `${whereLine(b.visit_type, b.visit_address)} If anything changed, just reply here.`,
               },
             },

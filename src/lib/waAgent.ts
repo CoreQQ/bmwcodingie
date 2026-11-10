@@ -3,23 +3,208 @@ import Anthropic from '@anthropic-ai/sdk';
 import { WHATSAPP_PROMPT } from './assistantPrompt';
 import { ensureClient, clientCode, historyForAssistant } from './crm';
 import { notifyTelegram, sendOwnerAlert } from './telegram';
-import { getHours, getSlotDuration, getBlockedDates } from './stats';
-import { windowsFor, windowsOverlap } from './hours';
 import { sendWhatsAppText } from './whatsapp';
 import { withOfferNote } from './offerNote';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
+// The WhatsApp agent's brain. Called by the Cloud API webhook (/api/whatsapp)
+// and by "Resume AI" in the bot.
+//
+// Rebuilt 10 Nov 2026 from three weeks of real chats. One model call returns a
+// structured decision — the message for the customer, a note for Alex, whether
+// it is urgent, and the lead — instead of free text plus tool calls. That is
+// what stops the failures the transcripts showed: the model's notes to itself
+// sent to a customer, "Passing this to Alex now" under every message of a
+// conversation Alex was already having, a pinned alert for a supplier's
+// advert. The conversation goes in as one labelled transcript, so the model
+// knows which lines are Alex's own and answers a burst of messages once.
 
-// The WhatsApp agent's brain: prompt, tools, lead capture and handover. Called
-// by the Cloud API webhook (/api/whatsapp) and by "Resume AI" in the bot.
+const MODEL = 'claude-opus-5-5';
+/** Used when the main model errors or is too slow — never leave a customer with nothing. */
+const BACKUP_MODEL = 'claude-sonnet-5-5';
 
+export type WaTurn = { at: string; who: 'customer' | 'assistant' | 'alex'; text: string };
 
+export type WaContext = {
+  /** The conversation before the messages being answered, oldest first. */
+  turns: WaTurn[];
+  /** The customer's new message(s): everything since the last reply. */
+  fresh: { at: string; text: string }[];
+  profileName?: string;
+  /** Our booking records for this number, newest first. */
+  pastJobs?: string;
+  /** A photo that came with the newest message. */
+  image?: { media_type: 'image/jpeg' | 'image/png' | 'image/webp'; data: string } | null;
+  now?: Date;
+};
+
+export type WaLead = { name: string; bmw_model: string; service: string; note: string };
+
+export type WaDecision = {
+  /** The exact message for the customer; '' sends nothing. */
+  reply: string;
+  /** What Alex needs to do about this customer; '' when nothing. */
+  notify_alex: string;
+  /** Asked for a person, upset or complaining: loud alert, assistant steps back. */
+  urgent: boolean;
+  lead: WaLead | null;
+};
+
+const DECISION_SCHEMA = {
+  type: 'object',
+  properties: {
+    reply: { type: 'string', description: 'The exact WhatsApp message to send to the customer now, or "" to send nothing.' },
+    notify_alex: { type: 'string', description: 'One short line in English for Alex about what this customer needs from him, or "".' },
+    urgent: { type: 'boolean', description: 'true only when they ask for a person, a call or Alex right now, are upset, or complain.' },
+    lead: {
+      anyOf: [
+        { type: 'null' },
+        {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Customer name if known, else ""' },
+            bmw_model: { type: 'string', description: 'Car model and year if known, else ""' },
+            service: { type: 'string', description: 'What they want done, short' },
+            note: { type: 'string', description: 'The VIN and any useful context, else ""' },
+          },
+          required: ['name', 'bmw_model', 'service', 'note'],
+          additionalProperties: false,
+        },
+      ],
+    },
+  },
+  required: ['reply', 'notify_alex', 'urgent', 'lead'],
+  additionalProperties: false,
+};
+
+/** "Mon 9 Nov 11:41" in Irish time — lets the model see gaps and who spoke when. */
+function stamp(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d
+    .toLocaleString('en-IE', { timeZone: 'Europe/Dublin', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
+    .replace(/,/g, '');
+}
+
+/** Whether to say hello is decided here, not left to the model: first contact
+ *  → greet and say it is the AI assistant; back after a break → "Hi again";
+ *  mid-chat → no hello. */
+function greetingNote(ctx: WaContext, now: Date): string {
+  const firstName = (ctx.profileName || '').trim().split(/\s+/)[0];
+  const lastAi = [...ctx.turns].reverse().find((t) => t.who === 'assistant');
+  if (!lastAi) {
+    const knowsAlex = ctx.turns.some((t) => t.who === 'alex');
+    return (
+      `GREETING: this is your first message to this customer. Open with a short hello${firstName ? ` using their first name (${firstName})` : ''} ` +
+      `and say once that you're the AI assistant for BMW Coding IE${knowsAlex ? ' (they have been talking to Alex himself, so make clear it is the assistant answering)' : ''}, then answer. ` +
+      `If your reply is only a holding line for Alex, skip the hello and the introduction.`
+    );
+  }
+  const gap = now.getTime() - new Date(lastAi.at).getTime();
+  return gap > 12 * 60 * 60 * 1000
+    ? `GREETING: they are coming back after a break. Open with a short "Hi again${firstName ? ` ${firstName}` : ''}!" — no need to introduce yourself again — then answer. If your reply is only a holding line for Alex, skip the hello.`
+    : 'GREETING: you are mid-conversation. No hello, just carry on.';
+}
+
+/** The whole situation as one labelled text: who the customer is, what was
+ *  said and by whom, and what is new. Exported for the test endpoint. */
+export function renderContext(ctx: WaContext): string {
+  const now = ctx.now ?? new Date();
+  const label = { customer: 'Customer', assistant: 'You', alex: 'Alex' } as const;
+  const parts: string[] = [];
+  const about = [
+    ctx.profileName ? `WhatsApp name: ${ctx.profileName} (use the first name; do not ask for it unless it is clearly not a real name)` : '',
+    ctx.pastJobs ? `Our booking records for this number (newest first): ${ctx.pastJobs}` : '',
+    `Now: ${stamp(now.toISOString())} (Irish time)`,
+  ].filter(Boolean);
+  parts.push(`CUSTOMER\n${about.join('\n')}`);
+  parts.push(
+    ctx.turns.length
+      ? `CONVERSATION SO FAR (oldest first)\n${ctx.turns.map((t) => `[${stamp(t.at)}] ${label[t.who]}: ${t.text}`).join('\n')}`
+      : 'CONVERSATION SO FAR\n(none — this is their first message)',
+  );
+  parts.push(`NEW — answer this\n${ctx.fresh.map((m) => `[${stamp(m.at)}] Customer: ${m.text}`).join('\n')}`);
+  parts.push(greetingNote(ctx, now));
+  return parts.join('\n\n');
+}
+
+function parseDecision(text: string): WaDecision {
+  const raw = JSON.parse(text) as Partial<WaDecision>;
+  const lead = raw.lead && typeof raw.lead === 'object' ? raw.lead : null;
+  return {
+    reply: String(raw.reply ?? '').trim(),
+    notify_alex: String(raw.notify_alex ?? '').trim().slice(0, 300),
+    urgent: raw.urgent === true,
+    lead: lead
+      ? {
+          name: String(lead.name ?? '').trim().slice(0, 120),
+          bmw_model: String(lead.bmw_model ?? '').trim().slice(0, 160),
+          service: String(lead.service ?? '').trim().slice(0, 160),
+          note: String(lead.note ?? '').trim().slice(0, 1000),
+        }
+      : null,
+  };
+}
+
+/**
+ * Ask the model what to do. No database, no sending — the test endpoint calls
+ * this with made-up conversations. Throws when no usable answer comes back,
+ * so the caller can tell Alex the customer got nothing.
+ */
+export async function decideWaReply(ctx: WaContext): Promise<WaDecision & { model: string; backupReason?: string }> {
+  const client = new Anthropic();
+  const text = renderContext(ctx);
+  const request = {
+    // Thinking is always on for these models and counts toward the limit, so
+    // this is room for the thinking plus a short message — the prompt keeps
+    // replies brief, not the ceiling.
+    max_tokens: 4000,
+    system: [{ type: 'text' as const, text: WHATSAPP_PROMPT, cache_control: { type: 'ephemeral' as const } }],
+    output_config: { effort: 'low' as const, format: { type: 'json_schema' as const, schema: DECISION_SCHEMA } },
+  };
+  const userContent = (): Anthropic.ContentBlockParam[] => [
+    ...(ctx.image ? [{ type: 'image' as const, source: { type: 'base64' as const, media_type: ctx.image.media_type, data: ctx.image.data } }] : []),
+    { type: 'text' as const, text },
+  ];
+
+  // Capped attempts: uncapped, a slow answer ran until the platform killed the
+  // function at 60 seconds — no reply, no error, no warning to Alex.
+  let response: { content: { type: string; text?: string }[]; stop_reason: string | null; model: string };
+  let backupReason: string | undefined;
+  try {
+    response = await client.beta.messages.create(
+      {
+        ...request,
+        model: MODEL,
+        messages: [{ role: 'user', content: userContent() }],
+        // If a safety classifier declines the request, the API re-runs it on
+        // the fallback model inside the same call.
+        betas: ['server-side-fallback-2026-07-01'],
+        fallbacks: [{ model: 'claude-opus-5' }],
+      },
+      { timeout: 25_000, maxRetries: 0 },
+    );
+  } catch (e) {
+    backupReason = e instanceof Error ? e.message : String(e);
+    console.warn('[waAgent] main model failed or too slow, using backup:', backupReason);
+    response = await client.messages.create(
+      { ...request, model: BACKUP_MODEL, messages: [{ role: 'user', content: userContent() }] },
+      { timeout: 18_000, maxRetries: 1 },
+    );
+  }
+  if (response.stop_reason === 'refusal') throw new Error('the model declined to answer');
+  if (response.stop_reason === 'max_tokens') throw new Error('the answer was cut off');
+  const out = response.content
+    .filter((b) => b.type === 'text')
+    .map((b) => b.text ?? '')
+    .join('')
+    .trim();
+  if (!out) throw new Error('empty AI reply');
+  return { ...parseDecision(out), model: response.model, backupReason };
+}
 
 /** Download a customer photo for the model to look at. Small, typed, and
  *  never fatal — a broken link just means we answer without the picture. */
-async function fetchImage(
-  url: string,
-): Promise<{ media_type: 'image/jpeg' | 'image/png' | 'image/webp'; data: string } | null> {
+async function fetchImage(url: string): Promise<WaContext['image']> {
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
@@ -38,60 +223,8 @@ async function fetchImage(
   }
 }
 
-/** Today's date in Dublin as YYYY-MM-DD (the server clock runs UTC). */
-function dublinDay(offsetDays = 0): string {
-  const d = new Date(Date.now() + offsetDays * 86400000);
-  return d.toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' });
-}
-
-/** Free (non-overlapping) windows for one day, honouring hours and blocks. */
-async function freeWindows(sb: SupabaseClient, day: string): Promise<string[]> {
-  const [hours, duration, blocked] = await Promise.all([
-    getHours(sb),
-    getSlotDuration(sb),
-    getBlockedDates(sb),
-  ]);
-  if (blocked.includes(day)) return [];
-  const weekday = new Date(`${day}T12:00:00`).getDay();
-  const all = windowsFor(hours, weekday, duration);
-  if (!all.length) return [];
-  const { data } = await sb
-    .from('bookings')
-    .select('slot_time')
-    .eq('slot_date', day)
-    .eq('status', 'confirmed');
-  const taken = ((data ?? []) as { slot_time: string }[]).map((r) => r.slot_time).filter(Boolean);
-  return all.filter((w) => !taken.some((t) => windowsOverlap(w, t)));
-}
-
-/** Human summary of the next few bookable days, for the model to read out. */
-async function availabilityText(sb: SupabaseClient, day?: string): Promise<string> {
-  const days = day ? [day] : Array.from({ length: 7 }, (_, i) => dublinDay(i + 1));
-  const lines: string[] = [];
-  for (const d of days) {
-    const free = await freeWindows(sb, d);
-    const label = new Date(`${d}T12:00:00`).toLocaleDateString('en-IE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'short',
-    });
-    lines.push(free.length ? `${label} (${d}): ${free.join(', ')}` : `${label} (${d}): fully booked`);
-  }
-  const total = (
-    await Promise.all(days.map((d) => freeWindows(sb, d)))
-  ).reduce((n, w) => n + w.length, 0);
-  lines.push(`Total free windows in this range: ${total}.`);
-  return lines.join('\n') || 'No bookable days found.';
-}
-
-
-/** Tell the owner a conversation needs him, quoting the customer verbatim. */
-async function notifyOwnerHandover(
-  waId: string,
-  name: string | undefined,
-  text: string,
-  reason: string,
-): Promise<void> {
+/** The loud, pinned alert: the customer asked for Alex or is unhappy. */
+async function notifyOwnerHandover(waId: string, name: string | undefined, text: string, reason: string): Promise<void> {
   const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   await sendOwnerAlert(
     `${name ? `<b>${esc(name)}</b> · ` : ''}<code>+${waId}</code>\n\n` +
@@ -108,25 +241,12 @@ async function notifyOwnerHandover(
   );
 }
 
-const BOOKING_LINK = 'https://www.bmwcoding.ie/#contact';
-
 /**
- * Hand the chat to Alex: stand the assistant down in this chat (sticky — he
- * turns it back on) and send him the loud, pinned alert with the customer's
- * own words.
+ * Hand the chat to Alex: stand the assistant down for six hours (it picks the
+ * chat back up after that if he has not — a permanent stop is only ever his
+ * own "Stop AI here") and send him the pinned alert with the customer's words.
  */
-async function handOverNow(
-  sb: SupabaseClient,
-  waId: string,
-  name: string | undefined,
-  text: string,
-  reason: string,
-): Promise<void> {
-  // Stand down for six hours, then pick the chat back up if he has not — the
-  // owner's own rule. This used to set a permanent pause, so every handover
-  // silenced a customer for good: five of six real chats in two days were
-  // stuck that way, one with eleven unanswered questions. A permanent stop is
-  // now only ever Alex's own "Stop AI here".
+async function handOverNow(sb: SupabaseClient, waId: string, name: string | undefined, text: string, reason: string): Promise<void> {
   await sb
     .from('wa_chats')
     .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() })
@@ -135,549 +255,113 @@ async function handOverNow(
 }
 
 /**
- * Days, times and "tonight"-style words: a request only Alex can answer.
- * Deliberately no "sat" (sat nav is one of the commonest things BMW owners
- * ask about), no "sun" and no "now" ("how much now?").
- */
-const TIME_WORDS =
-  /\b(tonight|today|tomorrow|this (?:evening|morning|afternoon|weekend)|monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thu|thur|thurs|fri|weekend|asap)\b|\b\d{1,2}(?:[:.]\d{2})?\s*(?:-|–|to|till|until)\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?\b|\b\d{1,2}\s*(?:am|pm)\b|\b\d{1,2}[:.]\d{2}\b/i;
-
-/** Asking for a person, or plainly fed up with the bot. */
-const WANTS_HUMAN =
-  /\b(human|real person|actual person|someone real|speak to|talk to|call me|ring me|phone me|give me a call|manager|bot|robot|ai\b|a\.i|yoke|useless|stupid|annoying|ridiculous|going (?:round|around) in circles|doing my head|not helpful|pointless|forget it|nevermind|never mind|wtf|ffs)\b/i;
-
-/**
- * The cases a model reply has already got wrong in front of customers. Checked
- * before the model is called; when one matches, the customer gets one fixed,
- * friendly line and Alex gets the alert.
- */
-function handoverTrigger(text: string): { reason: string; line: string } | null {
-  // The one case that is always Alex's: they asked for him, or they are fed up
-  // with talking to a bot. Anything else the assistant keeps helping with —
-  // going silent on a customer mid-conversation felt worse than the bot.
-  if (WANTS_HUMAN.test(text.trim())) {
-    return {
-      reason: 'Customer asked for a person or is frustrated with the assistant',
-      line: "No problem — I've let Alex know and he'll reply here shortly. 👍",
-    };
-  }
-  return null;
-}
-
-/** The time words the customer used, e.g. "tonight 7-9pm", or '' if none. */
-function requestedTime(text: string): string {
-  const found = text.match(new RegExp(TIME_WORDS.source, 'gi')) ?? [];
-  return [...new Set(found.map((f) => f.trim()))].join(' ').slice(0, 40);
-}
-
-const LEAD_TOOL: Anthropic.Tool = {
-  name: 'save_lead',
-  description:
-    'Record this customer as a lead when they state a concrete service request or booking intent. Call at most once per conversation.',
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      name: { type: 'string', description: 'Customer name if known' },
-      bmw_model: { type: 'string', description: 'Car model/year if mentioned' },
-      service: { type: 'string', description: 'What they want, short' },
-      note: { type: 'string', description: 'Useful context from the chat' },
-    },
-    required: ['service'],
-  },
-};
-
-
-const AVAILABILITY_TOOL: Anthropic.Tool = {
-  name: 'check_availability',
-  description:
-    "Look up the real free time slots. Call this before suggesting any time — never invent availability. Omit 'date' to get the next seven days.",
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      date: { type: 'string', description: 'A single day to check, YYYY-MM-DD' },
-    },
-  },
-};
-
-const BOOK_TOOL: Anthropic.Tool = {
-  name: 'book_slot',
-  description:
-    "Provisionally book a free slot for the customer. Only use a date and time that check_availability returned. The booking is pending until the owner confirms — tell the customer exactly that.",
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      date: { type: 'string', description: 'YYYY-MM-DD' },
-      time: { type: 'string', description: 'The window exactly as returned, e.g. "19:00–21:00"' },
-      name: { type: 'string', description: 'Customer name' },
-      service: { type: 'string', description: 'What is being booked' },
-      bmw_model: { type: 'string', description: 'Car model/year if known' },
-    },
-    required: ['date', 'time', 'name', 'service'],
-  },
-};
-
-
-
-const HANDOVER_TOOL: Anthropic.Tool = {
-  name: 'hand_over',
-  description:
-    "Stop answering and pass this conversation to Alex. Use it whenever the message is outside BMW coding/diagnostics/retrofits/booking, refers to a conversation you cannot see, disputes something, or you are not certain. Calling this is always safer than improvising.",
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      reason: { type: 'string', description: 'Why this needs Alex, one short line' },
-    },
-    required: ['reason'],
-  },
-};
-
-const REMEMBER_TOOL: Anthropic.Tool = {
-  name: 'remember',
-  description:
-    "Store the durable facts about this customer so you still know them next time: name, car (model + year), head unit, what they want, anything agreed. Call this the moment you learn something new. Pass the COMPLETE up-to-date set of facts each time — it replaces what was stored. Keep it under 400 characters.",
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      facts: { type: 'string', description: 'e.g. "Alex, 2016 F30 NBT Evo, wants CarPlay (€150), prefers evenings"' },
-    },
-    required: ['facts'],
-  },
-};
-
-/**
- * The open, slot-less enquiry we already have for this customer, if any.
- *
- * The model calls save_lead again whenever it learns something new, which used
- * to mean a fresh row each time and the same person listed three times in the
- * daily agenda. One conversation is one enquiry until Alex closes it.
+ * The open, slot-less enquiry we already have for this customer, if any. One
+ * conversation is one enquiry until Alex closes it — the model reports the
+ * lead again whenever it learns something new, and that must update the row,
+ * not list the same person three times.
  */
 async function openLeadFor(
   sb: SupabaseClient,
   contact: string,
-): Promise<{ id: number; public_token?: string; service?: string; bmw_model?: string; message?: string } | null> {
+): Promise<{ id: number; service?: string; bmw_model?: string; message?: string } | null> {
   const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
   const { data } = await sb
     .from('bookings')
-    .select('id, public_token, service, bmw_model, message')
+    .select('id, service, bmw_model, message')
     .eq('contact', contact)
     .eq('status', 'pending')
     .is('slot_date', null)
     .gt('created_at', since)
     .order('created_at', { ascending: false })
     .limit(1);
-  const row = (data ?? [])[0] as
-    | { id: number; public_token?: string; service?: string; bmw_model?: string; message?: string }
-    | undefined;
-  return row ?? null;
+  return ((data ?? [])[0] as { id: number; service?: string; bmw_model?: string; message?: string } | undefined) ?? null;
+}
+
+async function saveLead(sb: SupabaseClient, waId: string, contact: string, profileName: string | undefined, lead: WaLead): Promise<void> {
+  const name = lead.name || profileName || `WhatsApp ${waId}`;
+  const open = await openLeadFor(sb, contact).catch(() => null);
+  if (open) {
+    // Keep whatever we learned, drop nothing we already knew. No second
+    // Telegram card: the WhatsApp mirror already shows the conversation.
+    await sb
+      .from('bookings')
+      .update({
+        name,
+        bmw_model: lead.bmw_model || open.bmw_model || '',
+        service: lead.service || open.service || '',
+        message: lead.note || open.message || '',
+      })
+      .eq('id', open.id)
+      .then(() => undefined, () => undefined);
+    return;
+  }
+  const note = withOfferNote(lead.note);
+  const ins = await sb
+    .from('bookings')
+    .insert({ name, contact, bmw_model: lead.bmw_model, service: lead.service, message: note, source: 'WhatsApp AI', status: 'pending' })
+    .select('id')
+    .single();
+  const id = (ins.data as { id: number } | null)?.id;
+  const cl = contact.startsWith('+') ? await ensureClient(sb, contact, name).catch(() => null) : null;
+  // Never lose a lead: Telegram is told even when the row could not be saved.
+  await notifyTelegram({
+    name,
+    contact,
+    bmw_model: lead.bmw_model,
+    service: lead.service,
+    message: note,
+    slot_date: null,
+    slot_time: '',
+    source: '🤖 WhatsApp AI',
+    id,
+    persisted: Boolean(id),
+    clientNote: cl ? `🆔 <b>Client:</b> ${clientCode(cl.id)}` : undefined,
+  }).catch(() => undefined);
 }
 
 /**
- * Produce the agent's reply for an inbound WhatsApp message, persisting a
- * lead (booking + client + owner notification) when the model captures one.
- * `text` is the message just received; history is read from wa_messages.
+ * The assistant's answer to what the customer just sent: reads the chat,
+ * asks the model, saves the lead and raises the alert when it is urgent.
+ * `reply` may be empty — some messages are Alex's, or need no answer.
  */
-// The facts the assistant saves with `remember` (car, year, head unit, what
-// was agreed). Kept in app_config under one key per chat, so long chats keep
-// them after the messages that carried them fall out of the 16-message
-// window — and no migration is needed for it.
-const memoryKey = (waId: string) => `wa_memory:${waId}`;
-
-async function loadWaMemory(sb: SupabaseClient, waId: string): Promise<string> {
-  const { data } = await sb.from('app_config').select('value').eq('key', memoryKey(waId)).maybeSingle();
-  return (data as { value?: string } | null)?.value ?? '';
-}
-
-async function saveWaMemory(sb: SupabaseClient, waId: string, facts: string): Promise<void> {
-  await sb.from('app_config').upsert({ key: memoryKey(waId), value: facts }).then(() => undefined, () => undefined);
-}
-
 export async function generateWaReply(
   sb: SupabaseClient,
   waId: string,
   text: string,
   profileName?: string,
-  /** Model id; Opus by default. */
-  model = 'claude-opus-5',
   /** How the customer is addressed in the CRM — a +number, or an id label
    *  when the transport gives us no phone (then no client record is made). */
   contact = `+${waId}`,
   /** Photo the customer just sent (e.g. their iDrive home screen). */
   imageUrl?: string,
-  /** Facts remembered from earlier messages (survives even without a DB). */
-  priorMemory?: string,
-): Promise<{ reply: string; memory: string; askedTime?: string }> {
-  // Newest 16, then put back in order. This used to read the OLDEST 14, so in
-  // any longer chat the model never saw what the customer had just said — it
-  // kept answering the start of the conversation, which is exactly what
-  // "going round in circles" looks like from the other side.
-  const [{ data: history }, stored, pastJobs] = await Promise.all([
-    sb.from('wa_messages').select('role, content, via, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(16),
-    priorMemory === undefined ? loadWaMemory(sb, waId).catch(() => '') : Promise.resolve(priorMemory),
+): Promise<{ reply: string; notify: string; urgent: boolean }> {
+  const [{ data: history }, pastJobs, image] = await Promise.all([
+    sb.from('wa_messages').select('role, content, via, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(30),
     /^\+?\d{8,15}$/.test(contact) ? historyForAssistant(sb, contact).catch(() => '') : Promise.resolve(''),
+    imageUrl ? fetchImage(imageUrl) : Promise.resolve(null),
   ]);
-  priorMemory = stored || undefined;
-  const recent = ((history ?? []) as { role: string; content: string; via?: string | null; created_at?: string }[])
-    .slice()
+  const rows = ((history ?? []) as { role: string; content: string; via?: string | null; created_at: string }[])
+    .filter((m) => m.content?.trim())
     .reverse();
 
-  // Decided in code, before any model call: the situations where a model
-  // reply has already cost customers. A handover here is instant, identical
-  // every time, and cannot be talked out of.
-  // "Hi Alex", "thanks Alex": they are talking to him, usually because he has
-  // already replied from his phone (which never reaches us). Butting in there
-  // is exactly what he asked the assistant never to do, so stay silent, and
-  // stand down for six hours as if he had pressed "I'll reply".
-  if (/\balex\b/i.test(text)) {
-    await sb
-      .from('wa_chats')
-      .upsert({ wa_id: waId, owner_replied_at: new Date().toISOString() })
-      .then(() => undefined, () => undefined);
-    return { reply: '', memory: priorMemory ?? '' };
+  // Everything the customer sent since the last reply is answered together.
+  let split = rows.length;
+  while (split > 0 && rows[split - 1].role === 'user') split -= 1;
+  const fresh = rows.slice(split).map((m) => ({ at: m.created_at, text: m.content }));
+  if (!fresh.length) fresh.push({ at: new Date().toISOString(), text });
+  const turns: WaTurn[] = rows.slice(0, split).map((m) => ({
+    at: m.created_at,
+    who: m.role === 'user' ? 'customer' : m.via === 'owner' ? 'alex' : 'assistant',
+    text: m.content.replace(/^\[Alex\]\s*/, ''),
+  }));
+
+  const decision = await decideWaReply({ turns, fresh, profileName, pastJobs: pastJobs || undefined, image });
+
+  if (decision.lead?.service) await saveLead(sb, waId, contact, profileName, decision.lead).catch(() => undefined);
+  if (decision.urgent) {
+    await handOverNow(sb, waId, profileName, fresh.map((m) => m.text).join('\n'), decision.notify_alex || 'The customer asked for you');
   }
-
-  const trigger = handoverTrigger(text);
-  if (trigger) {
-    await handOverNow(sb, waId, profileName, text, trigger.reason);
-    return { reply: trigger.line, memory: priorMemory ?? '' };
-  }
-
-  // A specific time is Alex's to confirm, but the rest of their message still
-  // deserves an answer — the assistant carries on, told exactly how to handle
-  // the time part, and the mirror in Telegram flags it. (It used to be a loud
-  // pinned alert of its own, fired by any "tomorrow" or "fri".)
-  const when = requestedTime(text);
-
-  const messages = recent
-    .filter((m) => m.content?.trim())
-    .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
-  if (!messages.length || messages[messages.length - 1].role !== 'user') {
-    messages.push({ role: 'user', content: text });
-  }
-
-  // If the customer just repeated themselves, our previous reply missed the
-  // point — saying the same thing again is the worst possible response.
-  const priorUser = [...messages].reverse().find((m, i) => i > 0 && m.role === 'user');
-  const repeated = Boolean(priorUser && priorUser.content.trim() === text.trim());
-  const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant')?.content ?? '';
-
-  const client = new Anthropic();
-  const known = [
-    profileName ? `WhatsApp profile name: ${profileName} (use it — do not ask their name unless it is clearly not a real one)` : '',
-    priorMemory ? priorMemory : '',
-    pastJobs
-      ? `Their history with us (our booking records, newest first): ${pastJobs}. Use it so you never ask again for a car we already know; mention it only when it helps (e.g. "last time we did CarPlay on your F30").`
-      : '',
-  ]
-    .filter(Boolean)
-    .join('\n');
-  // Whether to say hello is decided here, not left to the model: it saw old
-  // history (or nothing it recognised as a start) and skipped the greeting on
-  // a customer's first message. First contact → greet and say it is the AI
-  // assistant; back after a break → a short "hi again"; mid-chat → no hello.
-  const lastAiAt = [...recent].reverse().find((m) => m.role === 'assistant' && m.created_at)?.created_at;
-  const sinceAi = lastAiAt ? Date.now() - new Date(lastAiAt).getTime() : Infinity;
-  const firstName = (profileName || '').trim().split(/\s+/)[0];
-  const greeting =
-    sinceAi === Infinity
-      ? `GREETING: this is your first message to this customer. Open with a short hello${
-          firstName ? ` using their first name (${firstName})` : ''
-        } and say once that you're the AI assistant for BMW Coding IE, then answer.`
-      : sinceAi > 12 * 60 * 60 * 1000
-        ? `GREETING: they are coming back after a break. Open with a short friendly "Hi again${
-            firstName ? ` ${firstName}` : ''
-          }!" — no need to introduce yourself again — then answer.`
-        : 'GREETING: you are mid-conversation. No hello, just carry on.';
-  const notes = [
-    greeting,
-    known ? `WHAT YOU ALREADY KNOW ABOUT THIS CUSTOMER (do not ask again):\n${known}` : '',
-    lastAssistant
-      ? `YOUR PREVIOUS MESSAGE (do not repeat it — say something new):\n${lastAssistant.slice(0, 600)}`
-      : '',
-    repeated
-      ? 'The customer has just sent the same message again, which means your last reply did not answer them. Read their message carefully, answer the actual question, and do not ask anything they have already told you.'
-      : '',
-    when
-      ? `The customer asked for a specific time ("${when}"). You cannot see the diary, so do not confirm, reject or suggest any time. Say Alex confirms times personally and has already been told they asked for ${when}, and give the booking link. Answer the rest of their message normally.`
-      : '',
-  ].filter(Boolean);
-  const system = notes.length ? `${WHATSAPP_PROMPT}\n\n${notes.join('\n\n')}` : WHATSAPP_PROMPT;
-  let memory = priorMemory ?? '';
-  const convo: Anthropic.MessageParam[] = messages.map((m) => ({ role: m.role, content: m.content }));
-
-  // A photo (usually the iDrive home screen) goes in with the latest message —
-  // identifying the head unit from the UI is what decides the price.
-  if (imageUrl) {
-    const img = await fetchImage(imageUrl);
-    if (img) {
-      const last = convo[convo.length - 1];
-      const caption = typeof last?.content === 'string' ? last.content : text;
-      convo[convo.length - 1] = {
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: img.media_type, data: img.data } },
-          { type: 'text', text: caption || 'Photo from the customer.' },
-        ],
-      };
-    }
-  }
-
-  // Save a lead / book a slot / read the diary. The model may need two or
-  // three turns (check availability → offer times → book), so loop instead of
-  // handling a single tool call.
-  let reply = '';
-  let usedTool = false;
-  let handedOver = false;
-
-  // If the chosen model is overloaded or errors, answer with the next one
-  // down rather than leave a customer with nothing. Accuracy rules are in the
-  // prompt, so the fallback follows the same ones.
-  const FALLBACK_MODEL = 'claude-sonnet-5';
-  // Each attempt is capped. Uncapped, a slow answer simply ran until the
-  // platform killed the function at 60 seconds — no reply, no error, no
-  // warning to Alex. Capped, a slow primary falls back in time, and if both
-  // fail the caller gets an error it can report.
-  const create = async (params: Omit<Anthropic.MessageCreateParamsNonStreaming, 'model'>) => {
-    try {
-      return await client.messages.create({ ...params, model }, { timeout: 25_000, maxRetries: 0 });
-    } catch (e) {
-      if (model === FALLBACK_MODEL) throw e;
-      console.warn('[waAgent] primary model failed or too slow, falling back:', e instanceof Error ? e.message : e);
-      return await client.messages.create({ ...params, model: FALLBACK_MODEL }, { timeout: 20_000, maxRetries: 1 });
-    }
-  };
-
-  for (let round = 0; round < 4; round++) {
-    const response: Anthropic.Message = await create({
-      // Room for the tool calls AND the text: the model writes its notes
-      // (remember / save_lead) before the reply, and a tight ceiling spent on
-      // them cut a customer's answer off mid-word.
-      max_tokens: 700,
-      system,
-      messages: convo,
-      // No diary tools. Given a calendar, the model did date arithmetic in its
-      // head and got it wrong in front of customers ("tonight is Friday, we're
-      // open" then "we're not open Friday evenings"). The live slots are on the
-      // website; its only job is to send people there.
-      // No "remember" tool any more: it made the model write a paragraph of
-      // notes before every reply, which on the larger model doubled the wait.
-      // It now reads the newest messages directly, so the notes were redundant.
-      tools: [LEAD_TOOL, HANDOVER_TOOL],
-    });
-
-    let text = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('')
-      .trim();
-    // Never send half a sentence. If the ceiling was hit, keep what ends
-    // cleanly; if nothing does, ask again rather than send a fragment.
-    if (text && response.stop_reason === 'max_tokens') {
-      const cut = Math.max(text.lastIndexOf('. '), text.lastIndexOf('! '), text.lastIndexOf('? '));
-      text = cut > 40 ? text.slice(0, cut + 1).trim() : '';
-    }
-    if (text) reply = text;
-
-    const calls = response.content.filter(
-      (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use',
-    );
-    if (!calls.length) break;
-    usedTool = true;
-
-    convo.push({ role: 'assistant', content: response.content });
-    const results: Anthropic.ToolResultBlockParam[] = [];
-
-    for (const call of calls) {
-      let result = 'done';
-
-      if (call.name === 'check_availability') {
-        const { date } = call.input as { date?: string };
-        const day = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : undefined;
-        result = await availabilityText(sb, day);
-      }
-
-      if (call.name === 'book_slot') {
-        const inp = call.input as {
-          date?: string; time?: string; name?: string; service?: string; bmw_model?: string;
-        };
-        const day = String(inp.date ?? '');
-        const time = String(inp.time ?? '').trim();
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) {
-          result = 'Rejected: date must be YYYY-MM-DD.';
-        } else if (day <= dublinDay(0)) {
-          result = 'Rejected: that day is in the past — offer a future date.';
-        } else {
-          const free = await freeWindows(sb, day);
-          if (!free.includes(time)) {
-            result = free.length
-              ? `Rejected: "${time}" is not free. Free that day: ${free.join(', ')}.`
-              : `Rejected: nothing free on ${day}.`;
-          } else {
-            const bookName =
-              String(inp.name ?? '').trim().slice(0, 120) || profileName || `WhatsApp ${waId}`;
-            const service = String(inp.service ?? '').trim().slice(0, 160);
-            const bmw_model = String(inp.bmw_model ?? '').trim().slice(0, 160);
-            const isPhone = contact.startsWith('+');
-            const cl = isPhone ? await ensureClient(sb, contact, bookName).catch(() => null) : null;
-            const status = cl?.banned ? 'declined' : 'pending';
-            // The enquiry this customer already has becomes the booking, rather
-            // than sitting beside it as a second entry in the agenda.
-            const open = await openLeadFor(sb, contact).catch(() => null);
-            let row: { id: number; public_token?: string } | null = null;
-            if (open) {
-              const upd = await sb
-                .from('bookings')
-                .update({
-                  name: bookName,
-                  bmw_model: bmw_model || open.bmw_model || '',
-                  service: service || open.service || '',
-                  slot_date: day,
-                  slot_time: time,
-                  status,
-                })
-                .eq('id', open.id)
-                .select('id, public_token')
-                .single();
-              row = (upd.data as { id: number; public_token?: string } | null) ?? {
-                id: open.id,
-                public_token: open.public_token,
-              };
-            } else {
-              const ins = await sb
-                .from('bookings')
-                .insert({
-                  name: bookName,
-                  contact,
-                  bmw_model,
-                  service,
-                  message: withOfferNote(''),
-                  slot_date: day,
-                  slot_time: time,
-                  source: 'WhatsApp AI',
-                  status,
-                })
-                .select('id, public_token')
-                .single();
-              row = ins.data as { id: number; public_token?: string } | null;
-            }
-            const id = row?.id;
-            const token = row?.public_token;
-            await notifyTelegram({
-              name: bookName,
-              contact,
-              bmw_model,
-              service,
-              message: withOfferNote(''),
-              slot_date: day,
-              slot_time: time,
-              source: '🤖 WhatsApp AI — slot requested',
-              id,
-              public_token: token,
-              persisted: Boolean(id),
-              clientNote: cl?.banned
-                ? `⛔️ <b>BLACKLISTED</b> · ${clientCode(cl.id)} — auto-declined`
-                : cl
-                  ? `🆔 <b>Client:</b> ${clientCode(cl.id)}`
-                  : undefined,
-            }).catch(() => undefined);
-            const track = token ? ` Give them this live status link: ${SITE_URL}/b/${token}` : '';
-            result =
-              `Booked provisionally: ${day} ${time}. Tell the customer it is pending until Alex confirms, ` +
-              `and that he will message shortly.${track}`;
-          }
-        }
-      }
-
-      if (call.name === 'hand_over') {
-        const reason = String((call.input as { reason?: string }).reason ?? '').slice(0, 300);
-        // Go quiet for six hours so Alex owns the conversation, and tell him
-        // immediately — with the customer's own words, not our summary.
-        // Sticky, not a six-hour nap: these are exactly the chats where a
-        // later "helpful" message contradicts Alex. He reopens it explicitly.
-        await handOverNow(sb, waId, profileName, text, reason);
-        handedOver = true;
-        result = 'Handed to Alex. Say only the holding line and nothing else.';
-      }
-
-      if (call.name === 'remember') {
-        const facts = String((call.input as { facts?: string }).facts ?? '').trim().slice(0, 400);
-        if (facts) memory = facts;
-        result = 'Noted.';
-      }
-
-      if (call.name === 'save_lead') {
-        const inp = call.input as { name?: string; bmw_model?: string; service?: string; note?: string };
-        const leadName =
-          String(inp.name ?? '').trim().slice(0, 120) || profileName || `WhatsApp ${waId}`;
-        const bmw_model = String(inp.bmw_model ?? '').trim().slice(0, 160);
-        const service = String(inp.service ?? '').trim().slice(0, 160);
-        const note = withOfferNote(String(inp.note ?? '').trim().slice(0, 1000));
-        const isPhone = contact.startsWith('+');
-        const open = await openLeadFor(sb, contact).catch(() => null);
-        if (open) {
-          // Keep whatever we learned, drop nothing we already knew.
-          await sb
-            .from('bookings')
-            .update({
-              name: leadName,
-              bmw_model: bmw_model || open.bmw_model || '',
-              service: service || open.service || '',
-              message: note || open.message || '',
-            })
-            .eq('id', open.id)
-            .then(() => undefined, () => undefined);
-          result = 'Already saved earlier in this chat — details updated. Do not mention it again.';
-        } else {
-          const ins = await sb
-            .from('bookings')
-            .insert({
-              name: leadName,
-              contact,
-              bmw_model,
-              service,
-              message: note,
-              source: 'WhatsApp AI',
-              status: 'pending',
-            })
-            .select('id')
-            .single();
-          const id = (ins.data as { id: number } | null)?.id;
-          const cl = isPhone ? await ensureClient(sb, contact, leadName).catch(() => null) : null;
-          await notifyTelegram({
-            name: leadName,
-            contact,
-            bmw_model,
-            service,
-            message: note,
-            slot_date: null,
-            slot_time: '',
-            source: '🤖 WhatsApp AI',
-            id,
-            persisted: Boolean(id),
-            clientNote: cl ? `🆔 <b>Client:</b> ${clientCode(cl.id)}` : undefined,
-          }).catch(() => undefined);
-          result = 'Lead saved — the team has the details.';
-        }
-      }
-
-      results.push({ type: 'tool_result', tool_use_id: call.id, content: result });
-    }
-
-    convo.push({ role: 'user', content: results });
-    // The tools are notes and alerts — their results never change what the
-    // customer should read. Once there is a reply, stop: a second model call
-    // just to "acknowledge" a note doubled the wait for the customer.
-    if (reply) break;
-  }
-
-  if (handedOver) {
-    // One neutral line: never contradict the customer, never explain ourselves.
-    reply = "Passing this to Alex now — he'll reply here shortly. 👍";
-  } else if (!reply && usedTool) {
-    reply = `Got it — Alex will confirm with you shortly. You can also pick a time here: ${BOOKING_LINK}`;
-  }
-  if (memory && memory !== (priorMemory ?? '')) await saveWaMemory(sb, waId, memory);
-  if (!reply) throw new Error('empty AI reply');
-  return { reply, memory, askedTime: when || undefined };
+  return { reply: decision.reply, notify: decision.notify_alex, urgent: decision.urgent };
 }
 
 const SERVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -689,7 +373,7 @@ const SERVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
 export async function answerPendingWaMessage(
   sb: SupabaseClient,
   waId: string,
-): Promise<{ text: string; reply: string; sendError?: string; aiError?: string; askedTime?: string } | null> {
+): Promise<{ text: string; reply: string; sendError?: string; aiError?: string; notify?: string } | null> {
   const [{ data: recent }, { data: chat }] = await Promise.all([
     sb.from('wa_messages').select('role, content, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(6),
     sb.from('wa_chats').select('name').eq('wa_id', waId).maybeSingle(),
@@ -703,17 +387,17 @@ export async function answerPendingWaMessage(
   const text = row.content;
   const name = (chat as { name?: string | null } | null)?.name || undefined;
   let reply = '';
-  let askedTime: string | undefined;
+  let notify: string | undefined;
   try {
-    const out = await generateWaReply(sb, waId, text, name, 'claude-opus-5', `+${waId}`);
+    const out = await generateWaReply(sb, waId, text, name, `+${waId}`);
     reply = out.reply.trim();
-    askedTime = out.askedTime;
+    notify = out.notify || undefined;
   } catch (e) {
     return { text, reply: '', aiError: e instanceof Error ? e.message : String(e) };
   }
-  if (!reply) return { text, reply };
+  if (!reply) return { text, reply, notify };
   const sent = await sendWhatsAppText(waId, reply);
-  if (!sent.ok) return { text, reply, sendError: sent.error || 'send failed', askedTime };
+  if (!sent.ok) return { text, reply, sendError: sent.error || 'send failed', notify };
   await sb.from('wa_messages').insert({ msg_id: sent.id || `out:resume:${waId}:${Date.now()}`, wa_id: waId, role: 'assistant', content: reply, via: 'ai' });
-  return { text, reply, askedTime };
+  return { text, reply, notify };
 }

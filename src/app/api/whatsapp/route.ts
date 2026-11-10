@@ -35,6 +35,25 @@ export const maxDuration = 60;
 const ok = () => NextResponse.json({ ok: true });
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const STAND_DOWN_MS = 6 * 60 * 60 * 1000;
+// People send a thought as three messages, or four photos in a row. Each one
+// used to get its own (near-identical) answer. Now a message waits this long,
+// and only the newest in the chat is answered — with all of them in view.
+const BURST_WAIT_MS = 6000;
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/** Has the assistant already said this (by its opening words) in this chat recently? */
+async function saidRecently(sb: SupabaseClient, waId: string, opening: string, hours: number): Promise<boolean> {
+  const since = new Date(Date.now() - hours * 3600000).toISOString();
+  const { data } = await sb
+    .from('wa_messages')
+    .select('msg_id')
+    .eq('wa_id', waId)
+    .eq('role', 'assistant')
+    .gt('created_at', since)
+    .like('content', `${opening}%`)
+    .limit(1);
+  return Boolean(data?.length);
+}
 
 // ── Verification handshake (Meta GETs this once when the webhook is saved) ──
 export async function GET(req: Request) {
@@ -74,7 +93,7 @@ export async function GET(req: Request) {
       ok: true,
       // Deploy marker: bump it in a redeploy-only commit, then check it here
       // to know the new build (and new env values) are live.
-      v: 113,
+      v: 114,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
@@ -333,6 +352,11 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     .insert({ msg_id: msg.id, wa_id: waId, role: 'user', content: photo && text ? `[photo] ${text}` : stored, via: 'customer' });
   if (insErr?.code === '23505') return;
 
+  // A 👍 on one of our messages, or a sticker, is not something to answer —
+  // it used to get "I can't open attachments, passing it to Alex" and stand
+  // the assistant down for six hours.
+  if (msg.type === 'reaction' || msg.type === 'sticker') return;
+
   void ensureClient(sb, who, name || undefined).catch(() => null);
 
   // Chat state and the global switch in one go.
@@ -358,7 +382,10 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   // "unsupported" message with no images). Ask for them one at a time and
   // keep the chat with the assistant: it reads single photos fine.
   if (msg.type === 'unsupported') {
-    if (!paused && !aiOff) {
+    // Once per chat in twelve hours: on 9 Nov one customer got this line six
+    // times in two minutes, one per item of the album.
+    const asked = !paused && !aiOff && !(await saidRecently(sb, waId, "Sorry — that one didn't come through", 12).catch(() => false));
+    if (asked) {
       const line =
         "Sorry — that one didn't come through to me: WhatsApp doesn't pass photo albums to the assistant. Could you send the photos again one at a time? Then I can read them straight away 👍";
       const sent = await sendWhatsAppText(waId, line);
@@ -367,7 +394,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     const why = msg.errors?.[0]?.title || msg.errors?.[0]?.message || msg.unsupported?.type || 'unsupported';
     await sendOwnerWithMarkup(
       `${head}\n📎 <i>sent something WhatsApp does not pass to the assistant (${esc(why)} — usually several photos at once). ${
-        !paused && !aiOff ? 'It asked them to resend one photo at a time.' : 'Open WhatsApp to see it.'
+        asked ? 'It asked them to resend one photo at a time.' : 'Open WhatsApp to see it.'
       }</i>`,
       { inline_keyboard: [controls, numberRow] },
       'whatsapp',
@@ -379,7 +406,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   // tell the customer Alex will look, hand the chat to him, mirror it.
   const unreadable = msg.type !== 'text' && !photo && !text;
   if (unreadable) {
-    if (!paused && !aiOff) {
+    if (!paused && !aiOff && !(await saidRecently(sb, waId, 'Got that 👍 I can', 6).catch(() => false))) {
       const line =
         "Got that 👍 I can't open attachments here, so I'm passing it straight to Alex — he will look at it himself and come back to you shortly.";
       const sent = await sendWhatsAppText(waId, line);
@@ -399,22 +426,40 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   let reply = '';
   let aiError = '';
   let skipped = '';
-  let askedTime = '';
+  let notify = '';
+  let urgent = false;
   if (aiOff) skipped = '🔇 The assistant is off for every chat — <code>/wa on all</code> switches it back.';
   else if (ownerHandling) skipped = '✋ You are handling this chat — the assistant stays quiet for 6h from your last reply.';
   else if (paused) skipped = '⏸ AI paused for this chat — replies handled by you.';
   else if (isRateLimited(`wa-ai:${waId}`, 20, 60 * 60 * 1000)) skipped = '🤖 Hourly limit for this chat reached — reply yourself.';
   else {
-    try {
-      // A photo goes to the model as an image (their iDrive screen, a dash
-      // warning); fetched here because the media URL needs our bearer token.
-      let imageUrl: string | undefined;
-      if (photo?.id) imageUrl = (await downloadWhatsAppMedia(photo.id))?.dataUrl;
-      const out = await generateWaReply(sb, waId, text || 'Photo attached.', name || undefined, 'claude-opus-5', who, imageUrl);
-      reply = out.reply.trim();
-      askedTime = out.askedTime ?? '';
-    } catch (e) {
-      aiError = e instanceof Error ? e.message : String(e);
+    // Wait a moment: if they are still typing, the newest message's turn
+    // answers everything at once and this one stays quiet.
+    await sleep(BURST_WAIT_MS);
+    const { data: newest } = await sb
+      .from('wa_messages')
+      .select('msg_id, role, via')
+      .eq('wa_id', waId)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    const latest = (newest as { msg_id: string; role: string; via: string | null }[] | null)?.[0];
+    if (latest && latest.role === 'user' && latest.msg_id !== msg.id) {
+      skipped = '↪︎ Answered together with their next message.';
+    } else if (latest && latest.via === 'owner') {
+      skipped = '✋ You answered this one yourself — the assistant stayed quiet.';
+    } else {
+      try {
+        // A photo goes to the model as an image (their iDrive screen, a VIN
+        // plate); fetched here because the media URL needs our bearer token.
+        let imageUrl: string | undefined;
+        if (photo?.id) imageUrl = (await downloadWhatsAppMedia(photo.id))?.dataUrl;
+        const out = await generateWaReply(sb, waId, text || 'Photo attached.', name || undefined, who, imageUrl);
+        reply = out.reply.trim();
+        notify = out.notify;
+        urgent = out.urgent;
+      } catch (e) {
+        aiError = e instanceof Error ? e.message : String(e);
+      }
     }
   }
 
@@ -439,12 +484,11 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
     lines.push(
       `❌ <b>WhatsApp refused to send the answer</b> — the customer got nothing. Copy it and send from your phone:\n<pre>${esc(reply.slice(0, 3000))}</pre>\n<code>${esc(sendError.slice(0, 300))}</code>`,
     );
-  if (!reply && !aiError && !skipped && text && /\balex\b/i.test(text))
-    lines.push("👋 They're talking to you by name — the assistant stayed quiet and stands down for 6h.");
-  else if (!reply && !aiError && !skipped) lines.push('🤫 The assistant chose not to answer this one — it is yours.');
+  if (notify) lines.push(`👉 <b>For you:</b> ${esc(notify)}`);
+  if (!reply && !aiError && !skipped) lines.push(notify ? '🤫 The assistant left this one to you.' : '🤫 Nothing to answer here — the assistant stayed quiet.');
+  if (urgent) lines.push('🚨 Marked urgent — the assistant stands down here for 6h.');
   if (aiError) lines.push(`⚠️ <b>The assistant could not answer</b> — the customer got no reply. Answer them yourself.\n<code>${esc(aiError.slice(0, 200))}</code>`);
   if (skipped) lines.push(skipped);
-  if (askedTime) lines.push(`⏰ <b>Asked for a specific time: ${esc(askedTime)}</b> — the assistant told them you confirm times yourself.`);
   const copyRow = sendError ? [[{ text: '📋 Copy answer', copy_text: { text: reply.slice(0, 256) } }]] : [];
   // The customer got no answer → 🚨 Срочно; otherwise the WhatsApp topic.
   await sendOwnerWithMarkup(lines.join('\n'), { inline_keyboard: [...copyRow, controls, numberRow] }, aiError || sendError ? 'urgent' : 'whatsapp');

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { decideWaReply, renderContext, type WaContext, type WaTurn } from '@/lib/waAgentNext';
+import { decideWaReply, renderContext, type WaContext, type WaTurn } from '@/lib/waAgent';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,6 +17,8 @@ type Case = {
   turns?: { m: number; who: 'c' | 'ai' | 'alex'; text: string }[];
   /** The new message(s) being answered. */
   fresh: string[];
+  /** A photo sent with the newest message (base64). */
+  image?: { media_type: 'image/jpeg' | 'image/png' | 'image/webp'; data: string };
 };
 
 export async function POST(req: Request) {
@@ -36,6 +38,7 @@ export async function POST(req: Request) {
         fresh: c.fresh.map((text) => ({ at: now.toISOString(), text })),
         profileName: c.profileName,
         pastJobs: c.pastJobs,
+        image: c.image,
         now,
       };
       const t0 = Date.now();

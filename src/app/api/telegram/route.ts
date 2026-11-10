@@ -67,14 +67,14 @@ function answerPendingInBackground(sb: SupabaseClient, waId: string): void {
       if (r.aiError) {
         await sendOwnerMessage(`${head}\n⚠️ <b>The assistant could not answer</b> — reply yourself.\n<code>${escapeHtml(r.aiError.slice(0, 200))}</code>`);
       } else if (!r.reply) {
-        await sendOwnerMessage(`${head}\n🤫 The assistant chose not to answer this one — it is yours.`);
+        await sendOwnerMessage(`${head}\n🤫 The assistant left this one to you.${r.notify ? `\n👉 <b>For you:</b> ${escapeHtml(r.notify)}` : ''}`);
       } else if (r.sendError) {
         await sendOwnerWithMarkup(
           `${head}\n❌ <b>WhatsApp refused to send the answer</b> — copy it and send from your phone:\n<pre>${escapeHtml(r.reply.slice(0, 3000))}</pre>\n<code>${escapeHtml(r.sendError.slice(0, 300))}</code>`,
           { inline_keyboard: [[{ text: '📋 Copy answer', copy_text: { text: r.reply.slice(0, 256) } }]] },
         );
       } else {
-        await sendOwnerMessage(`${head}\n🤖 ${escapeHtml(r.reply)}`);
+        await sendOwnerMessage(`${head}\n🤖 ${escapeHtml(r.reply)}${r.notify ? `\n👉 <b>For you:</b> ${escapeHtml(r.notify)}` : ''}`);
       }
     })().catch(() => undefined),
   );
