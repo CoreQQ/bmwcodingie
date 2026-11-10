@@ -214,11 +214,12 @@ what fixes it every time.
 
 **"Site updated" in Telegram:** each production build is announced once
 (`src/lib/deployPing.ts`, key `last_deploy` = "<build time>:<commit>" in
-`app_config`; only a NEWER build may write it — on 8 Nov an old and a new
-build answering at once kept overwriting each other and sent the line every
-few seconds) — by
-`GET /api/deploy-ping` after a deploy, or by the first WhatsApp / Telegram /
-visitor request the new build serves, whichever comes first. The line quotes
+`app_config`) — by `GET /api/deploy-ping` after a deploy, or by the first
+WhatsApp / Telegram / visitor request the new build serves. It reads the
+stored value, stays silent for the same commit or a newer build, claims with
+a compare-and-swap, and a server instance announces at most once. It sent
+repeats on 8 and 10 Nov — **never poll `/api/deploy-ping` in a loop**; wait
+on the `v:` marker of `/api/whatsapp` and call the ping once. The line quotes
 the commit's first line (merge prefix stripped), so write it for the owner.
 
 **Offers (11.11, Black Friday, Christmas):** dates in
