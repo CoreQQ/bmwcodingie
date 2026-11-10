@@ -31,12 +31,13 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
   // varies with the software version, so every job is quoted from the VIN.
   const quoteOnly = unit === 'mgu-id8';
 
-  // The antenna is part of Android Auto on NBT Evo, and of CarPlay on Black Friday.
+  // The antenna is part of CarPlay + Android Auto together on NBT Evo, and of
+  // CarPlay on Black Friday.
   const antennaWith = (id: string) =>
     id !== 'wifi-antenna'
       ? ''
       : antennaInAndroidAuto(picked, unit)
-        ? 'Android Auto'
+        ? 'CarPlay + Android Auto'
         : BF_ON && picked.includes('carplay')
           ? 'CarPlay'
           : '';
@@ -63,12 +64,13 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
         lines.push({ label: item.label, amount: 0, bundled: true });
         continue;
       }
-      lines.push({ label: combo ? `${item.label} (${combo.with})` : item.label, amount });
+      const small = item.small?.[priceUnit];
+      lines.push({ label: combo ? `${item.label} (${combo.with})` : small ? `${item.label} (${small})` : item.label, amount });
       total += amount;
       if (item.from || item.fromOn?.includes(priceUnit) || combo?.from) anyFrom = true;
     }
     for (const a of ADD_ONS) {
-      // Included with Android Auto on NBT Evo (and with CarPlay on Black Friday), ticked or not.
+      // Included with CarPlay + Android Auto on NBT Evo (and with CarPlay on Black Friday), ticked or not.
       if (antennaWith(a.id)) {
         lines.push({ label: a.label, amount: 0, bundled: true });
         continue;
@@ -172,12 +174,17 @@ export function PriceCalculator({ contactHref = '/#contact' }: { contactHref?: s
                     <span className="block text-sm text-ink">{item.label}</span>
                     {item.note && <span className="mt-0.5 block text-[11px] leading-snug text-faint">{item.note}</span>}
                   </span>
-                  <span className="shrink-0 font-mono text-xs text-muted">
+                  <span className="shrink-0 text-right font-mono text-xs text-muted">
                     {unavailable
                       ? 'n/a'
                       : bundled
                         ? 'included'
                         : `${item.from || item.fromOn?.includes(priceUnit) || combo?.from ? 'from ' : combo ? '+' : ''}€${amount}`}
+                    {!unavailable && !bundled && !combo && item.small?.[priceUnit] && (
+                      <span className="mt-0.5 block max-w-[7.5rem] font-sans text-[10px] leading-tight text-faint">
+                        ({item.small[priceUnit]})
+                      </span>
+                    )}
                   </span>
                 </button>
               );

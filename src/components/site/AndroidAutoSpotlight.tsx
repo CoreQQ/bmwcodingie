@@ -1,7 +1,7 @@
 import { ArrowRight, Check, MessageCircle, ScanSearch } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { PRICE_ITEMS } from '@/lib/pricing';
+import { ANDROID_AUTO_WITH_CARPLAY, PRICE_ITEMS } from '@/lib/pricing';
 import { waHref } from '@/lib/waMessage';
 import { OfferPrice } from './OfferPrice';
 
@@ -62,7 +62,7 @@ function ScreenMock({ caption }: { caption: string }) {
 
 export async function AndroidAutoSpotlight({ whatsapp }: { whatsapp: string }) {
   const t = await getTranslations('AndroidAutoNew');
-  const price = PRICE_ITEMS.find((i) => i.id === 'android-auto')?.price['nbt-evo'] ?? 250;
+  const price = PRICE_ITEMS.find((i) => i.id === 'android-auto')?.price['nbt-evo'] ?? 150;
   const features = [t('f1'), t('f2'), t('f3'), t('f4')];
 
   return (
@@ -101,12 +101,17 @@ export async function AndroidAutoSpotlight({ whatsapp }: { whatsapp: string }) {
                 ))}
               </ul>
 
-              <div className="mt-7 flex flex-wrap items-end gap-x-5 gap-y-3">
+              {/* Owner, 10 Nov 2026: €150 with "(without CarPlay and antenna)" in small print. */}
+              <div className="mt-7 flex flex-wrap items-end gap-x-3 gap-y-1.5">
                 <p className="font-display text-6xl font-bold leading-none text-white">
                   <OfferPrice text={`€${price}`} />
                 </p>
-                <p className="pb-1 text-sm text-muted">{t('priceNote')}</p>
+                <p className="pb-1.5 text-[11px] leading-snug text-muted">({t('priceOnly')})</p>
               </div>
+              <p className="mt-3 text-sm text-muted">{t('priceNote')}</p>
+              <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-muted">
+                {t('withCarplay', { price: `€${ANDROID_AUTO_WITH_CARPLAY}` })}
+              </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
                 <a href="#vin-check" className="btn-primary">

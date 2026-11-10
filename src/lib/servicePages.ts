@@ -134,7 +134,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { q: 'Can you activate Apple CarPlay on my BMW?', a: 'On most NBT Evo and MGU systems, yes. Send your model, year and VIN-derived build and we will confirm whether wired, wireless or both are supported on your exact car.' },
       { q: 'Is wireless CarPlay included?', a: 'On supported NBT Evo and MGU head units, wireless CarPlay is included. Some older systems support wired CarPlay only — we confirm this before booking.' },
       { q: 'Is there a subscription after activation?', a: 'No. We enable full CarPlay through coding, so there is no trial limit and no annual fee once it is activated.' },
-      { q: 'Can you also activate Android Auto?', a: 'Yes — €200 on iDrive 7 (MGU), and now natively on NBT Evo with ID6 for €250. Ask us with your build and we will confirm before booking.' },
+      { q: 'Can you also activate Android Auto?', a: 'Yes — €200 on iDrive 7 (MGU), and now natively on NBT Evo with ID6: €150 for Android Auto on its own (without CarPlay activation and antenna), or €250 together with the CarPlay activation it runs on. Ask us with your build and we will confirm before booking.' },
     ],
     related: [
       { slug: 'bmw-android-auto-activation', label: 'BMW Android Auto activation' },
@@ -148,33 +148,35 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
 
   'bmw-android-auto-activation': {
     slug: 'bmw-android-auto-activation',
-    // NBT Evo ID6 is new (owner, 30 Oct 2026): native Android Auto, €250.
-    price: { amount: 200, text: 'New (beta): €250 on NBT Evo (ID6) · €200 on iDrive 7 (MGU) · iDrive 8.5 from €400 · iDrive 8 per car' },
+    // NBT Evo ID6 (owner, 10 Nov 2026): €150 for Android Auto alone, €250
+    // together with the CarPlay activation and the antenna.
+    price: { amount: 150, text: 'New (beta): €150 on NBT Evo (ID6), without CarPlay activation and antenna — €250 with both · €200 on iDrive 7 (MGU) · iDrive 8.5 from €400 · iDrive 8 per car' },
     galleryMatch: ['android'],
     metaTitle: 'BMW Android Auto Ireland | Now on NBT Evo ID6 & iDrive 7',
     metaDescription:
-      'Native Android Auto for BMW in Ireland — now on NBT Evo ID6 (€250) as well as iDrive 7 (€200). iDrive 8.5 from €400. No adapter box. Mobile in Dublin or remote.',
+      'Native Android Auto for BMW in Ireland — now on NBT Evo ID6 (€150, or €250 with CarPlay) as well as iDrive 7 (€200). No adapter box. Mobile in Dublin or remote.',
     serviceName: 'BMW Android Auto Activation',
     eyebrow: 'Android Auto · Dublin & Ireland',
     h1: 'BMW Android Auto Activation Ireland — Now on NBT Evo ID6',
     heroSub:
       'Native Android Auto for BMW in Dublin and across Ireland — on iDrive 7 (MGU), and now on NBT Evo with ID6: the iDrive 6 cars that were always told it could not be done.',
     intro: [
-      'Android Auto has always been an iDrive 7 feature, so owners of NBT Evo cars were told it could not be done. We now activate it natively on NBT Evo with ID6 software: Google Maps, Waze, Spotify, calls and messages on the car’s own screen, with no adapter box or dongle. It is €250, one-off, and that includes the Apple CarPlay activation it runs on and the Wi-Fi antenna if your car needs one. It is still in testing (beta): it may not work on every car or phone, it is done at your own risk and we can’t take responsibility for how it behaves — you only pay if you see it working.',
+      'Android Auto has always been an iDrive 7 feature, so owners of NBT Evo cars were told it could not be done. We now activate it natively on NBT Evo with ID6 software: Google Maps, Waze, Spotify, calls and messages on the car’s own screen, with no adapter box or dongle. It is €150, one-off, for Android Auto on its own — that is without the Apple CarPlay activation and the Wi-Fi antenna. Android Auto runs on CarPlay, so if CarPlay is not active on your car yet it is €250 for everything: the CarPlay activation, the Wi-Fi antenna if your car needs one, and Android Auto. It is still in testing (beta): it may not work on every car or phone, it is done at your own risk and we can’t take responsibility for how it behaves — you only pay if you see it working.',
       'On iDrive 7 (MGU) we enable Android Auto through coding for €200. Every car is checked from its VIN first, so you know before booking whether your head unit and software version support it. NBT Evo cars still on ID4/ID5 software get the ID6 update first — we confirm the price for both together. Activation is done in person around Dublin or remotely across Ireland.',
     ],
     includedHeading: 'What Android Auto activation includes',
     included: [
-      'Native Android Auto on NBT Evo (ID6) — new, in beta testing, €250 with CarPlay activation and the Wi-Fi antenna (if needed) included',
+      'Native Android Auto on NBT Evo (ID6) — new, in beta testing, €150 (without CarPlay activation and antenna)',
+      'CarPlay not active yet? €250 for everything on NBT Evo: CarPlay activation, Wi-Fi antenna (if needed) and Android Auto',
       'Android Auto on MGU (iDrive 7) — €200',
       'Integration into the car’s own iDrive screen — no adapter box',
       'A clear compatibility check from your VIN before booking',
       'Pairing and a working confirmation before you pay',
-      'On NBT Evo, CarPlay activation is part of the €250; on iDrive 7 it can be done in the same session',
+      'On iDrive 7, CarPlay can be activated in the same session',
     ],
     modelsHeading: 'Supported systems',
     models: [
-      'NBT Evo (iDrive 6) with ID6 software — now supported, €250',
+      'NBT Evo (iDrive 6) with ID6 software — now supported, €150 (€250 with CarPlay activation and antenna)',
       'NBT Evo on ID4/ID5 software — ID6 update first, price for both confirmed from the VIN',
       'MGU (iDrive 7) — supported on most builds, €200',
       'iDrive 8.5 from €400 · iDrive 8 quoted per car',
@@ -183,13 +185,13 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { title: 'Compatibility check', body: 'Send your model, year and VIN. We confirm your head unit and software version, and whether it needs the ID6 update first, before anything is booked.' },
       { title: 'In person or remote', body: 'We come to the car around Dublin, or you connect a laptop and ENET cable for remote activation across Ireland where supported.' },
       { title: 'Activate and pair', body: 'We activate Android Auto, pair your phone and show it working on the iDrive screen.' },
-      { title: 'Pay on completion', body: 'You pay once it is shown working: €250 on NBT Evo ID6, €200 on iDrive 7. iDrive 8 is quoted per car from your VIN.' },
+      { title: 'Pay on completion', body: 'You pay once it is shown working: €150 on NBT Evo ID6 (€250 with CarPlay activation and antenna), €200 on iDrive 7. iDrive 8 is quoted per car from your VIN.' },
     ],
     faqs: [
       { q: 'Is Android Auto on NBT Evo finished?', a: 'Not yet — it is in beta testing. It may not work on every car or with every phone, it is done at your own risk and we cannot take responsibility for how it behaves. You only pay once you have seen it working on your car.' },
-      { q: 'Can you activate Android Auto on NBT Evo (iDrive 6)?', a: 'Yes — on NBT Evo with ID6 software we now activate native Android Auto for €250. Cars still on ID4/ID5 get the ID6 update first; we confirm it from your VIN.' },
+      { q: 'Can you activate Android Auto on NBT Evo (iDrive 6)?', a: 'Yes — on NBT Evo with ID6 software we now activate native Android Auto for €150. That price is Android Auto on its own, without the CarPlay activation and antenna; with both it is €250. Cars still on ID4/ID5 get the ID6 update first; we confirm it from your VIN.' },
       { q: 'Is it an adapter or a box?', a: 'No. It is activated in the car’s own iDrive system, so it runs on the original screen with nothing plugged in behind the dash.' },
-      { q: 'Can I have both CarPlay and Android Auto?', a: 'Where your system supports both, yes — we can activate them in the same session. We confirm what your exact car supports beforehand.' },
+      { q: 'Can I have both CarPlay and Android Auto?', a: 'Where your system supports both, yes — we can activate them in the same session. On NBT Evo the two together are €250, Wi-Fi antenna included if the car needs one. We confirm what your exact car supports beforehand.' },
       { q: 'Can this be done remotely?', a: 'Yes, where supported. You connect a laptop and ENET cable to the OBD port and we activate over the connection.' },
     ],
     related: [

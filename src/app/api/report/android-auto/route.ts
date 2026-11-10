@@ -153,7 +153,7 @@ export async function GET(req: Request) {
   if (shown < total) text += `\n\n…and ${total - shown} more.`;
 
   const outreach =
-    "Hi! Good news: Android Auto now works on NBT Evo (iDrive 6) BMWs. It's €250, still in beta (done at your own risk), and you only pay if you see it working. Want me to check your car? Send me your full VIN (17 characters).";
+    "Hi! Good news: Android Auto now works on NBT Evo (iDrive 6) BMWs. It's €150 if CarPlay is already active on your car (€250 with the CarPlay activation and Wi-Fi antenna), still in beta (done at your own risk), and you only pay if you see it working. Want me to check your car? Send me your full VIN (17 characters).";
   const sent = await sendOwnerWithMarkup(
     text,
     { inline_keyboard: [[{ text: '📋 Copy message for them', copy_text: { text: outreach } }]] },

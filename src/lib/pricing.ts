@@ -22,6 +22,8 @@ export type PriceItem = {
   from?: boolean;
   /** "From" on these head units only (the price is firm on the others). */
   fromOn?: Exclude<HeadUnit, 'unknown'>[];
+  /** Small print beside the price on that head unit: what the figure leaves out. */
+  small?: Partial<Record<Exclude<HeadUnit, 'unknown'>, string>>;
 };
 
 export const PRICE_ITEMS: PriceItem[] = [
@@ -41,10 +43,12 @@ export const PRICE_ITEMS: PriceItem[] = [
   {
     id: 'android-auto',
     label: 'Android Auto activation',
-    // NBT Evo is new (owner, 30 Oct 2026): native Android Auto on ID6 for €250,
-    // with the CarPlay activation it runs on and the Wi-Fi antenna in it (1 Nov).
-    note: 'New on NBT Evo — beta, at your own risk, needs ID6 software; CarPlay activation and the Wi-Fi antenna (if needed) included · iDrive 7 · from €400 on iDrive 8.5. iDrive 8 is quoted per car.',
-    price: { 'nbt-evo': 250, mgu: 200, 'mgu-id8': null, 'mgu-id85': 400 },
+    // NBT Evo (owner, 10 Nov 2026): €150 for Android Auto on its own — no
+    // CarPlay activation, no antenna. It runs on CarPlay, so a car without it
+    // takes the package: ANDROID_AUTO_WITH_CARPLAY for everything (1 Nov).
+    note: 'New on NBT Evo — beta, at your own risk, needs ID6 software. With the CarPlay activation it runs on: €250 for both, Wi-Fi antenna included · iDrive 7 · from €400 on iDrive 8.5. iDrive 8 is quoted per car.',
+    price: { 'nbt-evo': 150, mgu: 200, 'mgu-id8': null, 'mgu-id85': 400 },
+    small: { 'nbt-evo': 'without CarPlay and antenna' },
   },
   {
     id: 'japan',
@@ -136,21 +140,32 @@ export const isFromUnit = (unit: HeadUnit) => FROM_UNITS.includes(unit);
 
 const onNbtEvo = (unit: HeadUnit) => unit === 'nbt-evo' || unit === 'unknown';
 
-/** CarPlay is already in the Japan conversion, the ID6 update and, on NBT
- *  Evo, Android Auto (which runs on it) — never charge for it twice. */
+/** CarPlay is already in the Japan conversion and the ID6 update — never
+ *  charge for it twice. */
 export function isBundledOut(selected: string[], itemId: string, unit: HeadUnit): boolean {
   if (itemId !== 'carplay') return false;
   if (selected.includes('japan')) return true;
-  return onNbtEvo(unit) && (selected.includes('id6') || selected.includes('android-auto'));
+  return onNbtEvo(unit) && selected.includes('id6');
 }
 
-/** Android Auto on NBT Evo includes the Wi-Fi antenna when the car needs one. */
-export const antennaInAndroidAuto = (selected: string[], unit: HeadUnit) =>
-  selected.includes('android-auto') && onNbtEvo(unit);
+/**
+ * CarPlay + Android Auto together on NBT Evo (owner, 1 and 10 Nov 2026): €250
+ * for everything — the CarPlay activation, Android Auto and the Wi-Fi antenna
+ * if the car needs one. Android Auto on its own (CarPlay already active, or
+ * coming with the Japan conversion / ID6 update) is its listed price.
+ */
+export const ANDROID_AUTO_WITH_CARPLAY = 250;
+
+const androidAutoPackage = (selected: string[], unit: HeadUnit) =>
+  onNbtEvo(unit) && selected.includes('android-auto') && selected.includes('carplay') && !isBundledOut(selected, 'carplay', unit);
+
+/** The Wi-Fi antenna is part of the CarPlay + Android Auto package on NBT Evo. */
+export const antennaInAndroidAuto = (selected: string[], unit: HeadUnit) => androidAutoPackage(selected, unit);
 
 /**
- * What an item costs next to the rest of the job (owner, 1 Nov 2026): the ID6
- * update is +€100 on top of the Japan conversion (€350 together); on iDrive 7
+ * What an item costs next to the rest of the job (owner, 1 Nov 2026): on NBT
+ * Evo Android Auto is +€100 on top of the CarPlay activation (€250 together)
+ * and the ID6 update is +€100 on top of the Japan conversion (€350); on iDrive 7
  * the apps are +€100 with the conversion, and the cluster navigation is from
  * €80 with the conversion or the apps (€150 on its own).
  */
@@ -160,6 +175,10 @@ export function comboPrice(
   unit: HeadUnit,
 ): { amount: number; with: string; from?: boolean } | undefined {
   const japan = selected.includes('japan');
+  if (itemId === 'android-auto' && androidAutoPackage(selected, unit)) {
+    const carplay = PRICE_ITEMS.find((i) => i.id === 'carplay')?.price['nbt-evo'] ?? 0;
+    return { amount: ANDROID_AUTO_WITH_CARPLAY - carplay, with: 'with CarPlay activation' };
+  }
   if (itemId === 'id6' && japan && onNbtEvo(unit)) return { amount: 100, with: 'with the Japan conversion' };
   if (unit !== 'mgu') return undefined;
   if (itemId === 'apps' && japan) return { amount: 100, with: 'with the Japan conversion' };

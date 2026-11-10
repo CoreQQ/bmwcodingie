@@ -1,5 +1,6 @@
 import {
   ADD_ONS,
+  ANDROID_AUTO_WITH_CARPLAY,
   CALL_OUT,
   MIN_JOB,
   PRICE_ITEMS,
@@ -33,7 +34,8 @@ function inclusions(item: PriceItem, unit: Unit): string[] {
   // radio only, so nothing is promised as included there.
   if (unit === 'mgu-id85') return out;
   if (item.id !== 'carplay' && isBundledOut([item.id], 'carplay', unit)) out.push('CarPlay included');
-  if (antennaInAndroidAuto([item.id], unit)) out.push('Wi-Fi antenna included');
+  const small = item.small?.[unit];
+  if (small) out.push(small);
   if (item.id === 'android-auto' && unit === 'nbt-evo') out.push('beta');
   if (item.id === 'remote-start') out.push('from the key · app from €300');
   if (item.id === 'apps') out.push('not BMW’s own');
@@ -74,7 +76,13 @@ export function priceListText(): string {
   const appsWithJapan = comboPrice(['japan', 'apps'], 'apps', 'mgu')?.amount;
   const navWithPackage = comboPrice(['japan', 'cluster-nav'], 'cluster-nav', 'mgu')?.amount;
   const navAlone = PRICE_ITEMS.find((i) => i.id === 'cluster-nav')?.price.mgu;
+  const aaWithCarplay = comboPrice(['carplay', 'android-auto'], 'android-auto', 'nbt-evo')?.amount;
   lines.push('', '<b>Combinations</b>');
+  if (aaWithCarplay !== undefined)
+    lines.push(
+      `• CarPlay + Android Auto (NBT Evo) — <b>${eur(ANDROID_AUTO_WITH_CARPLAY)}</b> (Android Auto +${eur(aaWithCarplay)})` +
+        (antennaInAndroidAuto(['carplay', 'android-auto'], 'nbt-evo') ? ' · Wi-Fi antenna included' : ''),
+    );
   if (id6WithJapan !== undefined) lines.push(`• Japan → EU + ID6 update (NBT Evo) — <b>${eur(japanNbt + id6WithJapan)}</b> (ID6 +${eur(id6WithJapan)})`);
   if (appsWithJapan !== undefined) lines.push(`• Japan → EU + apps (iDrive 7) — <b>${eur(japanMgu + appsWithJapan)}</b> (apps +${eur(appsWithJapan)})`);
   if (navWithPackage !== undefined) lines.push(`• Cluster navigation with Japan or the apps (iDrive 7) — <b>from ${eur(navWithPackage)}</b>${navAlone ? ` (${eur(navAlone)} alone)` : ''}`);

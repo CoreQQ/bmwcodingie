@@ -92,6 +92,16 @@ unknown columns and retries; other readers fall back to defaults.
   combinations, extras, rules and current/upcoming offers. Built from
   `src/lib/pricing.ts` (`src/lib/priceList.ts`), so it always matches the site.
   Also 💶 in `/tools` and on the reply keyboard.
+  **Changing a price:** `pricing.ts` first, then grep the old figure — it is
+  also written out in prose (`servicePages.ts`, `chassisPages.ts`, `blog.ts`,
+  `upgradeLandings.ts`, `assistantPrompt.ts`, `llms.txt`, `messages/*.json`).
+  The catalogue rows on `/models` are in the database (Mini App → Services);
+  `GET/POST /api/report/catalog?key=<diagnostics key>` lists and fixes a row.
+  Keep a row's `price_label` to one number — the 💶 paid buttons and the
+  invoice wizard read the digits out of it.
+  Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
+  activation, no antenna — shown in small print), **€250 together with the
+  CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
 - `/tools` — 🇯🇵 `/jp` address · 🔧 `/cheat [query|add|del]` · 📊 `/stats` ·
   📆 `/calendar` · ⛔️ `/banlist` (`/ban C-007 reason`, `/unban`).
 - `/setup` re-registers the menu and the reply keyboard (⏰ Agenda · 📅 Bookings ·
