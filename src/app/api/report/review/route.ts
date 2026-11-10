@@ -51,6 +51,68 @@ export async function GET(req: Request) {
   const days = Math.min(Number(url.searchParams.get('days')) || 35, 90);
   const since = new Date(Date.now() - days * 86400000).toISOString();
 
+  // part=funnel — the business by week: enquiries, bookings, paid jobs and
+  // what was asked for. "Few people lately" is answered here, not by visits.
+  if (part === 'funnel') {
+    const from = new Date(Date.now() - 120 * 86400000).toISOString();
+    const weekOf = (iso: string) => {
+      const d = new Date(new Date(iso).toLocaleString('en-US', { timeZone: 'Europe/Dublin' }));
+      d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // back to Monday
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    type B = { created_at: string; slot_date: string | null; status: string; service: string | null; source: string | null };
+    const bookings: B[] = [];
+    for (let page = 0; page < 5; page++) {
+      const { data } = await sb.from('bookings').select('created_at, slot_date, status, service, source').gt('created_at', from).order('created_at', { ascending: true }).range(page * 1000, page * 1000 + 999);
+      bookings.push(...((data ?? []) as B[]));
+      if ((data ?? []).length < 1000) break;
+    }
+    const { data: pay } = await sb.from('payments').select('created_at, amount, service').gt('created_at', from).order('created_at', { ascending: true }).limit(1000);
+    const payments = (pay ?? []) as { created_at: string; amount: number; service: string | null }[];
+    const waUsers: { wa_id: string; created_at: string }[] = [];
+    for (let page = 0; page < 12; page++) {
+      const { data } = await sb.from('wa_messages').select('wa_id, created_at').eq('role', 'user').order('created_at', { ascending: true }).range(page * 1000, page * 1000 + 999);
+      waUsers.push(...((data ?? []) as { wa_id: string; created_at: string }[]));
+      if ((data ?? []).length < 1000) break;
+    }
+    const firstSeen = new Map<string, string>();
+    for (const m of waUsers) if (!firstSeen.has(m.wa_id)) firstSeen.set(m.wa_id, m.created_at);
+
+    const weeks: Record<string, { enquiries: number; withSlot: number; jobsConfirmed: number; paidJobs: number; paid: number; waNewPeople: number; waActivePeople: number }> = {};
+    const w = (k: string) => (weeks[k] ??= { enquiries: 0, withSlot: 0, jobsConfirmed: 0, paidJobs: 0, paid: 0, waNewPeople: 0, waActivePeople: 0 });
+    for (const b of bookings) {
+      w(weekOf(b.created_at)).enquiries += 1;
+      if (b.slot_date) w(weekOf(b.created_at)).withSlot += 1;
+      if (b.slot_date && b.status === 'confirmed') w(weekOf(`${b.slot_date}T12:00:00Z`)).jobsConfirmed += 1;
+    }
+    for (const p of payments) {
+      w(weekOf(p.created_at)).paidJobs += 1;
+      w(weekOf(p.created_at)).paid += Number(p.amount) || 0;
+    }
+    for (const at of firstSeen.values()) if (at >= from) w(weekOf(at)).waNewPeople += 1;
+    const active = new Map<string, Set<string>>();
+    for (const m of waUsers) {
+      if (m.created_at < from) continue;
+      const k = weekOf(m.created_at);
+      if (!active.has(k)) active.set(k, new Set());
+      active.get(k)!.add(m.wa_id);
+    }
+    for (const [k, set] of active) w(k).waActivePeople = set.size;
+
+    const mid = new Date(Date.now() - 30 * 86400000).toISOString();
+    const prev = new Date(Date.now() - 60 * 86400000).toISOString();
+    const svc = (rows: B[]) => top(rows.map((r) => (r.service || '(not said)').slice(0, 40)), 15);
+    return NextResponse.json({
+      ok: true,
+      waHistoryFrom: waUsers[0]?.created_at ?? null,
+      weeks: Object.fromEntries(Object.entries(weeks).sort((a, b) => (a[0] < b[0] ? -1 : 1))),
+      statusLast60: top(bookings.filter((b) => b.created_at >= prev).map((b) => `${b.slot_date ? 'slot' : 'enquiry'}:${b.status}`), 12),
+      servicesLast30: svc(bookings.filter((b) => b.created_at >= mid)),
+      servicesPrev30: svc(bookings.filter((b) => b.created_at < mid && b.created_at >= prev)),
+      paymentsByService: top(payments.map((p) => `${(p.service || '?').slice(0, 30)} · €${Math.round(Number(p.amount) || 0)}`), 40),
+    });
+  }
+
   if (part === 'site') {
     const [{ data: visits, error: vErr }, { data: leads }] = await Promise.all([
       sb.from('site_visits').select('created_at, path, referrer, source, device, country, is_returning').gt('created_at', since).order('created_at', { ascending: true }).limit(20000),
