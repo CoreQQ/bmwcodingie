@@ -60,8 +60,8 @@ After changing env vars: **Redeploy** (with cache is fine).
 `app_config` (k/v: `slot_duration_hours`) · `clients` (codes C-001, `banned`, `note`) ·
 `payments` · `wa_chats`/`wa_messages` (WhatsApp) · `cheat_notes` (/cheat add) ·
 `car_models` (+configurator) · `site_visits` (evening digest; until it exists
-the digest falls back to section_time). The assistant's per-chat facts live in
-`app_config` as `wa_memory:<wa_id>`; `wa_ai_owner = meta` means "assistant off
+the digest falls back to section_time). (`wa_memory:<wa_id>` rows in
+`app_config` are from the old assistant and no longer read.) `wa_ai_owner = meta` means "assistant off
 for every chat" (`/wa off all`).
 
 **A missing table/column never breaks the site**: the booking insert drops
@@ -140,6 +140,40 @@ initData. Log out = clear the app's site data.
 plus owed-per-person. Add-job form + per-row delete. Same rows and math as the
 bot's `/paid` (economics columns in `payments`: `cost`, `cost_note`,
 `share_pct`, `share_name`).
+
+## WhatsApp assistant (rebuilt 10 Nov 2026)
+
+`src/lib/waAgent.ts` + the prompt in `src/lib/assistantPrompt.ts`
+(`WHATSAPP_PROMPT`; prices come from `CORE_FACTS`, shared with the site chat).
+
+- **One model call, one structured answer** (`output_config.format`): `reply`
+  (the exact message, may be empty), `notify_alex` (shown in the Telegram
+  mirror as "👉 For you"), `urgent` (pinned 🚨 alert + 6h stand-down) and
+  `lead` (creates or updates the open enquiry). The model's own notes can no
+  longer reach a customer, which happened on 10 Nov.
+- **Model:** `claude-opus-5-5`, effort `low`, refusal fallback to
+  `claude-opus-5` (server-side `fallbacks`), and `claude-sonnet-5-5` as a
+  backup when the call errors or takes over 25 s. Thinking is always on and
+  counts toward `max_tokens` (4000) — do not lower it to "keep replies short";
+  the prompt does that.
+- **The conversation goes in as one labelled transcript** (last 30 messages:
+  Customer / You / Alex, with Irish timestamps); everything the customer sent
+  since the last reply is answered together.
+- **Bursts:** the webhook waits 6 s and only the newest customer message in
+  the chat is answered (`BURST_WAIT_MS`). Reactions and stickers are stored
+  and never answered. The "album didn't come through" and "can't open
+  attachments" lines are sent once per chat per 12 h / 6 h.
+- **No regex gates any more.** The old code went silent for 6 h whenever a
+  message contained "Alex", handed over on words like "ai", "bot" or "yoke",
+  and forced a speech about times on any "today". The model now decides: it
+  answers what the facts cover and flags the rest for Alex.
+- **Stand-down rules unchanged:** Alex replying from his phone (or "I'll
+  reply") silences the assistant in that chat for 6 h; `/wa stop` for good.
+- **Testing:** `POST /api/report/agent-test?key=<diagnostics key>` runs the
+  assistant on made-up conversations — no database, no WhatsApp, no Telegram.
+  `GET /api/report/review?key=…&part=wa` returns recent real chats with
+  numbers masked. The 30 scenarios used on 10 Nov are in the session
+  scratchpad; re-run them after any prompt change.
 
 ## Slot logic
 
