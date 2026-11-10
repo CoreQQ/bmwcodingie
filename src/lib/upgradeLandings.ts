@@ -233,7 +233,7 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
     included: [
       'ID4 / ID5 → ID6 software update on NBT Evo, CarPlay included (€300)',
       'Apple CarPlay activation (NBT Evo €150 · iDrive 7 €220)',
-      'Android Auto on iDrive 7 (€200), now also on NBT Evo ID6 (€250); iDrive 8 per car',
+      'Android Auto on iDrive 7 (€200), now also on NBT Evo ID6 (€150, or €250 with CarPlay activation and antenna); iDrive 8 per car',
       'Navigation map updates',
       'Japan-import conversions to EU radio, language and navigation (from €250)',
       'Coding: fullscreen CarPlay, video in motion (passenger use only), menus and more',

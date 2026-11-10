@@ -45,7 +45,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: 'MGU (iDrive 7/8): CarPlay and Android Auto',
         paragraphs: [
-          'On MGU cars CarPlay is usually present but sometimes trial-limited, and Android Auto is built for this generation (we can now also add it natively to NBT Evo with ID6, €250). Activation unlocks both permanently where the build supports it. Wireless operation is standard here — MGU was designed around it.',
+          'On MGU cars CarPlay is usually present but sometimes trial-limited, and Android Auto is built for this generation (we can now also add it natively to NBT Evo with ID6, from €150). Activation unlocks both permanently where the build supports it. Wireless operation is standard here — MGU was designed around it.',
         ],
       },
       {
@@ -188,12 +188,12 @@ export const BLOG_POSTS: BlogPost[] = [
           'Apple CarPlay activation — €150 on NBT Evo, €220 on MGU (no subscription)',
           'Wi-Fi antenna fitted (for wireless CarPlay on some builds) — +€30',
           'iDrive ID4/ID5 → ID6 update — €300 with Apple CarPlay activation included (+€100 with a Japan → EU conversion)',
-          'Android Auto activation — €200 on iDrive 7 (MGU), new: €250 on NBT Evo with ID6, CarPlay activation and Wi-Fi antenna included — iDrive 8 quoted per car',
+          'Android Auto activation — €200 on iDrive 7 (MGU), new: €150 on NBT Evo with ID6 (without CarPlay activation and antenna; €250 with both) — iDrive 8 quoted per car',
           'Full ISTA diagnostics with written summary — from €80',
           'Video in Motion — from €60',
           'Sport displays / digital cluster layouts — from €60',
           'Comfort pack (mirrors, windows, chimes, lighting) — from €40–50 per item, bundled cheaper',
-          'Japan → EU conversion — €250 NBT Evo, €300 MGU with everything convertible included, CarPlay included on both (Android Auto separate: €250 NBT Evo ID6, €200 MGU)',
+          'Japan → EU conversion — €250 NBT Evo, €300 MGU with everything convertible included, CarPlay included on both (Android Auto separate: €150 NBT Evo ID6, €200 MGU)',
           'Minimum job — €80 per visit or remote session; the smaller settings above are combined into one job',
         ],
       },
@@ -536,7 +536,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: 'Phone integration',
         paragraphs: [
-          'Most G20s have the hardware for both Apple CarPlay and Android Auto. Where CarPlay is missing or ran out as a trial, activation is €220 on iDrive 7 and permanent. Android Auto is €200 on the same system (and we now add it to older NBT Evo cars with ID6 too, €250).',
+          'Most G20s have the hardware for both Apple CarPlay and Android Auto. Where CarPlay is missing or ran out as a trial, activation is €220 on iDrive 7 and permanent. Android Auto is €200 on the same system (and we now add it to older NBT Evo cars with ID6 too, from €150).',
           'Late G20 LCI cars moved to iDrive 8, where the software version decides what can be done; those are checked and priced per car.',
         ],
       },
@@ -675,7 +675,7 @@ export const BLOG_POSTS: BlogPost[] = [
         ],
         bullets: [
           'NBT Evo (iDrive 6) — €150; on ID4/ID5 software the ID6 update with CarPlay included is €300',
-          'iDrive 7 (MGU) — €220; Android Auto €200 on the same system (and now €250 on NBT Evo ID6)',
+          'iDrive 7 (MGU) — €220; Android Auto €200 on the same system (and now from €150 on NBT Evo ID6)',
           'iDrive 8 / 8.5 — checked and priced per car',
           'No subscription, reversible like all coding',
         ],
