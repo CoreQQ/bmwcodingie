@@ -102,6 +102,15 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **VINs are tap-to-copy:** every HTML message leaving `tgCall` passes
+  through `tapToCopyVins` (`src/lib/vin.ts`), which wraps each VIN in `<code>`
+  (shown upper case, O→0) — customer texts, enquiries, lead cards, all of it.
+- **"Open WhatsApp" buttons go to WhatsApp Business** (11 Nov 2026): they link
+  to `/api/w/<number>` (`bizChatLink` in `src/lib/phone.ts`), a page that opens
+  `whatsapp-smb://` on iPhone / the `com.whatsapp.w4b` intent on Android and
+  keeps the plain wa.me link as a second button. A bare wa.me link opens the
+  personal WhatsApp when both apps are installed. Customer-facing links on
+  the site stay wa.me.
 - `/tools` — 🇯🇵 `/jp` address · 🔧 `/cheat [query|add|del]` · 📊 `/stats` ·
   📆 `/calendar` · ⛔️ `/banlist` (`/ban C-007 reason`, `/unban`).
 - `/setup` re-registers the menu and the reply keyboard (⏰ Agenda · 📅 Bookings ·

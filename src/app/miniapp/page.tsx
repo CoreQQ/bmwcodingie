@@ -9,6 +9,7 @@ import {
 import type { Booking, Review } from '@/lib/types';
 import type { BusinessStats } from '@/lib/stats';
 import { customWindow, windowsFor, windowsOverlap, WEEKDAY_LABELS, type HoursMap } from '@/lib/hours';
+import { bizChatLink } from '@/lib/phone';
 
 type ServiceRow = { id: number; title: string; price_label: string; visible: boolean; sort_order: number };
 
@@ -820,7 +821,7 @@ function ClientsTab({
                     <Phone size={12} /> Call
                   </a>
                   <a
-                    href={`https://wa.me/${c.contact.replace(/\D/g, '')}`}
+                    href={bizChatLink(c.contact)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 border border-white/10 px-3 py-2 text-[11px] active:scale-95"

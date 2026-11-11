@@ -49,6 +49,7 @@ import { PRICE_LIST_KEYBOARD, priceListText } from '@/lib/priceList';
 import type { Booking } from '@/lib/types';
 import { isRateLimited } from '@/lib/rateLimit';
 import { announceDeployOnce } from '@/lib/deployPing';
+import { bizChatLink } from '@/lib/phone';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -271,7 +272,7 @@ async function trySwipeReply(sb: SupabaseClient, replied: string, body: string):
   if (!/WhatsApp|NEEDS YOU/i.test(head)) return false;
   const waId = /\+(\d{8,15})\b/.exec(head)?.[1];
   if (!waId) return false;
-  const open = { text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` };
+  const open = { text: '💬 Open WhatsApp', url: bizChatLink(waId) };
   if (!isWhatsAppConfigured()) {
     await sendOwnerWithMarkup('WhatsApp sending is not connected — answer from your phone.', { inline_keyboard: [[open]] });
     return true;
@@ -743,7 +744,7 @@ export async function POST(req: Request) {
           outsideWindow
             ? `⌛ Not sent: more than 24h since <code>+${to}</code> last wrote — WhatsApp only allows templates after that. Send it from your phone.`
             : `❌ Failed: <code>${escapeHtml((sent.error || 'unknown error').slice(0, 300))}</code>`,
-          { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${to}` }]] },
+          { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: bizChatLink(to) }]] },
         );
       }
       return ok();

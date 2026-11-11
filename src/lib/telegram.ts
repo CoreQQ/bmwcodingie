@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { translateToRussian } from './translate';
-import { waLinkFor } from './phone';
+import { bizChatLinkFor } from './phone';
+import { tapToCopyVins } from './vin';
 import { BF, BF_ON, NOV11, NOV11_ON, XMAS, XMAS_ON } from './season';
 import { getSupabaseAdmin } from './supabase';
 
@@ -170,7 +171,10 @@ async function tgCall(method: string, payload: Record<string, unknown>, attempt 
     console.warn('[telegram] TG_TOKEN not set — skipping', method);
     return null;
   }
-  const body = payload.reply_markup ? { ...payload, reply_markup: sanitizeMarkup(payload.reply_markup) } : payload;
+  // Every VIN in an HTML message becomes tap-to-copy (vin.ts).
+  const dressed =
+    payload.parse_mode === 'HTML' && typeof payload.text === 'string' ? { ...payload, text: tapToCopyVins(payload.text) } : payload;
+  const body = dressed.reply_markup ? { ...dressed, reply_markup: sanitizeMarkup(dressed.reply_markup) } : dressed;
   try {
     const res = await fetch(`${API}/${method}`, {
       method: 'POST',
@@ -382,7 +386,7 @@ export function bookingLines(lead: Lead): string[] {
     '━━━━━━━━━━━━━━━━━━━',
     `👤 <b>Name:</b> ${esc(lead.name)}`,
     // A number is a link so one tap opens the chat; anything else stays plain text.
-    `☎️ <b>Contact:</b> ${waLinkFor(lead.contact) ? `<a href="${waLinkFor(lead.contact)}">${esc(lead.contact)}</a>` : esc(lead.contact)}`,
+    `☎️ <b>Contact:</b> ${bizChatLinkFor(lead.contact) ? `<a href="${bizChatLinkFor(lead.contact)}">${esc(lead.contact)}</a>` : esc(lead.contact)}`,
   ];
   if (slot) lines.push(`🕒 <b>Requested slot:</b> ${esc(slot)}`);
   // Where matters as much as when: without it nobody knows who is travelling.
@@ -433,7 +437,7 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
   // Confirm/decline buttons only make sense for a saved slot booking; the
   // WhatsApp button goes on every lead that came with a number.
   const rows: InlineButton[][] = [];
-  const wa = waLinkFor(lead.contact);
+  const wa = bizChatLinkFor(lead.contact);
   if (wa) rows.push([{ text: '💬 Open in WhatsApp', url: wa }]);
   if (lead.id && slot) rows.push(...bookingKeyboard(lead.id, lead.name, slot, lead.public_token, lead.visitType).inline_keyboard);
   // A request with a time is a booking to confirm; without one it is an enquiry.
@@ -468,7 +472,7 @@ export async function editBookingMessage(
     outcome === 'confirmed'
       ? { text: '📋 Copy confirmation reply', copy_text: { text: confirmReply(lead.name, slot, lead.public_token, lead.visitType) } }
       : { text: '📋 Copy "offer other times" reply', copy_text: { text: declineReply(lead.name, slot) } };
-  const wa = waLinkFor(lead.contact);
+  const wa = bizChatLinkFor(lead.contact);
   await tgCall('editMessageText', {
     chat_id: chatId,
     message_id: messageId,

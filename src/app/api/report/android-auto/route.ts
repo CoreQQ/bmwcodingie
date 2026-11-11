@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
 import { phoneKey } from '@/lib/crm';
-import { normalizePhone } from '@/lib/phone';
+import { bizChatLink, normalizePhone } from '@/lib/phone';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -123,7 +123,7 @@ export async function GET(req: Request) {
 
   const day = (iso: string) => new Date(iso).toLocaleDateString('en-IE', { timeZone: 'Europe/Dublin', day: 'numeric', month: 'short' });
   const line = (p: (typeof list)[number], i: number) => {
-    const who = p.phone ? `<a href="https://wa.me/${p.phone}">+${p.phone}</a>` : '—';
+    const who = p.phone ? `<a href="${bizChatLink(p.phone)}">+${p.phone}</a>` : '—';
     const quote = p.quote.replace(/\s+/g, ' ').slice(0, 90);
     return (
       `${i + 1}. <b>${esc(p.name || 'No name')}</b> · ${who} · ${day(p.first)} · ${[...p.via].join(', ')}` +

@@ -27,3 +27,22 @@ export function waLinkFor(raw: string, text?: string): string | null {
   if (!p) return null;
   return `https://wa.me/${p.slice(1)}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 }
+
+// ─── The owner's own buttons (bot, Mini App) ───
+// A wa.me link opens whichever WhatsApp the phone prefers, and on a phone with
+// both apps that is the personal one, not WhatsApp Business where the
+// customers are (owner, 11 Nov 2026). These go through /api/w/<number>, a
+// small page that opens the chat in WhatsApp Business and keeps the ordinary
+// link one tap away. Customer-facing links stay wa.me — it is their phone.
+const OWNER_SITE = 'https://www.bmwcoding.ie';
+
+/** Link that opens the chat with this number in WhatsApp Business. */
+export function bizChatLink(phone: string, text?: string): string {
+  return `${OWNER_SITE}/api/w/${phone.replace(/\D/g, '')}${text ? `?t=${encodeURIComponent(text)}` : ''}`;
+}
+
+/** bizChatLink for a phone in any accepted format; null when it is not a phone. */
+export function bizChatLinkFor(raw: string, text?: string): string | null {
+  const p = normalizePhone(raw);
+  return p ? bizChatLink(p, text) : null;
+}
