@@ -35,8 +35,14 @@ export type WaContext = {
   pastJobs?: string;
   /** A photo that came with the newest message. */
   image?: { media_type: 'image/jpeg' | 'image/png' | 'image/webp'; data: string } | null;
+  /** Set instead of `fresh` to draft Alex's own first message to someone who
+   *  enquired on the website (see draftOwnerReply). */
+  web?: WebEnquiry;
   now?: Date;
 };
+
+/** What the website form, the VIN check or the site chat stored. */
+export type WebEnquiry = { name?: string; bmw_model?: string; service?: string; message?: string; channel?: string };
 
 export type WaLead = { name: string; bmw_model: string; service: string; note: string };
 
@@ -121,11 +127,46 @@ export function renderContext(ctx: WaContext): string {
   parts.push(
     ctx.turns.length
       ? `CONVERSATION SO FAR (oldest first)\n${ctx.turns.map((t) => `[${stamp(t.at)}] ${label[t.who]}: ${t.text}`).join('\n')}`
-      : 'CONVERSATION SO FAR\n(none — this is their first message)',
+      : ctx.web
+        ? 'CONVERSATION SO FAR\n(nothing on WhatsApp with this number yet)'
+        : 'CONVERSATION SO FAR\n(none — this is their first message)',
   );
+  if (ctx.web) {
+    parts.push(webEnquiryBlock(ctx.web));
+    return parts.join('\n\n');
+  }
   parts.push(`NEW — answer this\n${ctx.fresh.map((m) => `[${stamp(m.at)}] Customer: ${m.text}`).join('\n')}`);
   parts.push(greetingNote(ctx, now));
   return parts.join('\n\n');
+}
+
+/** A website enquiry and the one job that goes with it: write the message
+ *  Alex sends from his own phone to start the WhatsApp conversation. */
+function webEnquiryBlock(web: WebEnquiry): string {
+  const isVinCheck = /^vin check/i.test(web.name ?? '');
+  const firstName = isVinCheck ? '' : (web.name ?? '').trim().split(/\s+/)[0];
+  const fields = [
+    web.channel ? `Came through: ${web.channel}` : '',
+    !isVinCheck && web.name ? `Name: ${web.name}` : '',
+    web.bmw_model ? `BMW: ${web.bmw_model}` : '',
+    web.service ? `Wants: ${web.service}` : '',
+    web.message ? `What they wrote / what was recorded: ${web.message}` : '',
+  ].filter(Boolean);
+  return (
+    `WEBSITE ENQUIRY — this did NOT come as a WhatsApp message. The person left it on bmwcoding.ie:\n${fields.join('\n')}\n\n` +
+    `YOUR JOB THIS TIME IS DIFFERENT: write the first WhatsApp message that Alex will send to this person himself, from his own phone. ` +
+    `It goes in "reply". Write it as Alex, in the first person:\n` +
+    `- Open with "Hi${firstName ? ` ${firstName}` : ''}, Alex from BMW Coding IE here 👋" and one short thanks for the enquiry on the site` +
+    `${isVinCheck ? ' (they used the VIN check on the site, so say you saw their VIN check)' : ''}. Never mention an assistant or AI.\n` +
+    `- Then answer what they asked exactly as you would on WhatsApp, from the facts: the price for their car where the facts give one, and what is included. ` +
+    `If the car or system is not clear, give the usual prices by system in one short line.\n` +
+    `- Wherever you would normally say "Alex will confirm / check", say "I'll confirm / I'll check".\n` +
+    `- If a full 17-character VIN is not in the enquiry, ask for it (logbook or bottom of the windscreen). If it is there, say you will check the car from it.\n` +
+    `- End with one easy next step: they can reply here, or pick a time at https://www.bmwcoding.ie/#contact.\n` +
+    `- Plain text, no markdown, no bullet lists, under 550 characters. One message.\n` +
+    `- If the conversation above shows they have already been answered on WhatsApp, write a short follow-up instead of repeating it.\n` +
+    `For this job always return notify_alex "" , urgent false and lead null.`
+  );
 }
 
 function parseDecision(text: string): WaDecision {
@@ -201,6 +242,30 @@ export async function decideWaReply(ctx: WaContext): Promise<WaDecision & { mode
     .trim();
   if (!out) throw new Error('empty AI reply');
   return { ...parseDecision(out), model: response.model, backupReason };
+}
+
+/**
+ * The first WhatsApp message for someone who enquired on the website, written
+ * for Alex to send from his own phone (the bot opens the chat with it filled
+ * in). `turns` is whatever was already said with this number on WhatsApp.
+ */
+export async function draftOwnerReply(web: WebEnquiry, turns: WaTurn[] = [], pastJobs?: string): Promise<string> {
+  const decision = await decideWaReply({ turns, fresh: [], web, pastJobs });
+  return decision.reply.replace(/\s+\n/g, '\n').trim().slice(0, 900);
+}
+
+/** The stored WhatsApp conversation with a number, as the model reads it. */
+export async function storedTurns(sb: SupabaseClient, waId: string, limit = 14): Promise<WaTurn[]> {
+  if (!/^\d{8,15}$/.test(waId)) return [];
+  const { data } = await sb.from('wa_messages').select('role, content, via, created_at').eq('wa_id', waId).order('created_at', { ascending: false }).limit(limit);
+  return ((data ?? []) as { role: string; content: string; via?: string | null; created_at: string }[])
+    .filter((m) => m.content?.trim())
+    .reverse()
+    .map((m) => ({
+      at: m.created_at,
+      who: m.role === 'user' ? ('customer' as const) : m.via === 'owner' ? ('alex' as const) : ('assistant' as const),
+      text: m.content.replace(/^\[Alex\]\s*/, ''),
+    }));
 }
 
 /** Download a customer photo for the model to look at. Small, typed, and

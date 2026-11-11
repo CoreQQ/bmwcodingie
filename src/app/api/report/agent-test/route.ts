@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { decideWaReply, renderContext, type WaContext, type WaTurn } from '@/lib/waAgent';
+import { decideWaReply, renderContext, type WaContext, type WaTurn, type WebEnquiry } from '@/lib/waAgent';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,9 @@ type Case = {
   /** Earlier conversation: m = minutes ago. */
   turns?: { m: number; who: 'c' | 'ai' | 'alex'; text: string }[];
   /** The new message(s) being answered. */
-  fresh: string[];
+  fresh?: string[];
+  /** A website enquiry instead: drafts Alex's own first message to them. */
+  web?: WebEnquiry;
   /** A photo sent with the newest message (base64). */
   image?: { media_type: 'image/jpeg' | 'image/png' | 'image/webp'; data: string };
 };
@@ -35,7 +37,8 @@ export async function POST(req: Request) {
     cases.map(async (c) => {
       const ctx: WaContext = {
         turns: (c.turns ?? []).map((t): WaTurn => ({ at: at(t.m), who: who[t.who], text: t.text })),
-        fresh: c.fresh.map((text) => ({ at: now.toISOString(), text })),
+        fresh: (c.fresh ?? []).map((text) => ({ at: now.toISOString(), text })),
+        web: c.web,
         profileName: c.profileName,
         pastJobs: c.pastJobs,
         image: c.image,

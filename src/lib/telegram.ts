@@ -426,6 +426,40 @@ async function bookingDetailLines(lead: Lead): Promise<string[]> {
   return lines;
 }
 
+// ─── An enquiry's buttons (owner, 11 Nov 2026: fewer taps) ───
+// Everything he does with an enquiry sits under the enquiry itself: open the
+// chat, have the first reply written for him, and say how it ended — so the
+// /quotes list keeps itself up to date without him visiting it.
+export type EnquiryState = { id: number; contact: string; source?: string | null; status?: string | null; handled?: boolean | null };
+
+/** True when the first WhatsApp message is still his to write (site form, VIN
+ *  check, site chat). In a WhatsApp enquiry the assistant is already talking. */
+const needsFirstMessage = (source?: string | null) => !/whatsapp ai/i.test(source ?? '');
+
+export function enquiryKeyboard(e: EnquiryState): InlineKeyboard {
+  const rows: InlineButton[][] = [];
+  const wa = bizChatLinkFor(e.contact);
+  if (wa) {
+    const row: InlineButton[] = [{ text: '💬 Open WhatsApp', url: wa }];
+    if (needsFirstMessage(e.source)) row.push({ text: '✍️ Write the reply', callback_data: `draft:${e.id}` });
+    rows.push(row);
+  }
+  // The current state carries a dot; any of the three can be tapped to change it.
+  const state = e.status === 'won' ? 'w' : e.status === 'lost' ? 'l' : e.handled ? 'a' : '';
+  const mark = (key: string, label: string) => `${state === key ? '● ' : ''}${label}`;
+  rows.push([
+    { text: mark('a', '✅ Answered'), callback_data: `ls:a:${e.id}` },
+    { text: mark('w', '🏁 Booked'), callback_data: `ls:w:${e.id}` },
+    { text: mark('l', '👎 No deal'), callback_data: `ls:l:${e.id}` },
+  ]);
+  return { inline_keyboard: rows };
+}
+
+/** Swap the buttons under a message, leaving its text as it is. */
+export async function editMarkup(chatId: number | string, messageId: number, keyboard: InlineKeyboard): Promise<void> {
+  await tgCall('editMessageReplyMarkup', { chat_id: chatId, message_id: messageId, reply_markup: keyboard });
+}
+
 /** Sends a new-enquiry / booking-request notification to the owner's Telegram chat. */
 export async function notifyTelegram(lead: Lead): Promise<boolean> {
   const lines = await bookingDetailLines(lead);
@@ -438,7 +472,10 @@ export async function notifyTelegram(lead: Lead): Promise<boolean> {
   // WhatsApp button goes on every lead that came with a number.
   const rows: InlineButton[][] = [];
   const wa = bizChatLinkFor(lead.contact);
-  if (wa) rows.push([{ text: '💬 Open in WhatsApp', url: wa }]);
+  if (lead.id && !slot) {
+    // A saved enquiry: chat, ready reply and outcome under the card itself.
+    rows.push(...enquiryKeyboard({ id: lead.id, contact: lead.contact, source: lead.source }).inline_keyboard);
+  } else if (wa) rows.push([{ text: '💬 Open in WhatsApp', url: wa }]);
   if (lead.id && slot) rows.push(...bookingKeyboard(lead.id, lead.name, slot, lead.public_token, lead.visitType).inline_keyboard);
   // A request with a time is a booking to confirm; without one it is an enquiry.
   return sendTelegramMessage(lines.join('\n'), rows.length ? { inline_keyboard: rows } : undefined, slot ? 'bookings' : 'leads');

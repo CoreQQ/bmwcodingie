@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { InlineButton, InlineKeyboard } from '@/lib/telegram';
-import { bizChatLink } from '@/lib/phone';
+import { bizChatLink, bizChatLinkFor } from '@/lib/phone';
 
 // The owner's morning view of the business: today, tomorrow, and everyone still
 // waiting on him. Lives here rather than in the cron so the bot can rebuild the
@@ -19,7 +19,41 @@ export type AgendaLead = {
   created_at?: string;
   handled?: boolean;
   source?: string | null;
+  visit_type?: string | null;
+  visit_address?: string | null;
 };
+
+/** Google Maps with the route to an address already asked for. */
+export const mapsLink = (address: string) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+
+/**
+ * One job on a day list: time, the customer (a tap opens their WhatsApp chat),
+ * the service, and where it happens — the address is a tap to the route
+ * (owner, 11 Nov 2026: the service is mobile, the day is driven).
+ */
+export function jobLine(b: AgendaLead): string {
+  const chat = bizChatLinkFor(b.contact ?? '');
+  const name = esc((b.name ?? '').trim() || 'No name');
+  const where =
+    b.visit_type === 'mobile'
+      ? b.visit_address
+        ? ` · 📍 <a href="${esc(mapsLink(b.visit_address))}">${esc(b.visit_address.slice(0, 80))}</a>`
+        : ' · 📍 you go to them — no address yet'
+      : b.visit_type === 'meet'
+        ? ' · 🤝 they come to you'
+        : '';
+  return `  ${b.status === 'confirmed' ? '✅' : '⏳'} ${esc(b.slot_time ?? '')} — ${chat ? `<a href="${chat}">${name}</a>` : name}${b.service ? ` · ${esc(b.service)}` : ''}${where}`;
+}
+
+/** The jobs on these days. visit_type / visit_address are newer columns: if
+ *  the migration has not run, read without them rather than show an empty day. */
+export async function jobsOn(sb: SupabaseClient, days: string[]): Promise<AgendaLead[]> {
+  const read = (cols: string) =>
+    sb.from('bookings').select(cols).in('slot_date', days).in('status', ['pending', 'confirmed']).order('slot_time', { ascending: true });
+  const full = await read('id, name, contact, service, slot_date, slot_time, status, visit_type, visit_address');
+  const { data } = full.error ? await read('id, name, contact, service, slot_date, slot_time, status') : full;
+  return (data ?? []) as unknown as AgendaLead[];
+}
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -186,25 +220,15 @@ export async function buildAgenda(
   const today = dayKey(0);
   const tomorrow = dayKey(1);
 
-  const [{ data: slotData }, waiting, waPending, enquiries] = await Promise.all([
-    sb
-      .from('bookings')
-      .select('id, name, contact, service, slot_date, slot_time, status')
-      .in('slot_date', [today, tomorrow])
-      .in('status', ['pending', 'confirmed'])
-      .order('slot_time', { ascending: true }),
+  const [rows, waiting, waPending, enquiries] = await Promise.all([
+    jobsOn(sb, [today, tomorrow]).catch(() => [] as AgendaLead[]),
     waitingLeads(sb),
     unansweredChats(sb).catch(() => [] as PendingChat[]),
-    openEnquiries(sb).catch((): Enquiries => ({ fresh: [], answered: [], extras: new Map() })),
+    openEnquiries(sb).catch((): Enquiries => ({ fresh: [], answered: [], extras: new Map(), quiet: 0 })),
   ]);
-  const rows = (slotData ?? []) as AgendaLead[];
   const openCount = enquiries.fresh.length + enquiries.answered.length;
 
-  const icon = (s?: string) => (s === 'confirmed' ? '✅' : '⏳');
-  const fmt = (list: AgendaLead[]) =>
-    list.map(
-      (b) => `  ${icon(b.status)} ${b.slot_time} — ${esc(b.name)}${b.service ? ` · ${esc(b.service)}` : ''}`,
-    );
+  const fmt = (list: AgendaLead[]) => list.map(jobLine);
 
   const todays = rows.filter((b) => b.slot_date === today);
   const tomorrows = rows.filter((b) => b.slot_date === tomorrow);
@@ -254,9 +278,19 @@ export async function buildAgenda(
 
 /** How long an open enquiry stays on the list before it is considered dead. */
 const ENQUIRY_DAYS = 30;
+/** An answered enquiry nobody came back on: after this it is off the list
+ *  (11 Nov 2026 — the list had grown past a hundred names and was not being
+ *  read). Nothing is closed; it is just not shown. */
+const ANSWERED_DAYS = 14;
 const ENQUIRY_PAGE = 20;
 
-export type Enquiries = { fresh: AgendaLead[]; answered: AgendaLead[]; extras: Map<number, number> };
+export type Enquiries = {
+  fresh: AgendaLead[];
+  answered: AgendaLead[];
+  extras: Map<number, number>;
+  /** Answered more than ANSWERED_DAYS ago with no decision — not listed. */
+  quiet: number;
+};
 
 function personKey(b: AgendaLead): string {
   const phone = (b.contact ?? '').replace(/\D/g, '');
@@ -281,8 +315,10 @@ export async function openEnquiries(sb: SupabaseClient): Promise<Enquiries> {
   const at = (l: AgendaLead) => l.created_at ?? '';
   // Not answered: longest wait first. Answered: most recent first.
   const fresh = leads.filter((l) => unanswered.has(personKey(l))).sort((a, b) => at(a).localeCompare(at(b)));
-  const answered = leads.filter((l) => !unanswered.has(personKey(l))).sort((a, b) => at(b).localeCompare(at(a)));
-  return { fresh, answered, extras };
+  const quietBefore = new Date(Date.now() - ANSWERED_DAYS * 86400000).toISOString();
+  const allAnswered = leads.filter((l) => !unanswered.has(personKey(l)));
+  const answered = allAnswered.filter((l) => at(l) >= quietBefore).sort((a, b) => at(b).localeCompare(at(a)));
+  return { fresh, answered, extras, quiet: allAnswered.length - answered.length };
 }
 
 /** VIN-check leads carry "VIN check · <model>" as the name; show whose number it is instead. */
@@ -303,7 +339,7 @@ function channel(b: AgendaLead): string {
 }
 
 export async function buildEnquiries(sb: SupabaseClient, page = 0): Promise<{ text: string; keyboard: InlineKeyboard }> {
-  const [{ fresh, answered, extras }, waPending] = await Promise.all([
+  const [{ fresh, answered, extras, quiet }, waPending] = await Promise.all([
     openEnquiries(sb),
     unansweredChats(sb).catch(() => [] as PendingChat[]),
   ]);
@@ -328,6 +364,7 @@ export async function buildEnquiries(sb: SupabaseClient, page = 0): Promise<{ te
   });
   if (pages > 1) lines.push('', `Page ${p + 1} of ${pages}.`);
   if (all.length) lines.push('', 'Tap a number to open it.');
+  if (quiet) lines.push(`🗄 ${quiet} older ${quiet === 1 ? 'one is' : 'ones are'} not shown: answered over ${ANSWERED_DAYS} days ago, no reply since.`);
   if (waPending.length) lines.push(`💬 Plus ${waPending.length} WhatsApp ${waPending.length === 1 ? 'chat' : 'chats'} waiting for a reply.`);
 
   const buttons: InlineButton[][] = [];
@@ -389,7 +426,10 @@ export function buildLeadCard(b: AgendaLead, from: 'agenda' | 'quotes' = 'agenda
       { text: '📋 Number', copy_text: { text: phone } },
       { text: '💬 WhatsApp', url: bizChatLink(phone) },
     ]);
-    buttons.push([{ text: '📖 Read the chat', callback_data: `leadlog:${b.id}` }]);
+    const more: InlineButton[] = [{ text: '📖 Read the chat', callback_data: `leadlog:${b.id}` }];
+    // The assistant is already talking in a WhatsApp enquiry; the others start with his message.
+    if (!/whatsapp ai/i.test(b.source ?? '')) more.push({ text: '✍️ Write the reply', callback_data: `draft:${b.id}` });
+    buttons.push(more);
   }
   if (from === 'quotes') {
     if (!b.handled) buttons.push([{ text: '✅ Answered — sent a price', callback_data: `leaddone:${b.id}:q` }]);
