@@ -18,6 +18,7 @@ import { ensureClient } from '@/lib/crm';
 import { generateWaReply } from '@/lib/waAgent';
 import { markContactHandled } from '@/lib/agenda';
 import { announceDeployOnce } from '@/lib/deployPing';
+import { bizChatLink } from '@/lib/phone';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -93,7 +94,7 @@ export async function GET(req: Request) {
       ok: true,
       // Deploy marker: bump it in a redeploy-only commit, then check it here
       // to know the new build (and new env values) are live.
-      v: 118,
+      v: 119,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
@@ -251,7 +252,7 @@ async function handleUpdate(update: WaUpdate): Promise<void> {
             const err = e instanceof Error ? e.message : String(e);
             await sendOwnerWithMarkup(
               `⚠️ <b>WhatsApp bot error</b> · <code>+${msg.from}</code>\n<code>${esc(err.slice(0, 300))}</code>\nThe customer got no reply — answer them yourself.`,
-              { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${msg.from}` }]] },
+              { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: bizChatLink(msg.from) }]] },
               'urgent',
             ).catch(() => undefined);
           }
@@ -299,7 +300,7 @@ async function handleStatus(sb: SupabaseClient | null, st: WaStatus): Promise<vo
     `❌ <b>WhatsApp could not deliver</b>${to ? ` · <code>+${to}</code>` : ''}\n<code>${esc(why || 'no reason given')}</code>${
       text ? `\n\nThe message:\n<pre>${esc(text.slice(0, 1500))}</pre>` : ''
     }`,
-    to ? { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: `https://wa.me/${to}` }]] } : undefined,
+    to ? { inline_keyboard: [[{ text: '💬 Open WhatsApp', url: bizChatLink(to) }]] } : undefined,
     'urgent',
   );
 }
@@ -321,7 +322,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   const waId = msg.from;
   const label = name ? `${esc(name)} · ` : '';
   const who = `+${waId}`;
-  const numberRow = [{ text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` }, { text: '📋 Number', copy_text: { text: who } }];
+  const numberRow = [{ text: '💬 Open WhatsApp', url: bizChatLink(waId) }, { text: '📋 Number', copy_text: { text: who } }];
 
   // What did they say? Text, a tapped button, or a photo with a caption.
   let text =

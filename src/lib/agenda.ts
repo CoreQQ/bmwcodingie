@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { InlineButton, InlineKeyboard } from '@/lib/telegram';
+import { bizChatLink } from '@/lib/phone';
 
 // The owner's morning view of the business: today, tomorrow, and everyone still
 // waiting on him. Lives here rather than in the cron so the bot can rebuild the
@@ -170,7 +171,7 @@ export function buildPendingWa(list: PendingChat[]): { text: string; keyboard: I
     const first = (c.name || `+${c.waId}`).split(/\s+/)[0].slice(0, 14);
     const row: InlineButton[] = [];
     if (Date.now() - new Date(c.at).getTime() < SERVICE_WINDOW_MS) row.push({ text: `🤖 ${first}`, callback_data: `war:${c.waId}` });
-    row.push({ text: `💬 ${first}`, url: `https://wa.me/${c.waId}` });
+    row.push({ text: `💬 ${first}`, url: bizChatLink(c.waId) });
     row.push({ text: '✅', callback_data: `wadone:${c.waId}` });
     return row;
   });
@@ -386,7 +387,7 @@ export function buildLeadCard(b: AgendaLead, from: 'agenda' | 'quotes' = 'agenda
   if (phone) {
     buttons.push([
       { text: '📋 Number', copy_text: { text: phone } },
-      { text: '💬 WhatsApp', url: `https://wa.me/${phone.replace(/\D/g, '')}` },
+      { text: '💬 WhatsApp', url: bizChatLink(phone) },
     ]);
     buttons.push([{ text: '📖 Read the chat', callback_data: `leadlog:${b.id}` }]);
   }

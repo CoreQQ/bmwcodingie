@@ -5,6 +5,7 @@ import { ensureClient, clientCode, historyForAssistant } from './crm';
 import { notifyTelegram, sendOwnerAlert } from './telegram';
 import { sendWhatsAppText } from './whatsapp';
 import { withOfferNote } from './offerNote';
+import { bizChatLink } from './phone';
 
 // The WhatsApp agent's brain. Called by the Cloud API webhook (/api/whatsapp)
 // and by "Resume AI" in the bot.
@@ -233,7 +234,7 @@ async function notifyOwnerHandover(waId: string, name: string | undefined, text:
       `The assistant stands down here for 6 hours, then answers again if you haven't. <code>/wa stop +${waId}</code> keeps it off for good.`,
     {
       inline_keyboard: [
-        [{ text: '💬 Open WhatsApp', url: `https://wa.me/${waId}` }],
+        [{ text: '💬 Open WhatsApp', url: bizChatLink(waId) }],
         [{ text: '📋 Number', copy_text: { text: `+${waId}` } }],
         [{ text: '▶️ Resume AI here', callback_data: `war:${waId}` }],
       ],
