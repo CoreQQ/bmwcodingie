@@ -7,7 +7,9 @@ import {
   buildBookingsDay,
   buildBookingsMenu,
   editBookingMessage,
+  editMarkup,
   editMessage,
+  enquiryKeyboard,
   isOwner,
   registerBotCommands,
   autoTopics,
@@ -29,7 +31,7 @@ import { getBusinessStats, getHours, getBlockedDates, getSlotDuration } from '@/
 import { calendarToken } from '@/lib/calendar';
 import { REVIEW_TEMPLATES, hasReviewUrl } from '@/lib/reviewTemplates';
 import { sendWhatsAppText, normalizeWaNumber, isWhatsAppConfigured } from '@/lib/whatsapp';
-import { answerPendingWaMessage } from '@/lib/waAgent';
+import { answerPendingWaMessage, draftOwnerReply, storedTurns } from '@/lib/waAgent';
 import {
   buildAgenda,
   buildEnquiries,
@@ -41,7 +43,7 @@ import {
   type AgendaLead,
 } from '@/lib/agenda';
 import { jpAddressMessage } from '@/lib/jpAddress';
-import { findClients, formatClient, resolveClient, ensureClient, clientCode } from '@/lib/crm';
+import { findClients, formatClient, resolveClient, ensureClient, clientCode, historyForAssistant } from '@/lib/crm';
 import { customWindow, windowsFor, windowsOverlap, windowLabel } from '@/lib/hours';
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import { CHEAT_SHEET, CHEAT_DISCLAIMER, findCheat, formatCheat } from '@/lib/cheatsheet';
@@ -49,7 +51,7 @@ import { PRICE_LIST_KEYBOARD, priceListText } from '@/lib/priceList';
 import type { Booking } from '@/lib/types';
 import { isRateLimited } from '@/lib/rateLimit';
 import { announceDeployOnce } from '@/lib/deployPing';
-import { bizChatLink } from '@/lib/phone';
+import { bizChatLink, normalizePhone } from '@/lib/phone';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -76,6 +78,55 @@ function answerPendingInBackground(sb: SupabaseClient, waId: string): void {
         );
       } else {
         await sendOwnerMessage(`${head}\n🤖 ${escapeHtml(r.reply)}${r.notify ? `\n👉 <b>For you:</b> ${escapeHtml(r.notify)}` : ''}`);
+      }
+    })().catch(() => undefined),
+  );
+}
+
+/**
+ * ✍️ under a website enquiry: the first WhatsApp message, written for Alex to
+ * send from his own phone. It arrives as a new message with a button that
+ * opens WhatsApp Business with the text typed in — he reads it, changes what
+ * he likes and presses send. Nothing is sent to the customer from here.
+ */
+function draftReplyInBackground(sb: SupabaseClient, lead: AgendaLead): void {
+  waitUntil(
+    (async () => {
+      const digits = (normalizePhone(lead.contact ?? '') ?? '').slice(1);
+      const isVinCheck = (lead.name ?? '').startsWith('VIN check');
+      const who = isVinCheck ? `VIN check …${digits.slice(-4)}` : (lead.name ?? '').trim() || `+${digits}`;
+      const src = (lead.source ?? '').toLowerCase();
+      const channel = isVinCheck || src.includes('vin') ? 'the VIN check on the site' : src.includes('chat') ? 'the chat on the site' : 'the booking form on the site';
+      try {
+        const [turns, pastJobs] = await Promise.all([
+          storedTurns(sb, digits).catch(() => []),
+          digits ? historyForAssistant(sb, `+${digits}`).catch(() => '') : Promise.resolve(''),
+        ]);
+        const text = await draftOwnerReply(
+          { name: lead.name, bmw_model: lead.bmw_model, service: lead.service, message: lead.message, channel },
+          turns,
+          pastJobs || undefined,
+        );
+        if (!text) throw new Error('nothing came back');
+        // A button link has a size limit; a very long reply is copied instead.
+        const link = bizChatLink(digits, text);
+        const fits = link.length <= 1500;
+        await sendOwnerWithMarkup(
+          `✍️ <b>Reply for ${escapeHtml(who)}</b>${lead.service ? ` · ${escapeHtml(lead.service.slice(0, 60))}` : ''}\n` +
+            (fits
+              ? `<blockquote>${escapeHtml(text)}</blockquote>\nThe button opens WhatsApp Business with this typed in — change anything there, then send.`
+              : `<code>${escapeHtml(text)}</code>\nTap the text to copy it, then open the chat and paste.`),
+          {
+            inline_keyboard: [
+              [{ text: fits ? '💬 Open WhatsApp with this reply' : '💬 Open WhatsApp', url: fits ? link : bizChatLink(digits) }],
+              [{ text: '🔄 Another version', callback_data: `draft:${lead.id}` }],
+            ],
+          },
+        );
+      } catch (e) {
+        await sendOwnerMessage(
+          `⚠️ Could not write the reply for ${escapeHtml(who)} (${escapeHtml((e instanceof Error ? e.message : String(e)).slice(0, 160))}). Tap ✍️ again in a moment, or write it yourself.`,
+        );
       }
     })().catch(() => undefined),
   );
@@ -1281,6 +1332,60 @@ export async function POST(req: Request) {
     return ok();
   }
 
+  // ── The buttons under an enquiry card (enquiryKeyboard in lib/telegram) ──
+  // ✅ Answered / 🏁 Booked / 👎 No deal, recorded for every open enquiry from
+  // that number. The card keeps its text; the row shows the state with a dot,
+  // and tapping another one changes it (that is also the undo).
+  const leadState = /^ls:(a|w|l):(\d+)$/.exec(cq.data);
+  if (leadState) {
+    const id = Number(leadState[2]);
+    const { data: row } = await sb.from('bookings').select('*').eq('id', id).maybeSingle();
+    const lead = row as AgendaLead | null;
+    if (!lead) {
+      await answerCallback(cq.id, 'That enquiry is gone.');
+      return ok();
+    }
+    if (lead.slot_date) {
+      await answerCallback(cq.id, 'This one has a time booked — use its booking card.');
+      return ok();
+    }
+    const contact = lead.contact ?? '';
+    let status = 'pending';
+    if (leadState[1] === 'a') {
+      await sb.from('bookings').update({ status, handled: true }).eq('id', id);
+      await markContactHandled(sb, contact).catch(() => 0);
+    } else {
+      status = leadState[1] === 'w' ? 'won' : 'lost';
+      await sb.from('bookings').update({ status, handled: true }).eq('id', id);
+      if (contact) {
+        await sb
+          .from('bookings')
+          .update({ status, handled: true })
+          .eq('contact', contact)
+          .eq('status', 'pending')
+          .is('slot_date', null)
+          .then(() => undefined, () => undefined);
+      }
+    }
+    await editMarkup(chatId, messageId, enquiryKeyboard({ id, contact, source: lead.source, status, handled: true }));
+    await answerCallback(cq.id, leadState[1] === 'a' ? 'Answered — waiting on them ✓' : leadState[1] === 'w' ? 'Booked 🏁' : 'Closed — no deal');
+    return ok();
+  }
+
+  // ✍️ Write the reply: drafted in the background, arrives as a new message.
+  const draft = /^draft:(\d+)$/.exec(cq.data);
+  if (draft) {
+    const { data: row } = await sb.from('bookings').select('*').eq('id', Number(draft[1])).maybeSingle();
+    const lead = row as AgendaLead | null;
+    if (!lead || !normalizePhone(lead.contact ?? '')) {
+      await answerCallback(cq.id, lead ? 'No phone number on this enquiry.' : 'That enquiry is gone.');
+      return ok();
+    }
+    await answerCallback(cq.id, '✍️ Writing the reply — a few seconds…');
+    draftReplyInBackground(sb, lead);
+    return ok();
+  }
+
   // "Answered" on a lead card: this person (every enquiry from the number) is done.
   const leadDone = /^leaddone:(\d+)(:q)?$/.exec(cq.data);
   if (leadDone) {
@@ -1404,7 +1509,8 @@ export async function POST(req: Request) {
       const p = svc?.price_label ? parseInt(String(svc.price_label).replace(/[^\d]/g, ''), 10) : NaN;
       if (Number.isFinite(p) && p > 0) amounts.add(p);
     }
-    [60, 80, 120, 150].forEach((a) => amounts.add(a));
+    // The prices jobs actually come to (pricing.ts, Nov 2026) — the old list stopped at €150.
+    [80, 150, 200, 250, 300, 350].forEach((a) => amounts.add(a));
     const sorted = [...amounts].sort((a, b) => a - b);
     const rows: { text: string; callback_data: string }[][] = [];
     for (let i = 0; i < sorted.length; i += 3) {

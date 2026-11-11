@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
-import { unansweredChats } from '@/lib/agenda';
+import { jobLine, jobsOn, unansweredChats, type AgendaLead } from '@/lib/agenda';
 
 export const runtime = 'nodejs';
 // Never prerender: without CRON_SECRET the handler reads nothing from the
@@ -67,19 +67,15 @@ export async function GET(req: Request) {
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const tomorrow = new Date(Date.now() + 86400000).toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' });
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' });
 
-  const [visits, attention, leads, wa, pays, nextDay, waiting] = await Promise.all([
+  const [visits, attention, leads, wa, pays, dayJobs, waiting] = await Promise.all([
     sb.from('site_visits').select('path, referrer, source, city, is_returning').gt('created_at', since).limit(5000),
     sb.from('section_time').select('path').gt('created_at', since).limit(20000),
     sb.from('bookings').select('name, source, service').gt('created_at', since).limit(500),
     sb.from('wa_messages').select('wa_id, role, via, content').gt('created_at', since).limit(5000),
-    sb.from('payments').select('amount').gt('created_at', since).limit(500),
-    sb
-      .from('bookings')
-      .select('name, service, slot_time, status')
-      .eq('slot_date', tomorrow)
-      .in('status', ['pending', 'confirmed'])
-      .order('slot_time', { ascending: true }),
+    sb.from('payments').select('amount, client').gt('created_at', since).limit(500),
+    jobsOn(sb, [today, tomorrow]).catch(() => [] as AgendaLead[]),
     unansweredChats(sb).catch(() => []),
   ]);
 
@@ -116,19 +112,26 @@ export async function GET(req: Request) {
   lines.push(`💬 <b>WhatsApp:</b> ${chats} chat${chats === 1 ? '' : 's'} · ${fromCustomers.length} messages in · ${byAi} answered by the assistant · ${byYou} by you`);
   if (waiting.length) lines.push(`⏳ <b>${waiting.length} still waiting for a reply</b>`);
 
-  const p = (pays.data ?? []) as { amount: number }[];
+  const p = (pays.data ?? []) as { amount: number; client?: string | null }[];
   if (p.length) {
     const sum = p.reduce((a, x) => a + Number(x.amount || 0), 0);
     lines.push(`💶 <b>Money:</b> €${sum.toFixed(0)} (${p.length} payment${p.length === 1 ? '' : 's'})`);
   }
 
-  const t = (nextDay.data ?? []) as { name: string; service: string | null; slot_time: string; status: string }[];
+  const t = dayJobs.filter((b) => b.slot_date === tomorrow);
   lines.push('', `📅 <b>Tomorrow:</b> ${t.length ? '' : 'nothing booked'}`);
-  for (const b of t.slice(0, 6)) {
-    lines.push(`   ${b.status === 'confirmed' ? '✅' : '⏳'} ${esc(b.slot_time)} — ${esc(b.name)}${b.service ? ` · ${esc(b.service)}` : ''}`);
-  }
+  for (const b of t.slice(0, 6)) lines.push(jobLine(b));
+
+  // Today's confirmed jobs nobody has logged money for: one tap each, while
+  // he still remembers what he was paid (11 Nov 2026 — /paid was being forgotten).
+  const paidNames = new Set(p.map((x) => (x.client ?? '').trim().toLowerCase()).filter(Boolean));
+  const unpaid = dayJobs
+    .filter((b) => b.slot_date === today && b.status === 'confirmed' && !paidNames.has((b.name ?? '').trim().toLowerCase()))
+    .slice(0, 5);
+  if (unpaid.length) lines.push('', `💶 <b>Today's jobs</b> — tap a name to log what you were paid.`);
 
   const buttons = [
+    ...unpaid.map((b) => [{ text: `💶 ${(b.name ?? '').trim().slice(0, 24) || 'Job'}${b.slot_time ? ` · ${b.slot_time}` : ''}`, callback_data: `bkpaid:${b.id}` }]),
     ...(waiting.length ? [[{ text: `⏳ WhatsApp waiting (${waiting.length})`, callback_data: 'wapend' }]] : []),
     [{ text: '⏰ Agenda', callback_data: 'agenda' }],
   ];

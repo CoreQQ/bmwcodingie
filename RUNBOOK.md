@@ -102,6 +102,16 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **Fewer taps (11 Nov 2026).** Under every new enquiry card: 💬 Open
+  WhatsApp · ✍️ Write the reply (site form / VIN check / site chat only — the
+  model drafts the first message *as Alex*, `draftOwnerReply` in
+  `waAgent.ts`, and a button opens WhatsApp Business with it typed in) ·
+  ✅ Answered / 🏁 Booked / 👎 No deal (`ls:a|w|l:<id>`; the row shows the state
+  with a dot, another tap changes it). `/quotes` no longer lists enquiries
+  answered over 14 days ago (they stay in the database, only counted). Day
+  lists (agenda, evening summary) link each name to the chat and each address
+  to Google Maps; the evening summary has a 💶 button per confirmed job of the
+  day with no payment logged.
 - **VINs are tap-to-copy:** every HTML message leaving `tgCall` passes
   through `tapToCopyVins` (`src/lib/vin.ts`), which wraps each VIN in `<code>`
   (shown upper case, O→0) — customer texts, enquiries, lead cards, all of it.
