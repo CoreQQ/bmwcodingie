@@ -48,6 +48,9 @@ export const UPGRADE_LANDINGS: Record<string, ServicePage> = {
       { q: 'What do I need for a remote session?', a: 'A Windows laptop with a stable internet connection, an ENET (Ethernet-to-OBD) cable, and the car parked with a battery charger or the engine able to keep the voltage up. We send a short checklist beforehand.' },
       { q: 'My BMW is from 2015 — will CarPlay work?', a: 'No — CarPlay cannot be activated on BMWs built before 2016. Hidden features, Video in Motion, maps and diagnostics still apply. From 2016 on, your VIN tells us whether your car can have it.' },
       { q: 'Is there a yearly fee?', a: 'No. It is a one-off activation with no subscription.' },
+      { q: 'Can BMW add Apple CarPlay to my car?', a: 'A BMW dealer can sell it on some cars; an independent activation does the same thing in the car’s own iDrive for a one-off price — €150 on NBT Evo, €220 on iDrive 7, with no subscription. It works on most BMWs built from 2016; earlier cars cannot have it activated.' },
+      { q: 'Is a CarPlay upgrade the same as a CarPlay retrofit box?', a: 'No. A retrofit box is extra hardware fitted behind the dash for cars that cannot run CarPlay natively. Activation switches on the CarPlay that the NBT Evo or iDrive 7 system already supports — nothing is added to the car, and it looks and works as if it came from the factory.' },
+      { q: 'Where can I get BMW CarPlay activation near me in Ireland?', a: 'Anywhere: it is done remotely, so it does not matter whether you are in Cork, Galway, Limerick or Donegal. You need a Windows laptop and an ENET cable; we connect, activate it and you see it working before you pay. Around Dublin we can come to the car instead.' },
     ],
     related: [
       { slug: 'apple-carplay-activation-dublin', label: 'CarPlay activation in Dublin' },

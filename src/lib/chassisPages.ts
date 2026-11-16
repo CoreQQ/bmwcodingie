@@ -398,9 +398,11 @@ const CHASSIS: ChassisFacts[] = [
 ];
 
 function buildChassisPage(f: ChassisFacts): ServicePage {
+  // "F-series BMW" read as "BMW F-series BMW Coding" in the title.
+  const name = f.short.replace(/ BMW$/, '');
   return {
     slug: f.slug,
-    metaTitle: `BMW ${f.short} Coding & CarPlay Ireland`,
+    metaTitle: `BMW ${name} Coding & CarPlay Ireland`,
     metaDescription: `BMW ${f.codes} coding in Dublin and across Ireland (${f.years}). ${f.popular[0]}, hidden features, Video in Motion and diagnostics — in person or remote.`,
     serviceName: `BMW ${f.title} Coding`,
     eyebrow: `${f.codes} · ${f.years}`,
@@ -410,7 +412,7 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
       f.genNote,
       `Every job starts with your exact build: send the model year and VIN and we confirm which features your ${f.short} supports before anything is booked. Work is done in person around Dublin and the surrounding counties, at your home or workplace, or remotely over ENET anywhere in Ireland. Everything is reversible and you pay on completion, once you have seen it working.`,
     ],
-    includedHeading: `Most-requested coding on the ${f.short}`,
+    includedHeading: `BMW ${name} coding list — the most requested options`,
     included: f.popular,
     modelsHeading: 'Generation details',
     models: [
@@ -427,6 +429,10 @@ function buildChassisPage(f: ChassisFacts): ServicePage {
     ],
     faqs: [
       f.faq,
+      {
+        q: `What are the coding options for a BMW ${name}?`,
+        a: `${f.popular.slice(0, 4).join('; ')} are the ones owners ask for most. The full BMW coding list also covers lighting, comfort, displays and multimedia; what your own car can have depends on its build, which we confirm from the VIN before booking.`,
+      },
       {
         q: `How much does coding a ${f.short} cost?`,
         a: 'It depends on the features: CarPlay activation is €150 on NBT Evo and €220 on MGU, diagnostics start from €80, and multi-feature sessions are priced as a bundle. We confirm the price up front from your build.',

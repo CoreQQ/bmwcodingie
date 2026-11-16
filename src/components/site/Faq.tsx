@@ -7,7 +7,9 @@ import { Reveal } from './Reveal';
 
 export function Faq() {
   const t = useTranslations('Faq');
-  const FAQS = [1, 2, 3, 4, 5, 6, 7].map((i) => ({
+  // 8–11 answer the searches people actually type (Nov 2026): what coding is,
+  // what it costs, "near me", and doing it with an app.
+  const FAQS = [8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 11].map((i) => ({
     q: t(`q${i}` as Parameters<typeof t>[0]),
     a: t(`a${i}` as Parameters<typeof t>[0]),
   }));

@@ -42,9 +42,9 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
   'bmw-coding-dublin': {
     slug: 'bmw-coding-dublin',
     price: { amount: 80, text: 'From €80 per visit or session · single settings from €40, combined' },
-    metaTitle: 'BMW Coding Dublin | Mobile Service, Pay on Completion',
+    metaTitle: 'BMW Coding Dublin | Mobile Specialist, From €80',
     metaDescription:
-      'BMW coding in Dublin at your home or workplace: hidden features, comfort and lighting coding, iDrive tweaks and ISTA checks for F and G series. Reversible.',
+      'BMW coding specialist in Dublin — we come to your home or work. Hidden features, CarPlay, iDrive and comfort coding for F & G series from €80. Pay when it works.',
     serviceName: 'BMW Coding',
     eyebrow: 'BMW Coding · Dublin & Ireland',
     h1: 'BMW Coding Dublin — Hidden Features, iDrive Coding & Retrofits',
@@ -53,6 +53,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     intro: [
       'BMW coding changes software parameters that already live inside your car. Instead of swapping parts, we adjust how the existing control units behave — enabling features that are dormant from the factory, tidying up convenience functions, and tailoring the car to how you actually drive it. Everything we change is reversible, and we can return any setting to factory before a dealer visit.',
       'BMW Coding is an independent BMW coding specialist based in Dublin. Most work is done in person across Dublin, Kildare, Wicklow, Meath and Louth, and remote BMW coding is available across Ireland when your car and connection support it. You pay on completion, once the feature has been shown working on your car.',
+      'Looking for BMW coding near you? There is no workshop to drive to and no dealer queue: this is a mobile BMW coding service, so the coder comes to your driveway or your work car park anywhere in Dublin — north side, south side, the city or the suburbs. Whether you call it coding, programming or unlocking features, it is the same job: one visit, every change shown working on your car, and payment only after that.',
     ],
     includedHeading: 'What BMW coding can enable',
     included: [
@@ -82,6 +83,10 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { q: 'Will coding affect my BMW warranty?', a: 'Coding adjusts software values that already exist in the car and is reversible. We can return any setting to factory before a dealer visit, and we will tell you up front if a request is likely to be flagged.' },
       { q: 'Can BMW coding be done remotely?', a: 'Yes, for many functions. You connect a laptop with an ENET cable to the OBD port and we code over the connection. Some coding and all hardware retrofits need to be done in person.' },
       { q: 'How long does BMW coding take?', a: 'Most coding sessions take from thirty minutes to a couple of hours depending on how many features are involved and whether diagnostics are needed first.' },
+      { q: 'Is there a BMW coding specialist near me in Dublin?', a: 'Yes — and you do not have to find us, we come to you. BMW Coding is a mobile service covering all of Dublin and the commuter counties (Kildare, Wicklow, Meath). Further away, most coding can be done remotely with a laptop and an ENET cable. Send your Eircode or area and we tell you the travel cost before you book.' },
+      { q: 'How much does BMW coding cost in Dublin?', a: 'A coding visit or remote session starts at €80: single settings are from €40 each and are combined into one job. Apple CarPlay activation is €150 on NBT Evo and €220 on iDrive 7. The call-out around Dublin is €20, and there is none for remote coding. You get the exact figure before you book and pay only when you have seen it working.' },
+      { q: 'Is BMW coding the same as BMW programming?', a: 'People use both words. Strictly, coding switches on or changes functions that are already in the car’s software, while programming (flashing) installs newer software on a control unit — an iDrive ID4 to ID6 update is programming, folding mirrors on lock is coding. We do both, with BMW’s own tools: ISTA and E-Sys.' },
+      { q: 'Can I code my BMW myself with an app like BimmerCode?', a: 'For simple comfort settings an app can work, and plenty of owners use one. It cannot do the jobs that need activation codes or new software — Apple CarPlay, navigation maps, a Japan to EU conversion, an iDrive update — and a mistake in expert mode can leave a module needing recovery. That is the work people book us for.' },
     ],
     related: [
       { slug: 'apple-carplay-activation-dublin', label: 'Apple CarPlay activation' },
@@ -135,6 +140,9 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { q: 'Is wireless CarPlay included?', a: 'On supported NBT Evo and MGU head units, wireless CarPlay is included. Some older systems support wired CarPlay only — we confirm this before booking.' },
       { q: 'Is there a subscription after activation?', a: 'No. We enable full CarPlay through coding, so there is no trial limit and no annual fee once it is activated.' },
       { q: 'Can you also activate Android Auto?', a: 'Yes — €200 on iDrive 7 (MGU), and now natively on NBT Evo with ID6: €150 for Android Auto on its own (without CarPlay activation and antenna), or €250 together with the CarPlay activation it runs on. Ask us with your build and we will confirm before booking.' },
+      { q: 'Can Apple CarPlay be added to a BMW that did not come with it?', a: 'On most BMWs built from 2016 with the NBT Evo or iDrive 7 system, yes — CarPlay is activated in the car’s own iDrive, with no box or screen swap. It is an upgrade in software, not a hardware retrofit: the car already has what it needs. Cars built before 2016 cannot have it activated. Send your VIN and we tell you which case yours is.' },
+      { q: 'How much does BMW Apple CarPlay cost in Ireland?', a: '€150 on NBT Evo (most 2016–2019 cars) and €220 on iDrive 7 (2020 onwards) — a one-off activation, no subscription. If your car needs the Wi-Fi antenna for wireless CarPlay it is €30 fitted. The call-out around Dublin is €20.' },
+      { q: 'Where can I get BMW CarPlay activation near me?', a: 'We come to you: home or work, anywhere in Dublin and the surrounding counties. Elsewhere in Ireland it can be activated remotely with a laptop and an ENET cable at your end.' },
     ],
     related: [
       { slug: 'bmw-android-auto-activation', label: 'BMW Android Auto activation' },
@@ -193,6 +201,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { q: 'Is it an adapter or a box?', a: 'No. It is activated in the car’s own iDrive system, so it runs on the original screen with nothing plugged in behind the dash.' },
       { q: 'Can I have both CarPlay and Android Auto?', a: 'Where your system supports both, yes — we can activate them in the same session. On NBT Evo the two together are €250, Wi-Fi antenna included if the car needs one. We confirm what your exact car supports beforehand.' },
       { q: 'Can this be done remotely?', a: 'Yes, where supported. You connect a laptop and ENET cable to the OBD port and we activate over the connection.' },
+      { q: 'Can Android Auto be added to iDrive 6 as an upgrade?', a: 'Yes — that is the new part. On NBT Evo with ID6 software Android Auto is activated natively, with no retrofit box: €150 if Apple CarPlay is already active on the car, or €250 together with the CarPlay activation and the Wi-Fi antenna. A car still on ID4/ID5 needs the ID6 update first.' },
     ],
     related: [
       { slug: 'apple-carplay-activation-dublin', label: 'Apple CarPlay activation' },
@@ -327,6 +336,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     intro: [
       'A Japanese import BMW is built for the JDM market — its navigation, radio bands, language and some convenience modules are set up for Japan, not Ireland. Converting it is a regular job for us: we change the region so the car runs as a European model, apply the navigation FSC activation code and load European maps, and address the details that catch imports out, like the ETC mirror module and TCB considerations.',
       'The work is available in Ireland, in person around Dublin and the surrounding counties. Because every import is slightly different, we confirm exactly what your specific car needs first — JDM specs vary by year and build, and an honest scope up front saves time and cost.',
+      'In plain terms: the menus change from Japanese to English, the radio picks up Irish stations instead of stopping at 90 MHz, the sat nav shows Ireland and Europe instead of Japan, and Apple CarPlay is activated as part of the same job.',
     ],
     includedHeading: 'What a Japan to EU conversion covers',
     included: [
@@ -357,6 +367,9 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { q: 'Will the navigation work with European maps?', a: 'On compatible systems we apply the navigation FSC activation code and install European maps so the navigation works here. We confirm your head unit supports it before booking.' },
       { q: 'What is the ETC mirror issue on imports?', a: 'Japanese imports often have an ETC toll module tied to the mirror that can cause faults here. We handle it as part of a proper conversion.' },
       { q: 'How long does a conversion take?', a: 'Most conversions are completed in a single in-person session, though map installation and FSC activation can add time depending on the system.' },
+      { q: 'Can you change a BMW from Japanese to English?', a: 'Yes. The language change is part of the conversion: menus, instrument cluster messages and voice prompts move from Japanese to English (or another European language). On a Japanese-market car the English option is often missing from the settings altogether, which is why it has to be converted rather than just selected.' },
+      { q: 'My Japanese import BMW radio only goes up to 90 MHz — can that be fixed?', a: 'Yes. Japan uses a different FM band, so an import only tunes 76–90 MHz and misses most Irish stations. The conversion sets the radio to the European band, with no band expander needed.' },
+      { q: 'How much does a Japan to EU conversion cost?', a: '€250 on NBT Evo (most 2016–2019 cars) and €300 on iDrive 7 (2020 onwards), with Apple CarPlay activation included in both. If an NBT Evo car is still on ID4/ID5 software, the ID6 update is €100 more.' },
     ],
     related: [
       { slug: 'bmw-map-updates-fsc-codes', label: 'BMW map updates and FSC codes' },
@@ -443,6 +456,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     intro: [
       'BMW navigation runs on map data that needs periodic updating, and each update is authorised by an FSC (Freischaltcode) tied to your car. We update the maps on compatible systems and apply the matching FSC activation code so the navigation accepts them — handy after an import, after a head-unit change, or simply when your maps are years out of date.',
       'Map and FSC work is available in Ireland, in person around Dublin and, on some systems, remotely. Compatibility depends on your head unit and current software, so we confirm what your car supports before booking and tell you honestly if an update is not worthwhile on your system.',
+      'Call it a map update, a sat nav update or a navigation update — it is the same job: current European maps installed on the BMW’s own navigation, with the activation (FSC) code that makes the car accept them.',
     ],
     includedHeading: 'What map and FSC work covers',
     included: [
@@ -470,6 +484,7 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
       { q: 'What is an FSC code?', a: 'An FSC (Freischaltcode) is an authorisation code tied to your car that unlocks or validates features like navigation maps. The right FSC lets the system accept updated maps.' },
       { q: 'My import has no navigation — can you activate it?', a: 'On compatible systems we can apply the FSC activation code and install maps to activate navigation, which is common after a Japanese import. Send your build and we will confirm.' },
       { q: 'Can map updates be done remotely?', a: 'Some FSC work can be done remotely, but full map installation often needs the car in person. We tell you which applies to your system.' },
+      { q: 'How much does a BMW sat nav map update cost in Ireland?', a: 'It depends on the navigation system and the map region the car needs, so it is quoted from your VIN before you book — you get one figure for the maps and the activation code together, and you pay once the new maps are shown working.' },
     ],
     related: [
       { slug: 'japan-import-bmw-conversion-ireland', label: 'Japan import BMW conversion' },
