@@ -48,6 +48,8 @@ import { customWindow, windowsFor, windowsOverlap, windowLabel } from '@/lib/hou
 import { CANNED_REPLIES, getReply } from '@/lib/replies';
 import { CHEAT_SHEET, CHEAT_DISCLAIMER, findCheat, formatCheat } from '@/lib/cheatsheet';
 import { PRICE_LIST_KEYBOARD, priceListText } from '@/lib/priceList';
+import { promoTexts } from '@/lib/promoKit';
+import { goalLines, monthProgress } from '@/lib/goal';
 import type { Booking } from '@/lib/types';
 import { isRateLimited } from '@/lib/rateLimit';
 import { announceDeployOnce } from '@/lib/deployPing';
@@ -299,10 +301,31 @@ async function sendReviewTemplates(sb: SupabaseClient, rest: string): Promise<vo
   await sendOwnerMessage(lines.join('\n'));
 }
 
+/**
+ * /promo — the advertising texts, one message each, the text in a block that
+ * copies on a tap. Where to post it is written above each one.
+ */
+async function sendPromoKit(sb: SupabaseClient | null): Promise<void> {
+  let whatsapp = '';
+  if (sb) {
+    const { data } = await sb.from('site_settings').select('whatsapp, phone').eq('id', 1).maybeSingle();
+    const row = data as { whatsapp?: string | null; phone?: string | null } | null;
+    whatsapp = row?.whatsapp || row?.phone || '';
+  }
+  const progress = sb ? await monthProgress(sb).catch(() => null) : null;
+  await sendOwnerMessage(
+    ['📣 <b>Ad texts — ready to post</b>', 'Tap a text to copy it. Prices and the offer line are today’s; send /promo again whenever they change.', ...(progress ? ['', ...goalLines(progress)] : [])].join('\n'),
+  );
+  for (const t of promoTexts(whatsapp)) {
+    await sendOwnerMessage(`<b>${escapeHtml(t.title)}</b>\n<i>${escapeHtml(t.where)}</i>\n<pre>${escapeHtml(t.text)}</pre>`);
+  }
+}
+
 const TOOLS_KEYBOARD = {
   inline_keyboard: [
     [{ text: '🇯🇵 Japanese address', callback_data: 'tool:jp' }],
     [{ text: '💶 All prices', callback_data: 'tool:prices' }],
+    [{ text: '📣 Ad texts — ready to post', callback_data: 'tool:promo' }],
     [{ text: '🔧 Coding cheat-sheet', callback_data: 'tool:cheat' }],
     [{ text: '📊 Stats', callback_data: 'tool:stats' }],
     [{ text: '📆 Calendar link', callback_data: 'tool:cal' }],
@@ -691,6 +714,11 @@ export async function POST(req: Request) {
     // Every coding price in one message (also 💶 in the keyboard and /tools).
     if (/^\/prices?(@\w+)?\b/i.test(text)) {
       await sendOwnerWithMarkup(priceListText(), PRICE_LIST_KEYBOARD);
+      return ok();
+    }
+    // Ready-to-post advertising texts, with today's prices (also in /tools).
+    if (/^\/promo(@\w+)?\b/i.test(text)) {
+      await sendPromoKit(sb);
       return ok();
     }
     if (/^\/tools(@\w+)?\b/.test(text)) {
@@ -1164,13 +1192,14 @@ export async function POST(req: Request) {
   }
 
   // /tools buttons and the review templates from /reply.
-  const tool = /^tool:(jp|prices|cheat|stats|cal|ban)$/.exec(cq.data);
+  const tool = /^tool:(jp|prices|promo|cheat|stats|cal|ban)$/.exec(cq.data);
   if (tool) {
     await answerCallback(cq.id);
     if (tool[1] === 'jp') {
       const { text, keyboard } = jpAddressMessage();
       await sendOwnerMessage(text, keyboard as never);
     } else if (tool[1] === 'prices') await sendOwnerWithMarkup(priceListText(), PRICE_LIST_KEYBOARD);
+    else if (tool[1] === 'promo') await sendPromoKit(sb);
     else if (tool[1] === 'cheat') await sendCheatIndex(sb);
     else if (tool[1] === 'stats') await sendStats(sb);
     else if (tool[1] === 'cal') await sendCalendarLink();

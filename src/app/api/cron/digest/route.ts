@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
 import { jobLine, jobsOn, unansweredChats, type AgendaLead } from '@/lib/agenda';
+import { goalLines, monthProgress } from '@/lib/goal';
 
 export const runtime = 'nodejs';
 // Never prerender: without CRON_SECRET the handler reads nothing from the
@@ -103,6 +104,9 @@ export async function GET(req: Request) {
 
   const l = (leads.data ?? []) as { name: string | null; source: string | null; service: string | null }[];
   lines.push('', `📥 <b>Enquiries:</b> ${l.length}${l.length ? ` — ${top(tally(l.map(channel)), 5)}` : ''}`);
+  // The month against its target, every evening (lib/goal.ts).
+  const progress = await monthProgress(sb).catch(() => null);
+  if (progress) lines.push(...goalLines(progress));
 
   const m = (wa.data ?? []) as { wa_id: string; role: string; via: string | null; content: string }[];
   const fromCustomers = m.filter((x) => x.role === 'user');
