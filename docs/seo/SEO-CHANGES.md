@@ -62,3 +62,36 @@ CarPlay €150 NBT Evo / €220 iDrive 7 · Android Auto €200 iDrive 7, iDrive
 - No `noindex` added anywhere (project rule) — county-page consolidation is a roadmap decision.
 - No new reviews, ratings, addresses, certifications or projects.
 - No DNS, analytics IDs, Search Console or Google Business Profile changes.
+
+## 16 Nov 2026 — covering the searches people actually type
+
+Owner: "I'm always in 3rd–5th place; I want the site to come up whenever
+someone needs coding." Google's own suggestions for Ireland (gl=ie) were
+compared with the text of all 63 indexable pages. Phrases that appeared on
+**no page at all**: "near me", "reviews", "what is bmw coding", "Japanese to
+English" / "change language", "sat nav", "cheat sheet", "remote start",
+"CarPlay retrofit / upgrade", "Android Auto upgrade". On one or two pages
+only: "specialist", "coder", "programming", "coding service", "BimmerCode".
+
+Changed:
+- `/bmw-coding-dublin` — title "BMW Coding Dublin | Mobile Specialist, From
+  €80", description, a "BMW coding near you" paragraph, four new questions
+  (specialist near me, cost in Dublin, coding vs programming, app vs specialist).
+- Home FAQ (all 6 languages) — what BMW coding is, cost in Ireland, specialist
+  near me, coding with an app; the first three now lead the list.
+- CarPlay Dublin / Ireland — "can CarPlay be added", cost in Ireland, near me,
+  upgrade vs retrofit box.
+- Japan → EU — Japanese to English, the 90 MHz radio, sat nav, cost.
+- Maps — "sat nav update" wording and a cost question. Android Auto — iDrive 6
+  upgrade question.
+- `/bmw-coding-list` — its title was being cut to "BMW Coding List" (too long,
+  with a " | " in it); now "BMW Coding List: Options & Hidden Features, F & G
+  Series". Model pages: "BMW F-series BMW Coding" duplicate fixed, the list is
+  headed "BMW <model> coding list — the most requested options", plus a
+  "coding options" question.
+- Two guides: `/blog/what-is-bmw-coding` (first in the list, so it is linked
+  from the home page) and `/blog/bimmercode-vs-bmw-coding-specialist-ireland`.
+
+Still open, and not fixable in code: there is no review on the site and no
+Google rating shown ("bmw coding dublin reviews" is a suggested search), and
+"near me" searches are answered by Google's map block first.

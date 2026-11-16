@@ -140,7 +140,15 @@
     "q6": "Mano importuotas automobilis yra Japonijos specifikacijos — galite jį konvertuoti?",
     "a6": "Konversija iš Japonijos į ES specifikaciją — dažnas darbas: regiono pakeitimas, FSC, ETC veidrodžių valdymas ir TCB aspektai. Atsiųskite informaciją, ir pasakysime, ko konkrečiai reikia jūsų automobiliui.",
     "q7": "Ar atvykimas pas automobilį yra mokamas?",
-    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų bazės vakarų Dubline. Tikslią kelionės kainą sužinosite prieš registraciją. Dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra."
+    "a7": "Taip — už atvykimą taikomas mokestis: €20 Dubline ir apylinkėse, toliau €1.25 už kilometrą, skaičiuojant nuo mūsų bazės vakarų Dubline. Tikslią kelionės kainą sužinosite prieš registraciją. Dirbant nuotoliniu būdu per ENET atvykimo mokesčio nėra.",
+    "q8": "Kas yra BMW kodavimas?",
+    "a8": "BMW kodavimas – tai nustatymų, kurie jau yra automobilio programinėje įrangoje, keitimas: įjungiamos gamykloje išjungtos funkcijos (veidrodėlių užlenkimas užrakinant, skaitmeninis greitis, vaizdas važiuojant) arba pakeičiamas esamų veikimas. Niekas nekeičiama fiziškai, viską galima grąžinti atgal. Didesni darbai – Apple CarPlay aktyvavimas, Japan → EU konversija, iDrive atnaujinimas – atliekami per tą pačią jungtį, BMW įrankiais.",
+    "q9": "Kiek kainuoja BMW kodavimas Airijoje?",
+    "a9": "Atvykimas arba nuotolinė sesija – nuo €80; atskiri nustatymai nuo €40 kiekvienas ir sujungiami į vieną darbą. Apple CarPlay aktyvavimas – €150 su NBT Evo ir €220 su iDrive 7, Japan → EU konversija – €250 arba €300, CarPlay įskaičiuotas. Tikslią kainą sužinote prieš registraciją, o mokate tik tada, kai viskas veikia.",
+    "q10": "Ar šalia manęs yra BMW kodavimo specialistas?",
+    "a10": "Jei esate Dubline, Kildare, Wicklow ar Meath – taip: dirbame mobiliai ir atvykstame į namus ar darbovietę. Kitur Airijoje daugumą kodavimo atliekame nuotoliniu būdu: prijungiate nešiojamąjį kompiuterį prie automobilio ENET kabeliu, o visa kita padarome mes.",
+    "q11": "Ar galiu užkoduoti BMW pats, naudodamas programėlę?",
+    "a11": "Tokios programėlės kaip BimmerCode susitvarko su paprastais komforto nustatymais, ir daug savininkų jomis naudojasi. Tačiau jos neatlieka darbų, kuriems reikia aktyvavimo kodų ar naujos programinės įrangos: Apple CarPlay, navigacijos žemėlapių, japoniško automobilio konversijos, iDrive atnaujinimo. Dėl to dažniausiai ir kreipiamasi į specialistą."
   },
   "Contact": {
     "eyebrow": "07 / Rezervacija",

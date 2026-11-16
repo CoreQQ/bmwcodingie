@@ -16,6 +16,94 @@ export type BlogPost = {
 };
 
 export const BLOG_POSTS: BlogPost[] = [
+  // Nov 2026: written for the searches nothing on the site answered —
+  // "define coding bmw", "what is bmw coding", "bimmercode ireland / near me".
+  {
+    slug: "what-is-bmw-coding",
+    title: "What Is BMW Coding? A Plain Guide for Irish Owners",
+    metaTitle: "What Is BMW Coding? Meaning, Cost & What It Changes",
+    description: "BMW coding explained in plain English: what it changes, how it differs from programming and retrofits, what it costs in Ireland and whether it is reversible.",
+    date: "2026-11-16",
+    readMinutes: 6,
+    intro: [
+      "A modern BMW leaves the factory with far more software in it than the owner ever sees. The same control units go into cars for every market and every trim level, and a long list of settings decides which functions are switched on in yours. BMW coding is the job of changing those settings.",
+      "This guide explains what coding is and is not, how it differs from programming and from a retrofit, what can realistically be changed, and what it costs in Ireland. It is written by the people who do it every day around Dublin, so the prices are the ones we actually charge.",
+    ],
+    sections: [
+      {
+        heading: "BMW coding, defined",
+        paragraphs: [
+          "Every function in the car — lights, locks, mirrors, the instrument cluster, iDrive — is run by a control unit, and each control unit holds a table of options. Coding means connecting to the car through the OBD port and changing those options: switching a function on, switching one off, or changing how it behaves.",
+          "Nothing is added to the car and nothing is replaced. If the mirrors can fold electrically, coding can make them fold when you lock the car. If the cluster can show a digital speed, coding can switch that display on. The ability was already there; the factory setting simply left it off for your market or your spec.",
+        ],
+      },
+      {
+        heading: "Coding, programming, activation and retrofits — four different jobs",
+        paragraphs: [
+          "People use “coding” for all of these, and a specialist does all four, but they are not the same work and they are not priced the same.",
+        ],
+        bullets: [
+          "Coding — changing options that already exist. Folding mirrors on lock, digital speed, welcome lights, Start/Stop memory.",
+          "Programming (flashing) — installing a newer software version on a control unit. Updating an iDrive from ID4 to ID6 is programming.",
+          "Activation — unlocking a function with a code tied to your car. Apple CarPlay and navigation maps work this way.",
+          "Retrofit — fitting hardware the car did not have (a reversing camera, cruise control buttons, ambient lighting) and then coding the car to use it.",
+        ],
+      },
+      {
+        heading: "What can be coded on a BMW",
+        paragraphs: [
+          "On F-Series and G-Series cars the usual requests fall into a few groups. What your own car can have depends on its build, which is why everything starts with the VIN.",
+        ],
+        bullets: [
+          "Comfort: mirrors folding on lock, windows and roof from the key, seatbelt chimes, Start/Stop memory",
+          "Lighting: welcome and coming-home lights, daytime running light behaviour, indicator blink count",
+          "Displays: digital speed, sport displays, cluster layouts, speed limit information where the car has the camera",
+          "Multimedia: Video in Motion for passengers, fullscreen CarPlay, iDrive menu options",
+          "Bigger jobs on the same connection: Apple CarPlay activation, Android Auto, Japan to EU conversion, iDrive updates, map updates",
+        ],
+      },
+      {
+        heading: "What coding cannot do",
+        paragraphs: [
+          "Coding cannot create hardware. Heated seats need the heating elements, a reversing camera needs a camera, adaptive cruise needs the radar. Where the parts are missing the job becomes a retrofit, with parts and fitting.",
+          "It also cannot get around the car’s generation. Apple CarPlay cannot be activated on BMWs built before 2016, because the head unit does not support it. An honest specialist tells you this from the VIN before you book, not when the car is already connected.",
+        ],
+      },
+      {
+        heading: "Is it safe and reversible? What about warranty?",
+        paragraphs: [
+          "Coding changes values that BMW’s own software provides for, so it is reversible: any setting can be returned to the factory value, for example before a dealer visit. We tell you up front if a particular request is one a dealer is likely to notice.",
+          "The risk is in how it is done, not in the idea. A stable power supply, the right data for your exact car and a backup before anything is written are what separate a routine job from a control unit that needs recovering. Video in Motion is for passengers; the driver should not be watching a screen.",
+        ],
+      },
+      {
+        heading: "What BMW coding costs in Ireland",
+        paragraphs: [
+          "Software jobs have known prices once the build is confirmed. These are ours in 2026, paid on completion once you have seen the result.",
+        ],
+        bullets: [
+          "A coding visit or remote session — from €80; single settings are from €40 each and are combined into one job",
+          "Apple CarPlay activation — €150 on NBT Evo (most 2016–2019 cars), €220 on iDrive 7",
+          "Japan to EU conversion — €250 on NBT Evo, €300 on iDrive 7, Apple CarPlay included",
+          "Full ISTA diagnostics with a written summary — from €80",
+          "Call-out — €20 around Dublin, then €1.25 per km; none for remote coding",
+        ],
+      },
+      {
+        heading: "How it is done",
+        paragraphs: [
+          "There are two ways. In person, we come to the car at your home or workplace around Dublin, Kildare, Wicklow and Meath. Remotely, anywhere in Ireland, you connect a Windows laptop to the car with an ENET cable and we do the work over a screen-share session. It is the same job at the same price.",
+          "Most sessions take between thirty minutes and a couple of hours. The tools are BMW’s own — ISTA for diagnostics and E-Sys for coding — which is what lets a specialist do the activation, programming and conversion work that phone apps cannot.",
+        ],
+      },
+    ],
+    related: [
+      { slug: "bmw-coding-dublin", label: "BMW coding in Dublin" },
+      { slug: "bmw-coding-list", label: "The full BMW coding list" },
+      { slug: "bmw-coding-price-calculator", label: "Price calculator" },
+      { slug: "remote-bmw-coding-ireland", label: "Remote coding across Ireland" },
+    ],
+  },
   {
     slug: 'bmw-apple-carplay-nbt-evo-vs-mgu',
     title: 'BMW Apple CarPlay Activation: NBT Evo vs MGU',
@@ -685,6 +773,77 @@ export const BLOG_POSTS: BlogPost[] = [
       { slug: 'bmw-carplay-activation-ireland', label: 'CarPlay activation across Ireland' },
       { slug: 'bmw-id4-to-id6-upgrade', label: 'ID4 → ID6 update' },
       { slug: 'blog/which-idrive-do-i-have', label: 'Which iDrive do I have?' },
+    ],
+  },
+  {
+    slug: "bimmercode-vs-bmw-coding-specialist-ireland",
+    title: "BimmerCode or a BMW Coding Specialist? What Each Can Do",
+    metaTitle: "BimmerCode in Ireland: App vs BMW Coding Specialist",
+    description: "What an app such as BimmerCode can change on your BMW, where it stops (CarPlay, maps, Japanese imports, iDrive updates) and when to use a specialist.",
+    date: "2026-11-16",
+    readMinutes: 5,
+    intro: [
+      "If you have searched for BMW coding you have met BimmerCode: a phone app that, with an OBD adapter, lets an owner change settings on their own car. People ask us about it every week — sometimes before booking, sometimes after trying it. Here is a fair account of what an app does well, where it stops, and when it makes more sense to have a specialist do the job.",
+    ],
+    sections: [
+      {
+        heading: "What a coding app is",
+        paragraphs: [
+          "BimmerCode and similar apps run on your phone and talk to the car through an adapter in the OBD port. You pick a control unit, change an option from a list and write it back. There is no service to book and nobody to meet: it is a tool, and you are the one doing the coding. The app and a supported adapter are bought once; the developer’s site lists the current price and which adapters work with which cars.",
+        ],
+      },
+      {
+        heading: "What an app does well",
+        paragraphs: [
+          "For the simple comfort and display settings, an app is a reasonable way to go if you are comfortable doing it yourself.",
+        ],
+        bullets: [
+          "Mirrors folding when the car is locked",
+          "Start/Stop remembering its last setting",
+          "Seatbelt and door chimes",
+          "Welcome lights and daytime running light behaviour",
+          "Digital speed and some display options in the cluster",
+        ],
+      },
+      {
+        heading: "Where an app stops",
+        paragraphs: [
+          "The jobs most people actually contact us about are not option changes at all, and an app is not built for them.",
+        ],
+        bullets: [
+          "Apple CarPlay and Android Auto activation — these need an activation for your specific car, not a setting",
+          "Navigation maps and map updates — new map data plus the code that makes the car accept it",
+          "Japanese import conversion — region, language, radio band and navigation all have to change together",
+          "iDrive software updates such as ID4 to ID6 — this is programming, done with BMW’s own tools",
+          "Retrofits — after new hardware is fitted, the car’s build has to be changed so every module knows about it",
+          "Diagnostics — reading a fault is easy; knowing what it means on your car is what ISTA is for",
+        ],
+      },
+      {
+        heading: "The risks of doing it yourself",
+        paragraphs: [
+          "The basic lists are hard to get wrong. Expert mode is different: it exposes raw values, and a wrong one — or a battery that sags while a module is being written — can leave a control unit that will not respond until it is recovered. Take a backup before every change, keep the car on a charger for anything longer than a quick toggle, and change one thing at a time so you know what did what.",
+        ],
+      },
+      {
+        heading: "Which one makes sense for you",
+        paragraphs: [
+          "If you want two or three comfort settings and you enjoy this kind of thing, an app will pay for itself. If you want CarPlay, a Japanese import sorted, an iDrive update or a retrofit — or you simply do not want the risk on your own car — that is specialist work.",
+          "A visit or remote session with us starts at €80 and the small settings are combined into that one job, so it often costs less than people expect to have everything done at once, shown working, and reversible.",
+        ],
+      },
+      {
+        heading: "“BimmerCode near me” in Ireland",
+        paragraphs: [
+          "There is no BimmerCode shop to visit — it is an app. People who search for it near them are usually looking for someone to do the coding for them, and that part we can help with: we come to the car around Dublin and the surrounding counties, and code remotely over an ENET cable anywhere in Ireland.",
+        ],
+      },
+    ],
+    related: [
+      { slug: "bmw-coding-dublin", label: "BMW coding in Dublin" },
+      { slug: "apple-carplay-activation-dublin", label: "Apple CarPlay activation" },
+      { slug: "bmw-coding-list", label: "The full BMW coding list" },
+      { slug: "blog/what-is-bmw-coding", label: "What is BMW coding?" },
     ],
   },
 ];

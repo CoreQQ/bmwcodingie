@@ -133,7 +133,9 @@ export const CODING_LIST: CodingCategory[] = [
 ];
 
 export const CODING_META = {
-  title: 'BMW Coding List | Codeable Features & Hidden Functions — Dublin & Ireland',
+  // Under 62 characters with no " | " in it — the longer one was cut down to
+  // "BMW Coding List" by seoTitle, which is what Google showed.
+  title: 'BMW Coding List: Options & Hidden Features, F & G Series',
   description:
-    'A full list of BMW coding options and hidden features we can enable on F- and G-series cars — CarPlay, Android Auto, iDrive 7 apps, remote engine start, ambient lighting, sport displays, comfort features, cruise control and more. In Dublin and across Ireland.',
+    'The BMW coding list for F and G series: every option and hidden feature we can enable — CarPlay, Video in Motion, folding mirrors, digital speed, remote start and more.',
 };

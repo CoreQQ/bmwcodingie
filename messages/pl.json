@@ -140,7 +140,15 @@
     "q6": "Mój samochód to import ze specyfikacją japońską — można go przekonwertować?",
     "a6": "Konwersje Japonia→UE to dla nas standardowe zlecenie: zmiana regionu, FSC, obsługa lusterek ETC i kwestie TCB. Wyślij szczegóły, a powiemy, czego potrzebuje konkretnie Twój samochód.",
     "q7": "Czy dojazd do samochodu jest płatny?",
-    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszej bazy w zachodnim Dublinie. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy kodowaniu zdalnym przez ENET opłaty za dojazd nie ma."
+    "a7": "Tak — za dojazd pobieramy opłatę: €20 w Dublinie i okolicach, a poza nim €1.25 za kilometr, liczone od naszej bazy w zachodnim Dublinie. Dokładny koszt dojazdu podajemy przed rezerwacją. Przy kodowaniu zdalnym przez ENET opłaty za dojazd nie ma.",
+    "q8": "Czym jest kodowanie BMW?",
+    "a8": "Kodowanie BMW to zmiana ustawień, które już są w oprogramowaniu auta: włączenie funkcji fabrycznie wyłączonych (składanie lusterek przy zamykaniu, cyfrowy prędkościomierz, wideo podczas jazdy) albo zmiana działania tych, które już są. Nic nie jest wymieniane i wszystko da się cofnąć. Większe prace — aktywacja Apple CarPlay, konwersja Japan → EU, aktualizacja iDrive — wykonuje się przez to samo połączenie, narzędziami BMW.",
+    "q9": "Ile kosztuje kodowanie BMW w Irlandii?",
+    "a9": "Wizyta lub sesja zdalna zaczyna się od €80; pojedyncze ustawienia od €40 każde i są łączone w jedno zlecenie. Aktywacja Apple CarPlay to €150 na NBT Evo i €220 na iDrive 7, a konwersja Japan → EU €250 lub €300 z CarPlay w cenie. Dokładną cenę znasz przed rezerwacją, a płacisz dopiero, gdy wszystko działa.",
+    "q10": "Czy w mojej okolicy jest specjalista od kodowania BMW?",
+    "a10": "Jeśli jesteś w Dublinie, Kildare, Wicklow lub Meath — tak: działamy mobilnie i przyjeżdżamy pod dom lub do pracy. W pozostałej części Irlandii większość kodowania robimy zdalnie: podłączasz laptop do auta kablem ENET, a resztą zajmujemy się my.",
+    "q11": "Czy mogę zakodować BMW samodzielnie aplikacją?",
+    "a11": "Aplikacje takie jak BimmerCode radzą sobie z prostymi ustawieniami komfortu i wielu właścicieli z nich korzysta. Nie wykonają jednak prac wymagających kodów aktywacyjnych lub nowego oprogramowania: Apple CarPlay, map nawigacji, konwersji auta z Japonii, aktualizacji iDrive. Po to zwykle umawia się specjalistę."
   },
   "Contact": {
     "eyebrow": "07 / Rezerwacja",

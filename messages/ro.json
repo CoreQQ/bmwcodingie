@@ -140,7 +140,15 @@
     "q6": "Maşina mea este import din Japonia — o puteți converti?",
     "a6": "Conversiile Japonia→UE sunt o lucrare obișnuită pentru noi: schimbarea regiunii, FSC, gestionarea oglinzilor pentru ETC și aspectele legate de TCB. Trimite-ne detaliile și îți spunem exact de ce are nevoie maşina ta.",
     "q7": "Deplasarea la mașină este cu plată?",
-    "a7": "Da — pentru deplasare se percepe o taxă: €20 în Dublin și împrejurimi, apoi €1.25 pe kilometru dincolo, calculat de la baza noastră din vestul Dublinului. Costul exact al deplasării îți este comunicat înainte de programare. Dacă lucrarea se face remote prin ENET, nu există taxă de deplasare."
+    "a7": "Da — pentru deplasare se percepe o taxă: €20 în Dublin și împrejurimi, apoi €1.25 pe kilometru dincolo, calculat de la baza noastră din vestul Dublinului. Costul exact al deplasării îți este comunicat înainte de programare. Dacă lucrarea se face remote prin ENET, nu există taxă de deplasare.",
+    "q8": "Ce este codarea BMW?",
+    "a8": "Codarea BMW înseamnă modificarea unor setări care există deja în software-ul mașinii: se activează funcții lăsate oprite din fabrică (plierea oglinzilor la închidere, viteza digitală, video în mers) sau se schimbă modul în care funcționează cele existente. Nu se înlocuiește nimic și totul este reversibil. Lucrările mai mari — activarea Apple CarPlay, conversia Japan → EU, actualizarea iDrive — se fac prin aceeași conexiune, cu instrumentele BMW.",
+    "q9": "Cât costă codarea BMW în Irlanda?",
+    "a9": "O vizită sau o sesiune la distanță pornește de la €80; setările individuale sunt de la €40 fiecare și se combină într-o singură lucrare. Activarea Apple CarPlay este €150 pe NBT Evo și €220 pe iDrive 7, iar conversia Japan → EU €250 sau €300, cu CarPlay inclus. Afli prețul exact înainte de programare și plătești doar după ce funcționează.",
+    "q10": "Există un specialist în codare BMW aproape de mine?",
+    "a10": "Dacă ești în Dublin, Kildare, Wicklow sau Meath, da: suntem un serviciu mobil și venim la tine acasă sau la serviciu. În restul Irlandei, majoritatea codărilor se fac de la distanță: conectezi un laptop la mașină cu un cablu ENET, iar noi facem restul.",
+    "q11": "Pot să-mi codez singur BMW-ul cu o aplicație?",
+    "a11": "Aplicații precum BimmerCode se descurcă cu setările simple de confort și mulți proprietari le folosesc. Nu pot face însă lucrările care necesită coduri de activare sau software nou: Apple CarPlay, hărți de navigație, conversia unei mașini din Japonia, actualizarea iDrive. Pentru acestea se apelează de obicei la un specialist."
   },
   "Contact": {
     "eyebrow": "07 / Programare",
