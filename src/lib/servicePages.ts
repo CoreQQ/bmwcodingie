@@ -360,11 +360,72 @@ export const SERVICE_PAGES: Record<string, ServicePage> = {
     ],
     related: [
       { slug: 'bmw-map-updates-fsc-codes', label: 'BMW map updates and FSC codes' },
+      { slug: 'japanese-import-bmw-conversion-for-dealers', label: 'conversions for dealers — several cars in one visit' },
       { slug: 'bmw-diagnostics-dublin', label: 'ISTA diagnostics' },
       { slug: 'bmw-coding-dublin', label: 'BMW coding in Dublin' },
       { slug: 'remote-bmw-coding-ireland', label: 'remote BMW coding across Ireland' },
     ],
     waMessage: 'Hi — I have a Japanese import BMW and I’d like it converted for Ireland. My car is a ',
+  },
+
+  // For the trade (16 Nov 2026). Japan → EU is the most requested job, and
+  // dealers who import BMWs from Japan need it on every car — one dealer is
+  // many conversions a month. Prices are the public ones; nothing here promises
+  // a discount.
+  'japanese-import-bmw-conversion-for-dealers': {
+    slug: 'japanese-import-bmw-conversion-for-dealers',
+    price: { amount: 250, text: '€250 per car on NBT Evo · €300 on iDrive 7 (MGU) · Apple CarPlay included · several cars in one visit' },
+    galleryMatch: ['japan'],
+    metaTitle: 'Japanese Import BMW Conversion for Dealers | Ireland',
+    metaDescription:
+      'For dealers importing BMWs from Japan: EU language, radio, navigation and maps converted at your premises, Apple CarPlay included. Several cars in one visit.',
+    serviceName: 'Japan to EU BMW Conversion for Dealers',
+    eyebrow: 'For the trade · Japanese imports',
+    h1: 'Japanese Import BMW Conversion for Dealers — Done at Your Premises',
+    heroSub:
+      'You import BMWs from Japan; we make them ready to sell in Ireland. Language, radio bands, navigation and European maps converted at your forecourt or unit, with Apple CarPlay activated on every car that supports it.',
+    intro: [
+      'Every BMW that arrives from Japan has the same problems on the forecourt: a Japanese menu, a radio that stops at 90 MHz, navigation that only knows Japan, and no CarPlay. A buyer notices all of it on the test drive. Converting these cars is the job we do most, so for a dealer it is routine: send the VINs, we confirm what each car has and what it costs, and we convert them where they stand.',
+      'We come to you around Dublin and the surrounding counties, and several cars can be done in the same visit. Further away, most conversions can be done remotely with a laptop and an ENET cable at your end. Each car is confirmed from its VIN before we start, and you pay per car once it is shown working.',
+    ],
+    includedHeading: 'What each car gets',
+    included: [
+      'European region, English (or another EU language) and Irish radio bands',
+      'Navigation activated with European maps, where the head unit supports it',
+      'Apple CarPlay activation included in the price on NBT Evo and iDrive 7',
+      'ETC mirror module and other Japan-only equipment handled so they do not throw faults',
+      'A diagnostic scan, so you know the car is clean before it goes on sale',
+      'NBT Evo cars still on ID4/ID5: the ID6 update is +€100 per car (€350 together)',
+      'One visit for the whole batch — the call-out is charged per visit, not per car',
+      'An invoice for each car',
+    ],
+    modelsHeading: 'Cars we convert',
+    models: [
+      'F-Series and G-Series BMWs with NBT Evo (roughly 2016–2019) — €250 per car',
+      'iDrive 7 / MGU cars (roughly 2020 onwards) — €300 per car, everything convertible included',
+      'iDrive 8 and newer — priced per car once we see the VIN',
+      'Not E-Series, and CarPlay cannot be activated on cars built before 2016',
+    ],
+    process: [
+      { title: 'Send the VINs', body: 'One message with the full 17-character VIN of each car. We tell you which system each one has, what can be converted and the price per car.' },
+      { title: 'Pick a day', body: 'We come to your premises around Dublin and the surrounding counties, or connect remotely elsewhere in Ireland. Cars that are in the yard the same day are done in the same visit.' },
+      { title: 'Convert and check', body: 'Each car is converted, scanned and shown to you working: menus, radio, navigation and CarPlay.' },
+      { title: 'Pay per car on completion', body: 'You pay for each car once it is done — €250 on NBT Evo, €300 on iDrive 7 — plus one call-out for the visit: €20 around Dublin, €1.25 per km beyond.' },
+    ],
+    faqs: [
+      { q: 'Can you do several cars in one visit?', a: 'Yes. Send the VINs first so we know what each car needs, and we plan the day around the batch. The call-out is charged once for the visit, not for each car.' },
+      { q: 'We sell cars regularly — is there a price for ongoing work?', a: 'Tell us roughly how many BMWs you bring in a month. The prices on this page are per car; for regular batches we agree the arrangement with you directly.' },
+      { q: 'Can it be done before the car is registered?', a: 'Yes. The conversion is done on the car itself and does not depend on registration, VRT or NCT. Many dealers have it done as soon as the car lands, so it is photographed and advertised already converted.' },
+      { q: 'Do you convert other makes?', a: 'No — BMW only (F-Series and G-Series). That is why the conversion is complete rather than a language change alone.' },
+      { q: 'What if a car cannot be fully converted?', a: 'We tell you from the VIN before you book it in. On the newest systems some parts of the conversion are limited, and those cars are quoted individually.' },
+    ],
+    related: [
+      { slug: 'japan-import-bmw-conversion-ireland', label: 'Japan import conversion for owners' },
+      { slug: 'apple-carplay-activation-dublin', label: 'Apple CarPlay activation' },
+      { slug: 'bmw-id4-to-id6-upgrade', label: 'iDrive ID4 → ID6 update' },
+      { slug: 'remote-bmw-coding-ireland', label: 'remote BMW coding across Ireland' },
+    ],
+    waMessage: 'Hi — I’m a dealer with Japanese import BMWs to convert. Cars / VINs: ',
   },
 
   'bmw-map-updates-fsc-codes': {
@@ -492,6 +553,7 @@ export const SERVICE_NAV: { slug: string; label: string }[] = [
   { slug: 'bmw-cruise-control-retrofit', label: 'Cruise Control Retrofit' },
   { slug: 'bmw-hidden-features', label: 'Hidden Features Coding' },
   { slug: 'japan-import-bmw-conversion-ireland', label: 'Japan Import Conversion' },
+  { slug: 'japanese-import-bmw-conversion-for-dealers', label: 'Japan Imports · For Dealers' },
   { slug: 'bmw-map-updates-fsc-codes', label: 'Map Updates & FSC Codes' },
   { slug: 'remote-bmw-coding-ireland', label: 'Remote BMW Coding' },
   { slug: 'bmw-coding-list', label: 'BMW Coding List' },

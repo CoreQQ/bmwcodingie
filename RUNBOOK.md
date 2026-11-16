@@ -102,6 +102,15 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **Growth goal (16 Nov 2026): December = 2× November's enquiries.**
+  `src/lib/goal.ts` counts the month against the target (`GOALS`) and the
+  evening summary prints it. `/promo` (also 📣 in `/tools`) sends ready-to-post
+  texts built from `pricing.ts` and the running offer (`src/lib/promoKit.ts`):
+  two marketplace listings, a message for import dealers, a Google Business
+  Profile post, an Instagram caption — links carry `utm_*`, so an enquiry from
+  them shows its source on the card. The dealer landing page is
+  `/japanese-import-bmw-conversion-for-dealers` (public prices, no discount
+  promised).
 - **Fewer taps (11 Nov 2026).** Under every new enquiry card: 💬 Open
   WhatsApp · ✍️ Write the reply (site form / VIN check / site chat only — the
   model drafts the first message *as Alex*, `draftOwnerReply` in
