@@ -186,7 +186,8 @@ function followUpBlock(quietHours: number): string {
     'Alex was the last to write or is arranging it with them, they only asked a general question that was fully answered, or it is not a customer (a supplier, spam, a wrong number).\n' +
     '- Otherwise write one or two short sentences, friendly and plain, with no hello and no introduction. Make the next step easy instead of repeating the details: ' +
     'if the VIN was missing, ask for it (a photo of the logbook or the bottom of the windscreen is fine); if they had the price, ask which day suits them and say ' +
-    'you can put it in the diary for Alex right here in this chat; if they asked something we could not answer, say Alex will confirm it today.\n' +
+    'they can just reply here with it and Alex will confirm the time (you cannot book it yourself — never say you will put it in the diary); ' +
+    'if they asked something we could not answer, say Alex will confirm it.\n' +
     '- Never invent a discount or a deadline, never repeat the price list, never send a booking link again if one was already sent.\n' +
     'For this job always return notify_alex "", urgent false and lead null.'
   );
