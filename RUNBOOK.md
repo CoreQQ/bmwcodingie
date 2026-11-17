@@ -102,6 +102,25 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **Vercel Pro (17 Nov 2026).** What the project uses it for: hourly crons
+  (Hobby allows one a day, ±59 min) — `/api/cron/followup` at :20 every hour;
+  Web Analytics custom events — every `trackGaEvent` also sends a cookieless
+  Vercel event (`whatsapp_click`, `call_click`, `vin_check_submit`,
+  `booking_submit`; properties `page`, `service`), so conversions are counted
+  for all visitors, not only those who accept cookies; runtime logs kept 1
+  day instead of 1 hour. If the team ever drops back to Hobby, the hourly
+  cron makes every deploy fail — remove it from `vercel.json` first.
+- **Follow-ups for people who went quiet** (`src/lib/followUp.ts`): hourly,
+  09:00–21:00 Irish time, for chats where we spoke last and the customer's
+  last message is 10–23.5 h old (inside WhatsApp's 24 h window); not when the
+  chat is paused, Alex replied within 6 h, or a job is in the diary. The model
+  writes one short nudge or decides none is right. `/wa followup ask` (default:
+  a Telegram card with ✅ Send / ✖️ Skip) · `auto` · `off`. One per silence
+  (`app_config` `fu:<wa_id>`).
+- **Site openers:** after the ready sentence the site puts in WhatsApp
+  ("Hi, I would like to check…") the webhook waits 25 s instead of 6 s for the
+  details, so it answers once (`OPENERS` in the WhatsApp route); its
+  `maxDuration` is 120 s.
 - **Growth goal (16 Nov 2026): December = 2× November's enquiries.**
   `src/lib/goal.ts` counts the month against the target (`GOALS`) and the
   evening summary prints it. `/promo` (also 📣 in `/tools`) sends ready-to-post

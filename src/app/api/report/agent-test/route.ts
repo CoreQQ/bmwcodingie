@@ -19,6 +19,8 @@ type Case = {
   fresh?: string[];
   /** A website enquiry instead: drafts Alex's own first message to them. */
   web?: WebEnquiry;
+  /** Hours the customer has been quiet: drafts the follow-up instead (lib/followUp.ts). */
+  followUp?: number;
   /** A photo sent with the newest message (base64). */
   image?: { media_type: 'image/jpeg' | 'image/png' | 'image/webp'; data: string };
 };
@@ -39,6 +41,7 @@ export async function POST(req: Request) {
         turns: (c.turns ?? []).map((t): WaTurn => ({ at: at(t.m), who: who[t.who], text: t.text })),
         fresh: (c.fresh ?? []).map((text) => ({ at: now.toISOString(), text })),
         web: c.web,
+        followUp: c.followUp ? { quietHours: c.followUp } : undefined,
         profileName: c.profileName,
         pastJobs: c.pastJobs,
         image: c.image,

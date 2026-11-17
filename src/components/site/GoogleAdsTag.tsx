@@ -1,5 +1,6 @@
 'use client';
 
+import { track as vercelTrack } from '@vercel/analytics';
 import { useEffect } from 'react';
 import Script from 'next/script';
 import { useCookieConsent } from '@/lib/useCookieConsent';
@@ -74,6 +75,17 @@ export function GoogleAdsTag() {
  * cookieless ping, so this is safe to call unconditionally.
  */
 export function trackGaEvent(name: string, params: Record<string, string | number | undefined> = {}) {
+  // Vercel Web Analytics custom event (Vercel Pro, 17 Nov 2026): cookieless,
+  // so it counts every visitor — GA4 only sees those who accept cookies.
+  // Two properties at most on Pro: the page and what it was about.
+  try {
+    const props: Record<string, string> = { page: String(params.page_path ?? (typeof location !== 'undefined' ? location.pathname : '')).slice(0, 100) };
+    const about = params.service ?? params.visit_type;
+    if (about !== undefined && about !== '') props.service = String(about).slice(0, 80);
+    vercelTrack(name, props);
+  } catch {
+    // never let analytics break a click
+  }
   if (!GA_ID) return;
   const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
   gtag?.('event', name, { ...params, send_to: GA_ID });

@@ -54,6 +54,7 @@ import type { Booking } from '@/lib/types';
 import { isRateLimited } from '@/lib/rateLimit';
 import { announceDeployOnce } from '@/lib/deployPing';
 import { bizChatLink, normalizePhone } from '@/lib/phone';
+import { followUpMode, sendAskedFollowUp, setFollowUpMode, skipFollowUp } from '@/lib/followUp';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bmwcoding.ie';
 
@@ -746,6 +747,7 @@ export async function POST(req: Request) {
             '<code>/wa reset +353…</code> — the assistant forgets that chat',
             '<code>/wa +353… text</code> — send a message',
             `<code>/wa ${on ? 'off' : 'on'} all</code> — assistant ${on ? 'off' : 'on'} in every chat`,
+            `<code>/wa followup ask|auto|off</code> — a follow-up for people who went quiet (now: <b>${await followUpMode(sb)}</b>)`,
           ].join('\n'),
           { inline_keyboard: [[{ text: `⏳ Waiting for a reply (${pending.length})`, callback_data: 'wapend' }]] },
         );
@@ -753,6 +755,18 @@ export async function POST(req: Request) {
       }
       if (/^(pending|waiting)$/i.test(rest)) {
         await sendPendingWa(sb);
+        return ok();
+      }
+      // Follow-ups for customers who went quiet (lib/followUp.ts).
+      const fu = /^follow-?ups?(?:\s+(ask|auto|off))?$/i.exec(rest);
+      if (fu) {
+        if (fu[1]) await setFollowUpMode(sb, fu[1].toLowerCase() as 'ask' | 'auto' | 'off');
+        const mode = await followUpMode(sb);
+        await sendOwnerMessage(
+          `🔁 <b>Follow-ups for people who went quiet:</b> ${mode === 'ask' ? '✋ ask me first' : mode === 'auto' ? '🤖 sent automatically' : '🔴 off'}\n` +
+            'Checked every hour, 09:00–21:00: when a customer stopped replying after our last message, the assistant writes one short follow-up while WhatsApp still allows it (24h).\n' +
+            '<code>/wa followup ask</code> · <code>/wa followup auto</code> · <code>/wa followup off</code>',
+        );
         return ok();
       }
       const all = /^(on|off)\s+all$/i.exec(rest);
@@ -1168,6 +1182,25 @@ export async function POST(req: Request) {
     const { text, keyboard } = buildPendingWa(await unansweredChats(sb));
     await editMessage(chatId, messageId, text, keyboard);
     await answerCallback(cq.id);
+    return ok();
+  }
+  // 🔁 Follow-up card: send the draft, or skip it.
+  const fuAct = /^fu(s|x):(\d{8,15})$/.exec(cq.data);
+  if (fuAct) {
+    const waId = fuAct[2];
+    if (fuAct[1] === 'x') {
+      await skipFollowUp(sb, waId);
+      await editMessage(chatId, messageId, `✖️ Follow-up skipped · <code>+${waId}</code>`, { inline_keyboard: [[{ text: '💬 Open chat', url: bizChatLink(waId) }]] });
+      await answerCallback(cq.id, 'Skipped');
+      return ok();
+    }
+    const r = await sendAskedFollowUp(sb, waId);
+    await answerCallback(cq.id, r.why);
+    if (r.ok && r.text) {
+      await editMessage(chatId, messageId, `🔁 <b>Follow-up sent</b> · <code>+${waId}</code>\n<blockquote>${escapeHtml(r.text)}</blockquote>`, {
+        inline_keyboard: [[{ text: '💬 Open chat', url: bizChatLink(waId) }]],
+      });
+    }
     return ok();
   }
   const waDone = /^wadone:(\d{8,15})$/.exec(cq.data);
