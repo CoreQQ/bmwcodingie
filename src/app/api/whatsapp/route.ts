@@ -19,9 +19,12 @@ import { generateWaReply } from '@/lib/waAgent';
 import { markContactHandled } from '@/lib/agenda';
 import { announceDeployOnce } from '@/lib/deployPing';
 import { bizChatLink } from '@/lib/phone';
+import { WA_DEFAULT_MESSAGE, WA_OPENERS } from '@/lib/waMessage';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+// 120 s: a longer wait after a site opener (below) plus the main model and
+// its backup must fit, with room to tell Alex if both fail.
+export const maxDuration = 120;
 
 // WhatsApp Business Cloud API webhook — Meta's own payload format, whether
 // Meta posts here directly or through a coexistence relay (Dualhook's Webhook
@@ -40,6 +43,14 @@ const STAND_DOWN_MS = 6 * 60 * 60 * 1000;
 // used to get its own (near-identical) answer. Now a message waits this long,
 // and only the newest in the chat is answered — with all of them in view.
 const BURST_WAIT_MS = 6000;
+// The button on the site opens WhatsApp with a ready sentence ("Hi, I would
+// like to check Apple CarPlay compatibility for my BMW."). Nearly everyone
+// sends it and then types the car and the question — on 16 Nov the assistant
+// answered the opener on its own, then the real question, as two separate
+// replies. After an opener alone it waits longer for the details.
+const OPENER_WAIT_MS = 25000;
+const OPENERS = new Set([WA_DEFAULT_MESSAGE, ...WA_OPENERS].map((t) => t.toLowerCase().replace(/[’']/g, "'").trim()));
+const isSiteOpener = (text: string) => OPENERS.has(text.toLowerCase().replace(/[’']/g, "'").trim());
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 /** Has the assistant already said this (by its opening words) in this chat recently? */
@@ -94,7 +105,7 @@ export async function GET(req: Request) {
       ok: true,
       // Deploy marker: bump it in a redeploy-only commit, then check it here
       // to know the new build (and new env values) are live.
-      v: 123,
+      v: 124,
       hint: 'WhatsApp Cloud API webhook — Meta/Dualhook POST here.',
       configured: isWhatsAppConfigured(),
       base: process.env.WHATSAPP_API_BASE || 'graph.facebook.com',
@@ -436,7 +447,7 @@ async function handleMessage(sb: SupabaseClient | null, msg: WaMessage, name: st
   else {
     // Wait a moment: if they are still typing, the newest message's turn
     // answers everything at once and this one stays quiet.
-    await sleep(BURST_WAIT_MS);
+    await sleep(isSiteOpener(text) ? OPENER_WAIT_MS : BURST_WAIT_MS);
     const { data: newest } = await sb
       .from('wa_messages')
       .select('msg_id, role, via')

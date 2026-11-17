@@ -32,6 +32,9 @@ export function waHref(whatsapp: string, text: string): string {
 
 export { DEFAULT_MESSAGE as WA_DEFAULT_MESSAGE };
 
+/** Every ready opener the site can put in the chat (the webhook waits longer after one). */
+export const WA_OPENERS: string[] = BY_PAGE.map(([, text]) => text);
+
 /** wa.me link with an optional pre-filled text; '#' when no number is set. */
 export function waLink(whatsapp: string, text?: string): string {
   const digits = whatsapp.replace(/[^\d]/g, '');

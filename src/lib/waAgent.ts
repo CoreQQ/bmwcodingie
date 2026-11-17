@@ -38,6 +38,9 @@ export type WaContext = {
   /** Set instead of `fresh` to draft Alex's own first message to someone who
    *  enquired on the website (see draftOwnerReply). */
   web?: WebEnquiry;
+  /** Set instead of `fresh` to write one follow-up to a customer who went
+   *  quiet (lib/followUp.ts). */
+  followUp?: { quietHours: number };
   now?: Date;
 };
 
@@ -135,6 +138,10 @@ export function renderContext(ctx: WaContext): string {
     parts.push(webEnquiryBlock(ctx.web));
     return parts.join('\n\n');
   }
+  if (ctx.followUp) {
+    parts.push(followUpBlock(ctx.followUp.quietHours));
+    return parts.join('\n\n');
+  }
   parts.push(`NEW — answer this\n${ctx.fresh.map((m) => `[${stamp(m.at)}] Customer: ${m.text}`).join('\n')}`);
   parts.push(greetingNote(ctx, now));
   return parts.join('\n\n');
@@ -166,6 +173,22 @@ function webEnquiryBlock(web: WebEnquiry): string {
     `- Plain text, no markdown, no bullet lists, under 550 characters. One message.\n` +
     `- If the conversation above shows they have already been answered on WhatsApp, write a short follow-up instead of repeating it.\n` +
     `For this job always return notify_alex "" , urgent false and lead null.`
+  );
+}
+
+/** A customer who stopped replying: one short nudge, or nothing. */
+function followUpBlock(quietHours: number): string {
+  return (
+    `FOLLOW-UP — nothing new from the customer. They have not written for about ${Math.round(quietHours)} hours, and the last message in the conversation is ours.\n` +
+    'YOUR JOB THIS TIME: decide whether ONE short follow-up message would help them go ahead, and if so write it in "reply".\n' +
+    '- Return reply "" (send nothing) when the conversation reached a natural end or a nudge would be pushy: they booked or agreed a time, ' +
+    'said thanks/bye/ok, said they will come back later or on a given day, declined or found it too expensive, it is work we do not do, ' +
+    'Alex was the last to write or is arranging it with them, they only asked a general question that was fully answered, or it is not a customer (a supplier, spam, a wrong number).\n' +
+    '- Otherwise write one or two short sentences, friendly and plain, with no hello and no introduction. Make the next step easy instead of repeating the details: ' +
+    'if the VIN was missing, ask for it (a photo of the logbook or the bottom of the windscreen is fine); if they had the price, ask which day suits them and say ' +
+    'you can put it in the diary for Alex right here in this chat; if they asked something we could not answer, say Alex will confirm it today.\n' +
+    '- Never invent a discount or a deadline, never repeat the price list, never send a booking link again if one was already sent.\n' +
+    'For this job always return notify_alex "", urgent false and lead null.'
   );
 }
 
