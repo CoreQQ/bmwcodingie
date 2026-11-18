@@ -1,12 +1,12 @@
 {
-  "_note": "Irish dates, inclusive: [first day, last day, first day it is shown as coming soon]. Read at build time by next.config.js (NEXT_PUBLIC_SEASON / NEXT_PUBLIC_UPCOMING) — a deploy inside a window turns that offer on, a deploy after it turns it off. Owner decisions of 25 Oct and 5 Nov 2026.",
+  "_note": "Irish dates, inclusive: [first day, last day, first day it is shown as coming soon]. Read at build time by next.config.js (NEXT_PUBLIC_SEASON / NEXT_PUBLIC_UPCOMING) — a deploy inside a window turns that offer on, a deploy after it turns it off. Owner decisions of 25 Oct, 5 Nov and 18 Nov 2026 (Black Friday brought forward to start at midnight on 19 Nov).",
   "nov11": [
     "2026-11-11",
     "2026-11-11",
     "2026-11-05"
   ],
   "blackfriday": [
-    "2026-11-27",
+    "2026-11-19",
     "2026-11-30",
     "2026-11-12"
   ],

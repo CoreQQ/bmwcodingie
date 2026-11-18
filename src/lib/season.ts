@@ -6,6 +6,8 @@
 // the browser always agree (no date checks in a first render — that is how
 // hydration breaks). The offer changes when the site is rebuilt on the day.
 
+import SEASON_DATES from './season-dates.json';
+
 export type Season = 'nov11' | 'blackfriday' | 'xmas' | '';
 const RAW = process.env.NEXT_PUBLIC_SEASON;
 export const SEASON: Season = RAW === 'nov11' || RAW === 'blackfriday' || RAW === 'xmas' ? RAW : '';
@@ -49,14 +51,21 @@ export const XMAS = {
   tag: 'outline' as 'filled' | 'outline',
 } as const;
 
-/** Black Friday → Cyber Monday (owner, 25 Oct): 10% off jobs DONE on
- *  27–30 November, and CarPlay activation includes the Wi-Fi antenna in the
- *  price — for every car, not only builds that need it. */
+/** Black Friday → Cyber Monday (owner, 25 Oct; brought forward on 18 Nov to
+ *  start at midnight on 19 Nov): 10% off jobs DONE on 19–30 November, and
+ *  CarPlay activation includes the Wi-Fi antenna in the price — for every
+ *  car, not only builds that need it. Not on top of the 11.11 discount. */
 export const BF = {
   pct: 10,
   until: '30 November',
-  dates: '27–30 November',
+  dates: '19–30 November',
+  short: '19–30 Nov',
 } as const;
+
+/** When Black Friday starts and ends, for the countdowns. Irish midnight is
+ *  UTC midnight from late October to late March, which covers every offer. */
+export const BF_STARTS_AT = `${SEASON_DATES.blackfriday[0]}T00:00:00Z`;
+export const BF_ENDS_AT = new Date(Date.parse(`${SEASON_DATES.blackfriday[1]}T00:00:00Z`) + 86400000).toISOString();
 
 /** 11.11 (owner, 5 Nov): 10% off the work for anyone who BOOKS on 11
  *  November; the job itself can be done any day up to 26 November, so it

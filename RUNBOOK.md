@@ -102,6 +102,12 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **Black Friday moved (owner, 18 Nov 2026):** runs 19–30 Nov (was 27–30),
+  starting at midnight. `season-dates.json` holds the dates; `BF_STARTS_AT` /
+  `BF_ENDS_AT` (season.ts) drive the countdown on the poster and the floating
+  notice (`OfferCountdown`, mounted-only so it never breaks hydration): to the
+  start while announced, to the end while running. Still needs the redeploy
+  just after midnight on the 19th to switch the prices on.
 - **Vercel Pro (17 Nov 2026).** What the project uses it for: hourly crons
   (Hobby allows one a day, ±59 min) — `/api/cron/followup` at :20 every hour;
   Web Analytics custom events — every `trackGaEvent` also sends a cookieless

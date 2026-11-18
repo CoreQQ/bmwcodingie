@@ -4,7 +4,7 @@ const SEASON_DATES = require('./src/lib/season-dates.json');
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 // Which offer the site runs, decided once per build from today's Irish date
-// (src/lib/season-dates.json), so a deploy on 27 Nov switches Black Friday on
+// (src/lib/season-dates.json), so a deploy on 19 Nov switches Black Friday on
 // and one on 1 Dec switches to Christmas. NEXT_PUBLIC_SEASON in Vercel
 // overrides it (Preview uses that to show an offer before its dates).
 function seasonForToday() {

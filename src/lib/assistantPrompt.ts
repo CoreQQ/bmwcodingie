@@ -11,7 +11,7 @@ const SOON_FACTS = [
   NOV11_SOON &&
     `11.11 — ${NOV11.pct}% off the work for bookings made ON 11 November, with the job done any day up to ${NOV11.doneBy}`,
   BF_SOON &&
-    `Black Friday — ${BF.pct}% off jobs DONE on ${BF.dates} (Friday to Cyber Monday), and Apple CarPlay activation includes the Wi-Fi antenna; slots on those days can be booked now`,
+    `Black Friday — starts at midnight tonight: ${BF.pct}% off jobs DONE on ${BF.dates} (until Cyber Monday), and Apple CarPlay activation includes the Wi-Fi antenna; slots on those days can be booked now`,
 ].filter(Boolean) as string[];
 
 // There is no workshop any more. Offering one sends a customer to a unit we do
@@ -54,12 +54,13 @@ ${LOCATION_FACT}
   offer (normally €150)".`
     : BF_ON
       ? `
-- BLACK FRIDAY OFFER (running now, Friday 27 to Cyber Monday 30 November): ${BF.pct}% off every job
-  DONE on those four days, and Apple CarPlay activation includes the Wi-Fi antenna in the price
-  (normally €30, every car). The call-out fee is not discounted. Give the
-  offer price and the regular one, e.g. "CarPlay on NBT Evo is €135 this Black Friday (normally
-  €150), antenna included". The discount is for jobs done 27–30 Nov: for a later date say the
-  regular price applies, and that our Christmas offer (10% off) starts on 1 December.`
+- BLACK FRIDAY OFFER (running now, ${BF.dates}, ending on Cyber Monday): ${BF.pct}% off every job
+  DONE in that time, and Apple CarPlay activation includes the Wi-Fi antenna in the price
+  (normally €30, every car). The call-out fee is not discounted, and it does not come on top of
+  the 11.11 discount (an 11.11 booking keeps its 10%, not 20%). Give the offer price and the
+  regular one, e.g. "CarPlay on NBT Evo is €135 this Black Friday (normally €150), antenna
+  included". The discount is for jobs done by ${BF.until}: for a later date say the regular price
+  applies, and that our Christmas offer (10% off) starts on 1 December.`
       : NOV11_ON
         ? `
 - 11.11 OFFER (today only, 11 November): ${NOV11.pct}% off the work for everyone who BOOKS TODAY —

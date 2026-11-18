@@ -20,6 +20,8 @@ import {
   OFFER,
   OFFER_ON,
   XMAS_ON,
+  BF_ENDS_AT,
+  BF_STARTS_AT,
 } from '@/lib/season';
 import { getHours } from '@/lib/stats';
 import { getSupabaseAdmin } from '@/lib/supabase';
@@ -48,7 +50,7 @@ export default async function LocaleLayout({
   // instead of request headers, so the pages can be prerendered and cached.
   setRequestLocale(locale);
 
-  const [settings, catalog, reviews, tCookie, tNotice, tOffer, tSoon] = await Promise.all([
+  const [settings, catalog, reviews, tCookie, tNotice, tOffer, tSoon, tBf] = await Promise.all([
     getSettings(),
     getCatalog(),
     getReviews(),
@@ -56,7 +58,10 @@ export default async function LocaleLayout({
     getTranslations('Announcement'),
     getTranslations(NOV11_ON ? 'ElevenEleven' : BF_ON ? 'BlackFriday' : 'Christmas'),
     getTranslations('OffersSoon'),
+    getTranslations('BlackFriday'),
   ]);
+  // Black Friday notices count down: to the start while announced, to the end while running.
+  const bfUnits = { d: tBf('unitD'), h: tBf('unitH'), m: tBf('unitM'), s: tBf('unitS') };
 
   // The floating notice: the running offer, else the next one coming, else
   // the "we come to you" card. Each has its own dismissal key.
@@ -68,12 +73,24 @@ export default async function LocaleLayout({
         href: NOV11_ON ? '/#eleven-eleven' : BF_ON ? '/#black-friday' : '/bmw-coding-price-calculator',
         storageKey: OFFER.noticeKey,
         variant: (XMAS_ON ? 'xmas' : NOV11_ON ? 'nov11' : 'blackfriday') as 'xmas' | 'nov11' | 'blackfriday',
+        countdown: BF_ON ? { to: BF_ENDS_AT, label: tBf('countdownEnds'), done: tBf('countdownOver'), units: bfUnits } : undefined,
       }
     : NOV11_SOON
       ? { title: tSoon('nov11Notice'), body: tSoon('nov11Fine'), cta: tSoon('noticeCta'), href: '/#eleven-eleven', storageKey: NOV11_SOON_NOTICE_KEY, variant: 'nov11' as const }
       : BF_SOON
-        ? { title: tSoon('bfNotice'), body: tSoon('bfFine'), cta: tSoon('noticeCta'), href: '/#black-friday', storageKey: BF_SOON_NOTICE_KEY, variant: 'blackfriday' as const }
+        ? {
+            title: tSoon('bfNotice'),
+            body: tSoon('bfFine'),
+            cta: tSoon('noticeCta'),
+            href: '/#black-friday',
+            storageKey: BF_SOON_NOTICE_KEY,
+            variant: 'blackfriday' as const,
+            countdown: { to: BF_STARTS_AT, label: tBf('countdownStarts'), done: tBf('countdownLive'), units: bfUnits, reloadWhenDone: true },
+          }
         : null;
+
+  // '2' = the notice carries a countdown line and needs more room in the hero (globals.css).
+  const noticeRoom = notice && 'countdown' in notice && notice.countdown ? '2' : '1';
 
   const mobileOnly = isMobileOnly();
 
@@ -211,7 +228,7 @@ export default async function LocaleLayout({
           after hydration shifted the whole page (CLS). Key matches Announcement. */}
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{if(localStorage.getItem(${JSON.stringify(notice ? notice.storageKey : NOTICE_KEY)})!=='seen')document.documentElement.dataset.notice='1'}catch(e){document.documentElement.dataset.notice='1'}`,
+          __html: `try{if(localStorage.getItem(${JSON.stringify(notice ? notice.storageKey : NOTICE_KEY)})!=='seen')document.documentElement.dataset.notice='${noticeRoom}'}catch(e){document.documentElement.dataset.notice='${noticeRoom}'}`,
         }}
       />
       {/* During an offer, or before one, its notice replaces the "we come to you" one. */}
@@ -224,6 +241,7 @@ export default async function LocaleLayout({
           dismissLabel={tNotice('dismiss')}
           storageKey={notice.storageKey}
           variant={notice.variant}
+          countdown={'countdown' in notice ? notice.countdown : undefined}
         />
       ) : (
         <Announcement
