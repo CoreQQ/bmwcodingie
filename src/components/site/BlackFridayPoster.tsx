@@ -1,11 +1,12 @@
 import { CalendarClock, MessageCircle, Wifi } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { PRICE_ITEMS } from '@/lib/pricing';
-import { BF, BF_ON, BF_SOON, offerPrice } from '@/lib/season';
+import { BF, BF_ENDS_AT, BF_ON, BF_SOON, BF_STARTS_AT, offerPrice } from '@/lib/season';
+import { OfferCountdown } from './OfferCountdown';
 import { waHref } from '@/lib/waMessage';
 
 // The Black Friday "poster" under the home hero: one loud statement (−10% on
-// every job done 27–30 Nov) and one concrete deal (CarPlay at the offer price
+// every job done 19–30 Nov), a countdown to the start or the end, and one concrete deal (CarPlay at the offer price
 // with the Wi-Fi antenna included). Prices come from pricing.ts, so the
 // poster can never disagree with the calculator.
 
@@ -13,7 +14,7 @@ const ACCENT = '#ffd23f';
 
 export async function BlackFridayPoster({ whatsapp }: { whatsapp: string }) {
   // Shown ahead of the dates too (owner: from 12 Nov) as an announcement —
-  // booking a slot for 27–30 Nov now is fine, the discount is by job date.
+  // booking a slot for 19–30 Nov ahead is fine, the discount is by job date.
   if (!BF_ON && !BF_SOON) return null;
   const soon = !BF_ON;
   const [t, tSoon] = await Promise.all([getTranslations('BlackFriday'), getTranslations('OffersSoon')]);
@@ -48,6 +49,15 @@ export async function BlackFridayPoster({ whatsapp }: { whatsapp: string }) {
                   −{BF.pct}%
                 </span>
               </h2>
+              {/* Owner, 18 Nov: count down to the start; once it runs, to the end. */}
+              <OfferCountdown
+                to={soon ? BF_STARTS_AT : BF_ENDS_AT}
+                label={soon ? t('countdownStarts') : t('countdownEnds')}
+                done={soon ? t('countdownLive') : t('countdownOver')}
+                units={{ d: t('unitD'), h: t('unitH'), m: t('unitM'), s: t('unitS') }}
+                reloadWhenDone={soon}
+                accent={ACCENT}
+              />
               <p className="mt-5 max-w-md text-base leading-relaxed text-muted">{soon ? tSoon('bfBody') : t('posterSub')}</p>
             </div>
 

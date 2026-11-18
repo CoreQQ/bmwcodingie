@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Gift, ShoppingBag, Tag, Truck, X } from 'lucide-react';
 import { NOTICE_KEY } from '@/lib/season';
+import { OfferCountdown, type CountdownUnits } from './OfferCountdown';
 
 /**
  * Site-wide notice about the move to a mobile-first service. Sits under the
@@ -17,6 +18,7 @@ export function Announcement({
   dismissLabel,
   storageKey = NOTICE_KEY,
   variant,
+  countdown,
 }: {
   title: string;
   body: string;
@@ -27,8 +29,11 @@ export function Announcement({
   /** An offer instead of the van: Christmas (gift, red edge), Black
    *  Friday (price tag, yellow edge) or 11.11 (bag, orange edge). */
   variant?: 'xmas' | 'blackfriday' | 'nov11';
+  /** A live countdown under the title (Black Friday start or end). */
+  countdown?: { to: string; label: string; done: string; units: CountdownUnits; reloadWhenDone?: boolean };
 }) {
   const KEY = storageKey;
+  const hasCountdown = Boolean(countdown);
   const [show, setShow] = useState(false);
   const [atTop, setAtTop] = useState(true);
 
@@ -45,7 +50,7 @@ export function Announcement({
   useEffect(() => {
     if (!show) return;
     // Lets the home hero make room for the card instead of sliding under it.
-    document.documentElement.dataset.notice = '1';
+    document.documentElement.dataset.notice = hasCountdown ? '2' : '1';
     const onScroll = () => setAtTop(window.scrollY < 80);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -53,7 +58,7 @@ export function Announcement({
       window.removeEventListener('scroll', onScroll);
       delete document.documentElement.dataset.notice;
     };
-  }, [show]);
+  }, [show, hasCountdown]);
 
   if (!show) return null;
 
@@ -95,6 +100,11 @@ export function Announcement({
         )}
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold leading-snug text-ink md:text-sm">{title}</p>
+          {countdown && (
+            <p className="mt-0.5">
+              <OfferCountdown size="sm" {...countdown} />
+            </p>
+          )}
           {/* On a phone the full paragraph would bury the page's own headline,
               so the detail lives one tap away instead. */}
           <p className="mt-1 hidden text-[13px] leading-relaxed text-muted md:block">{body}</p>

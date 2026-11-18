@@ -54,7 +54,7 @@ function offerLines(): string[] {
   const out: string[] = [];
   if (NOV11_ON) out.push(`🛍️ <b>11.11 — today:</b> −${NOV11.pct}% on the work for bookings made today, work done by ${NOV11.doneBy}`);
   else if (NOV11_SOON) out.push(`🛍️ 11.11 — coming: −${NOV11.pct}% on the work for bookings made on 11 Nov, work done by ${NOV11.doneBy}`);
-  if (BF_ON) out.push(`🏷️ <b>Black Friday — now:</b> −${BF.pct}% on jobs done ${BF.dates} · Wi-Fi antenna included with CarPlay`);
+  if (BF_ON) out.push(`🏷️ <b>Black Friday — now:</b> −${BF.pct}% on jobs done ${BF.dates} · Wi-Fi antenna included with CarPlay · not on top of 11.11`);
   else if (BF_SOON) out.push(`🏷️ Black Friday — coming: −${BF.pct}% on jobs done ${BF.dates} · Wi-Fi antenna included with CarPlay`);
   if (XMAS_ON) out.push(`🎄 <b>Christmas — now:</b> −${XMAS.pct}% on the work until ${XMAS.until}`);
   if (out.length && (NOV11_ON || BF_ON || XMAS_ON)) out.push('<i>Prices above are the regular ones; the discount is on the work, never the call-out.</i>');

@@ -505,9 +505,14 @@ main button[aria-pressed] {
 /* Room for the dismissible notice card under the header (Announcement.tsx). */
 html[data-notice] #top > div:first-child,
 html[data-notice] .notice-room { padding-top: 10.5rem; }
+/* A notice with a countdown line ("2") is one line taller. */
+html[data-notice='2'] #top > div:first-child,
+html[data-notice='2'] .notice-room { padding-top: 13rem; }
 @media (min-width: 768px) {
   html[data-notice] #top > div:first-child,
   html[data-notice] .notice-room { padding-top: 16rem; }
+  html[data-notice='2'] #top > div:first-child,
+  html[data-notice='2'] .notice-room { padding-top: 17.5rem; }
 }
 
 /* ── Christmas offer (NEXT_PUBLIC_SEASON=xmas) — see src/lib/season.ts ── */
