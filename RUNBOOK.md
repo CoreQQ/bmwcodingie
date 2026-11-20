@@ -102,6 +102,15 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **Visits counted without cookies (20 Nov 2026):** `HitCounter` (root
+  layout) sends each page view to `/api/hit`; `src/lib/hits.ts` keeps one JSON
+  row per Irish day in `app_config` (`hits:YYYY-MM-DD`: page views, visits,
+  sources, landing pages, device, country) — no IP, no id, nothing stored on
+  the visitor's device, bots filtered by user agent. The evening summary shows
+  it as "👥 Visits"; "👀 Accepted cookies" is the old consent-only count
+  (site_visits). `GET /api/report/review?key=…&part=hits&days=N` lists it.
+  Vercel Web Analytics must be switched on in the dashboard (Project →
+  Analytics) — it was off after the move to Pro, and custom events need it.
 - **Black Friday moved (owner, 18 Nov 2026):** runs 19–30 Nov (was 27–30),
   starting at midnight. `season-dates.json` holds the dates; `BF_STARTS_AT` /
   `BF_ENDS_AT` (season.ts) drive the countdown on the poster and the floating
