@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { sendOwnerWithMarkup } from '@/lib/telegram';
 import { jobLine, jobsOn, unansweredChats, type AgendaLead } from '@/lib/agenda';
 import { goalLines, monthProgress } from '@/lib/goal';
+import { readHits } from '@/lib/hits';
 
 export const runtime = 'nodejs';
 // Never prerender: without CRON_SECRET the handler reads nothing from the
@@ -85,11 +86,25 @@ export async function GET(req: Request) {
 
   // Visitors. Until the site_visits table exists (supabase/schema.sql), the
   // section-attention pings stand in as a rough traffic signal.
+  // Every visit, cookieless (lib/hits.ts) — the real number. The cookie-based
+  // count below only sees people who accepted cookies.
+  const hitDays = await readHits(sb, 8).catch(() => []);
+  const todayHits = hitDays[hitDays.length - 1]?.hits;
+  if (todayHits && todayHits.pv > 0) {
+    const week = hitDays.slice(0, -1).filter((d) => d.hits.land > 0);
+    const avg = week.length ? Math.round(week.reduce((a, d) => a + d.hits.land, 0) / week.length) : 0;
+    const srcLine = Object.entries(todayHits.src)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([k, n]) => `${esc(k)} ${n}`)
+      .join(' · ');
+    lines.push(`👥 <b>Visits:</b> ${todayHits.land} (${todayHits.pv} pages)${avg ? ` · 7-day average ${avg}` : ''}${srcLine ? `\n   From: ${srcLine}` : ''}`);
+  }
   type Visit = { path: string; referrer: string | null; source: string | null; city: string | null; is_returning: boolean };
   if (!visits.error) {
     const v = (visits.data ?? []) as Visit[];
     const back = v.filter((x) => x.is_returning).length;
-    lines.push(`👀 <b>Visitors:</b> ${v.length}${back ? ` (${back} returning)` : ''}`);
+    lines.push(`👀 <b>Accepted cookies:</b> ${v.length}${back ? ` (${back} returning)` : ''}`);
     if (v.length) {
       lines.push(`   Pages: ${top(tally(v.map((x) => x.path)), 4)}`);
       lines.push(`   Came via: ${top(tally(v.map((x) => cameVia(x.source, x.referrer))), 4)}`);

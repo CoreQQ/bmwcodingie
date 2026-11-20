@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { loadTopics } from '@/lib/telegram';
+import { readHits } from '@/lib/hits';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -113,6 +114,11 @@ export async function GET(req: Request) {
     });
   }
 
+  // part=hits — every visit, cookieless (lib/hits.ts), one line per day.
+  if (part === 'hits') {
+    return NextResponse.json({ ok: true, days: await readHits(sb, Math.min(days, 60)) });
+  }
+
   if (part === 'site') {
     const [{ data: visits, error: vErr }, { data: leads }] = await Promise.all([
       sb.from('site_visits').select('created_at, path, referrer, source, device, country, is_returning').gt('created_at', since).order('created_at', { ascending: true }).limit(20000),
@@ -144,6 +150,19 @@ export async function GET(req: Request) {
       visitsPerDay: tally(v.map((r) => day(r.created_at))),
       newVisitorsPerDay: tally(v.filter((r) => !r.is_returning).map((r) => day(r.created_at))),
       leadsPerDay: tally(l.map((r) => day(r.created_at))),
+      // Where the consenting visitors came from, day by day: a drop in one source shows here.
+      sourcePerDay: Object.fromEntries(
+        Object.entries(
+          v.reduce<Record<string, Record<string, number>>>((acc, r) => {
+            const d = day(r.created_at);
+            const h = host(r.referrer);
+            const s = h.includes('google') ? 'google' : h === '(direct)' || h.endsWith('bmwcoding.ie') ? 'direct' : 'other';
+            acc[d] ??= { google: 0, direct: 0, other: 0 };
+            acc[d][s] += 1;
+            return acc;
+          }, {}),
+        ).sort((a, b) => (a[0] < b[0] ? -1 : 1)),
+      ),
       leadsBySource: top(l.map((r) => r.source || '(site form)')),
       last14: { total: last14.length, referrers: top(last14.map((r) => host(r.referrer))), sources: top(last14.map((r) => r.source || '(none)')), paths: top(last14.map((r) => r.path)), device: top(last14.map((r) => r.device || '?')), country: top(last14.map((r) => r.country || '?')) },
       prev14: { total: prev14.length, referrers: top(prev14.map((r) => host(r.referrer))), sources: top(prev14.map((r) => r.source || '(none)')), paths: top(prev14.map((r) => r.path)), device: top(prev14.map((r) => r.device || '?')), country: top(prev14.map((r) => r.country || '?')) },

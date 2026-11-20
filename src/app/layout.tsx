@@ -7,6 +7,7 @@ import { MetaPixel } from '@/components/site/MetaPixel';
 import { GoogleAdsTag } from '@/components/site/GoogleAdsTag';
 import { Attribution } from '@/components/site/Attribution';
 import { VisitorPing } from '@/components/site/VisitorPing';
+import { HitCounter } from '@/components/site/HitCounter';
 
 // "Glass over photo" direction: Sora for headings, DM Sans for text.
 const sora = Sora({
@@ -107,6 +108,7 @@ window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;if(ch
         </noscript>
         {children}
         <VisitorPing />
+        <HitCounter />
         <Analytics />
         <SpeedInsights />
       </body>
