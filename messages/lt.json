@@ -109,7 +109,12 @@
     "next": "Kitas",
     "altFallback": "BMW kodavimo darbas",
     "emptyWork": "Darbas · {n}",
-    "emptyCaption": "Nuotraukos iš naujausių darbų bus pridėtos artimiausiu metu."
+    "emptyCaption": "Nuotraukos iš naujausių darbų bus pridėtos artimiausiu metu.",
+    "latest": "Naujausias darbas",
+    "count": "{n} tikri darbai · pirmiausia naujausi",
+    "pause": "Pauzė",
+    "play": "Tęsti",
+    "seeAll": "Visi projektai"
   },
   "WhyUs": {
     "eyebrow": "04 / Komanda",

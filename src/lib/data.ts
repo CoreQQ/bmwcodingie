@@ -73,11 +73,13 @@ export const getGallery = cache(async (): Promise<GalleryItem[]> => {
   if (!sb) return [];
 
   try {
+    // Newest work first (owner, 22 Nov 2026), everywhere the gallery is shown.
     const { data, error } = await sb
       .from('gallery')
       .select('*')
       .eq('visible', true)
-      .order('sort_order', { ascending: true });
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false });
     if (error || !data) return [];
     return data as GalleryItem[];
   } catch {

@@ -102,6 +102,13 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **Work gallery (22 Nov 2026):** newest photos first everywhere
+  (`getGallery` orders by `created_at` desc — `sort_order` no longer decides).
+  On the home page it is a moving strip (`Gallery.tsx`, `.gallery-track` in
+  globals.css): two rows on desktop, one on phones, starts when scrolled into
+  view, pauses on hover / the Pause button / reduced motion (then a plain
+  scrollable row). Chips come from the caption ("G30 …" → G30, Mini → MINI);
+  the newest photo gets "Latest job". Photos are still added in /admin/gallery.
 - **Visits counted without cookies (20 Nov 2026):** `HitCounter` (root
   layout) sends each page view to `/api/hit`; `src/lib/hits.ts` keeps one JSON
   row per Irish day in `app_config` (`hits:YYYY-MM-DD`: page views, visits,

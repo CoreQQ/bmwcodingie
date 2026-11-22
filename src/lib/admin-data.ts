@@ -32,7 +32,8 @@ export async function adminGetServices(): Promise<Service[]> {
 export async function adminGetGallery(): Promise<GalleryItem[]> {
   const sb = getSupabaseAdmin();
   if (!sb) return [];
-  const { data } = await sb.from('gallery').select('*').order('sort_order');
+  // Same order as the site: newest first.
+  const { data } = await sb.from('gallery').select('*').order('created_at', { ascending: false }).order('id', { ascending: false });
   return (data ?? []) as GalleryItem[];
 }
 

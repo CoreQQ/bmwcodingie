@@ -109,7 +109,12 @@
     "next": "Następne",
     "altFallback": "Realizacja kodowania BMW",
     "emptyWork": "Realizacja · {n}",
-    "emptyCaption": "Zdjęcia z ostatnich zleceń są właśnie dodawane."
+    "emptyCaption": "Zdjęcia z ostatnich zleceń są właśnie dodawane.",
+    "latest": "Najnowsza praca",
+    "count": "{n} prawdziwych realizacji · najnowsze pierwsze",
+    "pause": "Pauza",
+    "play": "Wznów",
+    "seeAll": "Wszystkie projekty"
   },
   "WhyUs": {
     "eyebrow": "04 / Zespół",
