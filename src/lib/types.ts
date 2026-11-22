@@ -39,6 +39,8 @@ export type GalleryItem = {
   caption: string;
   visible: boolean;
   sort_order: number;
+  /** When the photo was added — the gallery shows the newest first. */
+  created_at?: string;
 };
 
 export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'cancelled';

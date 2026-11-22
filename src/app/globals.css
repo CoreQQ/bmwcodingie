@@ -223,6 +223,30 @@ html {
   }
 }
 
+/* ---- Work gallery strip (Gallery.tsx) ----
+   Same loop as the marquee: two identical halves, each card carries its own
+   right padding so the halves match exactly. Edges fade out; hover or the
+   pause button stops it. */
+.gallery-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+.gallery-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 60s linear infinite;
+  will-change: transform;
+}
+.gallery-track--reverse {
+  animation-direction: reverse;
+}
+.gallery-marquee:hover .gallery-track,
+.gallery-marquee:focus-within .gallery-track,
+.gallery-marquee[data-paused] .gallery-track {
+  animation-play-state: paused;
+}
+
 /* Outlined display text (used by the marquee for alternating words) */
 .text-outline {
   color: transparent;
@@ -371,6 +395,19 @@ html {
   }
   .marquee-track {
     animation: none;
+  }
+  /* No motion: the strip becomes a row you scroll yourself, without the copy. */
+  .gallery-track {
+    animation: none;
+  }
+  .gallery-marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+    padding-inline: 1.25rem;
+  }
+  .gallery-track > [aria-hidden='true'] {
+    display: none;
   }
   .reveal,
   .reveal.is-in {

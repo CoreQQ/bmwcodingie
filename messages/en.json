@@ -103,13 +103,18 @@
   "Gallery": {
     "eyebrow": "03 / Work",
     "heading": "Real cars, real screens",
-    "intro": "Before / after, iDrive screens and work in progress — straight from jobs around Dublin.",
+    "intro": "Before / after, iDrive screens and work in progress — straight from jobs around Dublin. The newest first.",
     "close": "Close",
     "previous": "Previous",
     "next": "Next",
     "altFallback": "BMW coding work",
     "emptyWork": "Work · {n}",
-    "emptyCaption": "Photos from recent jobs are being added."
+    "emptyCaption": "Photos from recent jobs are being added.",
+    "latest": "Latest job",
+    "count": "{n} real jobs · newest first",
+    "pause": "Pause",
+    "play": "Play",
+    "seeAll": "See all projects"
   },
   "WhyUs": {
     "eyebrow": "04 / The team",

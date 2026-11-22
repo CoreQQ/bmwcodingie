@@ -109,7 +109,12 @@
     "next": "Următor",
     "altFallback": "Lucrare de coding BMW",
     "emptyWork": "Lucrare · {n}",
-    "emptyCaption": "Adăugăm în curând fotografii de la lucrările recente."
+    "emptyCaption": "Adăugăm în curând fotografii de la lucrările recente.",
+    "latest": "Cea mai nouă lucrare",
+    "count": "{n} lucrări reale · cele mai noi primele",
+    "pause": "Pauză",
+    "play": "Pornește",
+    "seeAll": "Toate proiectele"
   },
   "WhyUs": {
     "eyebrow": "04 / Echipa",
