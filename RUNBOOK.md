@@ -109,6 +109,13 @@ unknown columns and retries; other readers fall back to defaults.
   and `GOOGLE_PLACE_ID` are set in Vercel. Find the Place ID with
   `GET /api/google-place?key=<diagnostics key>&q=BMW Coding Dublin`. Cached
   6 h (≈120 requests a month, inside Google's free allowance).
+  Live since 25 Nov 2026: GOOGLE_PLACE_ID = ChIJAzTxaTi3tAERKsEilZJp8Ww
+  ("BMW Coding Dublin", CID 7850171703771709738 — the same listing as the
+  review link g.page/r/CSrBIpWSafFsECE). It does not come up in text search
+  (service-area listing), so it was taken from the review link's redirect.
+  Google returns the rating and count for it but no review texts
+  (`/api/google-place?key=…&id=<place id>` shows what comes back), so the
+  site shows the rating, the count and the link only.
 - **Work gallery (22 Nov 2026):** newest photos first everywhere
   (`getGallery` orders by `created_at` desc — `sort_order` no longer decides).
   On the home page it is a moving strip (`Gallery.tsx`, `.gallery-track` in
