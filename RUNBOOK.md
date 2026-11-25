@@ -102,6 +102,13 @@ unknown columns and retries; other readers fall back to defaults.
   Android Auto on NBT Evo (10 Nov 2026): **€150 on its own** (no CarPlay
   activation, no antenna — shown in small print), **€250 together with the
   CarPlay activation**, antenna included (`ANDROID_AUTO_WITH_CARPLAY`).
+- **Google reviews on the site (25 Nov 2026):** `GoogleReviews` (section on
+  the home page) and `GoogleRatingBadge` (under the hero buttons) show the
+  live rating, count and Google's own review picks — nothing until both
+  `GOOGLE_PLACES_API_KEY` (owner's Google Cloud key, Places API (New) only)
+  and `GOOGLE_PLACE_ID` are set in Vercel. Find the Place ID with
+  `GET /api/google-place?key=<diagnostics key>&q=BMW Coding Dublin`. Cached
+  6 h (≈120 requests a month, inside Google's free allowance).
 - **Work gallery (22 Nov 2026):** newest photos first everywhere
   (`getGallery` orders by `created_at` desc — `sort_order` no longer decides).
   On the home page it is a moving strip (`Gallery.tsx`, `.gallery-track` in

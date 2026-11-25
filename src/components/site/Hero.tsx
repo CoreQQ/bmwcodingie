@@ -6,6 +6,7 @@ import { WA_DEFAULT_MESSAGE, waHref } from '@/lib/waMessage';
 import { BF_ON, BF_SOON, NOV11_ON, NOV11_SOON, XMAS, XMAS_ON } from '@/lib/season';
 import { Snowfall, XmasGlow } from './Snowfall';
 import { SantaHat } from './SantaHat';
+import { GoogleRatingBadge } from './GoogleRatingBadge';
 
 // First screen per the owner's brief: what we do, the services in one line,
 // two actions (check your BMW, or WhatsApp), and four reasons to trust it.
@@ -100,6 +101,11 @@ export async function Hero({ settings }: { settings: SiteSettings }) {
             >
               <MessageCircle size={16} /> {t('ctaWhatsapp')}
             </a>
+          </div>
+
+          {/* The live Google rating, once the Places key is set (renders nothing before). */}
+          <div>
+            <GoogleRatingBadge />
           </div>
 
           {/* Quiet secondary paths for people not ready to message yet. */}
