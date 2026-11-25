@@ -1,4 +1,5 @@
-import { Instagram, Send, MessageCircle } from 'lucide-react';
+import { Instagram, MapPin, Send, MessageCircle } from 'lucide-react';
+import { GOOGLE_MAPS_URL } from '@/lib/googleProfile';
 import { getTranslations } from 'next-intl/server';
 import type { SiteSettings } from '@/lib/types';
 import { waLink } from '@/lib/data';
@@ -22,6 +23,15 @@ export async function Footer({ settings }: { settings: SiteSettings }) {
             <Logo className="h-24 w-auto" />
             <p className="mt-4 max-w-sm text-sm text-muted">{t('pitch')}</p>
             <div className="mt-5 flex gap-3">
+              <a
+                href={GOOGLE_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Google Maps"
+                className="flex h-10 w-10 items-center justify-center border border-white/10 text-muted transition-colors hover:border-bmw hover:text-ink"
+              >
+                <MapPin size={18} />
+              </a>
               <a
                 href={`https://instagram.com/${ig}`}
                 target="_blank"
