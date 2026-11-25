@@ -33,8 +33,10 @@ export async function getGoogleRating(): Promise<GoogleRating | null> {
         'X-Goog-Api-Key': key,
         'X-Goog-FieldMask': 'rating,userRatingCount,reviews,googleMapsUri',
       },
-      // Hourly: fresh enough to feel live, and a few hundred calls a month.
-      next: { revalidate: 3600 },
+      // Every six hours: reviews do not change by the hour, and it keeps the
+      // reviews request (Places "Enterprise + Atmosphere", 1,000 free a month
+      // since 2025) to about 120 a month — inside Google's free allowance.
+      next: { revalidate: 21600 },
     });
     if (!res.ok) {
       console.error('[googleReviews]', res.status, (await res.text()).slice(0, 200));
