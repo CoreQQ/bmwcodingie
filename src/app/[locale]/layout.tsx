@@ -23,6 +23,7 @@ import {
   BF_ENDS_AT,
   BF_STARTS_AT,
 } from '@/lib/season';
+import { GOOGLE_MAPS_URL } from '@/lib/googleProfile';
 import { getHours } from '@/lib/stats';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { DEFAULT_HOURS, type HoursMap } from '@/lib/hours';
@@ -115,6 +116,7 @@ export default async function LocaleLayout({
   }));
 
   const sameAs = [
+    GOOGLE_MAPS_URL,
     settings.instagram ? `https://instagram.com/${settings.instagram.replace(/^@/, '')}` : null,
     settings.telegram ? `https://t.me/${settings.telegram.replace(/^@/, '')}` : null,
   ].filter(Boolean) as string[];
@@ -204,6 +206,7 @@ export default async function LocaleLayout({
           ),
         },
         sameAs,
+        hasMap: GOOGLE_MAPS_URL,
         ...ratingData,
       },
     ],

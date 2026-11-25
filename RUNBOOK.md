@@ -116,6 +116,12 @@ unknown columns and retries; other readers fall back to defaults.
   Google returns the rating and count for it but no review texts
   (`/api/google-place?key=…&id=<place id>` shows what comes back), so the
   site shows the rating, the count and the link only.
+  The listing is service-area only, with no address, location or photos in
+  Google's data, and it did not come up in any Dublin search through the
+  Places API (25 Nov) — even its own name — while every listing that does
+  has a public address. `/api/google-place?key=…&near=dublin&q=…` shows the
+  ranking. The site links it (`GOOGLE_MAPS_URL` in src/lib/googleProfile.ts:
+  schema sameAs/hasMap and the footer).
 - **Work gallery (22 Nov 2026):** newest photos first everywhere
   (`getGallery` orders by `created_at` desc — `sort_order` no longer decides).
   On the home page it is a moving strip (`Gallery.tsx`, `.gallery-track` in
