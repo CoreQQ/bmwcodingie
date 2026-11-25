@@ -19,7 +19,7 @@ export async function GET(req: Request) {
       headers: {
         'X-Goog-Api-Key': process.env.GOOGLE_PLACES_API_KEY || '',
         'X-Goog-FieldMask':
-          'displayName,rating,userRatingCount,reviews,googleMapsUri,businessStatus,primaryType,primaryTypeDisplayName,types,formattedAddress,websiteUri,nationalPhoneNumber,regularOpeningHours,pureServiceAreaBusiness,photos',
+          'displayName,rating,userRatingCount,reviews,googleMapsUri,businessStatus,primaryType,primaryTypeDisplayName,types,formattedAddress,websiteUri,nationalPhoneNumber,regularOpeningHours,pureServiceAreaBusiness,photos,location,plusCode,addressComponents,utcOffsetMinutes',
       },
       cache: 'no-store',
     });
@@ -34,6 +34,10 @@ export async function GET(req: Request) {
       regularOpeningHours?: { weekdayDescriptions?: string[] };
       pureServiceAreaBusiness?: boolean;
       photos?: unknown[];
+      location?: { latitude?: number; longitude?: number };
+      plusCode?: { globalCode?: string; compoundCode?: string };
+      addressComponents?: { longText?: string; types?: string[] }[];
+      utcOffsetMinutes?: number;
       displayName?: { text?: string };
       rating?: number;
       userRatingCount?: number;
@@ -57,6 +61,10 @@ export async function GET(req: Request) {
       phone: d.nationalPhoneNumber ? 'set' : 'missing',
       hours: d.regularOpeningHours?.weekdayDescriptions,
       photos: d.photos?.length ?? 0,
+      location: d.location,
+      plusCode: d.plusCode,
+      region: (d.addressComponents ?? []).map((c) => `${c.longText} (${(c.types ?? [])[0] ?? ''})`),
+      utcOffsetMinutes: d.utcOffsetMinutes,
       reviews: (d.reviews ?? []).map((r) => ({
         rating: r.rating,
         when: r.relativePublishTimeDescription,
